@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <!-- ═══ PRIMARY SEO ═══════════════════════════════════════════ -->
+  <title>Shanios Blog — Engineering, Linux & Open Source</title>
+  <meta name="description" id="meta-desc" content="Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.">
+  <meta name="keywords" content="Shanios, immutable Linux, atomic updates, rollback, open source OS, Arch Linux, Btrfs, zero telemetry, shani.dev">
+  <meta name="author" content="Shanios Team">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical" id="canonical-url" href="https://blog.shani.dev/">
+
+  <!-- ═══ OPEN GRAPH ══════════════════════════════════════════════ -->
+  <meta property="og:site_name" content="Shanios Blog">
+  <meta property="og:title" id="og-title" content="Shanios Blog — Engineering, Linux & Open Source">
+  <meta property="og:description" id="og-desc" content="Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.">
+  <meta property="og:type" id="og-type" content="website">
+  <meta property="og:url" id="og-url" content="https://blog.shani.dev/">
+  <meta property="og:image" id="og-image" content="https://shani.dev/assets/images/logo.svg">
+  <meta property="og:image:alt" content="Shanios logo">
+  <meta property="og:locale" content="en_US">
+
+  <!-- ═══ TWITTER / X CARD ═══════════════════════════════════════ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@shani8dev">
+  <meta name="twitter:title" id="tw-title" content="Shanios Blog — Engineering, Linux & Open Source">
+  <meta name="twitter:description" id="tw-desc" content="Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.">
+  <meta name="twitter:image" id="tw-image" content="https://shani.dev/assets/images/logo.svg">
+
+  <!-- ═══ STRUCTURED DATA (JSON-LD) ══════════════════════════════ -->
+  <script type="application/ld+json" id="ld-blogs">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Shanios Blog",
+    "url": "https://blog.shani.dev/",
+    "description": "The official Shanios Blog covering immutable Linux, atomic updates, OS engineering, product releases, and project news.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Shanios",
+      "url": "https://shani.dev",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://shani.dev/assets/images/logo.svg"
+      }
+    },
+    "inLanguage": "en-US"
+  }
+  </script>
+  <script type="application/ld+json" id="ld-org">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Shanios",
+    "url": "https://shani.dev",
+    "logo": "https://shani.dev/assets/images/logo.svg",
+    "sameAs": [
+      "https://www.linkedin.com/in/Shrinivasvkumbhar/",
+      "https://github.com/shani8dev"
+    ]
+  }
+  </script>
+
+  <!-- ═══ PERFORMANCE / PRECONNECT ═══════════════════════════════ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.prod.website-files.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <!-- ═══ FAVICON (using Shanios CDN logo) ═══════════════════════ -->
+  <link rel="icon" type="image/svg+xml" href="https://shani.dev/assets/images/logo.svg">
+
+  <!-- Theme applied before CSS paints to prevent flash -->
+  <script>
+    (function(){
+      var t = localStorage.getItem('blogs-theme') ||
+              (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Prism.js — code syntax highlighting (theme swaps with dark/light mode) -->
+  <link rel="stylesheet" id="prism-theme" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <!-- KaTeX — math rendering (must be synchronous, before script.js) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <!-- Markdown Parser & Sanitizer -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+  <!-- Prism.js Core + Languages -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hcl.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-nginx.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+</head>
+<body>
+  <noscript>
+    <div style="text-align:center;padding:4rem 2rem;font-family:sans-serif">
+      <strong>JavaScript is required to view this blog.</strong><br><br>
+      Visit <a href="https://shani.dev">shani.dev</a> to learn more about Shanios.
+    </div>
+  </noscript>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  
+  <header class="site-header">
+    <!-- ✨ TOP BAR: Shanios tagline -->
+    <div class="auspicious-bar">
+      <a href="https://shani.dev" target="_blank" rel="noopener" class="auspicious-text" aria-label="Visit Shanios">॥ श्री ॥</a>
+    </div>
+
+    <div class="header__inner container">
+      <a href="#/" class="logo logo--img" id="logo-link" aria-label="blog.shani.dev home">
+        <img src="https://shani.dev/assets/images/about.svg" alt="Shanios" class="logo__img" height="28">
+        <span class="logo__sub">blog</span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <a href="#/">Home</a>
+        <a href="#/?tag=Engineering">Engineering</a>
+        <a href="#/?tag=Release">Release</a>
+        <a href="#/?tag=Linux">Linux</a>
+        <a href="#/?tag=News">News</a>
+      </nav>
+      <div class="header__actions">
+        <button class="btn-icon" id="search-toggle" aria-label="Search (Ctrl+K)">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        <button class="btn-icon" id="theme-btn" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
+        <button class="btn-icon menu-btn" id="menu-toggle" aria-label="Menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <nav class="mobile-nav container" id="mobile-nav" aria-hidden="true">
+      <a href="#/">Home</a>
+      <a href="#/?tag=Engineering">Engineering</a>
+      <a href="#/?tag=Release">Release</a>
+      <a href="#/?tag=Linux">Linux</a>
+      <a href="#/?tag=News">News</a>
+    </nav>
+  </header>
+
+  <div class="search-bar" id="search-bar" aria-hidden="true">
+    <div class="search-bar__inner container">
+      <i class="fa-solid fa-magnifying-glass search-bar__icon"></i>
+      <input type="search" class="search" id="search-input" placeholder="Search posts…" aria-label="Search">
+      <button class="btn-icon search-bar__close" id="search-close" aria-label="Close search">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+  <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <main id="main-content">
+    <!-- INDEX VIEW -->
+    <section id="view-index">
+      <header class="hero container">
+        <div class="hero__grid">
+          <div>
+            <span class="badge" id="hero-eyebrow">Shanios</span>
+            <p class="hero__sub" id="hero-sub">Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.</p>
+            <h1 class="hero__title" id="hero-title">Deep-dives, releases &<br>the engineering behind Shanios.</h1>
+            <div class="meta" id="hero-meta"></div>
+          </div>
+          <aside class="hero__sidebar">
+            <h3 class="sidebar__title">Also reading</h3>
+            <ul class="sidebar__list" id="aside-list">
+              <li class="loading-text">Loading…</li>
+            </ul>
+          </aside>
+        </div>
+      </header>
+
+      <section class="posts container">
+        <div class="section-header">
+          <h2 class="section-header__title" id="section-title">Latest Posts</h2>
+          <div class="section-header__line"></div>
+        </div>
+        <div class="filters__bar" id="tag-bar"></div>
+        <div class="grid" id="posts-grid" role="list"></div>
+      </section>
+    </section>
+
+    <!-- POST VIEW -->
+    <section id="view-post" class="container" style="display:none">
+      <div class="reading-progress" id="reading-bar"></div>
+      <article id="post-article"></article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer__inner container">
+      <span class="footer__brand" id="footer-name">
+        <img src="https://shani.dev/assets/images/about.svg" alt="Shanios" class="logo__img logo__img--footer" height="20">
+        <span class="logo__sub">blog</span>
+      </span>
+      <nav class="footer__links" id="footer-links"></nav>
+      <span class="footer__copy">© <span data-current-year></span></span>
+    </div>
+  </footer>
+
+  <button class="to-top" id="back-top" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <script src="script.js"></script>
+</body>
+</html>
