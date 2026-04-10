@@ -4,8 +4,8 @@
  * Architecture: Config → State → DataLoader → Renderer → UI → Router
  */
 const CONFIG = {
-  GITHUB_USER: '',
-  GITHUB_REPO: '',
+  GITHUB_USER: 'shani8dev',
+  GITHUB_REPO: 'shani-blog',
   AUTHOR_NAME: 'Shrinivas Kumbhar',
   AUTHOR_INITIALS: 'SK',
   AUTHOR_ROLE: 'Shanios · shani.dev',
