@@ -115,21 +115,21 @@ const Utils = {
   },
   _youtube(id, caption) {
     const fig = caption ? `<figcaption>${caption}</figcaption>` : '';
-    return `<figure class="media-figure"><iframe src="https://www.youtube-nocookie.com/embed/${id}" title="YouTube video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>${fig}</figure>`;
+    return `<figure class="media-embed"><div class="media-embed__ratio"><iframe src="https://www.youtube-nocookie.com/embed/${id}" title="YouTube video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>${fig}</figure>`;
   },
   _vimeo(id, caption) {
     const fig = caption ? `<figcaption>${caption}</figcaption>` : '';
-    return `<figure class="media-figure"><iframe src="https://player.vimeo.com/video/${id}" title="Vimeo video" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>${fig}</figure>`;
+    return `<figure class="media-embed"><div class="media-embed__ratio"><iframe src="https://player.vimeo.com/video/${id}" title="Vimeo video" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>${fig}</figure>`;
   },
   _video(src, caption) {
     const fig  = caption ? `<figcaption>${caption}</figcaption>` : '';
     const ext  = src.split('?')[0].split('.').pop().toLowerCase();
     const mime = { mp4: 'video/mp4', webm: 'video/webm', ogg: 'video/ogg', mov: 'video/mp4' }[ext] || 'video/mp4';
-    return `<figure class="media-figure"><video controls preload="metadata" loading="lazy"><source src="${src}" type="${mime}">Your browser doesn't support HTML video. <a href="${src}">Download it</a>.</video>${fig}</figure>`;
+    return `<figure class="media-figure media-figure--video"><video controls preload="metadata" loading="lazy"><source src="${src}" type="${mime}">Your browser doesn't support HTML video. <a href="${src}">Download it</a>.</video>${fig}</figure>`;
   },
   _audio(src, caption) {
     const fig = caption ? `<figcaption>${caption}</figcaption>` : '';
-    return `<figure class="media-figure"><audio controls preload="metadata" loading="lazy"><source src="${src}" type="audio/mpeg">Your browser doesn't support HTML audio. <a href="${src}">Download it</a>.</audio>${fig}</figure>`;
+    return `<figure class="media-figure media-figure--audio"><audio controls preload="metadata" loading="lazy"><source src="${src}" type="audio/mpeg">Your browser doesn't support HTML audio. <a href="${src}">Download it</a>.</audio>${fig}</figure>`;
   },
   _image(src, rest) {
     const parts   = rest.split('|').map(s => s.trim());
@@ -137,7 +137,7 @@ const Utils = {
     const caption = parts[1] !== undefined ? parts[1] : alt;
     const wide    = parts[2] === 'wide';
     const fig     = caption ? `<figcaption>${caption}</figcaption>` : '';
-    return `<figure class="media-figure${wide ? ' wide' : ''}"><img src="${src}" alt="${alt}" loading="lazy">${fig}</figure>`;
+    return `<figure class="media-figure${wide ? ' media-figure--wide' : ''}"><img src="${src}" alt="${alt}" loading="lazy">${fig}</figure>`;
   },
   _processShortcodes(text) {
     Utils._mediaBlocks = {};
@@ -166,7 +166,7 @@ const Utils = {
     return text;
   },
   _restoreShortcodes(html) {
-    html = html.replace(/<p>(MBLOCK\d+END)<\/p>/g, (_, token) => Utils._mediaBlocks[token] || '');
+    html = html.replace(/<p>(MBLOCK_\d+_END)<\/p>/g, (_, token) => Utils._mediaBlocks[token] || '');
     html = html.replace(/MBLOCK\d+_END/g, token => Utils._mediaBlocks[token] || '');
     return html;
   },

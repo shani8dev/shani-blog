@@ -132,11 +132,14 @@ body {
 .grid {
   display: grid;
   gap: var(--space-5);
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   width: 100%;
   align-items: start;
 }
-@media (max-width: 768px) {
+@media (max-width: 960px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
   .grid { grid-template-columns: 1fr; }
 }
 .loading-spinner { grid-column: 1/-1; display: flex; justify-content: center; padding: var(--space-20) 0; }
