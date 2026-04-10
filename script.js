@@ -251,47 +251,65 @@ const DataLoader = {
       UI.showError('Open via a local server', 'Browsers block file:// fetches.', 'python3 -m http.server 8080');
       return null;
     }
-    let list;
-    try {
-      const r = await fetch('/posts/index.json');
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      list = await r.json();
-      if (!Array.isArray(list)) throw new Error('posts/index.json must be a JSON array');
-    } catch (e) {
-      UI.showError('Could not load posts/index.json', e.message, '[ "my-post.md" ]');
-      return null;
+
+    // ── Discover post filenames via GitHub Contents API ───────────
+    // No index.json required — the API lists the posts/ directory directly.
+    let filenames;
+    if (CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO) {
+      try {
+        const apiUrl = `https://api.github.com/repos/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/contents/posts`;
+        const r = await fetch(apiUrl, { headers: { 'Accept': 'application/vnd.github.v3+json' } });
+        if (!r.ok) throw new Error(`GitHub API HTTP ${r.status}`);
+        const entries = await r.json();
+        filenames = entries
+          .filter(e => e.type === 'file' && e.name.endsWith('.md') && e.name !== 'index.md')
+          .map(e => e.name);
+      } catch (e) {
+        UI.showError('Could not list posts from GitHub API', e.message, `https://api.github.com/repos/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/contents/posts`);
+        return null;
+      }
+    } else {
+      // ── Local dev fallback: try index.json if present ────────────
+      try {
+        const r = await fetch('/posts/index.json');
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const list = await r.json();
+        if (!Array.isArray(list)) throw new Error('posts/index.json must be a JSON array');
+        // Fast path: metadata objects
+        if (list.length > 0 && typeof list[0] === 'object' && list[0] !== null) {
+          return list
+            .map(item => ({
+              slug:           item.slug || '',
+              title:          item.title || 'Untitled',
+              excerpt:        item.excerpt || '',
+              date:           item.date   || new Date().toISOString().split('T')[0],
+              tag:            item.tag    || 'Post',
+              readTime:       item.readTime || '1 min',
+              paywalled:      item.paywalled === true || item.paywalled === 'true',
+              cover:          item.cover || '',
+              author:         item.author         || CONFIG.AUTHOR_NAME,
+              authorRole:     item.author_role    || CONFIG.AUTHOR_ROLE,
+              authorBio:      item.author_bio     || CONFIG.AUTHOR_BIO,
+              authorInitials: item.author_initials || (
+                (item.author || CONFIG.AUTHOR_NAME)
+                  .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+              ),
+            }))
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+        filenames = list.filter(n => typeof n === 'string' && n.endsWith('.md'));
+      } catch (e) {
+        UI.showError('Local dev: could not load posts/index.json', e.message, '[ "my-post.md" ]');
+        return null;
+      }
     }
 
-    // ── Fast path: index.json contains metadata objects ──────────
-    if (list.length > 0 && typeof list[0] === 'object' && list[0] !== null) {
-      return list
-        .map(item => ({
-          slug:           item.slug || '',
-          title:          item.title || 'Untitled',
-          excerpt:        item.excerpt || '',
-          date:           item.date   || new Date().toISOString().split('T')[0],
-          tag:            item.tag    || 'Post',
-          readTime:       item.readTime || '1 min',
-          paywalled:      item.paywalled === true || item.paywalled === 'true',
-          cover:          item.cover || '',
-          author:         item.author         || CONFIG.AUTHOR_NAME,
-          authorRole:     item.author_role    || CONFIG.AUTHOR_ROLE,
-          authorBio:      item.author_bio     || CONFIG.AUTHOR_BIO,
-          authorInitials: item.author_initials || (
-            (item.author || CONFIG.AUTHOR_NAME)
-              .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
-          ),
-        }))
-        .sort((a, b) => new Date(b.date) - new Date(a.date));
-    }
-
-    // ── Slow path: array of filenames → fetch all in parallel ────
+    // ── Fetch all discovered .md files in parallel ────────────────
     const base = (CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO)
       ? `https://raw.githubusercontent.com/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/main/posts`
       : '/posts';
 
-    const files = list.filter(n => typeof n === 'string' && n.endsWith('.md'));
-    const posts = await Promise.all(files.map(async name => {
+    const posts = await Promise.all(filenames.map(async name => {
       try {
         const r = await fetch(`${base}/${name}`);
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -731,6 +749,13 @@ const Router = {
     this.setQuery({ tag: tag || null, page: 1 });
   },
   getSlug() {
+    // Handle /posts/slug (raw GitHub Pages path) → silently rewrite to /post/slug
+    const rawMd = location.pathname.match(/^\/posts\/(.+?)(?:\.md)?$/);
+    if (rawMd) {
+      const slug = decodeURIComponent(rawMd[1]);
+      history.replaceState({}, '', `/post/${encodeURIComponent(slug)}`);
+      return slug;
+    }
     const m = location.pathname.match(/^\/post\/(.+)$/);
     return m ? decodeURIComponent(m[1]) : null;
   },
