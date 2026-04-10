@@ -253,7 +253,7 @@ const DataLoader = {
     }
     let list;
     try {
-      const r = await fetch('posts/index.json');
+      const r = await fetch('/posts/index.json');
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       list = await r.json();
       if (!Array.isArray(list)) throw new Error('posts/index.json must be a JSON array');
@@ -288,7 +288,7 @@ const DataLoader = {
     // ── Slow path: array of filenames → fetch all in parallel ────
     const base = (CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO)
       ? `https://raw.githubusercontent.com/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/main/posts`
-      : 'posts';
+      : '/posts';
 
     const files = list.filter(n => typeof n === 'string' && n.endsWith('.md'));
     const posts = await Promise.all(files.map(async name => {
@@ -337,7 +337,7 @@ const DataLoader = {
     if (AppState.postsCache[slug]) return AppState.postsCache[slug];
     const base = (CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO)
       ? `https://raw.githubusercontent.com/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/main/posts`
-      : 'posts';
+      : '/posts';
 
     const r = await fetch(`${base}/${slug}.md`);
     if (!r.ok) throw new Error(`HTTP ${r.status} — could not load ${slug}.md`);
