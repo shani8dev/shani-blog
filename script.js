@@ -1,8 +1,8 @@
 /**
- * blog.shani.dev Blog Engine — SPA, config-driven, zero-build.
- * Single index.html. History API routing: / = list, /post/slug = article.
- * Architecture: Config → State → DataLoader → Renderer → UI → Router
- */
+blog.shani.dev Blog Engine — SPA, config-driven, zero-build.
+Single index.html. History API routing: / = list, /post/slug = article.
+Architecture: Config → State → DataLoader → Renderer → UI → Router
+*/
 const CONFIG = {
   GITHUB_USER: 'shani8dev',
   GITHUB_REPO: 'shani-blog',
@@ -75,7 +75,6 @@ const Utils = {
   slugify: text => text.toLowerCase()
     .replace(/[^\w\s-]/g, '').trim()
     .replace(/[\s_]+/g, '-').replace(/-+/g, '-'),
-
   CALLOUT_TYPES: {
     NOTE:      { icon: 'fa-solid fa-circle-info',          cls: 'callout-note'      },
     TIP:       { icon: 'fa-solid fa-lightbulb',            cls: 'callout-tip'       },
@@ -83,7 +82,6 @@ const Utils = {
     CAUTION:   { icon: 'fa-solid fa-fire',                 cls: 'callout-caution'   },
     IMPORTANT: { icon: 'fa-solid fa-star',                 cls: 'callout-important' },
   },
-
   renderMath(html) {
     if (typeof katex === 'undefined') return html;
     const parts = html.split(/(<pre[\s\S]*?<\/pre>|<code[\s\S]*?<\/code>)/);
@@ -91,105 +89,56 @@ const Utils = {
       if (i % 2 === 1) return part;
       part = part.replace(/\$\$([\s\S]+?)\$\$/g, (_, expr) => {
         try { return katex.renderToString(expr.trim(), { displayMode: true, throwOnError: false }); }
-        catch { return _; }
+        catch { return ''; }
       });
       part = part.replace(/(?<!\$)\$([^\n$]+?)\$(?!\$)/g, (_, expr) => {
         try { return katex.renderToString(expr.trim(), { displayMode: false, throwOnError: false }); }
-        catch { return _; }
+        catch { return ''; }
       });
       return part;
     }).join('');
   },
-
   // =========================================================
   // MEDIA SHORTCODES
-  // Usage in .md files:
-  //   ::youtube[VIDEO_ID]
-  //   ::youtube[VIDEO_ID|Caption text]
-  //   ::vimeo[VIDEO_ID|Caption]
-  //   ::video[https://…/file.mp4|Caption]
-  //   ::video[../assets/demo.mp4]
-  //   ::audio[https://…/file.mp3|Caption]
-  //   ::image[https://…/photo.jpg|Alt text|Caption|wide]
-  //   Standard MD images still work: ![alt](url)
-  //
-  // How it works: shortcodes are replaced with opaque placeholder tokens
-  // BEFORE markdown parsing, then the real HTML is injected AFTER DOMPurify
-  // (which would strip <iframe> and <video> if they went through it).
   // =========================================================
   _mediaBlocks: {},
-
   _mediaToken(html) {
     const key = `MBLOCK_${Object.keys(Utils._mediaBlocks).length}_END`;
     Utils._mediaBlocks[key] = html;
-    return '\n\n' + key + '\n\n'; // blank lines so marked wraps it as a paragraph, not inline
+    return '\n\n' + key + '\n\n';
   },
-
   _cap: raw => {
     const pipe = raw.lastIndexOf('|');
     return pipe === -1
       ? { val: raw.trim(), caption: '' }
       : { val: raw.slice(0, pipe).trim(), caption: raw.slice(pipe + 1).trim() };
   },
-
   _youtube(id, caption) {
     const fig = caption ? `<figcaption>${caption}</figcaption>` : '';
-    return `<figure class="media-embed media-embed--youtube">
-  <div class="media-embed__ratio">
-    <iframe src="https://www.youtube-nocookie.com/embed/${id}"
-      title="${caption || 'YouTube video'}"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowfullscreen loading="lazy"></iframe>
-  </div>${fig}
-</figure>`;
+    return `<figure class="media-figure"><iframe src="https://www.youtube-nocookie.com/embed/${id}" title="YouTube video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>${fig}</figure>`;
   },
-
   _vimeo(id, caption) {
     const fig = caption ? `<figcaption>${caption}</figcaption>` : '';
-    return `<figure class="media-embed media-embed--vimeo">
-  <div class="media-embed__ratio">
-    <iframe src="https://player.vimeo.com/video/${id}?dnt=1"
-      title="${caption || 'Vimeo video'}"
-      allow="autoplay; fullscreen; picture-in-picture"
-      allowfullscreen loading="lazy"></iframe>
-  </div>${fig}
-</figure>`;
+    return `<figure class="media-figure"><iframe src="https://player.vimeo.com/video/${id}" title="Vimeo video" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>${fig}</figure>`;
   },
-
   _video(src, caption) {
     const fig  = caption ? `<figcaption>${caption}</figcaption>` : '';
     const ext  = src.split('?')[0].split('.').pop().toLowerCase();
     const mime = { mp4: 'video/mp4', webm: 'video/webm', ogg: 'video/ogg', mov: 'video/mp4' }[ext] || 'video/mp4';
-    return `<figure class="media-figure media-figure--video">
-  <video controls preload="metadata" playsinline>
-    <source src="${src}" type="${mime}">
-    Your browser doesn't support HTML video. <a href="${src}">Download it</a>.
-  </video>${fig}
-</figure>`;
+    return `<figure class="media-figure"><video controls preload="metadata" loading="lazy"><source src="${src}" type="${mime}">Your browser doesn't support HTML video. <a href="${src}">Download it</a>.</video>${fig}</figure>`;
   },
-
   _audio(src, caption) {
     const fig = caption ? `<figcaption>${caption}</figcaption>` : '';
-    return `<figure class="media-figure media-figure--audio">
-  <audio controls preload="metadata">
-    <source src="${src}">
-    Your browser doesn't support HTML audio. <a href="${src}">Download it</a>.
-  </audio>${fig}
-</figure>`;
+    return `<figure class="media-figure"><audio controls preload="metadata" loading="lazy"><source src="${src}" type="audio/mpeg">Your browser doesn't support HTML audio. <a href="${src}">Download it</a>.</audio>${fig}</figure>`;
   },
-
   _image(src, rest) {
-    // rest = "alt | caption | wide"
     const parts   = rest.split('|').map(s => s.trim());
     const alt     = parts[0] || '';
     const caption = parts[1] !== undefined ? parts[1] : alt;
     const wide    = parts[2] === 'wide';
     const fig     = caption ? `<figcaption>${caption}</figcaption>` : '';
-    return `<figure class="media-figure${wide ? ' media-figure--wide' : ''}">
-  <img src="${src}" alt="${alt}" loading="lazy">${fig}
-</figure>`;
+    return `<figure class="media-figure${wide ? ' wide' : ''}"><img src="${src}" alt="${alt}" loading="lazy">${fig}</figure>`;
   },
-
   _processShortcodes(text) {
     Utils._mediaBlocks = {};
     text = text.replace(/::youtube\[([^\]]+)\]/g, (_, raw) => {
@@ -216,19 +165,14 @@ const Utils = {
     });
     return text;
   },
-
   _restoreShortcodes(html) {
-    // Tokens may be wrapped in <p> tags by marked — unwrap them
-    html = html.replace(/<p>(MBLOCK_\d+_END)<\/p>/g, (_, token) => Utils._mediaBlocks[token] || '');
-    html = html.replace(/MBLOCK_\d+_END/g, token => Utils._mediaBlocks[token] || '');
+    html = html.replace(/<p>(MBLOCK\d+END)<\/p>/g, (_, token) => Utils._mediaBlocks[token] || '');
+    html = html.replace(/MBLOCK\d+_END/g, token => Utils._mediaBlocks[token] || '');
     return html;
   },
-
   safeMarkdown: text => {
     if (typeof marked !== 'undefined') {
-      // 1. Replace shortcodes with opaque tokens before the MD parser sees them
       text = Utils._processShortcodes(text);
-
       const renderer = new marked.Renderer();
 
       renderer.code = (code, lang) => {
@@ -254,7 +198,6 @@ const Utils = {
         return `<a href="${href}"${t}${ext}>${linkText}</a>`;
       };
 
-      // Standard MD images — lazy load, figcaption from alt or title
       renderer.image = (src, title, alt) => {
         const t       = title ? ` title="${title}"` : '';
         const caption = alt || title;
@@ -268,21 +211,14 @@ const Utils = {
           const type = match[1].toUpperCase();
           const cfg  = Utils.CALLOUT_TYPES[type] || Utils.CALLOUT_TYPES.NOTE;
           const body = match[2].replace(/<\/p>$/, '').trim();
-          return `<div class="callout ${cfg.cls}" role="note">
-  <div class="callout__title"><i class="${cfg.icon}" aria-hidden="true"></i>${type}</div>
-  <div class="callout__body">${body}</div>
-</div>\n`;
+          return `<div class="callout ${cfg.cls}" role="note"><i class="${cfg.icon}" aria-hidden="true"></i><strong>${type}</strong>${body}</div>\n`;
         }
         return `<blockquote>${quote}</blockquote>\n`;
       };
 
-      // 2. Parse markdown (tokens pass through untouched)
       let raw = marked.parse(text, { renderer, gfm: true, breaks: false });
-
-      // 3. Math
       raw = Utils.renderMath(raw);
 
-      // 4. Sanitise (tokens are plain text — DOMPurify won't touch them)
       if (typeof DOMPurify !== 'undefined') {
         raw = DOMPurify.sanitize(raw, {
           ADD_TAGS: ['pre', 'code', 'span', 'video', 'audio', 'source', 'iframe',
@@ -299,20 +235,15 @@ const Utils = {
         });
       }
 
-      // 5. Inject shortcode HTML after sanitisation
       return Utils._restoreShortcodes(raw);
     }
     return text.replace(/\n/g, '<br>');
   },
-
   readTime: body => `${Math.max(1, Math.ceil(body.trim().split(/\s+/).length / 200))} min`
 };
 
 // =========================================
 // 3. DATA LOADER
-//    Fast path : posts/index.json is an array of metadata objects
-//    Slow path : posts/index.json is an array of .md filenames → fetch each
-//    Body fetch: on-demand, cached in AppState.postsCache
 // =========================================
 const DataLoader = {
   async load() {
@@ -320,7 +251,6 @@ const DataLoader = {
       UI.showError('Open via a local server', 'Browsers block file:// fetches.', 'python3 -m http.server 8080');
       return null;
     }
-
     let list;
     try {
       const r = await fetch('posts/index.json');
@@ -388,12 +318,12 @@ const DataLoader = {
           authorRole:     fm.author_role    || CONFIG.AUTHOR_ROLE,
           authorBio:      fm.author_bio     || CONFIG.AUTHOR_BIO,
           authorInitials: fm.author_initials || (
-            (fm.author || CONFIG.AUTHOR_NAME)
+             (fm.author || CONFIG.AUTHOR_NAME)
               .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
           ),
           body
         };
-        AppState.postsCache[slug] = post; // cache immediately
+        AppState.postsCache[slug] = post;
         return post;
       } catch (e) {
         console.error(`Failed: ${name}`, e);
@@ -403,11 +333,8 @@ const DataLoader = {
 
     return posts.filter(Boolean).sort((a, b) => new Date(b.date) - new Date(a.date));
   },
-
-  // On-demand body fetch (used with fast-path metadata-only index)
   async fetchBody(slug) {
     if (AppState.postsCache[slug]) return AppState.postsCache[slug];
-
     const base = (CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO)
       ? `https://raw.githubusercontent.com/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/main/posts`
       : 'posts';
@@ -427,7 +354,6 @@ const DataLoader = {
 // 4. RENDERER
 // =========================================
 const Renderer = {
-
   applyBranding() {
     document.title = `Shanios Blog — Engineering, Linux & Open Source`;
     document.getElementById('canonical-url')?.setAttribute('href', 'https://blog.shani.dev/');
@@ -443,7 +369,6 @@ const Renderer = {
       .join('');
     document.querySelectorAll('[data-current-year]').forEach(el => el.textContent = new Date().getFullYear());
   },
-
   renderHero(posts) {
     if (!posts.length) return;
     const p = posts[0];
@@ -454,7 +379,6 @@ const Renderer = {
     titleEl.innerHTML = `${words.join(' ')} <em>${last}</em>`;
     titleEl.onclick = () => Router.go(p.slug);
     titleEl.style.cursor = 'pointer';
-
     Utils.qs('#hero-sub').textContent = CONFIG.HERO_SUB;
     Utils.qs('#hero-meta').innerHTML = `
       <span class="avatar">${p.authorInitials}</span>
@@ -470,7 +394,7 @@ const Renderer = {
     if (existing) existing.remove();
     const link = document.createElement('button');
     link.className = 'hero-link';
-    link.textContent = 'Read post';
+    link.textContent  = 'Read post';
     link.onclick = () => Router.go(p.slug);
     Utils.qs('#hero-meta').after(link);
 
@@ -493,7 +417,6 @@ const Renderer = {
       btn.addEventListener('click', () => Router.go(btn.dataset.slug));
     });
   },
-
   renderPosts(posts, showFeatured = false) {
     const grid = Utils.qs('#posts-grid');
     if (!posts.length) {
@@ -520,7 +443,6 @@ const Renderer = {
         </div>
       </article>`;
     }).join('');
-
     grid.querySelectorAll('.card').forEach(card => {
       const idx = parseInt(card.dataset.idx);
       card.setAttribute('tabindex', '0');
@@ -531,8 +453,6 @@ const Renderer = {
       });
     });
   },
-
-  // ── PAGINATION ────────────────────────────────────────────────
   renderPagination(total, perPage, currentPage) {
     let container = Utils.qs('#pagination-container');
     if (!container) {
@@ -541,16 +461,13 @@ const Renderer = {
       const grid = Utils.qs('#posts-grid');
       if (grid && grid.parentNode) grid.parentNode.insertBefore(container, grid.nextSibling);
     }
-
     const totalPages = Math.ceil(total / perPage);
     if (totalPages <= 1) { container.innerHTML = ''; return; }
 
-    // Page numbers: always include 1, totalPages, and a window of ±1 around current
     const pageSet = new Set([1, totalPages]);
     for (let i = Math.max(1, currentPage - 1); i <= Math.min(totalPages, currentPage + 1); i++) pageSet.add(i);
     const sorted = [...pageSet].sort((a, b) => a - b);
 
-    // Insert ellipsis markers between non-contiguous runs
     const items = [];
     let prev = 0;
     for (const p of sorted) {
@@ -561,9 +478,9 @@ const Renderer = {
 
     let html = `<nav class="pagination" aria-label="Post pages">`;
     html += `<button class="pag-btn${currentPage === 1 ? ' disabled' : ''}"
-               data-page="${currentPage - 1}"
-               aria-label="Previous page"
-               ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>`;
+              data-page="${currentPage - 1}"
+              aria-label="Previous page"
+              ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>`;
 
     for (const item of items) {
       if (item === '…') {
@@ -576,9 +493,9 @@ const Renderer = {
     }
 
     html += `<button class="pag-btn${currentPage === totalPages ? ' disabled' : ''}"
-               data-page="${currentPage + 1}"
-               aria-label="Next page"
-               ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
+              data-page="${currentPage + 1}"
+              aria-label="Next page"
+              ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
     html += `</nav>`;
 
     container.innerHTML = html;
@@ -588,19 +505,15 @@ const Renderer = {
         const newPage = parseInt(btn.dataset.page);
         if (!newPage) return;
         Router.setQuery({ tag: AppState.filter === 'all' ? null : AppState.filter, page: newPage });
-        // Scroll back up to the posts section
         Utils.qs('#posts-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
   },
-
-  // ── FULL POST ─────────────────────────────────────────────────
   renderPost(post) {
     const app = Utils.qs('#post-article');
     const html = Utils.safeMarkdown(post.body);
     const paywalled = post.paywalled;
     const date = Utils.fmtDate(post.date);
-
     document.title = `${post.title} — Shanios Blog`;
     const postUrl = `https://blog.shani.dev/post/${post.slug}`;
     const defaultOgImg = 'https://shani.dev/assets/images/logo.svg';
@@ -632,9 +545,9 @@ const Renderer = {
     if (ldOrg) ldOrg.textContent = JSON.stringify({
       "@context": "https://schema.org", "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home",     "item": "https://blog.shani.dev/" },
-        { "@type": "ListItem", "position": 2, "name": post.tag,   "item": `https://blog.shani.dev/?tag=${post.tag}` },
-        { "@type": "ListItem", "position": 3, "name": post.title, "item": postUrl }
+        { "@type": "ListItem", "position": 1, "name": "Home",      "item": "https://blog.shani.dev/" },
+        { "@type": "ListItem", "position": 2, "name": post.tag,    "item": `https://blog.shani.dev/?tag=${post.tag}` },
+        { "@type": "ListItem", "position": 3, "name": post.title,  "item": postUrl }
       ]
     });
 
@@ -646,15 +559,15 @@ const Renderer = {
       const free  = blocks.slice(0, 3).map(n => n.outerHTML).join('');
       const gated = blocks.slice(3).map(n => n.outerHTML).join('');
       content = `<div class="paywall-wrap"><div class="post-body paywall-fade">${free}${gated}</div></div>
-        <div class="paywall-gate"><div class="paywall-card">
-          <i class="fa-solid fa-lock paywall-icon"></i>
-          <h3>Members only</h3>
-          <p>This post is for members. Unlock full access instantly.</p>
-          <div class="paywall-actions">
-            <button class="btn primary" id="unlock-btn"><i class="fa-solid fa-unlock"></i> Unlock Access</button>
-            <button class="btn" id="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to posts</button>
-          </div>
-        </div></div>`;
+         <div class="paywall-gate"><div class="paywall-card">
+           <i class="fa-solid fa-lock paywall-icon"></i>
+           <h3>Members only</h3>
+           <p>This post is for members. Unlock full access instantly.</p>
+           <div class="paywall-actions">
+             <button class="btn primary" id="unlock-btn"><i class="fa-solid fa-unlock"></i> Unlock Access</button>
+             <button class="btn" id="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to posts</button>
+           </div>
+         </div></div>`;
     } else {
       content = `<div class="post-body">${html}</div>`;
     }
@@ -706,24 +619,23 @@ const Renderer = {
       localStorage.setItem(`liked:${post.slug}`, is ? '1' : '0');
     });
 
-    // Prev / Next post navigation
     const navEl = app.querySelector('#post-nav-btns');
     if (navEl && AppState.posts.length) {
       const idx  = AppState.posts.findIndex(p => p.slug === post.slug);
-      const prev = idx < AppState.posts.length - 1 ? AppState.posts[idx + 1] : null; // older
-      const next = idx > 0                          ? AppState.posts[idx - 1] : null; // newer
+      const prev = idx < AppState.posts.length - 1 ? AppState.posts[idx + 1] : null;
+      const next = idx > 0 ? AppState.posts[idx - 1] : null;
       navEl.innerHTML = `
         ${prev ? `<button class="post-nav-btn" id="nav-prev">
-          <div class="nav-label"><i class="fa-solid fa-arrow-left"></i> Older</div>
-          <div class="nav-title">${prev.title}</div>
-        </button>` : `<button class="post-nav-btn" onclick="Router.back()">
-          <div class="nav-label"><i class="fa-solid fa-arrow-left"></i> Back</div>
-          <div class="nav-title">Browse all posts</div>
-        </button>`}
+           <div class="nav-label"><i class="fa-solid fa-arrow-left"></i> Older</div>
+           <div class="nav-title">${prev.title}</div>
+         </button>` : `<button class="post-nav-btn" onclick="Router.back()">
+           <div class="nav-label"><i class="fa-solid fa-arrow-left"></i> Back</div>
+           <div class="nav-title">Browse all posts</div>
+         </button>`}
         ${next ? `<button class="post-nav-btn post-nav-btn--right" id="nav-next">
-          <div class="nav-label">Newer <i class="fa-solid fa-arrow-right"></i></div>
-          <div class="nav-title">${next.title}</div>
-        </button>` : '<div></div>'}`;
+           <div class="nav-label">Newer <i class="fa-solid fa-arrow-right"></i></div>
+           <div class="nav-title">${next.title}</div>
+         </button>` : '<div></div>'}`;
       navEl.querySelector('#nav-prev')?.addEventListener('click', () => Router.go(prev.slug));
       navEl.querySelector('#nav-next')?.addEventListener('click', () => Router.go(next.slug));
     }
@@ -735,7 +647,6 @@ const Renderer = {
     });
     app.querySelector('#back-btn')?.addEventListener('click', () => Router.back());
 
-    // Code copy buttons
     app.querySelectorAll('pre').forEach(pre => {
       const wrap = document.createElement('div');
       wrap.className = 'code-block';
@@ -765,7 +676,6 @@ const Renderer = {
       wrap.appendChild(pre);
     });
 
-    // Table: scrollable + CSV copy
     app.querySelectorAll('.post-body table, .paywall-fade table').forEach(table => {
       const wrap = document.createElement('div');
       wrap.className = 'table-wrap';
@@ -799,7 +709,6 @@ const Renderer = {
     if (typeof Prism !== 'undefined') Prism.highlightAll();
     window.scrollTo({ top: 0, behavior: 'instant' });
 
-    // In-page anchor links — scroll only, don't trigger router
     app.querySelectorAll('a[href^="#"]').forEach(a => {
       a.addEventListener('click', e => {
         e.preventDefault();
@@ -811,7 +720,7 @@ const Renderer = {
 };
 
 // =========================================
-// 5. ROUTER — history API (real URL paths)
+// 5. ROUTER
 // =========================================
 const Router = {
   go(slug) {
@@ -824,7 +733,7 @@ const Router = {
   getSlug() {
     const m = location.pathname.match(/^\/post\/(.+)$/);
     return m ? decodeURIComponent(m[1]) : null;
-  }
+  },
   getParams() {
     const qs = new URLSearchParams(location.search);
     return {
@@ -839,15 +748,12 @@ const Router = {
     history.pushState({}, '', qs.toString() ? `/?${qs.toString()}` : '/');
     this.render();
   },
-
   async render() {
     const slug    = this.getSlug();
     const indexEl = document.getElementById('view-index');
     const postEl  = document.getElementById('view-post');
     const readBar = document.getElementById('reading-bar');
-
     if (slug) {
-      // ── POST VIEW ──────────────────────────────────────────────
       indexEl.style.display = 'none';
       postEl.style.display  = '';
       if (readBar) readBar.style.display = '';
@@ -878,12 +784,10 @@ const Router = {
           </div>`;
       }
     } else {
-      // ── LIST VIEW ─────────────────────────────────────────────
       indexEl.style.display = '';
       postEl.style.display  = 'none';
       if (readBar) readBar.style.display = 'none';
 
-      // Restore list-view meta
       document.title = `Shanios Blog — Engineering, Linux & Open Source`;
       document.getElementById('canonical-url')?.setAttribute('href', 'https://blog.shani.dev/');
       document.getElementById('og-type')?.setAttribute('content', 'website');
@@ -895,9 +799,8 @@ const Router = {
 
       const { tag, page } = this.getParams();
       AppState.filter = tag || 'all';
-      AppState.pagination.page = page;
+      AppState.pagination.page = page; 
 
-      // Nav active state
       document.querySelectorAll('.nav a, .mobile-nav a').forEach(a => {
         const href = a.getAttribute('href');
         const hrefTag = href?.includes('?tag=') ? href.split('?tag=')[1].toLowerCase() : null;
@@ -905,12 +808,10 @@ const Router = {
         a.classList.toggle('active', hrefTag === activeTag || (!hrefTag && !tag && href === '/'));
       });
 
-      // Chip active state
       document.querySelectorAll('.chip').forEach(chip =>
         chip.classList.toggle('active', chip.dataset.tag.toLowerCase() === AppState.filter.toLowerCase())
       );
 
-      // Filter + search (case-insensitive tag match)
       let filtered = AppState.filter === 'all'
         ? AppState.posts
         : AppState.posts.filter(p => p.tag.toLowerCase() === AppState.filter.toLowerCase());
@@ -924,7 +825,6 @@ const Router = {
         );
       }
 
-      // Paginate
       const { perPage } = AppState.pagination;
       const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
       if (AppState.pagination.page > totalPages) AppState.pagination.page = totalPages;
@@ -951,12 +851,7 @@ const UI = {
   showError(title, detail, code) {
     const grid = Utils.qs('#posts-grid');
     if (!grid) return;
-    grid.innerHTML = `
-      <div class="empty-state">
-        <i class="fa-solid fa-triangle-exclamation empty-icon" style="color:var(--color-error)"></i>
-        <h3>${title}</h3><p>${detail}</p>
-        ${code ? `<pre>${code}</pre>` : ''}
-      </div>`;
+    grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-triangle-exclamation empty-icon" style="color:var(--color-error)"></i><h3>${title}</h3><p>${detail}</p>${code ? `<pre><code>${code}</code></pre>` : ''}</div>`;
   },
   initTheme() {
     const btn  = Utils.qs('#theme-btn');
@@ -967,7 +862,7 @@ const UI = {
       document.documentElement.setAttribute('data-theme', t);
       AppState.theme = t;
       localStorage.setItem('blogs-theme', t);
-      if (icon) icon.className = t === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      if (icon) icon.className = t === 'dark' ? 'fa-solid fa-sun'  : 'fa-solid fa-moon';
       const prismLink = document.getElementById('prism-theme');
       if (prismLink) prismLink.href = t === 'dark' ? PRISM_DARK : PRISM_LIGHT;
     };
@@ -1015,8 +910,8 @@ const UI = {
     input?.addEventListener('input', e => {
       AppState.search = e.target.value.toLowerCase().trim();
       if (Router.getSlug()) return;
-      AppState.pagination.page = 1; // reset to page 1 on every search keystroke
-      Router.render();
+      AppState.pagination.page = 1;
+      Router.render(); 
       const live = Utils.qs('#search-live');
       if (live && AppState.search) {
         const q = AppState.search;
@@ -1024,9 +919,9 @@ const UI = {
           p.title.toLowerCase().includes(q) ||
           p.excerpt.toLowerCase().includes(q) ||
           p.tag.toLowerCase().includes(q) ||
-          (AppState.postsCache[p.slug]?.body || '').toLowerCase().includes(q)
+          (AppState.postsCache[p.slug]?.body || '').toLowerCase().includes(q) 
         ).length;
-        live.textContent = `${count} result${count !== 1 ? 's' : ''} for ${AppState.search}`;
+        live.textContent = `${count} result${count !== 1 ? 's' : ''} for "${AppState.search}"`;
       } else if (live) {
         live.textContent = '';
       }
@@ -1050,9 +945,7 @@ const UI = {
     if (!bar) return;
     const tags = ['all', ...new Set(AppState.posts.map(p => p.tag))];
     bar.innerHTML = tags.map(t =>
-      `<button class="chip ${t === AppState.filter ? 'active' : ''}" data-tag="${t}">
-        ${t !== 'all' ? `<i class="${TAG_ICONS[t] || 'fa-solid fa-tag'}" aria-hidden="true"></i> ` : ''}${t === 'all' ? 'All' : t}
-      </button>`
+      `<button class="chip ${t === AppState.filter ? 'active' : ''}" data-tag="${t}">${t !== 'all' ? '<i class="fa-solid fa-tag"></i> ' : ''}${t === 'all' ? 'All' : t}</button>`
     ).join('');
     bar.addEventListener('click', e => {
       const btn = e.target.closest('.chip');
@@ -1080,12 +973,10 @@ const UI = {
     }, { passive: true });
   },
   initLogoLink() {
-    // Intercept all internal nav links to use pushState (no page reload)
     document.addEventListener('click', e => {
       const a = e.target.closest('a[href]');
       if (!a) return;
       const href = a.getAttribute('href');
-      // Only intercept same-origin relative paths (not external, not anchors)
       if (!href || href.startsWith('http') || href.startsWith('//') || href.startsWith('#')) return;
       e.preventDefault();
       if (location.pathname + location.search !== href) {
@@ -1103,7 +994,7 @@ const UI = {
       navigator.clipboard.writeText(url).then(() => {
         const toast = Object.assign(document.createElement('div'), {
           className: 'toast',
-          innerHTML: '<i class="fa-solid fa-check"></i> Link copied'
+          innerHTML: '✓ Link copied'
         });
         document.body.appendChild(toast);
         setTimeout(() => toast.classList.add('show'), 10);
@@ -1124,10 +1015,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   UI.initReadingBar();
   UI.initSearch();
   UI.initLogoLink();
-
   const loadGrid = Utils.qs('#posts-grid');
   if (loadGrid) loadGrid.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-
   const posts = await DataLoader.load();
   if (posts) {
     AppState.posts = posts;
@@ -1135,6 +1024,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     UI.initFilters();
     Router.render();
   }
-
   window.addEventListener('popstate', () => Router.render());
 });
