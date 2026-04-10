@@ -1,1158 +1,1109 @@
-/* =========================================
-blog.shani.dev — Technical Editorial
-Design: Dark-first, coral/violet palette, Playfair Display
-headings, IBM Plex Mono for code/meta, DM Sans UI.
-Inspired by: The Verge, Stripe Press, Wired editorial.
-========================================= */
-/* =========================================
-0. FONTS
-========================================= */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
-/* =========================================
-RESET
-========================================= */
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { font-size: 16px; scroll-behavior: smooth; text-size-adjust: 100%; }
-body { min-height: 100vh; display: flex; flex-direction: column; }
-img { max-width: 100%; height: auto; display: block; }
-a { text-decoration: none; color: inherit; transition: color 0.2s ease, opacity 0.2s ease; }
-button { cursor: pointer; border: none; background: none; font: inherit; }
-ul, ol { list-style: none; }
-button, input, select, textarea { font: inherit; }
-/* Keyboard focus rings — WCAG 2.1 AA */
-:focus-visible {
-outline: 2px solid var(--color-accent);
-outline-offset: 3px;
-border-radius: var(--radius-sm);
-}
-:focus:not(:focus-visible) { outline: none; }
-/* Accent-tinted text selection */
-::selection { background: var(--color-accent-bg); color: var(--color-text); }
-/* =========================================
-2. DESIGN TOKENS — dark-first, coral/violet palette
-========================================= */
-:root {
-/* 🌑 Warm Charcoal — optimized for coral accent & long reading */
---color-bg:          #161514;
---color-bg-alt:      #1e1d1b;
---color-bg-elevated: #262422;
---color-bg-card:     #1b1a18;
-/* Neutral text on dark green-tinted base */
---color-text:        #f5f4f2;
---color-text-muted:  #b0aaa4;
---color-text-faint:  #8a8580;
---color-border:      #2e2c29;
---color-border-hover:#4a4641;
-/* Coral — vibrant, energetic, modern */
---color-accent:      #ff7f50;
---color-accent-hover:#ff6a33;
---color-accent-bg:   rgba(255, 127, 80, 0.12);
---color-accent-text: #161514;
-/* Violet — secondary accent */
---color-secondary:      #7c3aed;
---color-secondary-bg:   rgba(124, 58, 237, 0.1);
-/* Like / reaction — rose */
---color-like:           #e05c7a;
---color-like-bg:        rgba(224, 92, 122, 0.1);
-/* Misc */
---color-video-bg:       #000000;
---color-callout-note:   #3b82f6;
-/* Status */
---color-success:     #3dba7e;
---color-warning:     #e8a215;
---color-error:       #e85555;
-/* Fonts & Spacing */
---font-display: 'Playfair Display', Georgia, serif;
---font-sans:    'DM Sans', system-ui, sans-serif;
---font-mono:    'IBM Plex Mono', 'JetBrains Mono', Consolas, monospace;
---space-1: 0.25rem; --space-2: 0.5rem;  --space-3: 0.75rem; --space-4: 1rem;
---space-5: 1.25rem; --space-6: 1.5rem;  --space-8: 2rem;    --space-10: 2.5rem;
---space-12: 3rem;   --space-16: 4rem;   --space-20: 5rem;
---container: 1160px;
---max-prose: 1160px;
---radius-sm:  3px;
---radius-md:  6px;
---radius-lg:  12px;
---shadow-hover: 0 8px 36px rgba(22, 21, 20, 0.65) ;
---ease: cubic-bezier(0.4, 0, 0.2, 1);
---header-h: 82px; /* sticky header: 58px bar + ~24px auspicious */
-}
-/* Light mode */
-html[data-theme="light"] {
-/* ☀️ Warm Editorial — seamless pair for Warm Charcoal dark */
---color-bg:          #faf9f7;
---color-bg-alt:      #f2f0ec;
---color-bg-elevated: #eae8e3;
---color-bg-card:     #ffffff;
---color-text:        #1c1b19;
---color-text-muted:  #5a5752;
---color-text-faint:  #8a867f;
---color-border:      #e2dfd8;
---color-border-hover:#c8c4bb;
-/* Coral — slightly deeper for light bg contrast */
---color-accent:      #e85d2a;
---color-accent-hover:#d44e1e;
---color-accent-bg:   rgba(232, 93, 42, 0.08);
---color-accent-text: #ffffff;
---color-secondary:      #6d28d9;
---color-secondary-bg:   rgba(109, 40, 217, 0.08);
---shadow-hover: 0 8px 36px rgba(28, 27, 25, 0.08);
-}
-/* =========================================
-3. BASE
-========================================= */
-body {
-font-family: var(--font-sans);
-font-weight: 400;
-color: var(--color-text);
-background: var(--color-bg);
-line-height: 1.6;
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
-}
-/* =========================================
-4. LAYOUT
-========================================= */
-.container { width: 100%; max-width: var(--container); margin: 0 auto; padding: 0 var(--space-8); }
-@media (max-width: 600px) { .container { padding: 0 var(--space-5); } }
-.skip-link {
-position: absolute; top: -50px; left: var(--space-4);
-background: var(--color-accent); color: var(--color-accent-text);
-padding: var(--space-2) var(--space-4); border-radius: var(--radius-sm);
-z-index: 1000; transition: top 0.2s ease; font-size: 0.85rem;
-}
-.skip-link:focus { top: var(--space-4); outline: none; }
-.grid {
-display: grid;
-gap: var(--space-5);
-grid-template-columns: repeat(3, 1fr);
-width: 100%;
-align-items: start;
-}
-@media (max-width: 960px) {
-.grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 600px) {
-.grid { grid-template-columns: 1fr; }
-}
-.loading-spinner { grid-column: 1/-1; display: flex; justify-content: center; padding: var(--space-20) 0; }
-.spinner {
-width: 22px; height: 22px;
-border: 1.5px solid var(--color-border);
-border-top-color: var(--color-accent);
-border-radius: 50%;
-animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-/* =========================================
-5. HEADER
-========================================= */
-.site-header {
-position: sticky; top: 0; z-index: 100;
-background: var(--color-bg); /* fallback for browsers without color-mix */
-background: color-mix(in srgb, var(--color-bg) 88%, transparent);
-border-bottom: 1px solid var(--color-border);
-backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-}
-/* ✨ TOP BAR — brand accent strip */
-.auspicious-bar {
-display: flex; justify-content: center;
-padding: var(--space-1) 0;
-background: var(--color-bg-alt); border-bottom: 1px solid var(--color-border);
-font-family: var(--font-display); font-size: 0.85rem; letter-spacing: 0.12em;
-}
-.auspicious-text {
-color: var(--color-accent); font-weight: 700; opacity: 0.9;
-transition: opacity 0.2s var(--ease);
-text-decoration: none;
-}
-.auspicious-bar:hover .auspicious-text { opacity: 1; }
-html[data-theme="light"] .auspicious-text { color: var(--color-accent); opacity: 0.85; }
-@media (max-width: 600px) { .auspicious-bar { padding: var(--space-1) 0; font-size: 0.75rem; } }
-@media print { .auspicious-bar { display: none; } }
-.header__inner { display: flex; align-items: center; justify-content: space-between; height: 58px; gap: var(--space-6); }
-.logo {
-display: inline-flex; align-items: center; gap: var(--space-2);
-font-family: var(--font-display); font-weight: 800; font-size: 1.15rem;
-letter-spacing: -0.01em; color: var(--color-text); transition: opacity 0.15s;
-}
-.logo:hover { opacity: 0.85; }
-.logo::after { content: none; }
-.logo__img {
-height: 28px; width: auto; display: block;
-/* SVG is on green bg — show as-is in dark, invert border for light */
-}
-.logo__sub {
-font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500;
-letter-spacing: 0.1em; text-transform: uppercase;
-color: var(--color-accent); opacity: 0.9;
-border-left: 1px solid var(--color-border); padding-left: var(--space-2);
-}
-.logo__img--footer { height: 20px; }
-html[data-theme="light"] .logo__img { filter: none; }
-.nav { display: flex; gap: var(--space-1); }
-.nav a {
-padding: var(--space-2) var(--space-3);
-font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500;
-letter-spacing: 0.08em; text-transform: uppercase;
-color: var(--color-text-muted); border-radius: var(--radius-sm);
-transition: color 0.15s, background 0.15s;
-}
-.nav a:hover, .nav a.active { color: var(--color-accent); background: var(--color-accent-bg); }
-.header__actions { display: flex; align-items: center; gap: var(--space-3); }
-.search {
-height: 32px; padding: 0 var(--space-3);
-border: 1px solid var(--color-border); border-radius: var(--radius-sm);
-background: var(--color-bg-alt); color: var(--color-text);
-font-family: var(--font-mono); font-size: 0.75rem;
-width: 145px; outline: none;
-transition: border-color 0.15s, width 0.25s var(--ease), box-shadow 0.15s;
-}
-.search::placeholder { color: var(--color-text-faint); }
-.search:focus { border-color: var(--color-accent); width: 190px; box-shadow: 0 0 0 3px var(--color-accent-bg); }
-.btn-icon {
-width: 32px; height: 32px; display: grid; place-items: center;
-border-radius: var(--radius-sm); background: var(--color-bg-alt);
-color: var(--color-text-muted); font-size: 0.85rem;
-transition: background 0.15s, color 0.15s;
-}
-.btn-icon:hover { background: var(--color-bg-elevated); color: var(--color-text); }
-.menu-btn { display: none; flex-direction: column; gap: 4px; }
-.menu-btn span { display: block; width: 17px; height: 1.5px; background: currentColor; transition: all 0.2s var(--ease); }
-.menu-btn.open span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
-.menu-btn.open span:nth-child(2) { opacity: 0; }
-.menu-btn.open span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
-.mobile-nav {
-display: none; padding: var(--space-3) 0;
-border-top: 1px solid var(--color-border);
-flex-direction: column; gap: var(--space-1);
-background: var(--color-bg);
-}
-.mobile-nav.open { display: flex; animation: fadeUp 0.18s var(--ease); }
-.mobile-nav a {
-padding: var(--space-3) var(--space-5);
-font-family: var(--font-mono); font-size: 0.78rem;
-font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
-color: var(--color-text-muted);
-}
-.mobile-nav a:hover { color: var(--color-accent); }
-/* =========================================
-6. HERO — Editorial Featured Post
-========================================= */
-.hero {
-padding: var(--space-10) 0 var(--space-8);
-border-bottom: 1px solid var(--color-border);
-animation: fadeUp 0.5s var(--ease) both;
-}
-/* Two-column layout: featured post left, sidebar right */
-.hero__grid {
-display: grid;
-grid-template-columns: 1fr 320px;
-gap: 0;
-align-items: stretch;
-border: 1px solid var(--color-border);
-border-bottom: none;
-}
-@media (max-width: 960px) { .hero__grid { grid-template-columns: 1fr; } }
-/* ── Left: Featured Post ─────────────────────── */
-.hero__featured {
-display: flex; flex-direction: column;
-padding: var(--space-8) var(--space-12) var(--space-8) var(--space-8);
-border-right: 1px solid var(--color-border);
-cursor: pointer; position: relative;
-transition: background 0.2s var(--ease);
-min-height: 340px;
-overflow: hidden;
-}
-.hero__featured::before {
-content: '';
-position: absolute; top: 0; left: 0; right: 0; height: 3px;
-background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-secondary) 100%);
-}
-.hero__featured:hover { background: var(--color-bg-alt); }
-@media (max-width: 960px) {
-.hero__featured { border-right: none; border-bottom: 1px solid var(--color-border); min-height: unset; padding: var(--space-6); }
-}
-@media (max-width: 600px) { .hero__featured { padding: var(--space-5); } }
-/* "Featured" eyebrow label */
-.hero__eyebrow {
-display: inline-flex; align-items: center; gap: var(--space-3);
-font-family: var(--font-mono); font-size: 0.6rem; font-weight: 600;
-letter-spacing: 0.18em; text-transform: uppercase;
-color: var(--color-accent); margin-bottom: var(--space-5);
-}
-.hero__eyebrow-dot {
-width: 6px; height: 6px; border-radius: 50%;
-background: var(--color-accent);
-animation: pulse 2s ease-in-out infinite;
-}
-/* Tag pill inside hero */
-.hero__tag {
-display: inline-flex; align-items: center; gap: var(--space-2);
-font-family: var(--font-mono); font-size: 0.6rem; font-weight: 500;
-letter-spacing: 0.12em; text-transform: uppercase;
-color: var(--color-accent-text); background: var(--color-accent);
-padding: 3px var(--space-3); margin-bottom: var(--space-5);
-align-self: flex-start;
-}
-html[data-theme="light"] .hero__tag { color: #fff; }
-.hero__title {
-font-family: var(--font-display);
-font-size: clamp(1.8rem, 3.5vw, 2.9rem);
-font-weight: 800; line-height: 1.08;
-letter-spacing: -0.03em;
-color: var(--color-text); transition: color 0.2s;
-margin-bottom: var(--space-4); flex: 1;
-}
-.hero__featured:hover .hero__title { color: var(--color-accent); }
-.hero__title em { font-style: italic; color: var(--color-accent); }
-.hero__sub {
-font-size: 0.97rem; color: var(--color-text-muted);
-line-height: 1.72; max-width: 62ch;
-margin-bottom: var(--space-6);
-display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-}
-/* Meta row: avatar + author + date + readtime */
-.meta {
-display: flex; align-items: center; gap: var(--space-4);
-font-family: var(--font-mono); font-size: 0.72rem;
-color: var(--color-text-faint);
-flex-wrap: wrap;
-}
-.avatar {
-width: 30px; height: 30px; border-radius: 50%;
-background: var(--color-accent); color: var(--color-accent-text);
-display: grid; place-items: center;
-font-family: var(--font-sans); font-weight: 700; font-size: 0.62rem;
-flex-shrink: 0; letter-spacing: 0.02em;
-}
-/* CTA button */
-.hero-link {
-display: inline-flex; align-items: center; gap: var(--space-2);
-margin-top: var(--space-6); align-self: flex-start;
-font-family: var(--font-mono); font-weight: 600; font-size: 0.7rem;
-letter-spacing: 0.12em; text-transform: uppercase;
-color: var(--color-accent-text); background: var(--color-accent);
-padding: var(--space-2) var(--space-5);
-border: none; cursor: pointer;
-transition: background 0.15s, gap 0.2s;
-}
-.hero-link:hover { background: var(--color-accent-hover); gap: var(--space-3); }
-.hero-link::after { content: '→'; }
-/* ── Right: Also Reading sidebar ───────────────── */
-.hero__sidebar {
-display: flex; flex-direction: column;
-background: var(--color-bg-alt);
-}
-.sidebar__title {
-font-family: var(--font-mono); font-size: 0.6rem; font-weight: 600;
-letter-spacing: 0.18em; text-transform: uppercase;
-color: var(--color-text-faint);
-padding: var(--space-4) var(--space-5);
-border-bottom: 1px solid var(--color-border);
-display: flex; align-items: center; gap: var(--space-2);
-}
-.sidebar__title::before {
-content: ''; width: 14px; height: 1px; background: var(--color-text-faint);
-}
-.sidebar__list { flex: 1; }
-.sidebar__list li {
-padding: var(--space-4) var(--space-5);
-border-bottom: 1px solid var(--color-border);
-transition: background 0.15s;
-}
-.sidebar__list li:last-child { border-bottom: none; }
-.sidebar__list li:hover { background: var(--color-bg-elevated); }
-.sidebar__link {
-display: flex; align-items: flex-start; gap: var(--space-2);
-font-weight: 500; font-size: 0.84rem;
-color: var(--color-text); margin-bottom: var(--space-1);
-transition: color 0.15s; line-height: 1.45;
-background: none; border: none; cursor: pointer;
-text-align: left; padding: 0; font-family: var(--font-sans);
-width: 100%;
-}
-.sidebar__link:hover { color: var(--color-accent); }
-.sidebar__date { font-family: var(--font-mono); font-size: 0.68rem; color: var(--color-text-faint); display: flex; align-items: center; gap: var(--space-2); }
-.loading-text { color: var(--color-text-faint); animation: pulse 1.5s infinite; font-family: var(--font-mono); font-size: 0.78rem; }
-/* Legacy .badge still used in section headers / other spots */
-.badge {
-display: inline-flex; align-items: center; gap: var(--space-3);
-font-family: var(--font-mono); font-size: 0.65rem; font-weight: 500;
-letter-spacing: 0.14em; text-transform: uppercase;
-color: var(--color-accent); margin-bottom: var(--space-4);
-}
-.badge::before {
-content: ''; display: inline-block;
-width: 22px; height: 1px; background: var(--color-accent);
-}
-/* =========================================
-7. FILTERS
-========================================= */
-.filters__bar {
-display: flex; gap: var(--space-2); padding: var(--space-5) 0;
-overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--color-border);
-}
-.filters__bar::-webkit-scrollbar { display: none; }
-.chip {
-padding: var(--space-1) var(--space-4);
-font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500;
-letter-spacing: 0.1em; text-transform: uppercase;
-border: 1px solid var(--color-border); border-radius: 0;
-background: transparent; color: var(--color-text-muted);
-cursor: pointer; white-space: nowrap; transition: all 0.15s;
-}
-.chip:hover { border-color: var(--color-border-hover); color: var(--color-text); }
-.chip.active { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-accent-text); }
-/* =========================================
-8. POSTS SECTION
-========================================= */
-.posts {
-padding: var(--space-12) 0 var(--space-20);
-flex: 1;
-width: 100%;
-scroll-margin-top: var(--header-h);
-}
-.section-header {
-display: flex;
-align-items: center;
-gap: var(--space-5);
-margin-bottom: var(--space-6);
-width: 100%;
-}
-.section-header__title {
-font-family: var(--font-display); font-size: 0.95rem;
-font-weight: 700; color: var(--color-text); white-space: nowrap;
-}
-.section-header__line {
-flex: 1;
-height: 1px;
-background: var(--color-border);
-}
-/* =========================================
-9. CARDS
-========================================= */
-.card {
-display: flex; flex-direction: column;
-background: var(--color-bg-card);
-border: 1px solid var(--color-border); overflow: hidden;
-transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease), border-color 0.2s;
-animation: fadeUp 0.4s var(--ease) both; cursor: pointer;
-height: 100%;
-}
-.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--color-border-hover); }
-.card.featured {
-grid-column: 1 / -1;
-flex-direction: row;
-}
-.card__visual {
-aspect-ratio: 16/9;
-background: var(--color-bg-alt);
-display: grid; place-items: center;
-font-size: 1.8rem; color: var(--color-text-faint);
-border-bottom: 2px solid var(--color-accent);
-position: relative; overflow: hidden;
-}
-.card__visual::after {
-content: ''; position: absolute; inset: 0;
-background: linear-gradient(135deg, var(--color-accent-bg) 0%, transparent 55%);
-pointer-events: none;
-}
-.card.featured .card__visual {
-aspect-ratio: unset; min-height: 260px; width: 270px; flex-shrink: 0;
-border-bottom: none; border-right: 2px solid var(--color-accent);
-}
-.card__content { padding: var(--space-5) var(--space-6); display: flex; flex-direction: column; flex: 1; }
-.card__tag {
-font-family: var(--font-mono); font-size: 0.6rem; font-weight: 500;
-letter-spacing: 0.14em; text-transform: uppercase;
-color: var(--color-accent); margin-bottom: var(--space-3);
-}
-.card__title {
-font-family: var(--font-display); font-size: 1.05rem; font-weight: 700;
-line-height: 1.3; margin-bottom: var(--space-3); color: var(--color-text); transition: color 0.15s;
-}
-.card.featured .card__title { font-size: clamp(1.3rem, 2.2vw, 1.65rem); }
-.card:hover .card__title { color: var(--color-accent); }
-.card__excerpt {
-font-size: 0.87rem; color: var(--color-text-muted); line-height: 1.65;
-margin-bottom: auto;
-display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-}
-.card__footer {
-display: flex; align-items: center; justify-content: space-between;
-margin-top: var(--space-5); padding-top: var(--space-4); border-top: 1px solid var(--color-border);
-font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-text-faint);
-}
-.empty-state { grid-column: 1/-1; text-align: center; padding: var(--space-20) var(--space-6); color: var(--color-text-muted); }
-.empty-state h3 { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: var(--space-3); color: var(--color-text); }
-.empty-state pre {
-display: inline-block; text-align: left; margin-top: var(--space-4);
-padding: var(--space-3) var(--space-4); background: var(--color-bg-alt);
-border: 1px solid var(--color-border); font-size: 0.82rem; font-family: var(--font-mono);
-}
-/* =========================================
-10. POST PAGE — UNIFIED LAYOUT & SPACING
-(Aligned exactly with .container to eliminate narrow/squished look)
-========================================= */
-.post-header, .post-body, .post-footer, .post-cover {
-width: 100%;
-max-width: var(--container);
-margin-left: auto;
-margin-right: auto;
-padding-left: var(--space-5);
-padding-right: var(--space-5);
-}
-@media (min-width: 1024px) {
-.post-header, .post-body, .post-footer, .post-cover { padding-left: var(--space-8); padding-right: var(--space-8); }
-}
-/* Post header and footer use container width; only body uses prose width */
-.post-header, .post-footer { max-width: var(--container); }
-.post-body { max-width: var(--max-prose); }
-/* Matches .hero top/bottom padding */
-.post-header {
-margin-top: var(--space-16);
-margin-bottom: var(--space-12);
-animation: fadeUp 0.4s var(--ease) both;
-}
-.post-tag {
-display: inline-flex; align-items: center; gap: var(--space-2);
-font-family: var(--font-mono); font-size: 0.65rem; font-weight: 500;
-letter-spacing: 0.14em; text-transform: uppercase;
-color: var(--color-accent); margin-bottom: var(--space-4);
-}
-.post-title {
-font-family: var(--font-display);
-font-size: clamp(1.9rem, 4.5vw, 2.8rem);
-font-weight: 800; line-height: 1.1;
-letter-spacing: -0.03em; color: var(--color-text);
-margin-bottom: var(--space-5);
-}
-.post-excerpt {
-font-size: 1.05rem; color: var(--color-text-muted);
-line-height: 1.72; margin-bottom: var(--space-6);
-border-left: 3px solid var(--color-accent-bg);
-padding-left: var(--space-4);
-font-style: italic;
-}
-.post-meta {
-display: flex; align-items: center; gap: var(--space-4);
-flex-wrap: wrap;
-padding: var(--space-5) 0;
-border-top: 1px solid var(--color-border);
-border-bottom: 1px solid var(--color-border);
-margin-bottom: var(--space-8);
-}
-.meta-info { display: flex; flex-direction: column; gap: var(--space-1); flex: 1; min-width: 0; }
-.meta-name { font-family: var(--font-sans); font-size: 0.88rem; font-weight: 500; color: var(--color-text); }
-.meta-bio { font-size: 0.78rem; color: var(--color-text-faint); line-height: 1.5; margin-top: var(--space-1); max-width: 52ch; }
-.meta-details { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-text-faint); }
-.meta-actions { display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0; }
-.post-footer .meta-actions { margin-bottom: var(--space-6); }
-/* Body matches .posts section spacing */
-.post-body {
-margin-bottom: var(--space-12);
-animation: fadeUp 0.4s var(--ease) both;
-font-size: 1.02rem; line-height: 1.82; color: var(--color-text);
-}
-.post-body h1, .post-body h2, .post-body h3, .post-body h4, .post-body h5, .post-body h6 {
-font-family: var(--font-display); color: var(--color-text); line-height: 1.2;
-font-weight: 700; letter-spacing: -0.02em;
-margin-top: var(--space-10); margin-bottom: var(--space-4);
-scroll-margin-top: var(--header-h);
-}
-.post-body h1 { font-size: clamp(1.8rem, 4vw, 2.2rem); font-weight: 800; letter-spacing: -0.03em; margin-top: 0; }
-.post-body h2 { font-size: clamp(1.5rem, 3vw, 1.8rem); }
-.post-body h3 { font-size: clamp(1.25rem, 2.5vw, 1.4rem); font-style: italic; font-weight: 600; }
-.post-body h4 { font-size: 1.15rem; font-weight: 600; font-family: var(--font-sans); letter-spacing: 0; }
-.post-body h5 { font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); }
-.post-body h6 { font-size: 0.9rem; font-weight: 500; color: var(--color-text-faint); }
-.post-body p { margin-bottom: var(--space-5); }
-.post-body a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; transition: color 0.15s, text-decoration-color 0.15s; }
-.post-body a:hover { color: var(--color-accent-hover); }
-.post-body strong { font-weight: 600; color: var(--color-text); }
-.post-body em { font-style: italic; color: var(--color-text-muted); }
-.post-body small { font-size: 0.875em; color: var(--color-text-faint); }
-.post-body ul, .post-body ol { padding-left: var(--space-6); margin-bottom: var(--space-5); }
-.post-body ul { list-style: disc; }
-.post-body ol { list-style: decimal; }
-.post-body li { margin-bottom: var(--space-2); line-height: 1.7; }
-.post-body li::marker { color: var(--color-accent); }
-.post-body ul:has(input[type="checkbox"]) { list-style: none; padding-left: var(--space-2); }
-.post-body ul:has(input[type="checkbox"]) li { display: flex; align-items: flex-start; gap: var(--space-3); }
-.post-body input[type="checkbox"] { margin-top: 0.35em; accent-color: var(--color-accent); cursor: pointer; }
-.post-body blockquote {
-padding: var(--space-5) var(--space-6); border-left: 3px solid var(--color-accent);
-background: var(--color-bg-alt); margin: var(--space-8) 0;
-color: var(--color-text-muted); font-style: italic; font-size: 1.06rem; line-height: 1.75;
-font-family: var(--font-display); border-radius: 0 var(--radius-md) var(--radius-md) 0;
-}
-.post-body blockquote p { margin-bottom: var(--space-3); }
-.post-body blockquote p:last-child { margin-bottom: 0; }
-.post-body details {
-background: var(--color-bg-alt); border: 1px solid var(--color-border);
-border-radius: var(--radius-md); margin: var(--space-6) 0; overflow: hidden;
-}
-.post-body summary {
-padding: var(--space-3) var(--space-4); cursor: pointer; font-weight: 500;
-color: var(--color-text); transition: background 0.15s; list-style: none;
-position: relative; padding-left: var(--space-8);
-}
-.post-body summary::-webkit-details-marker { display: none; }
-.post-body summary::before {
-content: '▶'; position: absolute; left: var(--space-4); top: 50%;
-transform: translateY(-50%); font-size: 0.7rem; color: var(--color-accent);
-transition: transform 0.2s;
-}
-.post-body details[open] summary::before { transform: translateY(-50%) rotate(90deg); }
-.post-body details[open] summary { border-bottom: 1px solid var(--color-border); }
-.post-body details > :not(summary) { padding: var(--space-4) var(--space-4) var(--space-5); margin-top: 0; }
-.post-body :not(figure) > img, .post-body video, .post-body audio, .post-body iframe {
-width: 100%; max-width: 100%; border-radius: var(--radius-md);
-border: 1px solid var(--color-border); margin: var(--space-8) 0;
-background: var(--color-bg-alt);
-}
-.post-body img { height: auto; display: block; }
-.post-body img + em {
-display: block; text-align: center; font-size: 0.82rem; color: var(--color-text-faint);
-margin-top: calc(var(--space-2) * -1); margin-bottom: var(--space-8); font-style: normal;
-}
-.post-body video, .post-body audio { outline: none; }
-.post-body audio { height: auto; max-height: 44px; }
-.post-body iframe { aspect-ratio: 16/9; border: none; }
-.post-body table {
-width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: var(--space-8) 0;
-font-family: var(--font-mono); background: var(--color-bg-card);
-border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden;
-}
-.post-body thead { background: var(--color-bg-elevated); }
-.post-body th {
-text-align: left; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
-color: var(--color-text-muted); padding: var(--space-3) var(--space-4);
-border-bottom: 1px solid var(--color-border);
-}
-.post-body td {
-padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-border);
-color: var(--color-text); vertical-align: top;
-}
-.post-body tr:last-child td { border-bottom: none; }
-.post-body tr:hover td { background: var(--color-bg-elevated); transition: background 0.15s; }
-.post-body code:not(pre code) {
-font-family: var(--font-mono); font-size: 0.875em;
-background: var(--color-bg-elevated); color: var(--color-accent);
-padding: 0.15em 0.4em; border-radius: var(--radius-sm);
-border: 1px solid var(--color-border); white-space: nowrap;
-}
-.post-body hr {
-border: none; border-top: 1px solid var(--color-border); margin: var(--space-12) 0;
-}
-/* Post Cover Banner */
-.post-cover {
-margin-top: var(--space-8);
-margin-bottom: var(--space-8);
-padding: var(--space-8) var(--space-5);
-background: var(--color-bg-alt);
-border: 1px solid var(--color-border);
-border-top: 2px solid var(--color-accent);
-display: grid; place-items: center;
-overflow: hidden; position: relative;
-}
-.post-cover::before {
-content: ''; position: absolute; inset: 0;
-background: linear-gradient(135deg, var(--color-accent-bg) 0%, transparent 60%);
-pointer-events: none;
-}
-/* Post Footer & Nav — matches .posts bottom padding */
-.post-footer {
-margin-top: var(--space-8);
-margin-bottom: var(--space-20);
-padding-top: var(--space-6);
-border-top: 1px solid var(--color-border);
-}
-.post-tags { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-6); }
-.post-nav { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
-.post-nav-btn--empty { border-color: transparent; background: transparent; cursor: default; pointer-events: none; }
-.post-nav-btn { padding: var(--space-5); border: 1px solid var(--color-border); background: var(--color-bg-alt); transition: all 0.15s; width: 100%; text-align: left; font-family: var(--font-sans); cursor: pointer; }
-.post-nav-btn:hover { border-color: var(--color-accent); background: var(--color-bg-elevated); }
-.nav-label { font-family: var(--font-mono); font-size: 0.62rem; color: var(--color-text-faint); margin-bottom: var(--space-2); letter-spacing: 0.12em; text-transform: uppercase; }
-.nav-title { font-weight: 500; font-size: 0.88rem; color: var(--color-text); }
-.post-nav-btn--right { text-align: right; }
-/* =========================================
-13. READING PROGRESS BAR
+/**
+blog.shani.dev Blog Engine — SPA, config-driven, zero-build.
+Single index.html. History API routing: / = list, /post/slug = article.
+Architecture: Config → State → DataLoader → Renderer → UI → Router
 */
-.reading-progress {
-position: fixed; top: var(--header-h); left: 0; height: 2px; width: 0%;
-background: var(--color-accent); z-index: 99;
-transition: width 0.1s linear; pointer-events: none;
-}
-/* =========================================
-11. CODE BLOCKS & SYNTAX HIGHLIGHTING
-========================================= */
-.code-block {
-position: relative; margin: var(--space-8) 0; border-radius: var(--radius-md);
-overflow: hidden; border: 1px solid var(--color-border); background: var(--color-bg-card);
-}
-.code-block__bar {
-display: flex; align-items: center; justify-content: space-between;
-background: var(--color-bg-elevated); min-height: 36px; padding: 0 var(--space-4);
-border-bottom: 1px solid var(--color-border);
-}
-.code-lang {
-font-family: var(--font-mono); font-size: 0.65rem; font-weight: 600;
-letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-text-faint);
-pointer-events: none; user-select: none;
-}
-.copy-btn {
-padding: 4px var(--space-3); font-family: var(--font-mono); font-size: 0.66rem;
-font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
-border: 1px solid var(--color-border); background: transparent;
-color: var(--color-text-muted); cursor: pointer; transition: all 0.15s;
-opacity: 1; border-radius: var(--radius-sm);
-}
-.copy-btn:hover { color: var(--color-text); border-color: var(--color-border-hover); background: var(--color-bg); }
-.copy-btn.copied { opacity: 1; background: var(--color-accent); color: var(--color-accent-text); border-color: var(--color-accent); }
-.code-block pre {
-margin: 0 !important; padding: var(--space-5); background: transparent;
-overflow-x: auto; font-family: var(--font-mono); font-size: 0.875rem;
-line-height: 1.65; tab-size: 2; -moz-tab-size: 2;
-}
-.code-block code {
-font-family: var(--font-mono); font-size: inherit; background: transparent;
-padding: 0; border: none; display: block; color: inherit; margin: 0; white-space: pre;
-}
-/* =========================================
-12. PAYWALL
-========================================= */
-.paywall-wrap { position: relative; }
-.paywall-fade { mask-image: linear-gradient(to bottom, black 0%, transparent 58%); -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 58%); pointer-events: none; }
-.paywall-gate { max-width: var(--max-prose); margin: -2rem auto var(--space-12); padding: 0 var(--space-4); text-align: center; }
-.paywall-card {
-background: var(--color-bg-alt); border: 1px solid var(--color-border);
-border-top: 2px solid var(--color-accent); padding: var(--space-10) var(--space-8);
-}
-.paywall-card h3 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; margin-bottom: var(--space-3); color: var(--color-text); }
-.paywall-card p { color: var(--color-text-muted); margin-bottom: var(--space-6); max-width: 44ch; margin-left: auto; margin-right: auto; line-height: 1.72; }
-.paywall-actions { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; }
-/* =========================================
-14. FOOTER
-========================================= */
-.site-footer { margin-top: auto; border-top: 1px solid var(--color-border); padding: var(--space-6) 0; color: var(--color-text-faint); font-family: var(--font-mono); font-size: 0.72rem; background: var(--color-bg-alt); }
-.footer__inner { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
-.footer__brand { font-family: var(--font-display); font-weight: 800; font-size: 0.95rem; color: var(--color-text); letter-spacing: -0.01em; }
-.footer__brand .dot { color: var(--color-accent); }
-.footer__links { display: flex; gap: var(--space-5); margin-left: auto; }
-.footer__links a:hover { color: var(--color-accent); }
-.footer__copy { letter-spacing: 0.04em; }
-.to-top {
-position: fixed; bottom: var(--space-6); right: var(--space-6);
-width: 36px; height: 36px; border: 1px solid var(--color-border); background: var(--color-bg-elevated);
-color: var(--color-text-muted); display: grid; place-items: center;
-box-shadow: var(--shadow-hover); transition: opacity 0.2s, visibility 0.2s, transform 0.2s, border-color 0.2s, color 0.2s;
-opacity: 0; visibility: hidden; pointer-events: none; z-index: 90; font-size: 0.9rem;
-}
-.to-top.show { opacity: 1; visibility: visible; pointer-events: auto; }
-.to-top:hover { transform: translateY(-2px); border-color: var(--color-accent); color: var(--color-accent); }
-/* =========================================
-15. RESPONSIVE
-========================================= */
-@media (max-width: 768px) {
-.nav { display: none; }
-.menu-btn { display: flex; }
-.search { display: none; }
-.hero__sidebar { order: 2; }
-.card.featured { flex-direction: column; }
-.card.featured .card__visual { width: 100%; min-height: 180px; aspect-ratio: 16/9; border-right: none; border-bottom: 2px solid var(--color-accent); }
-.post-nav { grid-template-columns: 1fr; }
-.post-meta .meta-actions { width: 100%; margin-top: var(--space-3); }
-.footer__inner { flex-direction: column; text-align: center; }
-.footer__links { margin: 0; justify-content: center; }
-.post-header { margin-top: var(--space-10); }
-.hero { padding: var(--space-10) 0 var(--space-8); }
-}
-/* =========================================
-16. PRINT
-========================================= */
-@media print {
-.site-header, .filters, .filters__bar, .site-footer, .to-top,
-.reading-progress, .post-footer, .paywall-gate, .post-cover,
-.copy-btn, .post-back, .meta-actions, .post-tags,
-.hero__sidebar, .search-bar, .auspicious-bar { display: none !important; }
-body { background: #fff !important; color: #000 !important; }
-.post-body { font-size: 11pt; max-width: 100%; line-height: 1.65; color: #000 !important; }
-.post-body h2, .post-body h3 { color: #000 !important; }
-.post-body a { color: #000 !important; text-decoration: underline; }
-.post-excerpt { border-left-color: #999 !important; color: #333 !important; }
-.paywall-card { border-top-color: #999 !important; }
-.post-cover { border-top-color: #999 !important; }
-.paywall-fade { mask-image: none !important; -webkit-mask-image: none !important; }
-.code-block { background: #f5f5f5 !important; border: 1px solid #ccc !important; border-top: 2px solid #333 !important; }
-.code-block pre { color: #111 !important; background: transparent !important; }
-.token.comment     { color: #555 !important; }
-.token.keyword     { color: #000 !important; font-weight: 600; }
-.token.string      { color: #333 !important; }
-.token.function    { color: #000 !important; font-style: italic; }
-.token.number,
-.token.boolean     { color: #333 !important; }
-.token.operator,
-.token.punctuation { color: #111 !important; }
-.token.tag         { color: #000 !important; }
-.token.attr-name   { color: #333 !important; }
-.token.attr-value  { color: #333 !important; }
-.post-meta { border-color: #ccc !important; }
-.post-title, .post-tag { color: #000 !important; }
-.meta-name, .meta-details, .meta-role, .meta-bio { color: #333 !important; }
-.avatar { background: #333 !important; color: #fff !important; }
-.callout { border-left-color: #999 !important; background: #f5f5f5 !important; }
-.callout__title { color: #000 !important; }
-.callout__body { color: #333 !important; }
-.table-wrap { border-color: #ccc !important; }
-.table-bar, .table-copy-btn { display: none !important; }
-.post-body figure img { border-color: #ccc !important; }
-.post-body figcaption { color: #555 !important; }
-.heading-anchor { display: none !important; }
-.post-body del { color: #999 !important; }
-}
-/* =========================================
-17. ADDITIONS: Font Awesome, SPA, Search bar,
-Toast, Post-back, Tag chips, FA icons
-========================================= */
-.fa-solid, .fa-regular, .fa-brands { font-size: inherit; }
-.search-bar {
-display: none; background: var(--color-bg-alt);
-border-top: 1px solid var(--color-border); padding: var(--space-3) 0;
-}
-.search-bar.open { display: block; animation: fadeUp 0.18s var(--ease); }
-.search-bar__inner { display: flex; align-items: center; gap: var(--space-3); }
-.search-bar__icon { color: var(--color-text-faint); font-size: 0.85rem; }
-.search-bar .search { flex: 1; height: 38px; width: 100%; border-radius: var(--radius-sm); }
-.search-bar__close { flex-shrink: 0; }
-.meta-dot { color: var(--color-text-faint); margin: 0 2px; }
-.members-badge {
-display: inline-flex; align-items: center; gap: 4px;
-font-size: 0.72rem; font-weight: 600; color: var(--color-warning);
-font-family: var(--font-mono);
-}
-.sidebar__link i { margin-top: 3px; color: var(--color-accent); font-size: 0.8rem; flex-shrink: 0; }
-.card__icon {
-font-size: 2.2rem; color: var(--color-accent); opacity: 0.5;
-transition: opacity 0.2s, transform 0.2s;
-}
-.card:hover .card__icon { opacity: 0.85; transform: scale(1.08); }
-.card.featured .card__icon { font-size: 3rem; }
-.card__author { display: flex; align-items: center; gap: var(--space-2); }
-.card__author i { font-size: 0.75rem; color: var(--color-text-faint); }
-.card__meta { display: flex; align-items: center; gap: 4px; }
-.card__meta i { font-size: 0.72rem; }
-.post-back {
-display: inline-flex; align-items: center; gap: var(--space-2);
-background: none; border: none; cursor: pointer;
-font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500;
-letter-spacing: 0.08em; text-transform: uppercase;
-color: var(--color-text-faint); padding: 0; margin-bottom: var(--space-6);
-transition: color 0.15s;
-}
-.post-back:hover { color: var(--color-accent); }
-.post-back i { transition: transform 0.2s; }
-.post-back:hover i { transform: translateX(-3px); }
-.meta-role { color: var(--color-text-muted); }
-.post-cover-icon { font-size: 3.5rem; color: var(--color-accent); opacity: 0.25; position: relative; z-index: 1; }
-.post-nav-btn {
-padding: var(--space-5); border: 1px solid var(--color-border);
-background: var(--color-bg-alt); cursor: pointer; text-align: left;
-transition: all 0.15s; width: 100%; font-family: var(--font-sans);
-}
-.post-nav-btn:hover { border-color: var(--color-accent); background: var(--color-bg-elevated); }
-.tag-chip {
-display: inline-flex; align-items: center; gap: var(--space-2);
-padding: var(--space-1) var(--space-4); font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500;
-letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid var(--color-border); color: var(--color-text-muted);
-background: none; cursor: pointer; transition: all 0.15s;
-}
-.tag-chip:hover { border-color: var(--color-accent); color: var(--color-accent); }
-.tag-chip i { font-size: 0.75rem; }
-.paywall-icon { font-size: 2rem; color: var(--color-warning); display: block; margin-bottom: var(--space-4); }
-.empty-icon { font-size: 2.5rem; color: var(--color-text-faint); display: block; margin: 0 auto var(--space-4); }
-.toast {
-position: fixed; bottom: var(--space-8); left: 50%;
-transform: translateX(-50%) translateY(12px);
-background: var(--color-text); color: var(--color-bg);
-padding: var(--space-2) var(--space-5);
-font-family: var(--font-mono); font-size: 0.8rem;
-display: flex; align-items: center; gap: var(--space-2);
-z-index: 9999; opacity: 0; transition: opacity 0.25s, transform 0.25s;
-pointer-events: none;
-}
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.toast i { color: var(--color-success); }
-.footer__links a { display: inline-flex; align-items: center; gap: var(--space-2); letter-spacing: 0.04em; transition: color 0.15s; }
-.footer__links a i { font-size: 0.9rem; }
-/* =========================================
-18. BUTTON SYSTEM (Consolidated)
-========================================= */
-.btn {
-display: inline-flex; align-items: center; gap: var(--space-2);
-padding: var(--space-2) var(--space-4);
-font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500;
-letter-spacing: 0.08em; text-transform: uppercase;
-border: 1px solid var(--color-border); background: var(--color-bg-alt);
-color: var(--color-text-muted); cursor: pointer;
-transition: all 0.15s; white-space: nowrap;
-}
-.btn:hover {
-border-color: var(--color-border-hover); color: var(--color-text);
-background: var(--color-bg-elevated);
-}
-.btn.primary {
-background: var(--color-accent); border-color: var(--color-accent);
-color: var(--color-accent-text);
-}
-.btn.primary:hover {
-background: var(--color-accent-hover); border-color: var(--color-accent-hover);
-color: var(--color-accent-text);
-}
-.btn.like { color: var(--color-text-faint); }
-.btn.like:hover { border-color: var(--color-like); color: var(--color-like); }
-.btn.like.reacted { background: var(--color-like-bg); border-color: var(--color-like); color: var(--color-like); }
-@media (max-width: 960px) {
-.hero__sidebar { margin-top: 0; }
-}
-@media (max-width: 600px) {
-.footer__links a span { display: none; }
-.footer__links a i { font-size: 1rem; }
-.footer__links { gap: var(--space-4); }
-}
-@media (prefers-reduced-motion: reduce) {
-*, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-}
-/* =========================================
-19. MARKDOWN FEATURES
-========================================= */
-/* Heading anchor links (#) */
-.post-body .heading-anchor {
-text-decoration: none; color: var(--color-text-faint);
-font-family: var(--font-mono); font-size: 0.7em; font-weight: 400;
-margin-right: var(--space-2); opacity: 0;
-transition: opacity 0.15s, color 0.15s;
-vertical-align: middle;
-}
-.post-body h1:hover .heading-anchor,
-.post-body h2:hover .heading-anchor,
-.post-body h3:hover .heading-anchor,
-.post-body h4:hover .heading-anchor,
-.post-body h5:hover .heading-anchor,
-.post-body h6:hover .heading-anchor { opacity: 1; }
-.post-body .heading-anchor:hover { color: var(--color-accent); }
-@media (max-width: 768px) {
-  .post-body .heading-anchor { display: none; }
-}
-/* Figure / image captions */
-.post-body figure { margin: var(--space-8) 0; }
-.post-body figure img { margin: 0; border-radius: var(--radius-md); border: 1px solid var(--color-border); width: 100%; height: auto; }
-.post-body figcaption {
-text-align: center; font-size: 0.82rem; color: var(--color-text-faint);
-margin-top: var(--space-2); font-style: italic; font-family: var(--font-sans);
-}
-/* Strikethrough */
-.post-body del { text-decoration: line-through; color: var(--color-text-faint); }
-/* =========================================
-20. CALLOUTS (GitHub-style admonitions)
-========================================= */
-.callout {
-border-left: 3px solid; border-radius: 0 var(--radius-md) var(--radius-md) 0;
-padding: var(--space-4) var(--space-5); margin: var(--space-6) 0;
-background: var(--color-bg-alt);
-}
-.callout__title {
-font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600;
-letter-spacing: 0.1em; text-transform: uppercase;
-display: flex; align-items: center; gap: var(--space-2);
-margin-bottom: var(--space-2);
-}
-.callout__body { font-size: 0.95rem; line-height: 1.7; color: var(--color-text-muted); }
-.callout__body p:last-child { margin-bottom: 0; }
-.callout-note    { border-color: var(--color-callout-note); }
-.callout-note    .callout__title { color: var(--color-callout-note); }
-.callout-tip     { border-color: var(--color-success); }
-.callout-tip     .callout__title { color: var(--color-success); }
-.callout-warning { border-color: var(--color-warning); }
-.callout-warning .callout__title { color: var(--color-warning); }
-.callout-caution { border-color: var(--color-error); }
-.callout-caution .callout__title { color: var(--color-error); }
-.callout-important { border-color: var(--color-secondary); }
-.callout-important .callout__title { color: var(--color-secondary); }
-/* =========================================
-21. TABLE WRAP + COPY CSV
-========================================= */
-.table-wrap {
-margin: var(--space-8) 0; border: 1px solid var(--color-border);
-border-radius: var(--radius-md); overflow: hidden;
-}
-.table-bar {
-display: flex; justify-content: flex-end;
-background: var(--color-bg-elevated); padding: var(--space-2) var(--space-3);
-border-bottom: 1px solid var(--color-border);
-}
-.table-copy-btn {
-opacity: 1; /* always visible — tables don't have a hover-reveal pattern */
-}
-.table-copy-btn.copied { background: var(--color-accent); color: var(--color-accent-text); border-color: var(--color-accent); }
-/* Remove double border now that .table-wrap handles it */
-.post-body .table-wrap table { margin: 0; border: none; border-radius: 0; }
-/* =========================================
-22. KATEX MATH
-========================================= */
-.post-body .katex-display {
-margin: var(--space-6) 0; padding: var(--space-4);
-background: var(--color-bg-alt); border: 1px solid var(--color-border);
-border-radius: var(--radius-md); overflow-x: auto;
-}
-.post-body .katex { font-size: 1.05em; color: var(--color-text); }
-/* =========================================
-PAGE LOAD OVERLAY
-========================================= */
-#page-loader {
-position: fixed; inset: 0; z-index: 9999;
-background: var(--color-bg);
-display: flex; flex-direction: column;
-align-items: center; justify-content: center;
-gap: var(--space-5);
-transition: opacity 0.35s var(--ease), visibility 0.35s var(--ease);
-}
-#page-loader.hidden {
-opacity: 0; visibility: hidden; pointer-events: none;
-}
-.loader__logo {
-display: flex; align-items: center; gap: var(--space-2);
-animation: fadeUp 0.5s var(--ease) both;
-}
-.loader__logo img { height: 32px; width: auto; }
-.loader__logo span {
-font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500;
-letter-spacing: 0.1em; text-transform: uppercase;
-color: var(--color-accent); opacity: 0.9;
-border-left: 1px solid var(--color-border); padding-left: var(--space-2);
-}
-.loader__track {
-width: 160px; height: 2px;
-background: var(--color-border); border-radius: 2px; overflow: hidden;
-animation: fadeUp 0.5s 0.1s var(--ease) both;
-}
-.loader__bar {
-height: 100%; width: 0%;
-background: var(--color-accent);
-border-radius: 2px;
-animation: loaderFill 1.2s var(--ease) forwards;
-}
-@keyframes loaderFill {
-0%   { width: 0%; }
-40%  { width: 55%; }
-80%  { width: 82%; }
-100% { width: 96%; }
-}
-.loader__text {
-font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.12em;
-text-transform: uppercase; color: var(--color-text-faint);
-animation: fadeUp 0.5s 0.2s var(--ease) both;
-}
-/* Screen-reader only utility */
-.sr-only {
-position: absolute; width: 1px; height: 1px;
-padding: 0; margin: -1px; overflow: hidden;
-clip: rect(0,0,0,0); white-space: nowrap; border: 0;
-}
-/* =========================================
-PAGINATION
-========================================= */
-.pagination {
-display: flex; justify-content: center; flex-wrap: wrap; gap: var(--space-2);
-padding: var(--space-10) 0 var(--space-12); width: 100%;
-}
-.pag-btn {
-min-width: 38px; height: 38px; display: grid; place-items: center;
-border: 1px solid var(--color-border); background: var(--color-bg-card);
-color: var(--color-text-muted); font-family: var(--font-mono); font-size: 0.75rem;
-border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s var(--ease);
-}
-.pag-btn:hover:not(.disabled):not([disabled]) {
-border-color: var(--color-accent); color: var(--color-accent); background: var(--color-accent-bg);
-}
-.pag-btn.active {
-background: var(--color-accent); color: var(--color-accent-text); border-color: var(--color-accent); cursor: default;
-}
-.pag-btn.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
-.pag-ellipsis {
-display: grid; place-items: center;
-min-width: 38px; height: 38px;
-font-family: var(--font-mono); font-size: 0.75rem;
-color: var(--color-text-faint); pointer-events: none; user-select: none;
-}
-@media (max-width: 600px) {
-.pag-btn { min-width: 32px; height: 32px; font-size: 0.7rem; }
-.pag-ellipsis { min-width: 28px; height: 32px; }
-}
-/* =========================================
-MEDIA — images, video, audio, embeds
-========================================= */
-/* Base figure — shared by all media shortcodes and standard MD images */
-.post-body .media-figure,
-.post-body figure {
-margin: var(--space-8) 0;
-}
-.post-body .media-figure img,
-.post-body figure img {
-width: 100%; height: auto; display: block;
-border-radius: var(--radius-md);
-border: 1px solid var(--color-border);
-}
-.post-body .media-figure figcaption,
-.post-body figure figcaption {
-text-align: center; font-size: 0.82rem;
-color: var(--color-text-faint); margin-top: var(--space-2);
-font-style: italic; font-family: var(--font-sans);
-}
-/* Wide image — bleeds past the prose column */
-.post-body .media-figure--wide {
-margin-left: calc(-1 * var(--space-8));
-margin-right: calc(-1 * var(--space-8));
-}
-.post-body .media-figure--wide img { border-radius: var(--radius-sm); }
-@media (max-width: 768px) {
-.post-body .media-figure--wide {
-margin-left: calc(-1 * var(--space-5));
-margin-right: calc(-1 * var(--space-5));
-}
-}
-/* Local video */
-.post-body .media-figure--video video {
-width: 100%; height: auto; display: block;
-border-radius: var(--radius-md);
-border: 1px solid var(--color-border);
-background: var(--color-video-bg);
-}
-/* Audio player */
-.post-body .media-figure--audio audio {
-width: 100%; display: block;
-accent-color: var(--color-accent);
-margin-bottom: var(--space-2);
-}
-/* YouTube / Vimeo responsive 16:9 embed */
-.post-body .media-embed { margin: var(--space-8) 0; }
-.post-body .media-embed__ratio {
-position: relative; width: 100%;
-padding-bottom: 56.25%; /* 16:9 */
-height: 0; overflow: hidden;
-border-radius: var(--radius-md);
-border: 1px solid var(--color-border);
-background: var(--color-video-bg);
-}
-.post-body .media-embed__ratio iframe {
-position: absolute; top: 0; left: 0;
-width: 100%; height: 100%; border: none;
-}
-.post-body .media-embed figcaption {
-text-align: center; font-size: 0.82rem;
-color: var(--color-text-faint); margin-top: var(--space-2);
-font-style: italic; font-family: var(--font-sans);
-}
+const CONFIG = {
+  GITHUB_USER: 'shani8dev',
+  GITHUB_REPO: 'shani-blog',
+  AUTHOR_NAME: 'Shrinivas Kumbhar',
+  AUTHOR_INITIALS: 'SK',
+  AUTHOR_ROLE: 'Shanios · shani.dev',
+  AUTHOR_BIO: 'Immutable Linux on Arch. Two OS copies, one always safe. Bad update? One reboot back. Zero telemetry. Built in India 🇮🇳',
+  SITE_TITLE: 'Shanios Blog',
+  HERO_EYEBROW: 'Shanios',
+  HERO_SUB: "Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.",
+  SOCIAL_LINKS: [
+    { label: 'GitHub',   icon: 'fa-brands fa-github',   url: 'https://github.com/shani8dev' },
+    { label: 'LinkedIn', icon: 'fa-brands fa-linkedin',  url: 'https://www.linkedin.com/in/Shrinivasvkumbhar/' },
+    { label: 'Shanios',  icon: 'fa-brands fa-linux',     url: 'https://shani.dev' },
+    { label: 'Wiki',     icon: 'fa-solid fa-book-open',  url: 'https://wiki.shani.dev' },
+  ]
+};
+
+// ── Tag icons using Font Awesome ──────────────────────────────
+const TAG_ICONS = {
+  Product:      'fa-solid fa-box-open',
+  Engineering:  'fa-solid fa-gears',
+  News:         'fa-solid fa-newspaper',
+  Release:      'fa-solid fa-rocket',
+  Careers:      'fa-solid fa-briefcase',
+  Culture:      'fa-solid fa-people-group',
+  Partnerships: 'fa-solid fa-handshake',
+  Linux:        'fa-brands fa-linux',
+  AWS:          'fa-brands fa-aws',
+  DevOps:       'fa-solid fa-gears',
+  Platform:     'fa-solid fa-layer-group',
+  Incident:     'fa-solid fa-triangle-exclamation',
+  Essay:        'fa-solid fa-feather-pointed',
+  Post:         'fa-solid fa-file-lines',
+};
+
+// =========================================
+// 1. STATE
+// =========================================
+const AppState = {
+  posts: [],        // Metadata array (body loaded on demand)
+  postsCache: {},   // Keyed by slug — full post objects with body
+  filter: 'all',
+  search: '',
+  theme: localStorage.getItem('blogs-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+  isMember: localStorage.getItem('blogs_member') === '1',
+  pagination: { page: 1, perPage: 9 }
+};
+
+// =========================================
+// 2. UTILS
+// =========================================
+const Utils = {
+  qs: (sel, root) => (root || document).querySelector(sel),
+  fmtDate: str => new Date(str + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+  fmtDateShort: str => new Date(str + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+  tagIcon: tag => `<i class="${TAG_ICONS[tag] || TAG_ICONS.Post}" aria-hidden="true"></i>`,
+  parseFrontmatter: raw => {
+    const md = raw.replace(/^\uFEFF/, '');
+    const match = md.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+    if (!match) return { fm: {}, body: md };
+    const fm = {};
+    match[1].split(/\r?\n/).forEach(line => {
+      const i = line.indexOf(':');
+      if (i < 1) return;
+      fm[line.slice(0, i).trim()] = line.slice(i + 1).trim().replace(/^['"`]|['"`]$/g, '');
+    });
+    return { fm, body: match[2] };
+  },
+  slugify: text => text.toLowerCase()
+    .replace(/[^\w\s-]/g, '').trim()
+    .replace(/[\s_]+/g, '-').replace(/-+/g, '-'),
+  CALLOUT_TYPES: {
+    NOTE:      { icon: 'fa-solid fa-circle-info',          cls: 'callout-note'      },
+    TIP:       { icon: 'fa-solid fa-lightbulb',            cls: 'callout-tip'       },
+    WARNING:   { icon: 'fa-solid fa-triangle-exclamation', cls: 'callout-warning'   },
+    CAUTION:   { icon: 'fa-solid fa-fire',                 cls: 'callout-caution'   },
+    IMPORTANT: { icon: 'fa-solid fa-star',                 cls: 'callout-important' },
+  },
+  renderMath(html) {
+    if (typeof katex === 'undefined') return html;
+    const parts = html.split(/(<pre[\s\S]*?<\/pre>|<code[\s\S]*?<\/code>)/);
+    return parts.map((part, i) => {
+      if (i % 2 === 1) return part;
+      part = part.replace(/\$\$([\s\S]+?)\$\$/g, (_, expr) => {
+        try { return katex.renderToString(expr.trim(), { displayMode: true, throwOnError: false }); }
+        catch { return ''; }
+      });
+      part = part.replace(/(?<!\$)\$([^\n$]+?)\$(?!\$)/g, (_, expr) => {
+        try { return katex.renderToString(expr.trim(), { displayMode: false, throwOnError: false }); }
+        catch { return ''; }
+      });
+      return part;
+    }).join('');
+  },
+  // =========================================================
+  // MEDIA SHORTCODES
+  // =========================================================
+  _mediaBlocks: {},
+  _mediaToken(html) {
+    const key = `MBLOCK_${Object.keys(Utils._mediaBlocks).length}_END`;
+    Utils._mediaBlocks[key] = html;
+    return '\n\n' + key + '\n\n';
+  },
+  _cap: raw => {
+    const pipe = raw.lastIndexOf('|');
+    return pipe === -1
+      ? { val: raw.trim(), caption: '' }
+      : { val: raw.slice(0, pipe).trim(), caption: raw.slice(pipe + 1).trim() };
+  },
+  _youtube(id, caption) {
+    const fig = caption ? `<figcaption>${caption}</figcaption>` : '';
+    return `<figure class="media-embed"><div class="media-embed__ratio"><iframe src="https://www.youtube-nocookie.com/embed/${id}" title="YouTube video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>${fig}</figure>`;
+  },
+  _vimeo(id, caption) {
+    const fig = caption ? `<figcaption>${caption}</figcaption>` : '';
+    return `<figure class="media-embed"><div class="media-embed__ratio"><iframe src="https://player.vimeo.com/video/${id}" title="Vimeo video" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>${fig}</figure>`;
+  },
+  _video(src, caption) {
+    const fig  = caption ? `<figcaption>${caption}</figcaption>` : '';
+    const ext  = src.split('?')[0].split('.').pop().toLowerCase();
+    const mime = { mp4: 'video/mp4', webm: 'video/webm', ogg: 'video/ogg', mov: 'video/mp4' }[ext] || 'video/mp4';
+    return `<figure class="media-figure media-figure--video"><video controls preload="metadata" loading="lazy"><source src="${src}" type="${mime}">Your browser doesn't support HTML video. <a href="${src}">Download it</a>.</video>${fig}</figure>`;
+  },
+  _audio(src, caption) {
+    const fig = caption ? `<figcaption>${caption}</figcaption>` : '';
+    return `<figure class="media-figure media-figure--audio"><audio controls preload="metadata" loading="lazy"><source src="${src}" type="audio/mpeg">Your browser doesn't support HTML audio. <a href="${src}">Download it</a>.</audio>${fig}</figure>`;
+  },
+  _image(src, rest) {
+    const parts   = rest.split('|').map(s => s.trim());
+    const alt     = parts[0] || '';
+    const caption = parts[1] !== undefined ? parts[1] : alt;
+    const wide    = parts[2] === 'wide';
+    const fig     = caption ? `<figcaption>${caption}</figcaption>` : '';
+    return `<figure class="media-figure${wide ? ' media-figure--wide' : ''}"><img src="${src}" alt="${alt}" loading="lazy">${fig}</figure>`;
+  },
+  _processShortcodes(text) {
+    Utils._mediaBlocks = {};
+    text = text.replace(/::youtube\[([^\]]+)\]/g, (_, raw) => {
+      const { val, caption } = Utils._cap(raw);
+      return Utils._mediaToken(Utils._youtube(val, caption));
+    });
+    text = text.replace(/::vimeo\[([^\]]+)\]/g, (_, raw) => {
+      const { val, caption } = Utils._cap(raw);
+      return Utils._mediaToken(Utils._vimeo(val, caption));
+    });
+    text = text.replace(/::video\[([^\]]+)\]/g, (_, raw) => {
+      const { val, caption } = Utils._cap(raw);
+      return Utils._mediaToken(Utils._video(val, caption));
+    });
+    text = text.replace(/::audio\[([^\]]+)\]/g, (_, raw) => {
+      const { val, caption } = Utils._cap(raw);
+      return Utils._mediaToken(Utils._audio(val, caption));
+    });
+    text = text.replace(/::image\[([^\]]+)\]/g, (_, raw) => {
+      const first = raw.indexOf('|');
+      const src   = first === -1 ? raw.trim() : raw.slice(0, first).trim();
+      const rest  = first === -1 ? '' : raw.slice(first + 1);
+      return Utils._mediaToken(Utils._image(src, rest));
+    });
+    return text;
+  },
+  _restoreShortcodes(html) {
+    html = html.replace(/<p>(MBLOCK_\d+_END)<\/p>/g, (_, token) => Utils._mediaBlocks[token] || '');
+    html = html.replace(/MBLOCK\d+_END/g, token => Utils._mediaBlocks[token] || '');
+    return html;
+  },
+  safeMarkdown: text => {
+    if (typeof marked !== 'undefined') {
+      text = Utils._processShortcodes(text);
+      const renderer = new marked.Renderer();
+
+      renderer.code = (code, lang) => {
+        const safeLang = (lang || '').split(/\s/)[0];
+        const cls = safeLang ? `class="language-${safeLang}"` : '';
+        const escaped = code
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+        return `<pre><code ${cls}>${escaped}</code></pre>\n`;
+      };
+
+      renderer.heading = (text, level) => {
+        const id = Utils.slugify(text.replace(/<[^>]+>/g, ''));
+        return `<h${level} id="${id}"><a class="heading-anchor" href="#${id}" aria-hidden="true">#</a>${text}</h${level}>\n`;
+      };
+
+      renderer.link = (href, title, linkText) => {
+        const isExternal = href && !href.startsWith('#') && !href.startsWith('/');
+        const t = title ? ` title="${title}"` : '';
+        const ext = isExternal ? ` target="_blank" rel="noopener noreferrer"` : '';
+        return `<a href="${href}"${t}${ext}>${linkText}</a>`;
+      };
+
+      renderer.image = (src, title, alt) => {
+        const t       = title ? ` title="${title}"` : '';
+        const caption = alt || title;
+        const fig     = caption ? `<figcaption>${caption}</figcaption>` : '';
+        return `<figure class="media-figure"><img src="${src}" alt="${alt || ''}"${t} loading="lazy">${fig}</figure>`;
+      };
+
+      renderer.blockquote = (quote) => {
+        const match = quote.match(/^<p>\[!(NOTE|TIP|WARNING|CAUTION|IMPORTANT)\]([\s\S]*)/i);
+        if (match) {
+          const type = match[1].toUpperCase();
+          const cfg  = Utils.CALLOUT_TYPES[type] || Utils.CALLOUT_TYPES.NOTE;
+          const body = match[2].replace(/<\/p>$/, '').replace(/^(\s*<br\s*\/?>\s*|\n)/i, '').trim();
+          return `<div class="callout ${cfg.cls}" role="note"><div class="callout__title"><i class="${cfg.icon}" aria-hidden="true"></i>${type}</div><div class="callout__body">${body}</div></div>\n`;
+        }
+        return `<blockquote>${quote}</blockquote>\n`;
+      };
+
+      let raw = marked.parse(text, { renderer, gfm: true, breaks: false });
+      raw = Utils.renderMath(raw);
+
+      if (typeof DOMPurify !== 'undefined') {
+        raw = DOMPurify.sanitize(raw, {
+          ADD_TAGS: ['pre', 'code', 'span', 'video', 'audio', 'source', 'iframe',
+                     'details', 'summary', 'input', 'figure', 'figcaption',
+                     'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td',
+                     'math', 'annotation', 'semantics', 'mrow', 'mi', 'mn',
+                     'mo', 'msup', 'msub', 'mfrac', 'mspace', 'mtext'],
+          ADD_ATTR: ['class', 'id', 'src', 'controls', 'autoplay', 'loop', 'muted',
+                     'playsinline', 'width', 'height', 'allow', 'allowfullscreen',
+                     'frameborder', 'loading', 'type', 'checked', 'disabled',
+                     'target', 'rel', 'title', 'alt', 'scope', 'align',
+                     'encoding', 'display', 'style', 'aria-hidden', 'preload',
+                     'poster', 'dnt']
+        });
+      }
+
+      return Utils._restoreShortcodes(raw);
+    }
+    return text.replace(/\n/g, '<br>');
+  },
+  readTime: body => `${Math.max(1, Math.ceil(body.trim().split(/\s+/).length / 200))} min`
+};
+
+// =========================================
+// 3. DATA LOADER
+// =========================================
+const DataLoader = {
+  async load() {
+    if (location.protocol === 'file:') {
+      UI.showError('Open via a local server', 'Browsers block file:// fetches.', 'python3 -m http.server 8080');
+      return null;
+    }
+
+    // ── Discover post filenames via GitHub Contents API ───────────
+    // No index.json required — the API lists the posts/ directory directly.
+    let filenames;
+    if (CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO) {
+      try {
+        const apiUrl = `https://api.github.com/repos/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/contents/posts`;
+        const r = await fetch(apiUrl, { headers: { 'Accept': 'application/vnd.github.v3+json' } });
+        if (!r.ok) throw new Error(`GitHub API HTTP ${r.status}`);
+        const entries = await r.json();
+        filenames = entries
+          .filter(e => e.type === 'file' && e.name.endsWith('.md') && e.name !== 'index.md')
+          .map(e => e.name);
+      } catch (e) {
+        UI.showError('Could not list posts from GitHub API', e.message, `https://api.github.com/repos/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/contents/posts`);
+        return null;
+      }
+    } else {
+      // ── Local dev fallback: try index.json if present ────────────
+      try {
+        const r = await fetch('/posts/index.json');
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const list = await r.json();
+        if (!Array.isArray(list)) throw new Error('posts/index.json must be a JSON array');
+        // Fast path: metadata objects
+        if (list.length > 0 && typeof list[0] === 'object' && list[0] !== null) {
+          return list
+            .map(item => ({
+              slug:           item.slug || '',
+              title:          item.title || 'Untitled',
+              excerpt:        item.excerpt || '',
+              date:           item.date   || new Date().toISOString().split('T')[0],
+              tag:            item.tag    || 'Post',
+              readTime:       item.readTime || '1 min',
+              paywalled:      item.paywalled === true || item.paywalled === 'true',
+              cover:          item.cover || '',
+              author:         item.author         || CONFIG.AUTHOR_NAME,
+              authorRole:     item.author_role    || CONFIG.AUTHOR_ROLE,
+              authorBio:      item.author_bio     || CONFIG.AUTHOR_BIO,
+              authorInitials: item.author_initials || (
+                (item.author || CONFIG.AUTHOR_NAME)
+                  .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+              ),
+            }))
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+        filenames = list.filter(n => typeof n === 'string' && n.endsWith('.md'));
+      } catch (e) {
+        UI.showError('Local dev: could not load posts/index.json', e.message, '[ "my-post.md" ]');
+        return null;
+      }
+    }
+
+    // ── Fetch all discovered .md files in parallel ────────────────
+    const base = (CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO)
+      ? `https://raw.githubusercontent.com/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/main/posts`
+      : '/posts';
+
+    const posts = await Promise.all(filenames.map(async name => {
+      try {
+        const r = await fetch(`${base}/${name}`);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const { fm, body } = Utils.parseFrontmatter(await r.text());
+        const slug = name.replace(/\.md$/, '');
+        const post = {
+          slug,
+          title:   fm.title || 'Untitled',
+          excerpt: fm.excerpt || (() => {
+            const s = body
+              .replace(/```[\s\S]*?```/g, '').replace(/`[^`]+`/g, '')
+              .replace(/!?\[[^\]]*\]\([^)]*\)/g, '')
+              .replace(/[*_~]{1,3}([^*_~]+)[*_~]{1,3}/g, '$1')
+              .replace(/^#{1,6}\s+/gm, '').replace(/^>\s*/gm, '')
+              .replace(/^[-*+]\s+/gm, '').replace(/\n/g, ' ').trim();
+            return s.substring(0, 140) + (s.length > 140 ? '…' : '');
+          })(),
+          date:           fm.date     || new Date().toISOString().split('T')[0],
+          tag:            fm.tag      || 'Post',
+          readTime:       fm.readTime || Utils.readTime(body),
+          paywalled:      fm.paywalled === 'true',
+          cover:          fm.cover    || '',
+          author:         fm.author         || CONFIG.AUTHOR_NAME,
+          authorRole:     fm.author_role    || CONFIG.AUTHOR_ROLE,
+          authorBio:      fm.author_bio     || CONFIG.AUTHOR_BIO,
+          authorInitials: fm.author_initials || (
+             (fm.author || CONFIG.AUTHOR_NAME)
+              .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+          ),
+          body
+        };
+        AppState.postsCache[slug] = post;
+        return post;
+      } catch (e) {
+        console.error(`Failed: ${name}`, e);
+        return null;
+      }
+    }));
+
+    return posts.filter(Boolean).sort((a, b) => new Date(b.date) - new Date(a.date));
+  },
+  async fetchBody(slug) {
+    if (AppState.postsCache[slug]) return AppState.postsCache[slug];
+    const base = (CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO)
+      ? `https://raw.githubusercontent.com/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/main/posts`
+      : '/posts';
+
+    const r = await fetch(`${base}/${slug}.md`);
+    if (!r.ok) throw new Error(`HTTP ${r.status} — could not load ${slug}.md`);
+
+    const { fm, body } = Utils.parseFrontmatter(await r.text());
+    const meta = AppState.posts.find(p => p.slug === slug) || {};
+    const full = { ...meta, body };
+    AppState.postsCache[slug] = full;
+    return full;
+  }
+};
+
+// =========================================
+// 4. RENDERER
+// =========================================
+const Renderer = {
+  applyBranding() {
+    document.title = `Shanios Blog — Engineering, Linux & Open Source`;
+    document.getElementById('canonical-url')?.setAttribute('href', 'https://blog.shani.dev/');
+    ['og-title', 'tw-title'].forEach(id =>
+      Utils.qs(`#${id}`)?.setAttribute('content', 'Shanios Blog — Engineering, Linux & Open Source'));
+    ['og-desc', 'tw-desc'].forEach(id =>
+      Utils.qs(`#${id}`)?.setAttribute('content', CONFIG.HERO_SUB));
+    document.getElementById('og-url')?.setAttribute('content', 'https://blog.shani.dev/');
+    document.getElementById('og-type')?.setAttribute('content', 'website');
+    document.getElementById('meta-desc')?.setAttribute('content', CONFIG.HERO_SUB);
+    document.getElementById('footer-links').innerHTML = CONFIG.SOCIAL_LINKS
+      .map(s => `<a href="${s.url}" target="_blank" rel="noopener" aria-label="${s.label}"><i class="${s.icon}" aria-hidden="true"></i> <span>${s.label}</span></a>`)
+      .join('');
+    document.querySelectorAll('[data-current-year]').forEach(el => el.textContent = new Date().getFullYear());
+  },
+  renderHero(posts) {
+    if (!posts.length) return;
+    const p = posts[0];
+
+    // ── Build title with italicised last word ──────────────────
+    const words = p.title.split(' ');
+    const last  = words.pop();
+    const titleHtml = `${words.join(' ')} <em>${last}</em>`;
+
+    // ── Replace hero grid content with editorial featured-post layout ──
+    const heroGrid = Utils.qs('.hero__grid');
+    if (!heroGrid) return;
+
+    heroGrid.innerHTML = `
+      <!-- Featured post panel -->
+      <div class="hero__featured" id="hero-featured-panel">
+        <div class="hero__eyebrow">
+          <span class="hero__eyebrow-dot"></span>
+          Featured Post
+        </div>
+        <span class="hero__tag" id="hero-tag">${Utils.tagIcon(p.tag)} ${p.tag}</span>
+        <h1 class="hero__title" id="hero-title">${titleHtml}</h1>
+        <p class="hero__sub" id="hero-sub">${p.excerpt || CONFIG.HERO_SUB}</p>
+        <div class="meta" id="hero-meta">
+          <span class="avatar">${p.authorInitials}</span>
+          <span>${p.author}</span>
+          <span class="meta-dot">·</span>
+          <span>${Utils.fmtDateShort(p.date)}</span>
+          <span class="meta-dot">·</span>
+          <span><i class="fa-regular fa-clock"></i> ${p.readTime}</span>
+          ${p.paywalled ? '<span class="members-badge"><i class="fa-solid fa-star"></i> Members</span>' : ''}
+        </div>
+        <button class="hero-link" id="hero-read-btn">Read post</button>
+      </div>
+
+      <!-- Also reading sidebar -->
+      <aside class="hero__sidebar">
+        <h3 class="sidebar__title">Also reading</h3>
+        <ul class="sidebar__list" id="aside-list">
+          <li class="loading-text">Loading…</li>
+        </ul>
+      </aside>
+    `;
+
+    // Wire click handlers
+    Utils.qs('#hero-featured-panel').addEventListener('click', () => Router.go(p.slug));
+    // Stop the button from double-firing via the panel listener
+    Utils.qs('#hero-read-btn').addEventListener('click', e => { e.stopPropagation(); Router.go(p.slug); });
+
+    // ── Sidebar: posts 1-4 ──────────────────────────────────
+    const aside = Utils.qs('#aside-list');
+    const items = posts.slice(1, 5);
+    aside.innerHTML = items.length
+      ? items.map(item => `
+          <li>
+            <button class="sidebar__link" data-slug="${item.slug}">
+              ${Utils.tagIcon(item.tag)} ${item.title}
+            </button>
+            <span class="sidebar__date">
+              <i class="fa-regular fa-calendar"></i> ${Utils.fmtDateShort(item.date)}
+              <span class="meta-dot">·</span>
+              <i class="fa-regular fa-clock"></i> ${item.readTime}
+            </span>
+          </li>`).join('')
+      : '<li class="loading-text">No more posts</li>';
+    aside.querySelectorAll('.sidebar__link[data-slug]').forEach(btn => {
+      btn.addEventListener('click', e => { e.stopPropagation(); Router.go(btn.dataset.slug); });
+    });
+  },
+  renderPosts(posts, showFeatured = false) {
+    const grid = Utils.qs('#posts-grid');
+    if (!posts.length) {
+      grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-inbox empty-icon"></i><h3>No posts found</h3><p>Try a different topic or check back soon.</p></div>`;
+      return;
+    }
+    grid.innerHTML = posts.map((p, i) => {
+      const isFeat = showFeatured && i === 0;
+      return `<article class="card ${isFeat ? 'featured' : ''}" role="listitem" data-idx="${i}">
+        <div class="card__visual"><i class="${TAG_ICONS[p.tag] || TAG_ICONS.Post} card__icon" aria-hidden="true"></i></div>
+        <div class="card__content">
+          <span class="card__tag" data-tag="${p.tag}"><i class="${TAG_ICONS[p.tag] || TAG_ICONS.Post}"></i> ${p.tag}</span>
+          <h2 class="card__title">${p.title}</h2>
+          <p class="card__excerpt">${p.excerpt}</p>
+          <div class="card__footer">
+            <span class="card__author"><i class="fa-solid fa-user-pen"></i> ${p.author}</span>
+            <span class="card__meta">
+              <i class="fa-regular fa-calendar"></i> ${Utils.fmtDateShort(p.date)}
+              <span class="meta-dot">·</span>
+              <i class="fa-regular fa-clock"></i> ${p.readTime}
+              ${p.paywalled ? '<span class="members-badge"><i class="fa-solid fa-star"></i></span>' : ''}
+            </span>
+          </div>
+        </div>
+      </article>`;
+    }).join('');
+    grid.querySelectorAll('.card').forEach(card => {
+      const idx = parseInt(card.dataset.idx);
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `Read: ${posts[idx].title}`);
+      card.addEventListener('click', () => Router.go(posts[idx].slug));
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); Router.go(posts[idx].slug); }
+      });
+    });
+  },
+  renderPagination(total, perPage, currentPage) {
+    let container = Utils.qs('#pagination-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'pagination-container';
+      const grid = Utils.qs('#posts-grid');
+      if (grid && grid.parentNode) grid.parentNode.insertBefore(container, grid.nextSibling);
+    }
+    const totalPages = Math.ceil(total / perPage);
+    if (totalPages <= 1) { container.innerHTML = ''; return; }
+
+    const pageSet = new Set([1, totalPages]);
+    for (let i = Math.max(1, currentPage - 1); i <= Math.min(totalPages, currentPage + 1); i++) pageSet.add(i);
+    const sorted = [...pageSet].sort((a, b) => a - b);
+
+    const items = [];
+    let prev = 0;
+    for (const p of sorted) {
+      if (p - prev > 1) items.push('…');
+      items.push(p);
+      prev = p;
+    }
+
+    let html = `<nav class="pagination" aria-label="Post pages">`;
+    html += `<button class="pag-btn${currentPage === 1 ? ' disabled' : ''}"
+              data-page="${currentPage - 1}"
+              aria-label="Previous page"
+              ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>`;
+
+    for (const item of items) {
+      if (item === '…') {
+        html += `<span class="pag-ellipsis">…</span>`;
+      } else if (item === currentPage) {
+        html += `<button class="pag-btn active" disabled aria-current="page">${item}</button>`;
+      } else {
+        html += `<button class="pag-btn" data-page="${item}" aria-label="Go to page ${item}">${item}</button>`;
+      }
+    }
+
+    html += `<button class="pag-btn${currentPage === totalPages ? ' disabled' : ''}"
+              data-page="${currentPage + 1}"
+              aria-label="Next page"
+              ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
+    html += `</nav>`;
+
+    container.innerHTML = html;
+
+    container.querySelectorAll('.pag-btn:not(.disabled):not([disabled])').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const newPage = parseInt(btn.dataset.page);
+        if (!newPage) return;
+        Router.setQuery({ tag: AppState.filter === 'all' ? null : AppState.filter, page: newPage });
+        Utils.qs('#posts-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  },
+  renderPost(post) {
+    const app = Utils.qs('#post-article');
+    const html = Utils.safeMarkdown(post.body);
+    const paywalled = post.paywalled;
+    const date = Utils.fmtDateShort(post.date);
+    document.title = `${post.title} — Shanios Blog`;
+    const postUrl = `https://blog.shani.dev/post/${post.slug}`;
+    const defaultOgImg = 'https://shani.dev/assets/images/logo.svg';
+    const ogImg = post.cover || defaultOgImg;
+    document.getElementById('canonical-url')?.setAttribute('href', postUrl);
+    document.getElementById('meta-desc')?.setAttribute('content', post.excerpt);
+    document.getElementById('og-type')?.setAttribute('content', 'article');
+    ['og-title', 'tw-title'].forEach(id => Utils.qs(`#${id}`)?.setAttribute('content', post.title));
+    ['og-desc',  'tw-desc' ].forEach(id => Utils.qs(`#${id}`)?.setAttribute('content', post.excerpt));
+    document.getElementById('og-url')?.setAttribute('content', postUrl);
+    document.getElementById('og-image')?.setAttribute('content', ogImg);
+    document.getElementById('tw-image')?.setAttribute('content', ogImg);
+
+    const ldblogs = document.getElementById('ld-blogs');
+    if (ldblogs) ldblogs.textContent = JSON.stringify({
+      "@context": "https://schema.org", "@type": "BlogPosting",
+      "headline": post.title, "description": post.excerpt, "datePublished": post.date,
+      ...(post.cover ? { "image": post.cover } : {}),
+      "author": { "@type": "Person", "name": post.author },
+      "publisher": {
+        "@type": "Organization", "name": "Shanios", "url": "https://shani.dev",
+        "logo": { "@type": "ImageObject", "url": "https://shani.dev/assets/images/logo.svg" }
+      },
+      "mainEntityOfPage": { "@type": "WebPage", "@id": postUrl },
+      "url": postUrl, "keywords": post.tag, "inLanguage": "en-US"
+    });
+
+    const ldOrg = document.getElementById('ld-org');
+    if (ldOrg) ldOrg.textContent = JSON.stringify({
+      "@context": "https://schema.org", "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home",      "item": "https://blog.shani.dev/" },
+        { "@type": "ListItem", "position": 2, "name": post.tag,    "item": `https://blog.shani.dev/?tag=${post.tag}` },
+        { "@type": "ListItem", "position": 3, "name": post.title,  "item": postUrl }
+      ]
+    });
+
+    let content = '';
+    if (paywalled && !AppState.isMember) {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      const blocks = [...div.children];
+      const free  = blocks.slice(0, 3).map(n => n.outerHTML).join('');
+      const gated = blocks.slice(3).map(n => n.outerHTML).join('');
+      content = `<div class="paywall-wrap"><div class="post-body paywall-fade">${free}${gated}</div></div>
+         <div class="paywall-gate"><div class="paywall-card">
+           <i class="fa-solid fa-lock paywall-icon"></i>
+           <h3>Members only</h3>
+           <p>This post is for members. Unlock full access instantly.</p>
+           <div class="paywall-actions">
+             <button class="btn primary" id="unlock-btn"><i class="fa-solid fa-unlock"></i> Unlock Access</button>
+             <button class="btn" id="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to posts</button>
+           </div>
+         </div></div>`;
+    } else {
+      content = `<div class="post-body">${html}</div>`;
+    }
+
+    const liked = localStorage.getItem(`liked:${post.slug}`) === '1';
+
+    app.innerHTML = `
+      <header class="post-header">
+        <button class="post-back" onclick="Router.back()"><i class="fa-solid fa-arrow-left"></i> All posts</button>
+        <span class="post-tag">${Utils.tagIcon(post.tag)} ${post.tag}</span>
+        <h1 class="post-title">${post.title}</h1>
+        ${post.excerpt ? `<p class="post-excerpt">${post.excerpt.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>` : ''}
+        <div class="post-meta">
+          <span class="avatar">${post.authorInitials}</span>
+          <div class="meta-info">
+            <div class="meta-name"><i class="fa-solid fa-user-pen"></i> ${post.author}${post.authorRole ? ` · <span class="meta-role">${post.authorRole}</span>` : ''}</div>
+            ${post.authorBio ? `<div class="meta-bio">${post.authorBio}</div>` : ''}
+            <div class="meta-details">
+              <span><i class="fa-regular fa-calendar"></i> ${date}</span>
+              <span class="meta-dot">·</span>
+              <span><i class="fa-regular fa-clock"></i> ${post.readTime}</span>
+              ${paywalled ? '<span class="meta-dot">·</span><span class="members-badge"><i class="fa-solid fa-star"></i> Members</span>' : ''}
+            </div>
+          </div>
+          <div class="meta-actions">
+            <button class="btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
+            <button class="btn" id="share-btn"><i class="fa-solid fa-share-nodes"></i> Share</button>
+          </div>
+        </div>
+      </header>
+      <div class="post-cover" aria-hidden="true"><i class="${TAG_ICONS[post.tag] || TAG_ICONS.Post} post-cover-icon"></i></div>
+      ${content}
+      <footer class="post-footer">
+        <div class="post-tags">
+          <button class="tag-chip" onclick="Router.back('${post.tag}')">${Utils.tagIcon(post.tag)} ${post.tag}</button>
+          <button class="tag-chip" onclick="Router.back()"><i class="fa-solid fa-grip"></i> All Posts</button>
+        </div>
+        <div class="meta-actions">
+          <button class="btn like ${liked ? 'reacted' : ''}" id="like-btn">
+            <i class="fa-${liked ? 'solid' : 'regular'} fa-heart"></i> ${liked ? 'Liked' : 'Like'}
+          </button>
+        </div>
+        <div class="post-nav" id="post-nav-btns"></div>
+      </footer>`;
+
+    app.querySelector('#like-btn')?.addEventListener('click', function () {
+      const is = this.classList.toggle('reacted');
+      this.innerHTML = `<i class="fa-${is ? 'solid' : 'regular'} fa-heart"></i> ${is ? 'Liked' : 'Like'}`;
+      localStorage.setItem(`liked:${post.slug}`, is ? '1' : '0');
+    });
+
+    const navEl = app.querySelector('#post-nav-btns');
+    if (navEl && AppState.posts.length) {
+      const idx  = AppState.posts.findIndex(p => p.slug === post.slug);
+      const prev = idx < AppState.posts.length - 1 ? AppState.posts[idx + 1] : null;
+      const next = idx > 0 ? AppState.posts[idx - 1] : null;
+      navEl.innerHTML = `
+        ${prev ? `<button class="post-nav-btn" id="nav-prev">
+           <div class="nav-label"><i class="fa-solid fa-arrow-left"></i> Older</div>
+           <div class="nav-title">${prev.title}</div>
+         </button>` : `<button class="post-nav-btn" onclick="Router.back()">
+           <div class="nav-label"><i class="fa-solid fa-arrow-left"></i> Back</div>
+           <div class="nav-title">Browse all posts</div>
+         </button>`}
+        ${next ? `<button class="post-nav-btn post-nav-btn--right" id="nav-next">
+           <div class="nav-label">Newer <i class="fa-solid fa-arrow-right"></i></div>
+           <div class="nav-title">${next.title}</div>
+         </button>` : '<div class="post-nav-btn post-nav-btn--right post-nav-btn--empty"></div>'}`;
+      navEl.querySelector('#nav-prev')?.addEventListener('click', () => Router.go(prev.slug));
+      navEl.querySelector('#nav-next')?.addEventListener('click', () => Router.go(next.slug));
+    }
+    app.querySelector('#share-btn')?.addEventListener('click', () => UI.share());
+    app.querySelector('#unlock-btn')?.addEventListener('click', () => {
+      localStorage.setItem('blogs_member', '1');
+      AppState.isMember = true;
+      Renderer.renderPost(post);
+    });
+    app.querySelector('#back-btn')?.addEventListener('click', () => Router.back());
+
+    app.querySelectorAll('pre').forEach(pre => {
+      const wrap = document.createElement('div');
+      wrap.className = 'code-block';
+      const bar = document.createElement('div');
+      bar.className = 'code-block__bar';
+      const lang = pre.querySelector('code')?.className.match(/language-(\w+)/)?.[1];
+      const langLabel = Object.assign(document.createElement('span'), { className: 'code-lang', textContent: lang || '' });
+      bar.appendChild(langLabel);
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.innerHTML = `<i class="fa-regular fa-copy"></i> Copy`;
+      btn.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(pre.textContent); } catch {
+          try {
+            const ta = Object.assign(document.createElement('textarea'), { value: pre.textContent });
+            ta.style.cssText = 'position:fixed;opacity:0';
+            document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+          } catch { /* clipboard unavailable */ }
+        }
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> Copied`;
+        btn.classList.add('copied');
+        setTimeout(() => { btn.innerHTML = `<i class="fa-regular fa-copy"></i> Copy`; btn.classList.remove('copied'); }, 2000);
+      });
+      bar.appendChild(btn);
+      wrap.appendChild(bar);
+      pre.parentNode.insertBefore(wrap, pre);
+      wrap.appendChild(pre);
+    });
+
+    app.querySelectorAll('.post-body table, .paywall-fade table').forEach(table => {
+      const wrap = document.createElement('div');
+      wrap.className = 'table-wrap';
+      table.parentNode.insertBefore(wrap, table);
+      wrap.appendChild(table);
+      const bar = document.createElement('div');
+      bar.className = 'table-bar';
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'table-copy-btn btn';
+      copyBtn.innerHTML = `<i class="fa-regular fa-copy"></i> Copy CSV`;
+      copyBtn.addEventListener('click', async () => {
+        const rows = [...table.querySelectorAll('tr')];
+        const csv  = rows.map(r => [...r.querySelectorAll('th,td')]
+          .map(c => `"${c.textContent.replace(/"/g, '""')}"`)
+          .join(',')).join('\n');
+        try { await navigator.clipboard.writeText(csv); } catch {
+          try {
+            const ta = Object.assign(document.createElement('textarea'), { value: csv });
+            ta.style.cssText = 'position:fixed;opacity:0';
+            document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+          } catch { /* clipboard unavailable */ }
+        }
+        copyBtn.innerHTML = `<i class="fa-solid fa-check"></i> Copied`;
+        copyBtn.classList.add('copied');
+        setTimeout(() => { copyBtn.innerHTML = `<i class="fa-regular fa-copy"></i> Copy CSV`; copyBtn.classList.remove('copied'); }, 2000);
+      });
+      bar.appendChild(copyBtn);
+      wrap.insertBefore(bar, table);
+    });
+
+    if (typeof Prism !== 'undefined') Prism.highlightAll();
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
+    app.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const id = decodeURIComponent(a.getAttribute('href').slice(1));
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }
+};
+
+// =========================================
+// 5. ROUTER
+// =========================================
+const Router = {
+  go(slug) {
+    history.pushState({ slug }, '', `/post/${encodeURIComponent(slug)}`);
+    this.render();
+  },
+  back(tag) {
+    this.setQuery({ tag: tag || null, page: 1 });
+  },
+  getSlug() {
+    // Handle /posts/slug (raw GitHub Pages path) → silently rewrite to /post/slug
+    const rawMd = location.pathname.match(/^\/posts\/(.+?)(?:\.md)?$/);
+    if (rawMd) {
+      const slug = decodeURIComponent(rawMd[1]);
+      history.replaceState({}, '', `/post/${encodeURIComponent(slug)}`);
+      return slug;
+    }
+    const m = location.pathname.match(/^\/post\/(.+)$/);
+    return m ? decodeURIComponent(m[1]) : null;
+  },
+  getParams() {
+    const qs = new URLSearchParams(location.search);
+    return {
+      tag:  qs.get('tag') || null,
+      page: Math.max(1, parseInt(qs.get('page')) || 1)
+    };
+  },
+  setQuery({ tag, page } = {}) {
+    const qs = new URLSearchParams();
+    if (tag && tag !== 'all') qs.set('tag', tag);
+    if (page > 1) qs.set('page', page);
+    history.pushState({}, '', qs.toString() ? `/?${qs.toString()}` : '/');
+    this.render();
+  },
+  async render() {
+    const slug    = this.getSlug();
+    const indexEl = document.getElementById('view-index');
+    const postEl  = document.getElementById('view-post');
+    const readBar = document.getElementById('reading-bar');
+    if (slug) {
+      indexEl.style.display = 'none';
+      postEl.style.display  = '';
+      if (readBar) readBar.style.display = '';
+
+      document.querySelectorAll('.nav a, .mobile-nav a').forEach(a =>
+        a.classList.toggle('active', a.getAttribute('href') === '/')
+      );
+
+      Utils.qs('#post-article').innerHTML =
+        `<div class="loading-spinner"><div class="spinner"></div></div>`;
+
+      try {
+        const post = AppState.postsCache[slug] || await DataLoader.fetchBody(slug);
+        if (post && post.body) {
+          Renderer.renderPost(post);
+        } else {
+          throw new Error('body missing');
+        }
+      } catch {
+        Utils.qs('#post-article').innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-file-circle-xmark empty-icon"></i>
+            <h3>Post not found</h3>
+            <p>The post you're looking for doesn't exist or failed to load.</p>
+            <button class="btn primary" onclick="Router.back()">
+              <i class="fa-solid fa-arrow-left"></i> Back to posts
+            </button>
+          </div>`;
+      }
+    } else {
+      indexEl.style.display = '';
+      postEl.style.display  = 'none';
+      if (readBar) readBar.style.display = 'none';
+
+      document.title = `Shanios Blog — Engineering, Linux & Open Source`;
+      document.getElementById('canonical-url')?.setAttribute('href', 'https://blog.shani.dev/');
+      document.getElementById('og-type')?.setAttribute('content', 'website');
+      document.getElementById('og-url')?.setAttribute('content', 'https://blog.shani.dev/');
+      ['og-title', 'tw-title'].forEach(id =>
+        Utils.qs(`#${id}`)?.setAttribute('content', 'Shanios Blog — Engineering, Linux & Open Source'));
+      ['og-desc', 'tw-desc'].forEach(id =>
+        Utils.qs(`#${id}`)?.setAttribute('content', CONFIG.HERO_SUB));
+
+      const { tag, page } = this.getParams();
+      AppState.filter = tag || 'all';
+      AppState.pagination.page = page; 
+
+      document.querySelectorAll('.nav a, .mobile-nav a').forEach(a => {
+        const href = a.getAttribute('href');
+        const hrefTag = href?.includes('?tag=') ? href.split('?tag=')[1].toLowerCase() : null;
+        const activeTag = tag ? tag.toLowerCase() : null;
+        a.classList.toggle('active', hrefTag === activeTag || (!hrefTag && !tag && href === '/'));
+      });
+
+      document.querySelectorAll('.chip').forEach(chip =>
+        chip.classList.toggle('active', chip.dataset.tag.toLowerCase() === AppState.filter.toLowerCase())
+      );
+
+      let filtered = AppState.filter === 'all'
+        ? AppState.posts
+        : AppState.posts.filter(p => p.tag.toLowerCase() === AppState.filter.toLowerCase());
+      if (AppState.search) {
+        const q = AppState.search.toLowerCase();
+        filtered = filtered.filter(p =>
+          p.title.toLowerCase().includes(q) ||
+          p.excerpt.toLowerCase().includes(q) ||
+          p.tag.toLowerCase().includes(q) ||
+          (AppState.postsCache[p.slug]?.body || '').toLowerCase().includes(q)
+        );
+      }
+
+      const { perPage } = AppState.pagination;
+      const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+      if (AppState.pagination.page > totalPages) AppState.pagination.page = totalPages;
+      const start   = (AppState.pagination.page - 1) * perPage;
+      const visible = filtered.slice(start, start + perPage);
+
+      const showFeatured = AppState.filter === 'all' && AppState.pagination.page === 1 && !AppState.search;
+
+      // When on the default homepage view, the hero already features posts[0],
+      // so strip it from the grid to avoid showing the same post twice.
+      const gridPosts = (showFeatured && visible.length > 1)
+        ? visible.slice(1)
+        : visible;
+
+      const st = Utils.qs('#section-title');
+      if (st) st.textContent = AppState.search
+        ? `Results for "${AppState.search}"`
+        : (AppState.filter === 'all' ? 'Latest Posts' : AppState.filter);
+
+      // Hide hero when searching or tag-filtering — hero always shows latest post
+      // which is misleading when browsing a specific tag or search results
+      const heroEl = Utils.qs('.hero');
+      const heroVisible = !AppState.search && AppState.filter === 'all';
+      if (heroEl) {
+        if (heroVisible) {
+          heroEl.style.animation = 'none';  // prevent replay on restore
+          heroEl.style.display = '';
+        } else {
+          heroEl.style.display = 'none';
+        }
+      }
+
+      Renderer.renderPosts(gridPosts, false);
+      Renderer.renderPagination(filtered.length, perPage, AppState.pagination.page);
+
+      // Scroll posts section into view when search query changes
+      if (AppState.search) {
+        const postsEl = Utils.qs('.posts');
+        if (postsEl) postsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }
+};
+
+// =========================================
+// 6. UI & EVENTS
+// =========================================
+const UI = {
+  showError(title, detail, code) {
+    const grid = Utils.qs('#posts-grid');
+    if (!grid) return;
+    grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-triangle-exclamation empty-icon" style="color:var(--color-error)"></i><h3>${title}</h3><p>${detail}</p>${code ? `<pre><code>${code}</code></pre>` : ''}</div>`;
+  },
+  initTheme() {
+    const btn  = Utils.qs('#theme-btn');
+    const icon = Utils.qs('#theme-icon');
+    const PRISM_DARK  = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css';
+    const PRISM_LIGHT = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css';
+    const apply = t => {
+      document.documentElement.setAttribute('data-theme', t);
+      AppState.theme = t;
+      localStorage.setItem('blogs-theme', t);
+      if (icon) icon.className = t === 'dark' ? 'fa-solid fa-sun'  : 'fa-solid fa-moon';
+      const prismLink = document.getElementById('prism-theme');
+      if (prismLink) prismLink.href = t === 'dark' ? PRISM_DARK : PRISM_LIGHT;
+    };
+    apply(AppState.theme);
+    btn?.addEventListener('click', () =>
+      apply(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark')
+    );
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (!localStorage.getItem('blogs-theme')) apply(e.matches ? 'dark' : 'light');
+    });
+  },
+  initMenu() {
+    const btn = Utils.qs('#menu-toggle');
+    const nav = Utils.qs('#mobile-nav');
+    btn?.addEventListener('click', () => {
+      const open = nav?.classList.toggle('open');
+      btn.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      nav?.setAttribute('aria-hidden', open ? 'false' : 'true');
+    });
+    nav?.addEventListener('click', e => {
+      if (e.target.tagName === 'A' || e.target.closest('a')) {
+        nav.classList.remove('open');
+        btn.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+        nav.setAttribute('aria-hidden', 'true');
+      }
+    });
+  },
+  initSearch() {
+    const toggleBtn = Utils.qs('#search-toggle');
+    const closeBtn  = Utils.qs('#search-close');
+    const searchBar = Utils.qs('#search-bar');
+    const input     = Utils.qs('#search-input');
+    toggleBtn?.addEventListener('click', () => {
+      const open = searchBar.classList.toggle('open');
+      searchBar.setAttribute('aria-hidden', open ? 'false' : 'true');
+      if (open) setTimeout(() => input?.focus(), 80);
+    });
+    closeBtn?.addEventListener('click', () => {
+      searchBar.classList.remove('open');
+      searchBar.setAttribute('aria-hidden', 'true');
+      if (input) { input.value = ''; input.dispatchEvent(new Event('input')); }
+    });
+    input?.addEventListener('input', e => {
+      AppState.search = e.target.value.toLowerCase().trim();
+      if (Router.getSlug()) return;
+      AppState.pagination.page = 1;
+      Router.render(); 
+      const live = Utils.qs('#search-live');
+      if (live && AppState.search) {
+        const q = AppState.search;
+        const count = AppState.posts.filter(p =>
+          p.title.toLowerCase().includes(q) ||
+          p.excerpt.toLowerCase().includes(q) ||
+          p.tag.toLowerCase().includes(q) ||
+          (AppState.postsCache[p.slug]?.body || '').toLowerCase().includes(q) 
+        ).length;
+        live.textContent = `${count} result${count !== 1 ? 's' : ''} for "${AppState.search}"`;
+      } else if (live) {
+        live.textContent = '';
+      }
+    });
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        searchBar.classList.add('open');
+        searchBar.setAttribute('aria-hidden', 'false');
+        setTimeout(() => input?.focus(), 80);
+      }
+      if (e.key === 'Escape' && searchBar.classList.contains('open')) {
+        searchBar.classList.remove('open');
+        searchBar.setAttribute('aria-hidden', 'true');
+        if (input) { input.value = ''; input.dispatchEvent(new Event('input')); }
+      }
+    });
+  },
+  initFilters() {
+    const bar = Utils.qs('#tag-bar');
+    if (!bar) return;
+    const tags = ['all', ...new Set(AppState.posts.map(p => p.tag))];
+    bar.innerHTML = tags.map(t =>
+      `<button class="chip ${t === AppState.filter ? 'active' : ''}" data-tag="${t}">${t !== 'all' ? Utils.tagIcon(t) + ' ' : ''}${t === 'all' ? 'All' : t}</button>`
+    ).join('');
+    bar.addEventListener('click', e => {
+      const btn = e.target.closest('.chip');
+      if (!btn) return;
+      bar.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      AppState.search = '';
+      const input = Utils.qs('#search-input');
+      if (input) input.value = '';
+      Router.setQuery({ tag: btn.dataset.tag === 'all' ? null : btn.dataset.tag, page: 1 });
+    });
+  },
+  initBackTop() {
+    const btn = Utils.qs('#back-top');
+    if (!btn) return;
+    window.addEventListener('scroll', () => btn.classList.toggle('show', window.scrollY > 400), { passive: true });
+    btn.addEventListener('click', () => scrollTo({ top: 0, behavior: 'smooth' }));
+  },
+  initReadingBar() {
+    const bar = Utils.qs('#reading-bar');
+    if (!bar) return;
+    window.addEventListener('scroll', () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = total > 0 ? (window.scrollY / total * 100) + '%' : '0%';
+    }, { passive: true });
+  },
+  initLogoLink() {
+    document.addEventListener('click', e => {
+      const a = e.target.closest('a[href]');
+      if (!a) return;
+      const href = a.getAttribute('href');
+      if (!href || href.startsWith('http') || href.startsWith('//') || href.startsWith('#')) return;
+      e.preventDefault();
+      if (location.pathname + location.search !== href) {
+        history.pushState({}, '', href);
+        Router.render();
+      }
+    });
+  },
+  share() {
+    const url = location.href;
+    const title = document.title;
+    if (navigator.share) {
+      navigator.share({ title, url });
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        const toast = Object.assign(document.createElement('div'), {
+          className: 'toast',
+          innerHTML: '<i class="fa-solid fa-check"></i> Link copied'
+        });
+        document.body.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2000);
+      });
+    }
+  }
+};
+
+// =========================================
+// 7. BOOTSTRAP
+// =========================================
+document.addEventListener('DOMContentLoaded', async () => {
+  Renderer.applyBranding();
+  UI.initTheme();
+  UI.initMenu();
+  UI.initBackTop();
+  UI.initReadingBar();
+  UI.initSearch();
+  UI.initLogoLink();
+  const loadGrid = Utils.qs('#posts-grid');
+  if (loadGrid) loadGrid.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+  const posts = await DataLoader.load();
+  const loader = Utils.qs('#page-loader');
+  if (posts) {
+    AppState.posts = posts;
+    Renderer.renderHero(posts);
+    UI.initFilters();
+    Router.render();
+  }
+  // Dismiss the full-page loader once data is ready (or failed)
+  if (loader) {
+    // Snap the bar to 100% before fading out
+    const bar = loader.querySelector('.loader__bar');
+    if (bar) { bar.style.animation = 'none'; bar.style.width = '100%'; }
+    requestAnimationFrame(() => {
+      setTimeout(() => loader.classList.add('hidden'), 80);
+    });
+  }
+  window.addEventListener('popstate', () => Router.render());
+});
