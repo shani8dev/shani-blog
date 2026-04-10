@@ -390,34 +390,55 @@ const Renderer = {
   renderHero(posts) {
     if (!posts.length) return;
     const p = posts[0];
-    Utils.qs('#hero-eyebrow').textContent = CONFIG.HERO_EYEBROW;
-    const titleEl = Utils.qs('#hero-title');
+
+    // ── Build title with italicised last word ──────────────────
     const words = p.title.split(' ');
-    const last = words.pop();
-    titleEl.innerHTML = `${words.join(' ')} <em>${last}</em>`;
-    titleEl.onclick = () => Router.go(p.slug);
-    titleEl.style.cursor = 'pointer';
-    Utils.qs('#hero-sub').textContent = p.excerpt || CONFIG.HERO_SUB;
-    Utils.qs('#hero-meta').innerHTML = `
-      <span class="avatar">${p.authorInitials}</span>
-      <span>${p.author}</span>
-      <span class="meta-dot">·</span>
-      <span>${Utils.fmtDateShort(p.date)}</span>
-      <span class="meta-dot">·</span>
-      <span><i class="fa-regular fa-clock"></i> ${p.readTime}</span>
-      ${p.paywalled ? '<span class="members-badge"><i class="fa-solid fa-star"></i> Members</span>' : ''}
+    const last  = words.pop();
+    const titleHtml = `${words.join(' ')} <em>${last}</em>`;
+
+    // ── Replace hero grid content with editorial featured-post layout ──
+    const heroGrid = Utils.qs('.hero__grid');
+    if (!heroGrid) return;
+
+    heroGrid.innerHTML = `
+      <!-- Featured post panel -->
+      <div class="hero__featured" id="hero-featured-panel">
+        <div class="hero__eyebrow">
+          <span class="hero__eyebrow-dot"></span>
+          Featured Post
+        </div>
+        <span class="hero__tag" id="hero-tag">${Utils.tagIcon(p.tag)} ${p.tag}</span>
+        <h1 class="hero__title" id="hero-title">${titleHtml}</h1>
+        <p class="hero__sub" id="hero-sub">${p.excerpt || CONFIG.HERO_SUB}</p>
+        <div class="meta" id="hero-meta">
+          <span class="avatar">${p.authorInitials}</span>
+          <span>${p.author}</span>
+          <span class="meta-dot">·</span>
+          <span>${Utils.fmtDateShort(p.date)}</span>
+          <span class="meta-dot">·</span>
+          <span><i class="fa-regular fa-clock"></i> ${p.readTime}</span>
+          ${p.paywalled ? '<span class="members-badge"><i class="fa-solid fa-star"></i> Members</span>' : ''}
+        </div>
+        <button class="hero-link" id="hero-read-btn">Read post</button>
+      </div>
+
+      <!-- Also reading sidebar -->
+      <aside class="hero__sidebar">
+        <h3 class="sidebar__title">Also reading</h3>
+        <ul class="sidebar__list" id="aside-list">
+          <li class="loading-text">Loading…</li>
+        </ul>
+      </aside>
     `;
 
-    const existing = Utils.qs('.hero-link');
-    if (existing) existing.remove();
-    const link = document.createElement('button');
-    link.className = 'hero-link';
-    link.textContent  = 'Read post';
-    link.onclick = () => Router.go(p.slug);
-    Utils.qs('#hero-meta').after(link);
+    // Wire click handlers
+    Utils.qs('#hero-featured-panel').addEventListener('click', () => Router.go(p.slug));
+    // Stop the button from double-firing via the panel listener
+    Utils.qs('#hero-read-btn').addEventListener('click', e => { e.stopPropagation(); Router.go(p.slug); });
 
+    // ── Sidebar: posts 1-4 ──────────────────────────────────
     const aside = Utils.qs('#aside-list');
-    const items = posts.slice(1, 4);
+    const items = posts.slice(1, 5);
     aside.innerHTML = items.length
       ? items.map(item => `
           <li>
@@ -432,7 +453,7 @@ const Renderer = {
           </li>`).join('')
       : '<li class="loading-text">No more posts</li>';
     aside.querySelectorAll('.sidebar__link[data-slug]').forEach(btn => {
-      btn.addEventListener('click', () => Router.go(btn.dataset.slug));
+      btn.addEventListener('click', e => { e.stopPropagation(); Router.go(btn.dataset.slug); });
     });
   },
   renderPosts(posts, showFeatured = false) {
