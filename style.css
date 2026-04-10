@@ -975,6 +975,54 @@ Toast, Post-back, Tag chips, FA icons
 }
 .post-body .katex { font-size: 1.05em; color: var(--color-text); }
 
+/* =========================================
+PAGE LOAD OVERLAY
+========================================= */
+#page-loader {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--color-bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: var(--space-5);
+  transition: opacity 0.35s var(--ease), visibility 0.35s var(--ease);
+}
+#page-loader.hidden {
+  opacity: 0; visibility: hidden; pointer-events: none;
+}
+.loader__logo {
+  display: flex; align-items: center; gap: var(--space-2);
+  animation: fadeUp 0.5s var(--ease) both;
+}
+.loader__logo img { height: 32px; width: auto; }
+.loader__logo span {
+  font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--color-accent); opacity: 0.9;
+  border-left: 1px solid var(--color-border); padding-left: var(--space-2);
+}
+.loader__track {
+  width: 160px; height: 2px;
+  background: var(--color-border); border-radius: 2px; overflow: hidden;
+  animation: fadeUp 0.5s 0.1s var(--ease) both;
+}
+.loader__bar {
+  height: 100%; width: 0%;
+  background: var(--color-accent);
+  border-radius: 2px;
+  animation: loaderFill 1.2s var(--ease) forwards;
+}
+@keyframes loaderFill {
+  0%   { width: 0%; }
+  40%  { width: 55%; }
+  80%  { width: 82%; }
+  100% { width: 96%; }
+}
+.loader__text {
+  font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--color-text-faint);
+  animation: fadeUp 0.5s 0.2s var(--ease) both;
+}
+
 /* Screen-reader only utility */
 .sr-only {
   position: absolute; width: 1px; height: 1px;

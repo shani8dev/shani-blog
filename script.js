@@ -397,7 +397,7 @@ const Renderer = {
     titleEl.innerHTML = `${words.join(' ')} <em>${last}</em>`;
     titleEl.onclick = () => Router.go(p.slug);
     titleEl.style.cursor = 'pointer';
-    Utils.qs('#hero-sub').textContent = CONFIG.HERO_SUB;
+    Utils.qs('#hero-sub').textContent = p.excerpt || CONFIG.HERO_SUB;
     Utils.qs('#hero-meta').innerHTML = `
       <span class="avatar">${p.authorInitials}</span>
       <span>${p.author}</span>
@@ -858,12 +858,18 @@ const Router = {
 
       const showFeatured = AppState.filter === 'all' && AppState.pagination.page === 1 && !AppState.search;
 
+      // When on the default homepage view, the hero already features posts[0],
+      // so strip it from the grid to avoid showing the same post twice.
+      const gridPosts = (showFeatured && visible.length > 1)
+        ? visible.slice(1)
+        : visible;
+
       const st = Utils.qs('#section-title');
       if (st) st.textContent = AppState.search
         ? `Results for "${AppState.search}"`
         : (AppState.filter === 'all' ? 'Latest Posts' : AppState.filter);
 
-      Renderer.renderPosts(visible, showFeatured);
+      Renderer.renderPosts(gridPosts, false);
       Renderer.renderPagination(filtered.length, perPage, AppState.pagination.page);
     }
   }
@@ -1043,11 +1049,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   const loadGrid = Utils.qs('#posts-grid');
   if (loadGrid) loadGrid.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
   const posts = await DataLoader.load();
+  const loader = Utils.qs('#page-loader');
   if (posts) {
     AppState.posts = posts;
     Renderer.renderHero(posts);
     UI.initFilters();
     Router.render();
+  }
+  // Dismiss the full-page loader once data is ready (or failed)
+  if (loader) {
+    // Snap the bar to 100% before fading out
+    const bar = loader.querySelector('.loader__bar');
+    if (bar) { bar.style.animation = 'none'; bar.style.width = '100%'; }
+    requestAnimationFrame(() => {
+      setTimeout(() => loader.classList.add('hidden'), 80);
+    });
   }
   window.addEventListener('popstate', () => Router.render());
 });
