@@ -361,7 +361,6 @@ content: ''; width: 14px; height: 1px; background: var(--color-text-faint);
 .sidebar__list li {
 padding: var(--space-4) var(--space-5);
 border-bottom: 1px solid var(--color-border);
-display: flex; align-items: center; gap: var(--space-2);
 transition: background 0.15s;
 }
 .sidebar__list li:last-child { border-bottom: none; }
@@ -377,7 +376,7 @@ width: 100%;
 }
 .sidebar__link:hover { color: var(--color-accent); }
 .sidebar__date { font-family: var(--font-mono); font-size: 0.68rem; color: var(--color-text-faint); display: flex; align-items: center; gap: var(--space-2); }
-.loading-text { padding: var(--space-4) 0 !important; color: var(--color-text-faint); animation: pulse 1.5s infinite; font-family: var(--font-mono); font-size: 0.78rem; }
+.loading-text { padding: var(--space-4) 0 !important; color: var(--color-text-faint); animation: pulse 1.5s infinite; font-family: var(--font-mono); font-size: 0.78rem; align-items: center; }
 /* Legacy .badge still used in section headers / other spots */
 .badge {
 display: inline-flex; align-items: center; gap: var(--space-3);
