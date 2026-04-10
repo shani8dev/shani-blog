@@ -376,7 +376,7 @@ width: 100%;
 }
 .sidebar__link:hover { color: var(--color-accent); }
 .sidebar__date { font-family: var(--font-mono); font-size: 0.68rem; color: var(--color-text-faint); display: flex; align-items: center; gap: var(--space-2); }
-.loading-text { padding: var(--space-4) 0 !important; color: var(--color-text-faint); animation: pulse 1.5s infinite; font-family: var(--font-mono); font-size: 0.78rem; align-items: center; }
+.loading-text { padding: var(--space-4); color: var(--color-text-faint); animation: pulse 1.5s infinite; font-family: var(--font-mono); font-size: 0.78rem; align-items: center; }
 /* Legacy .badge still used in section headers / other spots */
 .badge {
 display: inline-flex; align-items: center; gap: var(--space-3);
