@@ -210,8 +210,8 @@ const Utils = {
         if (match) {
           const type = match[1].toUpperCase();
           const cfg  = Utils.CALLOUT_TYPES[type] || Utils.CALLOUT_TYPES.NOTE;
-          const body = match[2].replace(/<\/p>$/, '').trim();
-          return `<div class="callout ${cfg.cls}" role="note"><i class="${cfg.icon}" aria-hidden="true"></i><strong>${type}</strong>${body}</div>\n`;
+          const body = match[2].replace(/<\/p>$/, '').replace(/^(\s*<br\s*\/?>\s*|\n)/i, '').trim();
+          return `<div class="callout ${cfg.cls}" role="note"><div class="callout__title"><i class="${cfg.icon}" aria-hidden="true"></i>${type}</div><div class="callout__body">${body}</div></div>\n`;
         }
         return `<blockquote>${quote}</blockquote>\n`;
       };
@@ -552,7 +552,7 @@ const Renderer = {
     const app = Utils.qs('#post-article');
     const html = Utils.safeMarkdown(post.body);
     const paywalled = post.paywalled;
-    const date = Utils.fmtDate(post.date);
+    const date = Utils.fmtDateShort(post.date);
     document.title = `${post.title} — Shanios Blog`;
     const postUrl = `https://blog.shani.dev/post/${post.slug}`;
     const defaultOgImg = 'https://shani.dev/assets/images/logo.svg';
@@ -627,7 +627,7 @@ const Renderer = {
             <div class="meta-details">
               <span><i class="fa-regular fa-calendar"></i> ${date}</span>
               <span class="meta-dot">·</span>
-              <span><i class="fa-regular fa-clock"></i> ${post.readTime} read</span>
+              <span><i class="fa-regular fa-clock"></i> ${post.readTime}</span>
               ${paywalled ? '<span class="meta-dot">·</span><span class="members-badge"><i class="fa-solid fa-star"></i> Members</span>' : ''}
             </div>
           </div>
@@ -644,7 +644,7 @@ const Renderer = {
           <button class="tag-chip" onclick="Router.back('${post.tag}')">${Utils.tagIcon(post.tag)} ${post.tag}</button>
           <button class="tag-chip" onclick="Router.back()"><i class="fa-solid fa-grip"></i> All Posts</button>
         </div>
-        <div class="meta-actions" style="margin-bottom:var(--space-6)">
+        <div class="meta-actions">
           <button class="btn like ${liked ? 'reacted' : ''}" id="like-btn">
             <i class="fa-${liked ? 'solid' : 'regular'} fa-heart"></i> ${liked ? 'Liked' : 'Like'}
           </button>
@@ -674,7 +674,7 @@ const Renderer = {
         ${next ? `<button class="post-nav-btn post-nav-btn--right" id="nav-next">
            <div class="nav-label">Newer <i class="fa-solid fa-arrow-right"></i></div>
            <div class="nav-title">${next.title}</div>
-         </button>` : '<div></div>'}`;
+         </button>` : '<div class="post-nav-btn post-nav-btn--right post-nav-btn--empty"></div>'}`;
       navEl.querySelector('#nav-prev')?.addEventListener('click', () => Router.go(prev.slug));
       navEl.querySelector('#nav-next')?.addEventListener('click', () => Router.go(next.slug));
     }
@@ -890,8 +890,18 @@ const Router = {
         ? `Results for "${AppState.search}"`
         : (AppState.filter === 'all' ? 'Latest Posts' : AppState.filter);
 
+      // Hide hero when searching — it's irrelevant noise above results
+      const heroEl = Utils.qs('.hero');
+      if (heroEl) heroEl.style.display = AppState.search ? 'none' : '';
+
       Renderer.renderPosts(gridPosts, false);
       Renderer.renderPagination(filtered.length, perPage, AppState.pagination.page);
+
+      // Scroll posts section into view when search query changes
+      if (AppState.search) {
+        const postsEl = Utils.qs('.posts');
+        if (postsEl) postsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   }
 };
@@ -997,7 +1007,7 @@ const UI = {
     if (!bar) return;
     const tags = ['all', ...new Set(AppState.posts.map(p => p.tag))];
     bar.innerHTML = tags.map(t =>
-      `<button class="chip ${t === AppState.filter ? 'active' : ''}" data-tag="${t}">${t !== 'all' ? '<i class="fa-solid fa-tag"></i> ' : ''}${t === 'all' ? 'All' : t}</button>`
+      `<button class="chip ${t === AppState.filter ? 'active' : ''}" data-tag="${t}">${t !== 'all' ? Utils.tagIcon(t) + ' ' : ''}${t === 'all' ? 'All' : t}</button>`
     ).join('');
     bar.addEventListener('click', e => {
       const btn = e.target.closest('.chip');
@@ -1046,7 +1056,7 @@ const UI = {
       navigator.clipboard.writeText(url).then(() => {
         const toast = Object.assign(document.createElement('div'), {
           className: 'toast',
-          innerHTML: '✓ Link copied'
+          innerHTML: '<i class="fa-solid fa-check"></i> Link copied'
         });
         document.body.appendChild(toast);
         setTimeout(() => toast.classList.add('show'), 10);
