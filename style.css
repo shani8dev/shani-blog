@@ -361,6 +361,7 @@ content: ''; width: 14px; height: 1px; background: var(--color-text-faint);
 .sidebar__list li {
 padding: var(--space-4) var(--space-5);
 border-bottom: 1px solid var(--color-border);
+display: flex; align-items: center; gap: var(--space-2);
 transition: background 0.15s;
 }
 .sidebar__list li:last-child { border-bottom: none; }
