@@ -1,6 +1,6 @@
 /**
  * blog.shani.dev Blog Engine — SPA, config-driven, zero-build.
- * Single index.html. Hash routing: #/ = list, #/post/slug = article.
+ * Single index.html. History API routing: / = list, /post/slug = article.
  * Architecture: Config → State → DataLoader → Renderer → UI → Router
  */
 const CONFIG = {
@@ -602,7 +602,7 @@ const Renderer = {
     const date = Utils.fmtDate(post.date);
 
     document.title = `${post.title} — Shanios Blog`;
-    const postUrl = `https://blog.shani.dev/#/post/${post.slug}`;
+    const postUrl = `https://blog.shani.dev/post/${post.slug}`;
     const defaultOgImg = 'https://shani.dev/assets/images/logo.svg';
     const ogImg = post.cover || defaultOgImg;
     document.getElementById('canonical-url')?.setAttribute('href', postUrl);
@@ -633,7 +633,7 @@ const Renderer = {
       "@context": "https://schema.org", "@type": "BreadcrumbList",
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "Home",     "item": "https://blog.shani.dev/" },
-        { "@type": "ListItem", "position": 2, "name": post.tag,   "item": `https://blog.shani.dev/#/?tag=${post.tag}` },
+        { "@type": "ListItem", "position": 2, "name": post.tag,   "item": `https://blog.shani.dev/?tag=${post.tag}` },
         { "@type": "ListItem", "position": 3, "name": post.title, "item": postUrl }
       ]
     });
@@ -811,22 +811,22 @@ const Renderer = {
 };
 
 // =========================================
-// 5. ROUTER — hash-based SPA
+// 5. ROUTER — history API (real URL paths)
 // =========================================
 const Router = {
   go(slug) {
-    history.pushState({ slug }, '', `#/post/${slug}`);
+    history.pushState({ slug }, '', `/post/${encodeURIComponent(slug)}`);
     this.render();
   },
   back(tag) {
     this.setQuery({ tag: tag || null, page: 1 });
   },
   getSlug() {
-    const m = location.hash.match(/^#\/post\/(.+)$/);
+    const m = location.pathname.match(/^\/post\/(.+)$/);
     return m ? decodeURIComponent(m[1]) : null;
   },
   getParams() {
-    const qs = new URLSearchParams(location.hash.includes('?') ? location.hash.split('?')[1] : '');
+    const qs = new URLSearchParams(location.search);
     return {
       tag:  qs.get('tag') || null,
       page: Math.max(1, parseInt(qs.get('page')) || 1)
@@ -836,7 +836,7 @@ const Router = {
     const qs = new URLSearchParams();
     if (tag && tag !== 'all') qs.set('tag', tag);
     if (page > 1) qs.set('page', page);
-    history.pushState({}, '', qs.toString() ? `#/?${qs.toString()}` : '#/');
+    history.pushState({}, '', qs.toString() ? `/?${qs.toString()}` : '/');
     this.render();
   },
 
@@ -853,7 +853,7 @@ const Router = {
       if (readBar) readBar.style.display = '';
 
       document.querySelectorAll('.nav a, .mobile-nav a').forEach(a =>
-        a.classList.toggle('active', a.getAttribute('href') === '#/')
+        a.classList.toggle('active', a.getAttribute('href') === '/')
       );
 
       Utils.qs('#post-article').innerHTML =
@@ -902,7 +902,7 @@ const Router = {
         const href = a.getAttribute('href');
         const hrefTag = href?.includes('?tag=') ? href.split('?tag=')[1].toLowerCase() : null;
         const activeTag = tag ? tag.toLowerCase() : null;
-        a.classList.toggle('active', hrefTag === activeTag || (!hrefTag && !tag && href === '#/'));
+        a.classList.toggle('active', hrefTag === activeTag || (!hrefTag && !tag && href === '/'));
       });
 
       // Chip active state
@@ -1080,7 +1080,19 @@ const UI = {
     }, { passive: true });
   },
   initLogoLink() {
-    Utils.qs('#logo-link')?.addEventListener('click', e => { e.preventDefault(); Router.back(); });
+    // Intercept all internal nav links to use pushState (no page reload)
+    document.addEventListener('click', e => {
+      const a = e.target.closest('a[href]');
+      if (!a) return;
+      const href = a.getAttribute('href');
+      // Only intercept same-origin relative paths (not external, not anchors)
+      if (!href || href.startsWith('http') || href.startsWith('//') || href.startsWith('#')) return;
+      e.preventDefault();
+      if (location.pathname + location.search !== href) {
+        history.pushState({}, '', href);
+        Router.render();
+      }
+    });
   },
   share() {
     const url = location.href;
@@ -1113,12 +1125,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   UI.initSearch();
   UI.initLogoLink();
 
-  // Legacy post.html redirect
-  if (location.pathname.includes('post.html')) {
-    const slug = new URLSearchParams(location.search).get('slug');
-    if (slug) { location.replace(`index.html#/post/${encodeURIComponent(slug)}`); return; }
-  }
-
   const loadGrid = Utils.qs('#posts-grid');
   if (loadGrid) loadGrid.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
 
@@ -1130,6 +1136,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     Router.render();
   }
 
-  window.addEventListener('hashchange', () => Router.render());
-  window.addEventListener('popstate',   () => Router.render());
+  window.addEventListener('popstate', () => Router.render());
 });
