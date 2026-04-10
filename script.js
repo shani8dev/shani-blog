@@ -824,7 +824,7 @@ const Router = {
   getSlug() {
     const m = location.pathname.match(/^\/post\/(.+)$/);
     return m ? decodeURIComponent(m[1]) : null;
-  },
+  }
   getParams() {
     const qs = new URLSearchParams(location.search);
     return {
