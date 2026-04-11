@@ -4,8 +4,15 @@ date: '2026-04-10'
 tag: 'Engineering'
 excerpt: 'Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.'
 readTime: '7 min'
+cover: 'https://shani.dev/assets/images/saturn-x.png'
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shanios'
+author_bio: Shrinivas is cloud expert, devops engineer, creator of shanios.
+author_initials: SVK
+author_linkedin: https://linkedin.com/in/shrinivasvkumbhar
+author_github: https://github.com/shrinivasvkumbhar
+author_website: https://shani.dev
+paywalled: false
 ---
 
 Every system administrator knows a rule that desktop operating systems have ignored for decades: **you never touch the running system**.
