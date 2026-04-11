@@ -1,24 +1,69 @@
 /**
-blog.shani.dev Blog Engine — SPA, config-driven, zero-build.
-Single index.html. History API routing: / = list, /post/slug = article.
-Architecture: Config → State → DataLoader → Renderer → UI → Router
-*/
+ * Unified Blog Engine — SPA, config-driven, zero-build.
+ * Works for ANY brand: edit only the CONFIG block below.
+ * Architecture: Config → State → DataLoader → Renderer → UI → Router
+ *
+ * ─────────────────────────────────────────────────────────────────
+ *  HOW TO BRAND A NEW SITE
+ *  1. Fill in GITHUB_USER / GITHUB_REPO (or leave blank for local dev)
+ *  2. Fill in the BRAND block — every hardcoded string lives here
+ *  3. Set BLOG_URL to your production domain
+ *  4. Load the matching brand CSS (e.g. style-shani.css)
+ * ─────────────────────────────────────────────────────────────────
+ */
+
+// ═══════════════════════════════════════════════════════════════
+//  CONFIG  ←  THE ONLY BLOCK YOU NEED TO EDIT PER BRAND
+// ═══════════════════════════════════════════════════════════════
 const CONFIG = {
-  GITHUB_USER: 'shani8dev',
-  GITHUB_REPO: 'shani-blog',
-  AUTHOR_NAME: 'Shrinivas Kumbhar',
+  // ── GitHub Pages deployment ─────────────────────────────────
+  GITHUB_USER: 'shani8dev', 
+  GITHUB_REPO: 'shani-blog',  
+
+  // ── Production blog URL (no trailing slash) ──────────────────
+  BLOG_URL: 'https://blog.shani.dev',
+
+  // ── Author / team identity ───────────────────────────────────
+  AUTHOR_NAME:     'Shrinivas Kumbhar',
   AUTHOR_INITIALS: 'SK',
-  AUTHOR_ROLE: 'Shanios · shani.dev',
-  AUTHOR_BIO: 'Immutable Linux on Arch. Two OS copies, one always safe. Bad update? One reboot back. Zero telemetry. Built in India 🇮🇳',
-  SITE_TITLE: 'Shanios Blog',
-  HERO_EYEBROW: 'Shanios',
-  HERO_SUB: "Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.",
+  AUTHOR_ROLE:     'Shanios · shani.dev',
+  AUTHOR_BIO:      'Immutable Linux on Arch. Two OS copies, one always safe. Bad update? One reboot back. Zero telemetry. Built in India 🇮🇳',
+
+  // ── Site copy ────────────────────────────────────────────────
+  SITE_TITLE:        'Shanios Blog',
+  SITE_TAGLINE:      'Engineering, Linux & Open Source',   // appended to <title>
+  SITE_DESCRIPTION:  "Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.",
+  HERO_EYEBROW:      'Shanios',
+  HERO_SUB:          "Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.",
+
+  // ── Top / auspicious bar text ────────────────────────────────
+  AUSPICIOUS_TEXT:   '॥ श्री ॥',
+  AUSPICIOUS_URL:    'https://shani.dev',
+  AUSPICIOUS_LABEL:  'Visit Shanios',
+
+  // ── Logo / favicon ───────────────────────────────────────────
+  LOGO_IMG_URL:  'https://shani.dev/assets/images/about.svg',
+  LOGO_ALT:      'Shanios',
+  FAVICON_URL:   'https://shani.dev/assets/images/logo.svg',  // dynamically updates <link rel="icon"> via applyBranding()
+
+  // ── Publisher (for JSON-LD structured data) ──────────────────
+  PUBLISHER_NAME: 'Shanios',
+  PUBLISHER_URL:  'https://shani.dev',
+  PUBLISHER_LOGO: 'https://shani.dev/assets/images/logo.svg',
+
+  // ── Default OG image (used when post has no cover) ───────────
+  OG_IMAGE: 'https://shani.dev/assets/images/logo.svg',
+
+  // ── Twitter / X handle ───────────────────────────────────────
+  TWITTER_HANDLE: '@shani8dev',
+
+  // ── Footer + social links ────────────────────────────────────
   SOCIAL_LINKS: [
     { label: 'GitHub',   icon: 'fa-brands fa-github',   url: 'https://github.com/shani8dev' },
     { label: 'LinkedIn', icon: 'fa-brands fa-linkedin',  url: 'https://www.linkedin.com/in/Shrinivasvkumbhar/' },
     { label: 'Shanios',  icon: 'fa-brands fa-linux',     url: 'https://shani.dev' },
     { label: 'Wiki',     icon: 'fa-solid fa-book-open',  url: 'https://wiki.shani.dev' },
-  ]
+  ],
 };
 
 // ── Tag icons using Font Awesome ──────────────────────────────
@@ -31,6 +76,7 @@ const TAG_ICONS = {
   Culture:      'fa-solid fa-people-group',
   Partnerships: 'fa-solid fa-handshake',
   Linux:        'fa-brands fa-linux',
+  NDC:          'fa-solid fa-plane',
   AWS:          'fa-brands fa-aws',
   DevOps:       'fa-solid fa-gears',
   Platform:     'fa-solid fa-layer-group',
@@ -43,8 +89,8 @@ const TAG_ICONS = {
 // 1. STATE
 // =========================================
 const AppState = {
-  posts: [],        // Metadata array (body loaded on demand)
-  postsCache: {},   // Keyed by slug — full post objects with body
+  posts: [],
+  postsCache: {},
   filter: 'all',
   search: '',
   theme: localStorage.getItem('blogs-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
@@ -98,9 +144,7 @@ const Utils = {
       return part;
     }).join('');
   },
-  // =========================================================
-  // MEDIA SHORTCODES
-  // =========================================================
+  // ─── MEDIA SHORTCODES ─────────────────────────────────────────
   _mediaBlocks: {},
   _mediaToken(html) {
     const key = `MBLOCK_${Object.keys(Utils._mediaBlocks).length}_END`;
@@ -115,21 +159,21 @@ const Utils = {
   },
   _youtube(id, caption) {
     const fig = caption ? `<figcaption>${caption}</figcaption>` : '';
-    return `<figure class="media-embed"><div class="media-embed__ratio"><iframe src="https://www.youtube-nocookie.com/embed/${id}" title="YouTube video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>${fig}</figure>`;
+    return `<figure class="media-embed"><div class="media-embed__ratio"><iframe src="https://www.youtube-nocookie.com/embed/${id}" title="${caption || 'YouTube video'}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>${fig}</figure>`;
   },
   _vimeo(id, caption) {
     const fig = caption ? `<figcaption>${caption}</figcaption>` : '';
-    return `<figure class="media-embed"><div class="media-embed__ratio"><iframe src="https://player.vimeo.com/video/${id}" title="Vimeo video" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>${fig}</figure>`;
+    return `<figure class="media-embed"><div class="media-embed__ratio"><iframe src="https://player.vimeo.com/video/${id}?dnt=1" title="${caption || 'Vimeo video'}" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>${fig}</figure>`;
   },
   _video(src, caption) {
     const fig  = caption ? `<figcaption>${caption}</figcaption>` : '';
     const ext  = src.split('?')[0].split('.').pop().toLowerCase();
     const mime = { mp4: 'video/mp4', webm: 'video/webm', ogg: 'video/ogg', mov: 'video/mp4' }[ext] || 'video/mp4';
-    return `<figure class="media-figure media-figure--video"><video controls preload="metadata" loading="lazy"><source src="${src}" type="${mime}">Your browser doesn't support HTML video. <a href="${src}">Download it</a>.</video>${fig}</figure>`;
+    return `<figure class="media-figure media-figure--video"><video controls preload="metadata" playsinline loading="lazy"><source src="${src}" type="${mime}">Your browser doesn't support HTML video. <a href="${src}">Download it</a>.</video>${fig}</figure>`;
   },
   _audio(src, caption) {
     const fig = caption ? `<figcaption>${caption}</figcaption>` : '';
-    return `<figure class="media-figure media-figure--audio"><audio controls preload="metadata" loading="lazy"><source src="${src}" type="audio/mpeg">Your browser doesn't support HTML audio. <a href="${src}">Download it</a>.</audio>${fig}</figure>`;
+    return `<figure class="media-figure media-figure--audio"><audio controls preload="metadata" loading="lazy"><source src="${src}">Your browser doesn't support HTML audio. <a href="${src}">Download it</a>.</audio>${fig}</figure>`;
   },
   _image(src, rest) {
     const parts   = rest.split('|').map(s => s.trim());
@@ -167,7 +211,7 @@ const Utils = {
   },
   _restoreShortcodes(html) {
     html = html.replace(/<p>(MBLOCK_\d+_END)<\/p>/g, (_, token) => Utils._mediaBlocks[token] || '');
-    html = html.replace(/MBLOCK\d+_END/g, token => Utils._mediaBlocks[token] || '');
+    html = html.replace(/MBLOCK_\d+_END/g, token => Utils._mediaBlocks[token] || '');
     return html;
   },
   safeMarkdown: text => {
@@ -252,10 +296,10 @@ const DataLoader = {
       return null;
     }
 
-    // ── Discover post filenames via GitHub Contents API ───────────
-    // No index.json required — the API lists the posts/ directory directly.
     let filenames;
+
     if (CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO) {
+      // ── Auto-discover via GitHub Contents API ─────────────────
       try {
         const apiUrl = `https://api.github.com/repos/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/contents/posts`;
         const r = await fetch(apiUrl, { headers: { 'Accept': 'application/vnd.github.v3+json' } });
@@ -265,11 +309,12 @@ const DataLoader = {
           .filter(e => e.type === 'file' && e.name.endsWith('.md') && e.name !== 'index.md')
           .map(e => e.name);
       } catch (e) {
-        UI.showError('Could not list posts from GitHub API', e.message, `https://api.github.com/repos/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/contents/posts`);
+        UI.showError('Could not list posts from GitHub API', e.message,
+          `https://api.github.com/repos/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/contents/posts`);
         return null;
       }
     } else {
-      // ── Local dev fallback: try index.json if present ────────────
+      // ── Local dev fallback: posts/index.json ──────────────────
       try {
         const r = await fetch('/posts/index.json');
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -290,7 +335,7 @@ const DataLoader = {
               author:         item.author         || CONFIG.AUTHOR_NAME,
               authorRole:     item.author_role    || CONFIG.AUTHOR_ROLE,
               authorBio:      item.author_bio     || CONFIG.AUTHOR_BIO,
-              authorInitials: item.author_initials || (
+              authorInitials: item.author_initials || CONFIG.AUTHOR_INITIALS || (
                 (item.author || CONFIG.AUTHOR_NAME)
                   .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
               ),
@@ -304,7 +349,7 @@ const DataLoader = {
       }
     }
 
-    // ── Fetch all discovered .md files in parallel ────────────────
+    // ── Fetch all .md files in parallel ───────────────────────
     const base = (CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO)
       ? `https://raw.githubusercontent.com/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/main/posts`
       : '/posts';
@@ -335,8 +380,8 @@ const DataLoader = {
           author:         fm.author         || CONFIG.AUTHOR_NAME,
           authorRole:     fm.author_role    || CONFIG.AUTHOR_ROLE,
           authorBio:      fm.author_bio     || CONFIG.AUTHOR_BIO,
-          authorInitials: fm.author_initials || (
-             (fm.author || CONFIG.AUTHOR_NAME)
+          authorInitials: fm.author_initials || CONFIG.AUTHOR_INITIALS || (
+            (fm.author || CONFIG.AUTHOR_NAME)
               .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
           ),
           body
@@ -351,6 +396,7 @@ const DataLoader = {
 
     return posts.filter(Boolean).sort((a, b) => new Date(b.date) - new Date(a.date));
   },
+
   async fetchBody(slug) {
     if (AppState.postsCache[slug]) return AppState.postsCache[slug];
     const base = (CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO)
@@ -372,40 +418,108 @@ const DataLoader = {
 // 4. RENDERER
 // =========================================
 const Renderer = {
+  // ── Inject all brand strings from CONFIG into the DOM ────────
   applyBranding() {
-    document.title = `Shanios Blog — Engineering, Linux & Open Source`;
-    document.getElementById('canonical-url')?.setAttribute('href', 'https://blog.shani.dev/');
-    ['og-title', 'tw-title'].forEach(id =>
-      Utils.qs(`#${id}`)?.setAttribute('content', 'Shanios Blog — Engineering, Linux & Open Source'));
-    ['og-desc', 'tw-desc'].forEach(id =>
-      Utils.qs(`#${id}`)?.setAttribute('content', CONFIG.HERO_SUB));
-    document.getElementById('og-url')?.setAttribute('content', 'https://blog.shani.dev/');
+    const fullTitle = `${CONFIG.SITE_TITLE} — ${CONFIG.SITE_TAGLINE}`;
+    document.title = fullTitle;
+
+    // Canonical + OG URLs
+    document.getElementById('canonical-url')?.setAttribute('href', `${CONFIG.BLOG_URL}/`);
+    document.getElementById('og-url')?.setAttribute('content', `${CONFIG.BLOG_URL}/`);
     document.getElementById('og-type')?.setAttribute('content', 'website');
-    document.getElementById('meta-desc')?.setAttribute('content', CONFIG.HERO_SUB);
-    document.getElementById('footer-links').innerHTML = CONFIG.SOCIAL_LINKS
-      .map(s => `<a href="${s.url}" target="_blank" rel="noopener" aria-label="${s.label}"><i class="${s.icon}" aria-hidden="true"></i> <span>${s.label}</span></a>`)
-      .join('');
+
+    // Titles & descriptions
+    ['og-title', 'tw-title'].forEach(id =>
+      Utils.qs(`#${id}`)?.setAttribute('content', fullTitle));
+    ['og-desc', 'tw-desc'].forEach(id =>
+      Utils.qs(`#${id}`)?.setAttribute('content', CONFIG.SITE_DESCRIPTION));
+    document.getElementById('meta-desc')?.setAttribute('content', CONFIG.SITE_DESCRIPTION);
+
+    // OG image
+    document.getElementById('og-image')?.setAttribute('content', CONFIG.OG_IMAGE);
+    document.getElementById('tw-image')?.setAttribute('content', CONFIG.OG_IMAGE);
+
+    // Twitter handle
+    document.querySelector('meta[name="twitter:site"]')?.setAttribute('content', CONFIG.TWITTER_HANDLE);
+
+    // Favicon (dynamic update — avoids hardcoding in HTML per brand)
+    const faviconEl = document.querySelector('link[rel="icon"]');
+    if (faviconEl) faviconEl.href = CONFIG.FAVICON_URL;
+
+    // Auspicious bar
+    const ausLink = Utils.qs('.auspicious-text');
+    if (ausLink) {
+      ausLink.textContent = CONFIG.AUSPICIOUS_TEXT;
+      ausLink.href        = CONFIG.AUSPICIOUS_URL;
+      ausLink.setAttribute('aria-label', CONFIG.AUSPICIOUS_LABEL);
+    }
+
+    // Logo images (all .logo__img on page)
+    document.querySelectorAll('.logo__img').forEach(img => {
+      img.src = CONFIG.LOGO_IMG_URL;
+      img.alt = CONFIG.LOGO_ALT;
+    });
+
+    // Logo link aria-label
+    const logoLink = document.getElementById('logo-link');
+    if (logoLink) logoLink.setAttribute('aria-label', `${CONFIG.BLOG_URL.replace('https://', '')} home`);
+
+    // Footer
+    const footerLinks = document.getElementById('footer-links');
+    if (footerLinks) {
+      footerLinks.innerHTML = CONFIG.SOCIAL_LINKS
+        .map(s => `<a href="${s.url}" target="_blank" rel="noopener" aria-label="${s.label}"><i class="${s.icon}" aria-hidden="true"></i> <span>${s.label}</span></a>`)
+        .join('');
+    }
+
+    // Current year
     document.querySelectorAll('[data-current-year]').forEach(el => el.textContent = new Date().getFullYear());
+
+    // JSON-LD: Blog (homepage)
+    const ldBlogs = document.getElementById('ld-blogs');
+    if (ldBlogs) ldBlogs.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "name": CONFIG.SITE_TITLE,
+      "url": `${CONFIG.BLOG_URL}/`,
+      "description": CONFIG.SITE_DESCRIPTION,
+      "publisher": {
+        "@type": "Organization",
+        "name": CONFIG.PUBLISHER_NAME,
+        "url": CONFIG.PUBLISHER_URL,
+        "logo": { "@type": "ImageObject", "url": CONFIG.PUBLISHER_LOGO }
+      },
+      "inLanguage": "en-US"
+    });
+
+    // JSON-LD: Organization
+    const ldOrg = document.getElementById('ld-org');
+    if (ldOrg) ldOrg.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": CONFIG.PUBLISHER_NAME,
+      "url": CONFIG.PUBLISHER_URL,
+      "logo": CONFIG.PUBLISHER_LOGO,
+      "sameAs": CONFIG.SOCIAL_LINKS.map(s => s.url)
+    });
   },
+
   renderHero(posts) {
     if (!posts.length) return;
     const p = posts[0];
 
-    // ── Build title with italicised last word ──────────────────
     const words = p.title.split(' ');
     const last  = words.pop();
     const titleHtml = `${words.join(' ')} <em>${last}</em>`;
 
-    // ── Replace hero grid content with editorial featured-post layout ──
     const heroGrid = Utils.qs('.hero__grid');
     if (!heroGrid) return;
 
     heroGrid.innerHTML = `
-      <!-- Featured post panel -->
       <div class="hero__featured" id="hero-featured-panel">
         <div class="hero__eyebrow">
           <span class="hero__eyebrow-dot"></span>
-          Featured Post
+          ${CONFIG.HERO_EYEBROW}
         </div>
         <span class="hero__tag" id="hero-tag">${Utils.tagIcon(p.tag)} ${p.tag}</span>
         <h1 class="hero__title" id="hero-title">${titleHtml}</h1>
@@ -421,22 +535,16 @@ const Renderer = {
         </div>
         <button class="hero-link" id="hero-read-btn">Read post</button>
       </div>
-
-      <!-- Also reading sidebar -->
       <aside class="hero__sidebar">
         <h3 class="sidebar__title">Also reading</h3>
         <ul class="sidebar__list" id="aside-list">
           <li class="loading-text">Loading…</li>
         </ul>
-      </aside>
-    `;
+      </aside>`;
 
-    // Wire click handlers
     Utils.qs('#hero-featured-panel').addEventListener('click', () => Router.go(p.slug));
-    // Stop the button from double-firing via the panel listener
     Utils.qs('#hero-read-btn').addEventListener('click', e => { e.stopPropagation(); Router.go(p.slug); });
 
-    // ── Sidebar: posts 1-4 ──────────────────────────────────
     const aside = Utils.qs('#aside-list');
     const items = posts.slice(1, 5);
     aside.innerHTML = items.length
@@ -452,10 +560,12 @@ const Renderer = {
             </span>
           </li>`).join('')
       : '<li class="loading-text">No more posts</li>';
+
     aside.querySelectorAll('.sidebar__link[data-slug]').forEach(btn => {
       btn.addEventListener('click', e => { e.stopPropagation(); Router.go(btn.dataset.slug); });
     });
   },
+
   renderPosts(posts, showFeatured = false) {
     const grid = Utils.qs('#posts-grid');
     if (!posts.length) {
@@ -482,16 +592,26 @@ const Renderer = {
         </div>
       </article>`;
     }).join('');
+
     grid.querySelectorAll('.card').forEach(card => {
       const idx = parseInt(card.dataset.idx);
       card.setAttribute('tabindex', '0');
       card.setAttribute('aria-label', `Read: ${posts[idx].title}`);
-      card.addEventListener('click', () => Router.go(posts[idx].slug));
+      card.addEventListener('click', e => {
+        const tagChip = e.target.closest('.card__tag');
+        if (tagChip) {
+          e.stopPropagation();
+          Router.setQuery({ tag: posts[idx].tag, page: 1 });
+          return;
+        }
+        Router.go(posts[idx].slug);
+      });
       card.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); Router.go(posts[idx].slug); }
       });
     });
   },
+
   renderPagination(total, perPage, currentPage) {
     let container = Utils.qs('#pagination-container');
     if (!container) {
@@ -536,7 +656,6 @@ const Renderer = {
               aria-label="Next page"
               ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
     html += `</nav>`;
-
     container.innerHTML = html;
 
     container.querySelectorAll('.pag-btn:not(.disabled):not([disabled])').forEach(btn => {
@@ -548,15 +667,18 @@ const Renderer = {
       });
     });
   },
+
   renderPost(post) {
     const app = Utils.qs('#post-article');
     const html = Utils.safeMarkdown(post.body);
     const paywalled = post.paywalled;
     const date = Utils.fmtDateShort(post.date);
-    document.title = `${post.title} — Shanios Blog`;
-    const postUrl = `https://blog.shani.dev/post/${post.slug}`;
-    const defaultOgImg = 'https://shani.dev/assets/images/logo.svg';
-    const ogImg = post.cover || defaultOgImg;
+
+    // ── Update all meta / SEO for this post ───────────────────
+    const postUrl  = `${CONFIG.BLOG_URL}/post/${post.slug}`;
+    const ogImg    = post.cover || CONFIG.OG_IMAGE;
+
+    document.title = `${post.title} — ${CONFIG.SITE_TITLE}`;
     document.getElementById('canonical-url')?.setAttribute('href', postUrl);
     document.getElementById('meta-desc')?.setAttribute('content', post.excerpt);
     document.getElementById('og-type')?.setAttribute('content', 'article');
@@ -566,30 +688,35 @@ const Renderer = {
     document.getElementById('og-image')?.setAttribute('content', ogImg);
     document.getElementById('tw-image')?.setAttribute('content', ogImg);
 
-    const ldblogs = document.getElementById('ld-blogs');
-    if (ldblogs) ldblogs.textContent = JSON.stringify({
+    // JSON-LD: BlogPosting
+    const ldBlogs = document.getElementById('ld-blogs');
+    if (ldBlogs) ldBlogs.textContent = JSON.stringify({
       "@context": "https://schema.org", "@type": "BlogPosting",
       "headline": post.title, "description": post.excerpt, "datePublished": post.date,
       ...(post.cover ? { "image": post.cover } : {}),
       "author": { "@type": "Person", "name": post.author },
       "publisher": {
-        "@type": "Organization", "name": "Shanios", "url": "https://shani.dev",
-        "logo": { "@type": "ImageObject", "url": "https://shani.dev/assets/images/logo.svg" }
+        "@type": "Organization",
+        "name": CONFIG.PUBLISHER_NAME,
+        "url": CONFIG.PUBLISHER_URL,
+        "logo": { "@type": "ImageObject", "url": CONFIG.PUBLISHER_LOGO }
       },
       "mainEntityOfPage": { "@type": "WebPage", "@id": postUrl },
       "url": postUrl, "keywords": post.tag, "inLanguage": "en-US"
     });
 
+    // JSON-LD: BreadcrumbList
     const ldOrg = document.getElementById('ld-org');
     if (ldOrg) ldOrg.textContent = JSON.stringify({
       "@context": "https://schema.org", "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home",      "item": "https://blog.shani.dev/" },
-        { "@type": "ListItem", "position": 2, "name": post.tag,    "item": `https://blog.shani.dev/?tag=${post.tag}` },
-        { "@type": "ListItem", "position": 3, "name": post.title,  "item": postUrl }
+        { "@type": "ListItem", "position": 1, "name": "Home",     "item": `${CONFIG.BLOG_URL}/` },
+        { "@type": "ListItem", "position": 2, "name": post.tag,   "item": `${CONFIG.BLOG_URL}/?tag=${post.tag}` },
+        { "@type": "ListItem", "position": 3, "name": post.title, "item": postUrl }
       ]
     });
 
+    // ── Paywall ───────────────────────────────────────────────
     let content = '';
     if (paywalled && !AppState.isMember) {
       const div = document.createElement('div');
@@ -615,7 +742,7 @@ const Renderer = {
 
     app.innerHTML = `
       <header class="post-header">
-        <button class="post-back" onclick="Router.back()"><i class="fa-solid fa-arrow-left"></i> All posts</button>
+        <button class="post-back" id="post-back-btn"><i class="fa-solid fa-arrow-left"></i> All posts</button>
         <span class="post-tag">${Utils.tagIcon(post.tag)} ${post.tag}</span>
         <h1 class="post-title">${post.title}</h1>
         ${post.excerpt ? `<p class="post-excerpt">${post.excerpt.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>` : ''}
@@ -632,7 +759,7 @@ const Renderer = {
             </div>
           </div>
           <div class="meta-actions">
-            <button class="btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
+            <button class="btn" id="print-btn"><i class="fa-solid fa-print"></i> Print</button>
             <button class="btn" id="share-btn"><i class="fa-solid fa-share-nodes"></i> Share</button>
           </div>
         </div>
@@ -641,8 +768,8 @@ const Renderer = {
       ${content}
       <footer class="post-footer">
         <div class="post-tags">
-          <button class="tag-chip" onclick="Router.back('${post.tag}')">${Utils.tagIcon(post.tag)} ${post.tag}</button>
-          <button class="tag-chip" onclick="Router.back()"><i class="fa-solid fa-grip"></i> All Posts</button>
+          <button class="tag-chip" data-back-tag="${post.tag}">${Utils.tagIcon(post.tag)} ${post.tag}</button>
+          <button class="tag-chip" id="all-posts-btn"><i class="fa-solid fa-grip"></i> All Posts</button>
         </div>
         <div class="meta-actions">
           <button class="btn like ${liked ? 'reacted' : ''}" id="like-btn">
@@ -652,12 +779,20 @@ const Renderer = {
         <div class="post-nav" id="post-nav-btns"></div>
       </footer>`;
 
+    // ── Wire up all post interactions ─────────────────────────
+    app.querySelector('#post-back-btn')?.addEventListener('click', () => Router.back());
+    app.querySelector('#print-btn')?.addEventListener('click', () => window.print());
+    app.querySelector('#all-posts-btn')?.addEventListener('click', () => Router.back());
+    app.querySelector('[data-back-tag]')?.addEventListener('click', function() {
+      Router.back(this.dataset.backTag);
+    });
     app.querySelector('#like-btn')?.addEventListener('click', function () {
       const is = this.classList.toggle('reacted');
       this.innerHTML = `<i class="fa-${is ? 'solid' : 'regular'} fa-heart"></i> ${is ? 'Liked' : 'Like'}`;
       localStorage.setItem(`liked:${post.slug}`, is ? '1' : '0');
     });
 
+    // Prev / Next navigation
     const navEl = app.querySelector('#post-nav-btns');
     if (navEl && AppState.posts.length) {
       const idx  = AppState.posts.findIndex(p => p.slug === post.slug);
@@ -678,6 +813,7 @@ const Renderer = {
       navEl.querySelector('#nav-prev')?.addEventListener('click', () => Router.go(prev.slug));
       navEl.querySelector('#nav-next')?.addEventListener('click', () => Router.go(next.slug));
     }
+
     app.querySelector('#share-btn')?.addEventListener('click', () => UI.share());
     app.querySelector('#unlock-btn')?.addEventListener('click', () => {
       localStorage.setItem('blogs_member', '1');
@@ -686,6 +822,7 @@ const Renderer = {
     });
     app.querySelector('#back-btn')?.addEventListener('click', () => Router.back());
 
+    // Code blocks: copy button + language label
     app.querySelectorAll('pre').forEach(pre => {
       const wrap = document.createElement('div');
       wrap.className = 'code-block';
@@ -715,6 +852,7 @@ const Renderer = {
       wrap.appendChild(pre);
     });
 
+    // Tables: Copy CSV button
     app.querySelectorAll('.post-body table, .paywall-fade table').forEach(table => {
       const wrap = document.createElement('div');
       wrap.className = 'table-wrap';
@@ -748,6 +886,7 @@ const Renderer = {
     if (typeof Prism !== 'undefined') Prism.highlightAll();
     window.scrollTo({ top: 0, behavior: 'instant' });
 
+    // Smooth scroll for in-page anchor links
     app.querySelectorAll('a[href^="#"]').forEach(a => {
       a.addEventListener('click', e => {
         e.preventDefault();
@@ -799,7 +938,18 @@ const Router = {
     const indexEl = document.getElementById('view-index');
     const postEl  = document.getElementById('view-post');
     const readBar = document.getElementById('reading-bar');
+
+    // Close search bar on every navigation
+    const searchBar   = Utils.qs('#search-bar');
+    const searchInput = Utils.qs('#search-input');
+    if (searchBar?.classList.contains('open')) {
+      searchBar.classList.remove('open');
+      searchBar.setAttribute('aria-hidden', 'true');
+      if (searchInput) { searchInput.value = ''; AppState.search = ''; }
+    }
+
     if (slug) {
+      // ── Post view ─────────────────────────────────────────
       indexEl.style.display = 'none';
       postEl.style.display  = '';
       if (readBar) readBar.style.display = '';
@@ -824,28 +974,31 @@ const Router = {
             <i class="fa-solid fa-file-circle-xmark empty-icon"></i>
             <h3>Post not found</h3>
             <p>The post you're looking for doesn't exist or failed to load.</p>
-            <button class="btn primary" onclick="Router.back()">
+            <button class="btn primary" id="err-back-btn">
               <i class="fa-solid fa-arrow-left"></i> Back to posts
             </button>
           </div>`;
+        Utils.qs('#err-back-btn')?.addEventListener('click', () => Router.back());
       }
     } else {
+      // ── Index view ────────────────────────────────────────
       indexEl.style.display = '';
       postEl.style.display  = 'none';
       if (readBar) readBar.style.display = 'none';
 
-      document.title = `Shanios Blog — Engineering, Linux & Open Source`;
-      document.getElementById('canonical-url')?.setAttribute('href', 'https://blog.shani.dev/');
+      // Reset title + meta to homepage defaults
+      document.title = `${CONFIG.SITE_TITLE} — ${CONFIG.SITE_TAGLINE}`;
+      document.getElementById('canonical-url')?.setAttribute('href', `${CONFIG.BLOG_URL}/`);
       document.getElementById('og-type')?.setAttribute('content', 'website');
-      document.getElementById('og-url')?.setAttribute('content', 'https://blog.shani.dev/');
+      document.getElementById('og-url')?.setAttribute('content', `${CONFIG.BLOG_URL}/`);
       ['og-title', 'tw-title'].forEach(id =>
-        Utils.qs(`#${id}`)?.setAttribute('content', 'Shanios Blog — Engineering, Linux & Open Source'));
+        Utils.qs(`#${id}`)?.setAttribute('content', `${CONFIG.SITE_TITLE} — ${CONFIG.SITE_TAGLINE}`));
       ['og-desc', 'tw-desc'].forEach(id =>
-        Utils.qs(`#${id}`)?.setAttribute('content', CONFIG.HERO_SUB));
+        Utils.qs(`#${id}`)?.setAttribute('content', CONFIG.SITE_DESCRIPTION));
 
       const { tag, page } = this.getParams();
       AppState.filter = tag || 'all';
-      AppState.pagination.page = page; 
+      AppState.pagination.page = page;
 
       document.querySelectorAll('.nav a, .mobile-nav a').forEach(a => {
         const href = a.getAttribute('href');
@@ -861,6 +1014,7 @@ const Router = {
       let filtered = AppState.filter === 'all'
         ? AppState.posts
         : AppState.posts.filter(p => p.tag.toLowerCase() === AppState.filter.toLowerCase());
+
       if (AppState.search) {
         const q = AppState.search.toLowerCase();
         filtered = filtered.filter(p =>
@@ -879,8 +1033,7 @@ const Router = {
 
       const showFeatured = AppState.filter === 'all' && AppState.pagination.page === 1 && !AppState.search;
 
-      // When on the default homepage view, the hero already features posts[0],
-      // so strip it from the grid to avoid showing the same post twice.
+      // Hero already features posts[0], so strip it from the grid
       const gridPosts = (showFeatured && visible.length > 1)
         ? visible.slice(1)
         : visible;
@@ -890,14 +1043,12 @@ const Router = {
         ? `Results for "${AppState.search}"`
         : (AppState.filter === 'all' ? 'Latest Posts' : AppState.filter);
 
-      // Hide hero when searching or tag-filtering — hero always shows latest post
-      // which is misleading when browsing a specific tag or search results
       const heroEl = Utils.qs('.hero');
       const heroVisible = !AppState.search && AppState.filter === 'all';
       if (heroEl) {
         if (heroVisible) {
-          heroEl.style.animation = 'none';  // prevent replay on restore
-          heroEl.style.display = '';
+          heroEl.style.animation = '';
+          heroEl.style.display   = '';
         } else {
           heroEl.style.display = 'none';
         }
@@ -906,10 +1057,8 @@ const Router = {
       Renderer.renderPosts(gridPosts, false);
       Renderer.renderPagination(filtered.length, perPage, AppState.pagination.page);
 
-      // Scroll posts section into view when search query changes
       if (AppState.search) {
-        const postsEl = Utils.qs('.posts');
-        if (postsEl) postsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        Utils.qs('.posts')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   }
@@ -924,6 +1073,7 @@ const UI = {
     if (!grid) return;
     grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-triangle-exclamation empty-icon" style="color:var(--color-error)"></i><h3>${title}</h3><p>${detail}</p>${code ? `<pre><code>${code}</code></pre>` : ''}</div>`;
   },
+
   initTheme() {
     const btn  = Utils.qs('#theme-btn');
     const icon = Utils.qs('#theme-icon');
@@ -933,7 +1083,7 @@ const UI = {
       document.documentElement.setAttribute('data-theme', t);
       AppState.theme = t;
       localStorage.setItem('blogs-theme', t);
-      if (icon) icon.className = t === 'dark' ? 'fa-solid fa-sun'  : 'fa-solid fa-moon';
+      if (icon) icon.className = t === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
       const prismLink = document.getElementById('prism-theme');
       if (prismLink) prismLink.href = t === 'dark' ? PRISM_DARK : PRISM_LIGHT;
     };
@@ -945,6 +1095,7 @@ const UI = {
       if (!localStorage.getItem('blogs-theme')) apply(e.matches ? 'dark' : 'light');
     });
   },
+
   initMenu() {
     const btn = Utils.qs('#menu-toggle');
     const nav = Utils.qs('#mobile-nav');
@@ -963,6 +1114,7 @@ const UI = {
       }
     });
   },
+
   initSearch() {
     const toggleBtn = Utils.qs('#search-toggle');
     const closeBtn  = Utils.qs('#search-close');
@@ -982,7 +1134,7 @@ const UI = {
       AppState.search = e.target.value.toLowerCase().trim();
       if (Router.getSlug()) return;
       AppState.pagination.page = 1;
-      Router.render(); 
+      Router.render();
       const live = Utils.qs('#search-live');
       if (live && AppState.search) {
         const q = AppState.search;
@@ -990,7 +1142,7 @@ const UI = {
           p.title.toLowerCase().includes(q) ||
           p.excerpt.toLowerCase().includes(q) ||
           p.tag.toLowerCase().includes(q) ||
-          (AppState.postsCache[p.slug]?.body || '').toLowerCase().includes(q) 
+          (AppState.postsCache[p.slug]?.body || '').toLowerCase().includes(q)
         ).length;
         live.textContent = `${count} result${count !== 1 ? 's' : ''} for "${AppState.search}"`;
       } else if (live) {
@@ -1011,6 +1163,7 @@ const UI = {
       }
     });
   },
+
   initFilters() {
     const bar = Utils.qs('#tag-bar');
     if (!bar) return;
@@ -1029,12 +1182,14 @@ const UI = {
       Router.setQuery({ tag: btn.dataset.tag === 'all' ? null : btn.dataset.tag, page: 1 });
     });
   },
+
   initBackTop() {
     const btn = Utils.qs('#back-top');
     if (!btn) return;
     window.addEventListener('scroll', () => btn.classList.toggle('show', window.scrollY > 400), { passive: true });
     btn.addEventListener('click', () => scrollTo({ top: 0, behavior: 'smooth' }));
   },
+
   initReadingBar() {
     const bar = Utils.qs('#reading-bar');
     if (!bar) return;
@@ -1043,12 +1198,13 @@ const UI = {
       bar.style.width = total > 0 ? (window.scrollY / total * 100) + '%' : '0%';
     }, { passive: true });
   },
+
   initLogoLink() {
     document.addEventListener('click', e => {
       const a = e.target.closest('a[href]');
       if (!a) return;
       const href = a.getAttribute('href');
-      if (!href || href.startsWith('http') || href.startsWith('//') || href.startsWith('#')) return;
+      if (!href || href.startsWith('http') || href.startsWith('//') || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
       e.preventDefault();
       if (location.pathname + location.search !== href) {
         history.pushState({}, '', href);
@@ -1056,8 +1212,9 @@ const UI = {
       }
     });
   },
+
   share() {
-    const url = location.href;
+    const url   = location.href;
     const title = document.title;
     if (navigator.share) {
       navigator.share({ title, url });
@@ -1086,24 +1243,38 @@ document.addEventListener('DOMContentLoaded', async () => {
   UI.initReadingBar();
   UI.initSearch();
   UI.initLogoLink();
+
   const loadGrid = Utils.qs('#posts-grid');
   if (loadGrid) loadGrid.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-  const posts = await DataLoader.load();
+
+  const posts  = await DataLoader.load();
   const loader = Utils.qs('#page-loader');
+
   if (posts) {
     AppState.posts = posts;
     Renderer.renderHero(posts);
     UI.initFilters();
     Router.render();
   }
-  // Dismiss the full-page loader once data is ready (or failed)
+
+  // Dismiss full-page loader
   if (loader) {
-    // Snap the bar to 100% before fading out
     const bar = loader.querySelector('.loader__bar');
     if (bar) { bar.style.animation = 'none'; bar.style.width = '100%'; }
     requestAnimationFrame(() => {
       setTimeout(() => loader.classList.add('hidden'), 80);
     });
   }
-  window.addEventListener('popstate', () => Router.render());
+
+  window.addEventListener('popstate', () => {
+    const mobileNav = Utils.qs('#mobile-nav');
+    const menuBtn   = Utils.qs('#menu-toggle');
+    if (mobileNav?.classList.contains('open')) {
+      mobileNav.classList.remove('open');
+      menuBtn?.classList.remove('open');
+      menuBtn?.setAttribute('aria-expanded', 'false');
+      mobileNav.setAttribute('aria-hidden', 'true');
+    }
+    Router.render();
+  });
 });

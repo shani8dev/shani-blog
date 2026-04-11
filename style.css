@@ -1,7 +1,8 @@
 /* =========================================
-blog.shani.dev — Technical Editorial
-Design: Dark-first, coral/violet palette, Playfair Display
+Unified Blog Engine — Shared Stylesheet
+Design: Dark-first, editorial palette, Playfair Display
 headings, IBM Plex Mono for code/meta, DM Sans UI.
+Brand colors injected via brand-shani.css or brand-verteil.css.
 Inspired by: The Verge, Stripe Press, Wired editorial.
 ========================================= */
 /* =========================================
@@ -29,75 +30,51 @@ border-radius: var(--radius-sm);
 /* Accent-tinted text selection */
 ::selection { background: var(--color-accent-bg); color: var(--color-text); }
 /* =========================================
-2. DESIGN TOKENS — dark-first, coral/violet palette
+2. DESIGN TOKENS
+Load brand-shani.css or brand-verteil.css BEFORE this file.
+Those files define:  --color-bg, --color-accent, --color-secondary,
+--color-text, --color-border, --color-*  (dark + light overrides)
+The fixed tokens below (fonts, spacing, radii, status colours)
+are brand-independent and defined here.
 ========================================= */
 :root {
-/* 🌑 Warm Charcoal — optimized for coral accent & long reading */
---color-bg:          #161514;
---color-bg-alt:      #1e1d1b;
---color-bg-elevated: #262422;
---color-bg-card:     #1b1a18;
-/* Neutral text on dark green-tinted base */
---color-text:        #f5f4f2;
---color-text-muted:  #b0aaa4;
---color-text-faint:  #8a8580;
---color-border:      #2e2c29;
---color-border-hover:#4a4641;
-/* Coral — vibrant, energetic, modern */
---color-accent:      #ff7f50;
---color-accent-hover:#ff6a33;
---color-accent-bg:   rgba(255, 127, 80, 0.12);
---color-accent-text: #161514;
-/* Violet — secondary accent */
---color-secondary:      #7c3aed;
---color-secondary-bg:   rgba(124, 58, 237, 0.1);
 /* Like / reaction — rose */
 --color-like:           #e05c7a;
 --color-like-bg:        rgba(224, 92, 122, 0.1);
+
 /* Misc */
 --color-video-bg:       #000000;
 --color-callout-note:   #3b82f6;
+
 /* Status */
 --color-success:     #3dba7e;
 --color-warning:     #e8a215;
 --color-error:       #e85555;
-/* Fonts & Spacing */
+
+/* Fonts */
 --font-display: 'Playfair Display', Georgia, serif;
 --font-sans:    'DM Sans', system-ui, sans-serif;
 --font-mono:    'IBM Plex Mono', 'JetBrains Mono', Consolas, monospace;
+
+/* Spacing */
 --space-1: 0.25rem; --space-2: 0.5rem;  --space-3: 0.75rem; --space-4: 1rem;
 --space-5: 1.25rem; --space-6: 1.5rem;  --space-8: 2rem;    --space-10: 2.5rem;
 --space-12: 3rem;   --space-16: 4rem;   --space-20: 5rem;
+
+/* Layout */
 --container: 1160px;
 --max-prose: 1160px;
 --radius-sm:  3px;
 --radius-md:  6px;
 --radius-lg:  12px;
---shadow-hover: 0 8px 36px rgba(22, 21, 20, 0.65) ;
+
+/* Motion */
 --ease: cubic-bezier(0.4, 0, 0.2, 1);
---header-h: 82px; /* sticky header: 58px bar + ~24px auspicious */
+
+/* Header height: 58px bar + ~24px auspicious */
+--header-h: 82px;
 }
-/* Light mode */
-html[data-theme="light"] {
-/* ☀️ Warm Editorial — seamless pair for Warm Charcoal dark */
---color-bg:          #faf9f7;
---color-bg-alt:      #f2f0ec;
---color-bg-elevated: #eae8e3;
---color-bg-card:     #ffffff;
---color-text:        #1c1b19;
---color-text-muted:  #5a5752;
---color-text-faint:  #8a867f;
---color-border:      #e2dfd8;
---color-border-hover:#c8c4bb;
-/* Coral — slightly deeper for light bg contrast */
---color-accent:      #e85d2a;
---color-accent-hover:#d44e1e;
---color-accent-bg:   rgba(232, 93, 42, 0.08);
---color-accent-text: #ffffff;
---color-secondary:      #6d28d9;
---color-secondary-bg:   rgba(109, 40, 217, 0.08);
---shadow-hover: 0 8px 36px rgba(28, 27, 25, 0.08);
-}
+
 /* =========================================
 3. BASE
 ========================================= */
@@ -826,7 +803,7 @@ border-top: 1px solid var(--color-border); padding: var(--space-3) 0;
 .search-bar.open { display: block; animation: fadeUp 0.18s var(--ease); }
 .search-bar__inner { display: flex; align-items: center; gap: var(--space-3); }
 .search-bar__icon { color: var(--color-text-faint); font-size: 0.85rem; }
-.search-bar .search { flex: 1; height: 38px; width: 100% !important; border-radius: var(--radius-sm); }
+.search-bar .search { flex: 1; height: 44px; width: 100% !important; display: block !important; border-radius: var(--radius-sm); -webkit-user-select: text; user-select: text; touch-action: manipulation; font-size: 1rem; }
 .search-bar__close { flex-shrink: 0; }
 .meta-dot { color: var(--color-text-faint); margin: 0 2px; }
 .members-badge {

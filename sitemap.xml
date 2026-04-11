@@ -7,45 +7,27 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://blog.shani.dev/#/?tag=Product</loc>
+    <loc>https://blog.shani.dev/?tag=Engineering</loc>
     <lastmod>2026-04-10</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://blog.shani.dev/#/?tag=Engineering</loc>
+    <loc>https://blog.shani.dev/?tag=Release</loc>
     <lastmod>2026-04-10</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://blog.shani.dev/#/?tag=Platform</loc>
+    <loc>https://blog.shani.dev/?tag=Linux</loc>
     <lastmod>2026-04-10</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://blog.shani.dev/#/?tag=News</loc>
+    <loc>https://blog.shani.dev/?tag=News</loc>
     <lastmod>2026-04-10</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://blog.shani.dev/#/?tag=Linux</loc>
-    <lastmod>2026-04-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://blog.shani.dev/#/?tag=Partnerships</loc>
-    <lastmod>2026-04-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://blog.shani.dev/#/?tag=Careers</loc>
-    <lastmod>2026-04-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
 </urlset>

@@ -1,0 +1,67 @@
+/*
+ * brand-shani.css
+ * ──────────────────────────────────────────────────────────────
+ * Shanios brand tokens — Warm Charcoal base + Coral/Violet accent
+ *
+ * Load this BEFORE style.css (or import it at the top of style.css):
+ *   <link rel="stylesheet" href="brand-shani.css">
+ *   <link rel="stylesheet" href="style.css">
+ *
+ * To switch brands, swap this file for brand-verteil.css.
+ * style.css is identical for both brands.
+ * ──────────────────────────────────────────────────────────────
+ */
+
+/* ── Dark mode (default) ────────────────────────────────────── */
+:root {
+  /* 🌑 Warm Charcoal — optimized for coral accent & long reading */
+  --color-bg:          #161514;
+  --color-bg-alt:      #1e1d1b;
+  --color-bg-elevated: #262422;
+  --color-bg-card:     #1b1a18;
+
+  /* Text */
+  --color-text:        #f5f4f2;
+  --color-text-muted:  #b0aaa4;
+  --color-text-faint:  #8a8580;
+  --color-border:      #2e2c29;
+  --color-border-hover:#4a4641;
+
+  /* Coral — vibrant, energetic, modern */
+  --color-accent:      #ff7f50;
+  --color-accent-hover:#ff6a33;
+  --color-accent-bg:   rgba(255, 127, 80, 0.12);
+  --color-accent-text: #161514;
+
+  /* Violet — secondary accent (reading bar, important callouts) */
+  --color-secondary:    #7c3aed;
+  --color-secondary-bg: rgba(124, 58, 237, 0.1);  /* available for custom use e.g. callout-important bg */
+
+  --shadow-hover: 0 8px 36px rgba(22, 21, 20, 0.65);
+}
+
+/* ── Light mode ─────────────────────────────────────────────── */
+html[data-theme="light"] {
+  /* ☀️ Warm Editorial — seamless pair for Warm Charcoal dark */
+  --color-bg:          #faf9f7;
+  --color-bg-alt:      #f2f0ec;
+  --color-bg-elevated: #eae8e3;
+  --color-bg-card:     #ffffff;
+
+  --color-text:        #1c1b19;
+  --color-text-muted:  #5a5752;
+  --color-text-faint:  #8a867f;
+  --color-border:      #e2dfd8;
+  --color-border-hover:#c8c4bb;
+
+  /* Coral — slightly deeper for light bg contrast */
+  --color-accent:      #e85d2a;
+  --color-accent-hover:#d44e1e;
+  --color-accent-bg:   rgba(232, 93, 42, 0.08);
+  --color-accent-text: #ffffff;
+
+  --color-secondary:    #6d28d9;
+  --color-secondary-bg: rgba(109, 40, 217, 0.08);  /* available for custom use e.g. callout-important bg */
+
+  --shadow-hover: 0 8px 36px rgba(28, 27, 25, 0.08);
+}
