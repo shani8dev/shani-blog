@@ -1213,21 +1213,49 @@ const UI = {
     });
   },
 
+  showToast(msg) {
+    const toast = Object.assign(document.createElement('div'), {
+      className: 'toast',
+      innerHTML: msg
+    });
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
+  },
+
+  copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).catch(() => {
+        const ta = Object.assign(document.createElement('textarea'), { value: text });
+        ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        try { document.execCommand('copy'); } catch {}
+        ta.remove();
+      });
+    }
+    const ta = Object.assign(document.createElement('textarea'), { value: text });
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand('copy'); } catch {}
+    ta.remove();
+    return Promise.resolve();
+  },
+
   share() {
     const url   = location.href;
     const title = document.title;
     if (navigator.share) {
-      navigator.share({ title, url });
-    } else {
-      navigator.clipboard.writeText(url).then(() => {
-        const toast = Object.assign(document.createElement('div'), {
-          className: 'toast',
-          innerHTML: '<i class="fa-solid fa-check"></i> Link copied'
-        });
-        document.body.appendChild(toast);
-        setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2000);
+      navigator.share({ title, url }).catch(err => {
+        if (err && err.name !== 'AbortError') {
+          UI.copyToClipboard(url).then(() =>
+            UI.showToast('<i class="fa-solid fa-check"></i> Link copied')
+          );
+        }
       });
+    } else {
+      UI.copyToClipboard(url).then(() =>
+        UI.showToast('<i class="fa-solid fa-check"></i> Link copied')
+      );
     }
   }
 };

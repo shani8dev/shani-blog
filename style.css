@@ -528,6 +528,19 @@ margin-bottom: var(--space-8);
 .meta-details { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-text-faint); }
 .meta-actions { display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0; }
 .post-footer .meta-actions { margin-bottom: var(--space-6); }
+@media (max-width: 768px) {
+  .post-meta .meta-actions {
+    width: 100%;
+    flex-shrink: 1;
+    margin-top: var(--space-2);
+  }
+  .post-meta .meta-actions .btn {
+    flex: 1;
+    justify-content: center;
+    min-height: 44px;
+    font-size: 0.8rem;
+  }
+}
 /* Body matches .posts section spacing */
 .post-body {
 margin-bottom: var(--space-12);
@@ -742,7 +755,6 @@ opacity: 0; visibility: hidden; pointer-events: none; z-index: 90; font-size: 0.
 .card.featured { flex-direction: column; }
 .card.featured .card__visual { width: 100%; min-height: 180px; aspect-ratio: 16/9; border-right: none; border-bottom: 2px solid var(--color-accent); }
 .post-nav { grid-template-columns: 1fr; }
-.post-meta .meta-actions { width: 100%; margin-top: var(--space-3); }
 .footer__inner { flex-direction: column; text-align: center; }
 .footer__links { margin: 0; justify-content: center; }
 .post-header { margin-top: var(--space-10); }
@@ -876,6 +888,9 @@ letter-spacing: 0.08em; text-transform: uppercase;
 border: 1px solid var(--color-border); background: var(--color-bg-alt);
 color: var(--color-text-muted); cursor: pointer;
 transition: all 0.15s; white-space: nowrap;
+touch-action: manipulation;
+-webkit-tap-highlight-color: transparent;
+user-select: none;
 }
 .btn:hover {
 border-color: var(--color-border-hover); color: var(--color-text);
