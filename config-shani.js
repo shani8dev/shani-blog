@@ -173,7 +173,7 @@ const CONFIG = {
   // ── Monetization — Google AdSense ────────────────────────────
   // [script] Set both to inject an AdSense unit mid-post on free posts.
   //          Leave empty to fall back to the house ad (if enabled).
-  ADSENSE_CLIENT: '',
+  ADSENSE_CLIENT: 'ca-pub-8268043375450773',
   ADSENSE_SLOT:   '',
 
   // ── House ad ─────────────────────────────────────────────────
