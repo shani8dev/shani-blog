@@ -1265,7 +1265,7 @@ margin-top: var(--space-2); font-style: italic; font-family: var(--font-sans);
 /* Strikethrough */
 .post-body del { text-decoration: line-through; color: var(--color-text-faint); }
 /* =========================================
-19. TABLE OF CONTENTS
+19b. TABLE OF CONTENTS
 ========================================= */
 .toc {
   background: var(--color-bg-alt);

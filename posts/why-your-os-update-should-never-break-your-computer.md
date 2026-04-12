@@ -7,8 +7,8 @@ readTime: '7 min'
 cover: 'https://shani.dev/assets/images/saturn-x.png'
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shanios'
-author_bio: Shrinivas is cloud expert, devops engineer, creator of shanios.
-author_initials: SVK
+author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shanios.'
+author_initials: SK
 author_linkedin: https://linkedin.com/in/shrinivasvkumbhar
 author_github: https://github.com/shrinivasvkumbhar
 author_website: https://shani.dev

@@ -50,34 +50,44 @@ const AppState = {
 };
 
 // ── Validate stored license key silently on page load ─────────
-(async function validateStoredLicense() {
-  const stored = localStorage.getItem('blogs_license');
-  if (!stored || !CONFIG.LEMONSQUEEZY_STORE) return;
-
-  // Decode stored key — atob() throws on corrupt/non-base64 data; treat that as invalid.
-  let key;
-  try { key = atob(stored); } catch {
+// ── Crypto helpers — SHA-256 via Web Crypto API ───────────────
+// We NEVER store the raw license key. We store only a SHA-256 hex
+// digest. A stolen localStorage value cannot be reversed to the key.
+const LicenseCrypto = {
+  async hash(key) {
+    const buf = await crypto.subtle.digest(
+      'SHA-256',
+      new TextEncoder().encode(key.trim())
+    );
+    return Array.from(new Uint8Array(buf))
+      .map(b => b.toString(16).padStart(2, '0')).join('');
+  },
+  async store(key) {
+    const digest = await LicenseCrypto.hash(key);
+    localStorage.setItem('blogs_license_hash', digest);
+    localStorage.removeItem('blogs_license'); // remove any old btoa-encoded key
+  },
+  clear() {
+    localStorage.removeItem('blogs_license_hash');
+    localStorage.removeItem('blogs_license'); // legacy cleanup
     localStorage.removeItem('blogs_member');
-    localStorage.removeItem('blogs_license');
-    AppState.isMember = false;
-    return;
   }
+};
 
-  try {
-    const res = await fetch('https://api.lemonsqueezy.com/v1/licenses/validate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ license_key: key })
-    });
-    const data = await res.json();
-    if (!data.valid) {
-      localStorage.removeItem('blogs_member');
-      localStorage.removeItem('blogs_license');
-      AppState.isMember = false;
-    }
-  } catch { /* network error — leave membership state as-is */ }
+// ── Validate stored membership state on page load ─────────────
+// We only stored a hash, not the raw key, so we cannot re-hit the
+// LS API here. We trust blogs_member and let the next key entry
+// re-verify. If the hash is missing but member flag is set, the
+// state is corrupt — clear it so it can't grant free access.
+(function validateStoredLicense() {
+  if (!CONFIG.LEMONSQUEEZY_STORE) return;
+  const hasHash  = !!localStorage.getItem('blogs_license_hash');
+  const isMember = localStorage.getItem('blogs_member') === '1';
+  if (isMember && !hasHash) {
+    LicenseCrypto.clear();
+    AppState.isMember = false;
+  }
 })();
-
 // =========================================
 // 2. UTILS
 // =========================================
@@ -193,7 +203,10 @@ const Utils = {
     let m;
     while ((m = re.exec(text)) !== null) {
       const level = m[1].length;
-      const raw   = m[2].replace(/\*+|`|_+/g, '').trim();
+      const raw   = m[2]
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // links: keep label, drop URL
+        .replace(/\*+|`|_+|~+/g, '')             // bold, italic, code, strikethrough
+        .trim();
       // Skip the TOC heading itself
       if (/^(?:table\s+of\s+)?contents?$/i.test(raw)) continue;
       const id    = Utils.slugify(raw);
@@ -270,10 +283,13 @@ const Utils = {
       text = Utils._processShortcodes(text);
       const renderer = new marked.Renderer();
 
-      renderer.code = (code, lang) => {
-        const safeLang = (lang || '').split(/\s/)[0];
+      renderer.code = (codeOrToken, lang) => {
+        // marked@4 passes a token object; marked@2/3 passes (code, lang) strings.
+        const code = (codeOrToken && typeof codeOrToken === 'object') ? codeOrToken.text : codeOrToken;
+        const rawLang = (codeOrToken && typeof codeOrToken === 'object') ? codeOrToken.lang : lang;
+        const safeLang = ((rawLang || '').split(/\s/)[0]);
         const cls = safeLang ? `class="language-${safeLang}"` : '';
-        const escaped = code
+        const escaped = (code || '')
           .replace(/&/g, '&amp;')
           .replace(/</g, '&lt;')
           .replace(/>/g, '&gt;')
@@ -281,26 +297,42 @@ const Utils = {
         return `<pre><code ${cls}>${escaped}</code></pre>\n`;
       };
 
-      renderer.heading = (text, level) => {
-        const id = Utils.slugify(text.replace(/<[^>]+>/g, ''));
-        return `<h${level} id="${id}">${text}<a class="heading-anchor" href="#${id}" aria-hidden="true">#</a></h${level}>\n`;
+      renderer.heading = (textOrToken, level) => {
+        // marked@4 passes a token object; marked@2/3 passes (text, level).
+        const text  = (textOrToken && typeof textOrToken === 'object') ? (textOrToken.text || '') : textOrToken;
+        const depth = (textOrToken && typeof textOrToken === 'object') ? textOrToken.depth : level;
+        const plain = text.replace(/<[^>]+>/g, '').replace(/\[([^\]]*)\]\([^)]*\)/g, '$1');
+        const id = Utils.slugify(plain);
+        return `<h${depth} id="${id}">${text}<a class="heading-anchor" href="#${id}" aria-hidden="true">#</a></h${depth}>\n`;
       };
 
-      renderer.link = (href, title, linkText) => {
+      renderer.link = (hrefOrToken, title, linkText) => {
+        // marked@4 passes a token object; marked@2/3 passes (href, title, text).
+        const href     = (hrefOrToken && typeof hrefOrToken === 'object') ? hrefOrToken.href  : hrefOrToken;
+        const ttl      = (hrefOrToken && typeof hrefOrToken === 'object') ? hrefOrToken.title : title;
+        const txt      = (hrefOrToken && typeof hrefOrToken === 'object') ? hrefOrToken.text  : linkText;
         const isExternal = href && !href.startsWith('#') && !href.startsWith('/');
-        const t = title ? ` title="${title}"` : '';
+        const t = ttl ? ` title="${ttl}"` : '';
         const ext = isExternal ? ` target="_blank" rel="noopener noreferrer"` : '';
-        return `<a href="${href}"${t}${ext}>${linkText}</a>`;
+        return `<a href="${href}"${t}${ext}>${txt}</a>`;
       };
 
-      renderer.image = (src, title, alt) => {
-        const t       = title ? ` title="${title}"` : '';
-        const caption = alt || title;
+      renderer.image = (srcOrToken, title, alt) => {
+        // marked@4 passes a token object; marked@2/3 passes (src, title, alt).
+        const src     = (srcOrToken && typeof srcOrToken === 'object') ? srcOrToken.href  : srcOrToken;
+        const ttl     = (srcOrToken && typeof srcOrToken === 'object') ? srcOrToken.title : title;
+        const altText = (srcOrToken && typeof srcOrToken === 'object') ? srcOrToken.text  : alt;
+        const t       = ttl ? ` title="${ttl}"` : '';
+        const caption = altText || ttl;
         const fig     = caption ? `<figcaption>${caption}</figcaption>` : '';
-        return `<figure class="media-figure"><img src="${src}" alt="${alt || ''}"${t} loading="lazy">${fig}</figure>`;
+        return `<figure class="media-figure"><img src="${src}" alt="${altText || ''}"${t} loading="lazy">${fig}</figure>`;
       };
 
-      renderer.blockquote = (quote) => {
+      renderer.blockquote = (quoteOrToken) => {
+        // marked@4 passes a token object with .text; marked@2/3 passes an HTML string.
+        const quote = (quoteOrToken && typeof quoteOrToken === 'object')
+          ? (quoteOrToken.body || quoteOrToken.text || '')
+          : quoteOrToken;
         const match = quote.match(/^<p>\[!(NOTE|TIP|WARNING|CAUTION|IMPORTANT)\]([\s\S]*)/i);
         if (match) {
           const type = match[1].toUpperCase();
@@ -340,148 +372,257 @@ const Utils = {
 // =========================================
 // 3. DATA LOADER
 // =========================================
+// Post discovery priority (highest → lowest):
+//   1. posts/manifest.json  — pre-built by GitHub Actions (preferred, no API calls)
+//   2. GitHub Contents API  — fallback when manifest is absent (60 req/hr unauthenticated)
+//   3. posts/index.json     — local dev fallback
+//
+// A GitHub token is NEVER stored in config or shipped to the browser.
+// If you need to raise the rate limit or access a private repo, deploy
+// a Cloudflare Worker proxy and set CONFIG.POSTS_API_URL to its URL.
 const DataLoader = {
+  // ── Normalise a raw manifest/index item into a post record ───
+  // When manifest.json is built by GitHub Actions it includes the full
+  // post body (or a preview for paywalled posts) — so the browser never
+  // needs a second fetch just to open a post.
+  _normalise(item) {
+    const post = {
+      slug:           item.slug           || '',
+      title:          item.title          || 'Untitled',
+      excerpt:        item.excerpt        || '',
+      date:           item.date           || new Date().toISOString().split('T')[0],
+      tag:            item.tag            || 'Post',
+      readTime:       item.readTime       || '1 min',
+      paywalled:      item.paywalled === true || item.paywalled === 'true',
+      cover:          item.cover          || '',
+      author:         item.author         || CONFIG.AUTHOR_NAME,
+      authorRole:     item.author_role    || CONFIG.AUTHOR_ROLE,
+      authorBio:      item.author_bio     || CONFIG.AUTHOR_BIO,
+      authorInitials: item.author_initials || CONFIG.AUTHOR_INITIALS || (
+        (item.author || CONFIG.AUTHOR_NAME)
+          .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+      ),
+      authorLinkedin: item.author_linkedin || '',
+      authorGithub:   item.author_github   || '',
+      authorWebsite:  item.author_website  || '',
+    };
+    // Manifest is metadata-only — body is fetched on-demand when a post is opened.
+    // If body is present (e.g. legacy manifest or local dev index.json with body),
+    // cache it immediately so fetchBody() returns without a network request.
+    if (item.body !== undefined) {
+      post.body           = item.body;
+      post._previewCached = item._previewCached === true;
+      AppState.postsCache[post.slug] = post;
+    }
+    return post;
+  },
+
+  // ── _fetchMd: fetch + parse one .md file into a post metadata record ──
+  // body is intentionally NOT cached here — only stored on-demand in fetchBody().
+  async _fetchMd(name, base) {
+    const r = await fetch(`${base}/${name}`);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const { fm, body } = Utils.parseFrontmatter(await r.text());
+    const slug = name.replace(/\.md$/, '');
+    const isPaywalled = fm.paywalled === 'true';
+    return {
+      slug,
+      title:   fm.title || 'Untitled',
+      excerpt: fm.excerpt || (() => {
+        const excerptSrc = isPaywalled
+          ? (body.split(/\n\n+/).find(l => l.trim() && !l.startsWith('#')) || body)
+          : body;
+        const s = excerptSrc
+          .replace(/```[\s\S]*?```/g, '').replace(/`[^`]+`/g, '')
+          .replace(/!?\[[^\]]*\]\([^)]*\)/g, '')
+          .replace(/[*_~]{1,3}([^*_~]+)[*_~]{1,3}/g, '$1')
+          .replace(/^#{1,6}\s+/gm, '').replace(/^>\s*/gm, '')
+          .replace(/^[-*+]\s+/gm, '').replace(/\n/g, ' ').trim();
+        return s.substring(0, 140) + (s.length > 140 ? '…' : '');
+      })(),
+      date:           fm.date     || new Date().toISOString().split('T')[0],
+      tag:            fm.tag      || 'Post',
+      readTime:       fm.readTime || Utils.readTime(body),
+      paywalled:      isPaywalled,
+      cover:          fm.cover    || '',
+      author:         fm.author         || CONFIG.AUTHOR_NAME,
+      authorRole:     fm.author_role    || CONFIG.AUTHOR_ROLE,
+      authorBio:      fm.author_bio     || CONFIG.AUTHOR_BIO,
+      authorInitials: fm.author_initials || CONFIG.AUTHOR_INITIALS || (
+        (fm.author || CONFIG.AUTHOR_NAME).split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+      ),
+      authorLinkedin: fm.author_linkedin || '',
+      authorGithub:   fm.author_github   || '',
+      authorWebsite:  fm.author_website  || '',
+      // body NOT stored — fetched on-demand by fetchBody()
+    };
+  },
+
+  // ── _fetchBatch: fetch .md files with capped concurrency ──────────
+  // With hundreds of posts, firing 200 simultaneous fetches would
+  // saturate the browser connection pool. Process in batches of 12.
+  async _fetchBatch(filenames, base, batchSize = 12) {
+    const results = [];
+    for (let i = 0; i < filenames.length; i += batchSize) {
+      const batch = filenames.slice(i, i + batchSize);
+      const settled = await Promise.allSettled(batch.map(name => this._fetchMd(name, base)));
+      for (const r of settled) {
+        if (r.status === 'fulfilled') results.push(r.value);
+        else console.warn('[DataLoader] Failed to load a post:', r.reason?.message);
+      }
+    }
+    return results;
+  },
+
   async load() {
+    // ── file:// local dev ──────────────────────────────────────
+    // Browsers block fetch() on file:// origins. Serve via a local
+    // HTTP server instead:
+    //   python3 -m http.server 8080       # then open http://localhost:8080
+    //   npx serve .                        # alternative
+    //   npx http-server -p 8080 -c-1      # alternative (no cache)
     if (location.protocol === 'file:') {
-      UI.showError('Open via a local server', 'Browsers block file:// fetches.', 'python3 -m http.server 8080');
+      UI.showError(
+        'Open via a local dev server',
+        'Browsers block fetch() on file:// URLs. Start a local server in your repo root:',
+        'python3 -m http.server 8080\n# then open http://localhost:8080'
+      );
       return null;
     }
 
+    // ── Resolve the base URL for post files ────────────────────
+    // Priority:
+    //   1. CONFIG.POSTS_BASE_URL  — explicit override (Cloudflare R2, custom CDN, etc.)
+    //   2. Same origin (/posts)   — works for BOTH public AND private GitHub Pages repos.
+    //      The Pages site is always publicly served even when the source repo is private.
+    //   3. raw.githubusercontent.com — NOT used as default (requires auth on private repos).
+    //      Set CONFIG.POSTS_BASE_URL explicitly if needed.
+    const base = CONFIG.POSTS_BASE_URL || '/posts';
+
+    // ── 1. Try manifest.json first (built by GitHub Actions) ─────
+    // manifest.json is metadata-only (no body). ~100 KB for hundreds of posts.
+    // Body is fetched on-demand when the reader opens a post (see fetchBody).
+    try {
+      const r = await fetch(`${base}/manifest.json`, { cache: 'no-cache' });
+      if (r.ok) {
+        const list = await r.json();
+        if (Array.isArray(list) && list.length > 0 && typeof list[0] === 'object') {
+          return list.map(item => this._normalise(item))
+                     .sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+      }
+    } catch { /* manifest not present yet — fall through to next strategy */ }
+
+    // ── Detect local dev environment ──────────────────────────
+    // python3 -m http.server, npx serve, etc. all run on localhost.
+    // On localhost we never call the GitHub API — it would either rate-limit
+    // or 404 on private repos. Instead we scan posts/ directly.
+    const isLocalDev = ['localhost', '127.0.0.1', '0.0.0.0', '::1'].includes(location.hostname)
+      || location.hostname.startsWith('192.168.')
+      || location.hostname.endsWith('.local');
+
     let filenames;
 
-    if (CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO) {
-      // ── Auto-discover via GitHub Contents API ─────────────────
+    if (!isLocalDev && CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO) {
+      // ── 2. Fallback: GitHub Contents API (unauthenticated, 60 req/hr) ──
+      // Only reached on production when manifest.json doesn't exist yet
+      // (first deploy before the Action has run). Once the Action runs once,
+      // manifest.json is written and this path is never reached again.
       try {
-        const apiUrl = `https://api.github.com/repos/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/contents/posts`;
+        const apiUrl = CONFIG.POSTS_API_URL ||
+          `https://api.github.com/repos/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/contents/posts`;
         const r = await fetch(apiUrl, { headers: { 'Accept': 'application/vnd.github.v3+json' } });
         if (!r.ok) throw new Error(`GitHub API HTTP ${r.status}`);
         const entries = await r.json();
         filenames = entries
-          .filter(e => e.type === 'file' && e.name.endsWith('.md') && e.name !== 'index.md')
+          .filter(e => e.type === 'file' && e.name.endsWith('.md') && e.name !== 'index.md' && e.name !== 'manifest.json')
           .map(e => e.name);
       } catch (e) {
-        UI.showError('Could not list posts from GitHub API', e.message,
-          `https://api.github.com/repos/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/contents/posts`);
+        UI.showError(
+          'Could not list posts',
+          e.message,
+          'Tip: push once to trigger the GitHub Action — it writes posts/manifest.json and this fallback is never needed again.'
+        );
         return null;
       }
     } else {
-      // ── Local dev fallback: posts/index.json ──────────────────
+      // ── 3. Local dev: discover posts without GitHub API ───────
+      // Strategy A: posts/manifest.json — already handled above (strategy 1).
+      //   Run `node generate-manifest.js` once to create it, then just refresh.
+      // Strategy B: posts/index.json — a simple filename list you maintain.
+      // Strategy C: parse the directory listing from python3 -m http.server.
+      //   No extra files needed — works out of the box.
+
+      // Try index.json first (explicit list, fastest)
       try {
-        const r = await fetch('/posts/index.json');
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        const list = await r.json();
-        if (!Array.isArray(list)) throw new Error('posts/index.json must be a JSON array');
-        // Fast path: metadata objects
-        if (list.length > 0 && typeof list[0] === 'object' && list[0] !== null) {
-          return list
-            .map(item => ({
-              slug:           item.slug || '',
-              title:          item.title || 'Untitled',
-              excerpt:        item.excerpt || '',
-              date:           item.date   || new Date().toISOString().split('T')[0],
-              tag:            item.tag    || 'Post',
-              readTime:       item.readTime || '1 min',
-              paywalled:      item.paywalled === true || item.paywalled === 'true',
-              cover:          item.cover || '',
-              author:         item.author         || CONFIG.AUTHOR_NAME,
-              authorRole:     item.author_role    || CONFIG.AUTHOR_ROLE,
-              authorBio:      item.author_bio     || CONFIG.AUTHOR_BIO,
-              authorInitials: item.author_initials || CONFIG.AUTHOR_INITIALS || (
-                (item.author || CONFIG.AUTHOR_NAME)
-                  .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
-              ),
-              authorLinkedin: item.author_linkedin || '',
-              authorGithub:   item.author_github   || '',
-              authorWebsite:  item.author_website  || '',
-            }))
-            .sort((a, b) => new Date(b.date) - new Date(a.date));
+        const r = await fetch(`${base}/index.json`);
+        if (r.ok) {
+          const list = await r.json();
+          if (Array.isArray(list)) {
+            if (list.length > 0 && typeof list[0] === 'object' && list[0] !== null) {
+              return list.map(item => this._normalise(item))
+                         .sort((a, b) => new Date(b.date) - new Date(a.date));
+            }
+            filenames = list.filter(n => typeof n === 'string' && n.endsWith('.md'));
+          }
         }
-        filenames = list.filter(n => typeof n === 'string' && n.endsWith('.md'));
-      } catch (e) {
-        UI.showError('Local dev: could not load posts/index.json', e.message, '[ "my-post.md" ]');
-        return null;
+      } catch { /* no index.json — fall through to directory listing */ }
+
+      // Parse the HTML directory listing served by python3 -m http.server
+      if (!filenames) {
+        try {
+          const r = await fetch(`${base}/`);
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          const html = await r.text();
+          // Extract all href values ending in .md from the directory listing
+          const matches = [...html.matchAll(/href="([^"]+\.md)"/g)];
+          filenames = matches
+            .map(m => decodeURIComponent(m[1]).replace(/^.*\//, '')) // basename only
+            .filter(n => n !== 'index.md');
+          if (filenames.length === 0) throw new Error('No .md files found in posts/ directory listing.');
+        } catch (e) {
+          UI.showError(
+            'Local dev: could not discover posts',
+            'Run this once in your repo root to generate posts/manifest.json, then refresh:',
+            'node generate-manifest.js'
+          );
+          return null;
+        }
       }
     }
 
-    // ── Fetch all .md files in parallel ───────────────────────
-    const base = (CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO)
-      ? `https://raw.githubusercontent.com/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/main/posts`
-      : '/posts';
-
-    const posts = await Promise.all(filenames.map(async name => {
-      try {
-        const r = await fetch(`${base}/${name}`);
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        const { fm, body } = Utils.parseFrontmatter(await r.text());
-        const slug = name.replace(/\.md$/, '');
-        const post = {
-          slug,
-          title:   fm.title || 'Untitled',
-          excerpt: fm.excerpt || (() => {
-            // For paywalled posts without explicit fm.excerpt, use only first paragraph
-            const excerptSrc = (fm.paywalled === 'true')
-              ? (body.split(/\n\n+/).find(l => l.trim() && !l.startsWith('#')) || body)
-              : body;
-            const s = excerptSrc
-              .replace(/```[\s\S]*?```/g, '').replace(/`[^`]+`/g, '')
-              .replace(/!?\[[^\]]*\]\([^)]*\)/g, '')
-              .replace(/[*_~]{1,3}([^*_~]+)[*_~]{1,3}/g, '$1')
-              .replace(/^#{1,6}\s+/gm, '').replace(/^>\s*/gm, '')
-              .replace(/^[-*+]\s+/gm, '').replace(/\n/g, ' ').trim();
-            return s.substring(0, 140) + (s.length > 140 ? '…' : '');
-          })(),
-          date:           fm.date     || new Date().toISOString().split('T')[0],
-          tag:            fm.tag      || 'Post',
-          readTime:       fm.readTime || Utils.readTime(body),
-          paywalled:      fm.paywalled === 'true',
-          cover:          fm.cover    || '',
-          author:         fm.author         || CONFIG.AUTHOR_NAME,
-          authorRole:     fm.author_role    || CONFIG.AUTHOR_ROLE,
-          authorBio:      fm.author_bio     || CONFIG.AUTHOR_BIO,
-          authorInitials: fm.author_initials || CONFIG.AUTHOR_INITIALS || (
-            (fm.author || CONFIG.AUTHOR_NAME)
-              .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
-          ),
-          authorLinkedin: fm.author_linkedin || '',
-          authorGithub:   fm.author_github   || '',
-          authorWebsite:  fm.author_website  || '',
-          // For paywalled posts, keep only a short preview for non-members
-          body: (fm.paywalled === 'true' && !AppState.isMember)
-            ? Utils._stripTocBlock(body).split(/\n\n+/).slice(0, 12).join('\n\n')  // first ~12 paragraphs as preview
-            : body,
-          _previewCached: (fm.paywalled === 'true' && !AppState.isMember)
-        };
-        AppState.postsCache[slug] = post;
-        return post;
-      } catch (e) {
-        console.error(`Failed: ${name}`, e);
-        return null;
-      }
-    }));
-
-    return posts.filter(Boolean).sort((a, b) => new Date(b.date) - new Date(a.date));
+    // ── Fetch .md files in batches of 12 (connection-pool friendly) ─
+    const posts = await this._fetchBatch(filenames, base);
+    return posts.sort((a, b) => new Date(b.date) - new Date(a.date));
   },
 
   async fetchBody(slug) {
-    // Return cache if: not paywalled, member with full body, or non-member with preview cached
+    // ── Cache check ───────────────────────────────────────────
+    // Normal path (manifest.json exists): body is NOT in the manifest.
+    // We fetch the .md file the first time the reader opens a post,
+    // then cache it in AppState.postsCache for instant re-opens.
     const cached = AppState.postsCache[slug];
     if (cached) {
-      if (!cached.paywalled || AppState.isMember) return cached;
-      if (cached._previewCached) return cached;
+      // Body already present and correct for the current membership state
+      if (!cached.paywalled && cached.body !== undefined) return cached;
+      if (cached.paywalled && AppState.isMember && !cached._previewCached) return cached;
+      if (cached.paywalled && !AppState.isMember && cached._previewCached) return cached;
+      // Body missing (metadata-only from manifest) — fall through to fetch
     }
-    const base = (CONFIG.GITHUB_USER && CONFIG.GITHUB_REPO)
-      ? `https://raw.githubusercontent.com/${CONFIG.GITHUB_USER}/${CONFIG.GITHUB_REPO}/main/posts`
-      : '/posts';
 
+    const base = CONFIG.POSTS_BASE_URL || '/posts';
     const r = await fetch(`${base}/${slug}.md`);
     if (!r.ok) throw new Error(`HTTP ${r.status} — could not load ${slug}.md`);
 
     const { fm, body } = Utils.parseFrontmatter(await r.text());
     const meta = AppState.posts.find(p => p.slug === slug) || {};
     const isPaywalled = fm.paywalled === 'true' || meta.paywalled;
-    // Provide preview body for non-members, full body for members
     const previewBody = Utils._stripTocBlock(body).split(/\n\n+/).slice(0, 12).join('\n\n');
-    const full = { ...meta, body: (isPaywalled && !AppState.isMember) ? previewBody : body, _previewCached: (isPaywalled && !AppState.isMember) };
+    const full = {
+      ...meta,
+      body: (isPaywalled && !AppState.isMember) ? previewBody : body,
+      _previewCached: (isPaywalled && !AppState.isMember)
+    };
     AppState.postsCache[slug] = full;
     return full;
   }
@@ -620,12 +761,13 @@ const Renderer = {
     Utils.qs('#hero-featured-panel').addEventListener('click', () => Router.go(p.slug));
     Utils.qs('#hero-read-btn').addEventListener('click', e => { e.stopPropagation(); Router.go(p.slug); });
 
-    const aside = Utils.qs('#aside-list');
-    // Skip posts already visible in the hero + top grid cards.
-    // Sidebar shows items 7-11 so nothing duplicates the main grid.
-    const sidebarStart = Math.min(7, Math.max(1, posts.length - 4));
+    const { perPage } = AppState.pagination;
+    // Skip the hero post (index 0) and all posts visible in the main grid (indices 1..perPage-1).
+    // Sidebar shows the next batch so nothing duplicates the index view.
+    const sidebarStart = perPage;
     const items = posts.slice(sidebarStart, sidebarStart + 4);
-    aside.innerHTML = items.length
+    const asideList = Utils.qs('#aside-list');
+    asideList.innerHTML = items.length
       ? items.map(item => `
           <li>
             <button class="sidebar__link" data-slug="${Utils.escapeHtml(item.slug)}">
@@ -639,7 +781,7 @@ const Renderer = {
           </li>`).join('')
       : '<li class="loading-text">No more posts</li>';
 
-    aside.querySelectorAll('.sidebar__link[data-slug]').forEach(btn => {
+    asideList.querySelectorAll('.sidebar__link[data-slug]').forEach(btn => {
       btn.addEventListener('click', e => { e.stopPropagation(); Router.go(btn.dataset.slug); });
     });
   },
@@ -993,16 +1135,18 @@ const Renderer = {
 
         try {
           // Lemon Squeezy license validate — CORS-enabled, no server needed
+          const lsParams = { license_key: key };
+          if (CONFIG.LEMONSQUEEZY_PRODUCT) lsParams.product_id = CONFIG.LEMONSQUEEZY_PRODUCT;
           const res = await fetch('https://api.lemonsqueezy.com/v1/licenses/validate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ license_key: key })
+            body: new URLSearchParams(lsParams)
           });
           const data = await res.json();
 
           if (data.valid) {
             localStorage.setItem('blogs_member', '1');
-            localStorage.setItem('blogs_license', btoa(key));
+            await LicenseCrypto.store(key); // stores SHA-256 hash only — raw key is never persisted
             AppState.isMember = true;
             // Clear the stripped cache so the full body is re-fetched
             delete AppState.postsCache[post.slug];
@@ -1205,10 +1349,10 @@ const Router = {
     const postEl  = document.getElementById('view-post');
     const readBar = document.getElementById('reading-bar');
 
-    // Close search bar on every navigation
+    // Close search bar only when navigating to a post, not on index re-renders (e.g. search input)
     const searchBar   = Utils.qs('#search-bar');
     const searchInput = Utils.qs('#search-input');
-    if (searchBar?.classList.contains('open')) {
+    if (slug && searchBar?.classList.contains('open')) {
       searchBar.classList.remove('open');
       searchBar.setAttribute('aria-hidden', 'true');
       if (searchInput) { searchInput.value = ''; AppState.search = ''; }
@@ -1228,11 +1372,11 @@ const Router = {
         `<div class="loading-spinner"><div class="spinner"></div></div>`;
 
       try {
-        const post = AppState.postsCache[slug] || await DataLoader.fetchBody(slug);
-        if (post && (post.body || post.paywalled)) {
+        const post = await DataLoader.fetchBody(slug);
+        if (post) {
           Renderer.renderPost(post);
         } else {
-          throw new Error('body missing');
+          throw new Error('post not found');
         }
       } catch {
         Utils.qs('#post-article').innerHTML = `
@@ -1252,10 +1396,7 @@ const Router = {
       postEl.style.display  = 'none';
       if (readBar) { readBar.style.display = 'none'; readBar.style.width = '0%'; }
 
-      // Sync search state from the actual input value so any navigation path
-      // that didn't go through a close-handler can't leave a stale filter active.
-      const _searchInput = Utils.qs('#search-input');
-      if (_searchInput) AppState.search = _searchInput.value.toLowerCase().trim();
+      // AppState.search is kept in sync by the input event handler; no re-read needed here.
 
       // Reset title + meta to homepage defaults
       document.title = `${CONFIG.SITE_TITLE} — ${CONFIG.SITE_TAGLINE}`;
@@ -1292,9 +1433,12 @@ const Router = {
           if (p.title.toLowerCase().includes(q)) return true;
           if (p.excerpt.toLowerCase().includes(q)) return true;
           if (p.tag.toLowerCase().includes(q)) return true;
-          // Never search gated body content for non-members
+          // Only search body content that is already cached in memory.
+          // Never trigger on-demand fetches during search — that would
+          // fire hundreds of requests on every keystroke.
           if (p.paywalled && !AppState.isMember) return false;
-          return (AppState.postsCache[p.slug]?.body || '').toLowerCase().includes(q);
+          const cachedBody = AppState.postsCache[p.slug]?.body;
+          return cachedBody ? cachedBody.toLowerCase().includes(q) : false;
         });
       }
 
@@ -1330,9 +1474,7 @@ const Router = {
       Renderer.renderPosts(gridPosts, showFeatured);
       Renderer.renderPagination(filtered.length, perPage, AppState.pagination.page);
 
-      if (AppState.search) {
-        Utils.qs('.posts')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      // (Scroll to results is handled once by the search toggle, not on every re-render)
     }
   }
 };
@@ -1407,7 +1549,15 @@ const UI = {
       AppState.search = e.target.value.toLowerCase().trim();
       if (Router.getSlug()) return;
       AppState.pagination.page = 1;
+      const savedValue = e.target.value;
+      const savedCursor = e.target.selectionStart;
       Router.render();
+      // Restore focus + cursor after render re-paints the DOM
+      if (input) {
+        input.value = savedValue;
+        input.focus();
+        try { input.setSelectionRange(savedCursor, savedCursor); } catch {}
+      }
       const live = Utils.qs('#search-live');
       if (live && AppState.search) {
         const q = AppState.search;
@@ -1416,7 +1566,8 @@ const UI = {
           if (p.excerpt.toLowerCase().includes(q)) return true;
           if (p.tag.toLowerCase().includes(q)) return true;
           if (p.paywalled && !AppState.isMember) return false;
-          return (AppState.postsCache[p.slug]?.body || '').toLowerCase().includes(q);
+          const cachedBody = AppState.postsCache[p.slug]?.body;
+          return cachedBody ? cachedBody.toLowerCase().includes(q) : false;
         }).length;
         live.textContent = `${count} result${count !== 1 ? 's' : ''} for "${AppState.search}"`;
       } else if (live) {
@@ -1479,6 +1630,14 @@ const UI = {
       if (!a) return;
       const href = a.getAttribute('href');
       if (!href || href.startsWith('http') || href.startsWith('//') || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+      // Close the search bar before navigating
+      const searchBar = Utils.qs('#search-bar');
+      const searchInput = Utils.qs('#search-input');
+      if (searchBar?.classList.contains('open')) {
+        searchBar.classList.remove('open');
+        searchBar.setAttribute('aria-hidden', 'true');
+        if (searchInput) { searchInput.value = ''; AppState.search = ''; }
+      }
       e.preventDefault();
       if (location.pathname + location.search !== href) {
         history.pushState({}, '', href);
@@ -1578,8 +1737,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       menuBtn?.setAttribute('aria-expanded', 'false');
       mobileNav.setAttribute('aria-hidden', 'true');
     }
-    // Clear stale search state so back-navigation shows the correct listing
+    // Close search bar and clear stale search state on back/forward navigation
+    const searchBar   = Utils.qs('#search-bar');
     const searchInput = Utils.qs('#search-input');
+    if (searchBar?.classList.contains('open')) {
+      searchBar.classList.remove('open');
+      searchBar.setAttribute('aria-hidden', 'true');
+    }
     if (searchInput) { searchInput.value = ''; }
     AppState.search = '';
     Router.render();

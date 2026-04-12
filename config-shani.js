@@ -16,6 +16,25 @@ const CONFIG = {
   // ── Production blog URL (no trailing slash) ──────────────────
   BLOG_URL: 'https://blog.shani.dev',
 
+  // ── Post storage ─────────────────────────────────────────────
+  // Where the SPA fetches .md files and manifest.json from.
+  //
+  // LEAVE EMPTY for standard GitHub Pages (public OR private repo).
+  // The SPA will fetch from the same origin: /posts/manifest.json,
+  // /posts/my-post.md, etc. — GitHub Pages serves these as static
+  // files whether the source repo is public or private.
+  //
+  // Only set this if you store posts somewhere else:
+  //   Separate public GitHub repo:
+  //     POSTS_BASE_URL: 'https://raw.githubusercontent.com/shani8dev/blog-posts/main/posts'
+  //   Cloudflare R2 / S3 bucket:
+  //     POSTS_BASE_URL: 'https://pub-abc123.r2.dev/posts'
+  //   Cloudflare Worker proxy (for private repo without Pages, or Notion, etc.):
+  //     POSTS_BASE_URL: 'https://blog-proxy.yourname.workers.dev/posts'
+  //     POSTS_API_URL:  'https://blog-proxy.yourname.workers.dev/api/list'
+  POSTS_BASE_URL: '',   // ← leave empty for standard GitHub Pages
+  POSTS_API_URL:  '',   // ← leave empty unless using a Worker proxy
+
   // ── Author / team identity ───────────────────────────────────
   AUTHOR_NAME:     'Shrinivas Kumbhar',
   AUTHOR_INITIALS: 'SK',
