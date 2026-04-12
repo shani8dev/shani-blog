@@ -42,6 +42,10 @@ const TAG_ICONS = (CONFIG.TAG_ICONS && Object.keys(CONFIG.TAG_ICONS).length)
       Post:          'fa-solid fa-file-lines',
     };
 
+// ── Prism.js theme URLs — shared by script.js and admin.html ─────
+const PRISM_DARK  = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css';
+const PRISM_LIGHT = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css';
+
 // =========================================
 // UTILS
 // =========================================
@@ -328,5 +332,89 @@ const Utils = {
   readTime: body => {
     const wpm = CONFIG.WORDS_PER_MINUTE || 200;
     return `${Math.max(1, Math.ceil(body.trim().split(/\s+/).length / wpm))} min`;
+  },
+
+  // ── today — ISO date string for the current local day ────────────
+  // Used by admin.html (new-post defaults, serialise) and DataLoader
+  // fallbacks in script.js.
+  today: () => new Date().toISOString().split('T')[0],
+
+  // ── sanitizeFilename — make an upload filename URL/path-safe ─────
+  // Collapses whitespace to hyphens, strips unsafe chars, lowercases.
+  sanitizeFilename: name =>
+    name.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9._-]/g, '').toLowerCase(),
+
+  // ── filenameToAlt — derive human-readable alt text from a filename ─
+  // Strips extension, replaces hyphens/underscores with spaces.
+  filenameToAlt: name =>
+    name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
+
+  // ── applyThemeBase — shared DOM mutations for theme switching ─────
+  // Handles the 4 operations that are identical in both script.js and
+  // admin.html: data-theme attribute, localStorage, icon class, Prism
+  // stylesheet. Callers apply their own extras (AppState, Monaco, PWA,
+  // Giscus) after calling this.
+  //   storageKey — the full localStorage key (e.g. 'shani_theme')
+  applyThemeBase(t, storageKey) {
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem(storageKey, t);
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.className = t === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+    const prismLink = document.getElementById('prism-theme');
+    if (prismLink) prismLink.href = t === 'dark' ? PRISM_DARK : PRISM_LIGHT;
+  },
+
+  // ── copyToClipboard — robust clipboard write with textarea fallback ─
+  // Used by script.js (UI.copyToClipboard) and admin.html. Returns a
+  // Promise so callers can .then() for a success toast.
+  copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).catch(() => {
+        const ta = Object.assign(document.createElement('textarea'), { value: text });
+        ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        try { document.execCommand('copy'); } catch {}
+        ta.remove();
+      });
+    }
+    const ta = Object.assign(document.createElement('textarea'), { value: text });
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand('copy'); } catch {}
+    ta.remove();
+    return Promise.resolve();
+  },
+
+  // ── renderAuthorLinks — build the social link anchors for an author ──
+  // Used by both script.js renderPost() and admin.html renderPreview().
+  // Returns an HTML string (may be empty if no links are set).
+  renderAuthorLinks({ linkedin, github, website } = {}) {
+    return [
+      linkedin ? `<a href="${Utils.escapeHtml(linkedin)}" target="_blank" rel="noopener" class="author-card__link" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>` : '',
+      github   ? `<a href="${Utils.escapeHtml(github)}"   target="_blank" rel="noopener" class="author-card__link" aria-label="GitHub"><i class="fa-brands fa-github"></i> GitHub</a>`     : '',
+      website  ? `<a href="${Utils.escapeHtml(website)}"  target="_blank" rel="noopener" class="author-card__link" aria-label="Website"><i class="fa-solid fa-globe"></i> Website</a>`      : '',
+    ].filter(Boolean).join('');
+  },
+
+  // ── renderAuthorCard — full "Written by" card HTML ───────────────
+  // Used by both script.js renderPost() and admin.html renderPreview().
+  //   p = { initials, author, authorRole, authorBio, authorLinkedin,
+  //          authorGithub, authorWebsite }
+  renderAuthorCard(p) {
+    const links = Utils.renderAuthorLinks({
+      linkedin: p.authorLinkedin || p.linkedin,
+      github:   p.authorGithub   || p.github,
+      website:  p.authorWebsite  || p.website,
+    });
+    return `<div class="author-card">
+      <span class="author-card__avatar">${Utils.escapeHtml(p.initials || p.authorInitials || '')}</span>
+      <div class="author-card__body">
+        <div class="author-card__label">Written by</div>
+        <div class="author-card__name">${Utils.escapeHtml(p.author || '')}</div>
+        ${p.authorRole ? `<div class="author-card__role">${Utils.safeText(p.authorRole)}</div>` : ''}
+        ${p.authorBio  ? `<p class="author-card__bio">${Utils.safeText(p.authorBio)}</p>`       : ''}
+        ${links        ? `<div class="author-card__links">${links}</div>`                        : ''}
+      </div>
+    </div>`;
   },
 };

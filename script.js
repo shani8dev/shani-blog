@@ -209,7 +209,7 @@ const DataLoader = {
       slug:           item.slug           || '',
       title:          item.title          || 'Untitled',
       excerpt:        item.excerpt        || '',
-      date:           item.date           || new Date().toISOString().split('T')[0],
+      date:           item.date           || Utils.today(),
       tag:            item.tag            || 'Post',
       readTime:       item.readTime       || '1 min',
       paywalled:      item.paywalled === true || item.paywalled === 'true',
@@ -270,7 +270,7 @@ const DataLoader = {
           .replace(/^[-*+]\s+/gm, '').replace(/\n/g, ' ').trim();
         const _emc = CONFIG.EXCERPT_MAX_CHARS || 140; return s.substring(0, _emc) + (s.length > _emc ? '\u2026' : '');
       })(),
-      date:           fm.date     || new Date().toISOString().split('T')[0],
+      date:           fm.date     || Utils.today(),
       tag:            fm.tag      || 'Post',
       readTime:       fm.readTime || Utils.readTime(body),
       paywalled:      isPaywalled,
@@ -1057,23 +1057,7 @@ const Renderer = {
         : ''
       }
       ${content}
-      ${(() => {
-        const links = [
-          post.authorLinkedin ? `<a href="${Utils.escapeHtml(post.authorLinkedin)}" target="_blank" rel="noopener" class="author-card__link" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>` : '',
-          post.authorGithub   ? `<a href="${Utils.escapeHtml(post.authorGithub)}"   target="_blank" rel="noopener" class="author-card__link" aria-label="GitHub"><i class="fa-brands fa-github"></i> GitHub</a>` : '',
-          post.authorWebsite  ? `<a href="${Utils.escapeHtml(post.authorWebsite)}"  target="_blank" rel="noopener" class="author-card__link" aria-label="Website"><i class="fa-solid fa-globe"></i> Website</a>` : '',
-        ].filter(Boolean).join('');
-        return `<div class="author-card">
-          <span class="author-card__avatar">${Utils.escapeHtml(post.authorInitials)}</span>
-          <div class="author-card__body">
-            <div class="author-card__label">Written by</div>
-            <div class="author-card__name">${Utils.escapeHtml(post.author)}</div>
-            ${post.authorRole ? `<div class="author-card__role">${Utils.safeText(post.authorRole)}</div>` : ''}
-            ${post.authorBio  ? `<p class="author-card__bio">${Utils.safeText(post.authorBio)}</p>` : ''}
-            ${links ? `<div class="author-card__links">${links}</div>` : ''}
-          </div>
-        </div>`;
-      })()}
+      ${Utils.renderAuthorCard(post)}
       <footer class="post-footer">
         <div class="post-tags">
           <button class="tag-chip" data-back-tag="${Utils.escapeHtml(post.tag)}" title="Browse all ${Utils.escapeHtml(post.tag)} posts">${Utils.tagIcon(post.tag)} More ${Utils.escapeHtml(post.tag)}</button>
@@ -1902,15 +1886,10 @@ const UI = {
   initTheme() {
     const btn  = Utils.qs('#theme-btn');
     const icon = Utils.qs('#theme-icon');
-    const PRISM_DARK  = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css';
-    const PRISM_LIGHT = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css';
+    // PRISM_DARK / PRISM_LIGHT — declared in utils.js
     const apply = t => {
-      document.documentElement.setAttribute('data-theme', t);
+      Utils.applyThemeBase(t, _key('theme')); // shared DOM ops: data-theme, localStorage, icon, prism
       AppState.theme = t;
-      localStorage.setItem(_key('theme'), t);
-      if (icon) icon.className = t === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-      const prismLink = document.getElementById('prism-theme');
-      if (prismLink) prismLink.href = t === 'dark' ? PRISM_DARK : PRISM_LIGHT;
       // Update PWA theme-color
       const pwaTc = document.getElementById('pwa-theme-color');
       if (pwaTc) pwaTc.content = t === 'light' ? '#faf9f7' : '#161514';
@@ -2126,21 +2105,7 @@ const UI = {
   },
 
   copyToClipboard(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text).catch(() => {
-        const ta = Object.assign(document.createElement('textarea'), { value: text });
-        ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
-        document.body.appendChild(ta); ta.focus(); ta.select();
-        try { document.execCommand('copy'); } catch {}
-        ta.remove();
-      });
-    }
-    const ta = Object.assign(document.createElement('textarea'), { value: text });
-    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
-    document.body.appendChild(ta); ta.focus(); ta.select();
-    try { document.execCommand('copy'); } catch {}
-    ta.remove();
-    return Promise.resolve();
+    return Utils.copyToClipboard(text); // delegates to utils.js
   },
 
   initKeyboardShortcuts() {

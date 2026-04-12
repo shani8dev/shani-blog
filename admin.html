@@ -916,7 +916,7 @@ const DEFAULT_OWNER  = CFG.GITHUB_USER       || '';
 const DEFAULT_REPO   = CFG.GITHUB_REPO       || '';
 const DEFAULT_BRANCH = CFG.ADMIN_BRANCH      || 'main';
 const IMAGES_PATH    = CFG.ADMIN_IMAGES_PATH || 'assets/images';
-const TAG_ICONS      = CFG.TAG_ICONS         || {};
+// TAG_ICONS — declared in utils.js (do not redeclare)
 const STORAGE_PREFIX = CFG.STORAGE_PREFIX    || 'shani';
 const BLOG_URL       = CFG.BLOG_URL          || '';
 const AUTHOR_NAME    = CFG.AUTHOR_NAME       || '';
@@ -928,22 +928,15 @@ const ADSENSE_SLOT   = CFG.ADSENSE_SLOT      || '';
 const PUBLISHER_NAME = CFG.PUBLISHER_NAME    || CFG.SITE_TITLE || 'Blog';
 const PUBLISHER_URL  = CFG.PUBLISHER_URL     || CFG.BLOG_URL   || '';
 const SITE_TAGLINE   = CFG.SITE_TAGLINE      || '';
-const WORDS_PER_MINUTE = CFG.WORDS_PER_MINUTE || 200;
+// WORDS_PER_MINUTE — read via Utils.readTime (CONFIG.WORDS_PER_MINUTE || 200)
 
 // ═══════════════════════════════════════════════════════════════════
 // THEME
 // ═══════════════════════════════════════════════════════════════════
-const PRISM_DARK  = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css';
-const PRISM_LIGHT = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css';
+// PRISM_DARK / PRISM_LIGHT — declared in utils.js (do not redeclare)
 
 function applyTheme(t) {
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem(STORAGE_PREFIX + '_theme', t);
-  const icon = document.getElementById('theme-icon');
-  // Sun shown in dark mode (click → go light); Moon shown in light mode (click → go dark)
-  if (icon) icon.className = t === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-  const prismLink = document.getElementById('prism-theme');
-  if (prismLink) prismLink.href = t === 'dark' ? PRISM_DARK : PRISM_LIGHT;
+  Utils.applyThemeBase(t, STORAGE_PREFIX + '_theme'); // delegates shared DOM ops to utils.js
   // Rebuild Monaco themes from live CSS brand tokens, then switch
   if (typeof monaco !== 'undefined' && typeof buildMonacoTheme === 'function') {
     monaco.editor.defineTheme('shani-dark',  buildMonacoTheme('dark'));
@@ -1269,20 +1262,7 @@ async function openPost(slug) {
 
 function loadIntoEditor(slug, raw) {
   currentSlug = slug;
-  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
-  let fm = {}, body = raw;
-  if (match) {
-    match[1].split(/\r?\n/).forEach(line => {
-      const i = line.indexOf(':');
-      if (i < 1) return;
-      const key = line.slice(0, i).trim();
-      // Preserve everything after the first colon (handles URLs, timestamps, etc.)
-      const raw = line.slice(i + 1).trim();
-      // Strip only the outermost matching quote pair: 'value' or "value" or `value`
-      fm[key] = raw.replace(/^(['"`])([\s\S]*)\1$/, '$2');
-    });
-    body = match[2];
-  }
+  const { fm, body } = Utils.parseFrontmatter(raw); // delegates to utils.js
   // Basic
   document.getElementById('fm-title').value     = fm.title     || '';
   document.getElementById('fm-slug').value      = slug;
@@ -1518,13 +1498,13 @@ async function onGHFileSelected(file) {
       reader.readAsDataURL(file);
     });
     bar.style.width = '50%';
-    const filename  = file.name.replace(/\s+/g,'-').replace(/[^a-zA-Z0-9._-]/g,'').toLowerCase();
+    const filename  = Utils.sanitizeFilename(file.name);
     const repoPath  = `${IMAGES_PATH}/${filename}`;
     const existing  = await ghGetFile(repoPath);
     bar.style.width = '75%';
     await ghPutBinary(repoPath, base64, `assets: upload ${filename}`, existing.sha || undefined);
     bar.style.width = '100%';
-    const altText = filename.replace(/\.[^.]+$/, '').replace(/[-_]/g,' ');
+    const altText = Utils.filenameToAlt(filename);
     pendingImageMd = `![${altText}](/${repoPath})`;
     result.style.display = 'block';
     resText.textContent  = pendingImageMd;
@@ -1801,11 +1781,6 @@ function renderPreview() {
   const rt       = readTime || Utils.readTime(md);
   const initials = authorInit || (author ? author.substring(0, 2).toUpperCase() : '?');
   const tagIcon  = Utils.tagIcon(tag);
-  const authorLinks = [
-    authorLI  ? `<a href="${escHtml(authorLI)}"  target="_blank" rel="noopener" class="author-card__link"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>` : '',
-    authorGH  ? `<a href="${escHtml(authorGH)}"  target="_blank" rel="noopener" class="author-card__link"><i class="fa-brands fa-github"></i> GitHub</a>` : '',
-    authorWeb ? `<a href="${escHtml(authorWeb)}" target="_blank" rel="noopener" class="author-card__link"><i class="fa-solid fa-globe"></i> Website</a>` : '',
-  ].filter(Boolean).join('');
 
   // ── Assemble HTML — identical structure to Renderer.renderPost() in script.js ──
   let out = '';
@@ -1837,16 +1812,10 @@ function renderPreview() {
 
   out += `<div class="post-body">${html}</div>`;
 
-  out += `<div class="author-card">
-    <span class="author-card__avatar">${escHtml(initials)}</span>
-    <div class="author-card__body">
-      <div class="author-card__label">Written by</div>
-      <div class="author-card__name">${escHtml(author)}</div>
-      ${authorRole ? `<div class="author-card__role">${escHtml(authorRole)}</div>` : ''}
-      ${authorBio  ? `<p class="author-card__bio">${escHtml(authorBio)}</p>` : ''}
-      ${authorLinks ? `<div class="author-card__links">${authorLinks}</div>` : ''}
-    </div>
-  </div>`;
+  out += Utils.renderAuthorCard({
+    initials: initials, author, authorRole, authorBio,
+    authorLinkedin: authorLI, authorGithub: authorGH, authorWebsite: authorWeb,
+  });
 
   pane.innerHTML = out;
   pane.querySelectorAll('pre code').forEach(b => { if (typeof Prism !== 'undefined') Prism.highlightElement(b); });
@@ -1919,7 +1888,7 @@ function updateWordCount() {
   const v = getEditorValue();
   const words = v.trim() ? v.trim().split(/\s+/).length : 0;
   const chars = v.length;
-  document.getElementById('wc-display').textContent = `${words.toLocaleString()} words · ${Math.max(1,Math.ceil(words/WORDS_PER_MINUTE))} min read`;
+  document.getElementById('wc-display').textContent = `${words.toLocaleString()} words · ${Utils.readTime(v)}`;
   document.getElementById('wc-chars').textContent   = `${chars.toLocaleString()} chars`;
 }
 
@@ -1927,7 +1896,7 @@ async function copyMarkdown() {
   const result = serialise();
   if (!result) return;
   try {
-    await navigator.clipboard.writeText(result.raw);
+    await Utils.copyToClipboard(result.raw);
     log('Copied full markdown to clipboard ✓', 'ok');
   } catch {
     prompt('Copy this:', result.raw.slice(0,200) + '…');
@@ -1937,9 +1906,9 @@ async function copyMarkdown() {
 // ═══════════════════════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════════════════════
-function slugify(t){ return t.toLowerCase().replace(/[^\w\s-]/g,'').trim().replace(/[\s_]+/g,'-').replace(/-+/g,'-'); }
-function today()   { return new Date().toISOString().split('T')[0]; }
-function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function slugify(t){ return Utils.slugify(t); }  // delegates to utils.js
+function today()   { return Utils.today(); }      // delegates to utils.js
+function escHtml(s){ return Utils.escapeHtml(s||''); } // delegates to utils.js
 function getEditorValue(){ return monacoEditor ? monacoEditor.getValue() : ''; }
 function setEditorValue(v){ if (monacoEditor) monacoEditor.setValue(v); }
 function setStatus(msg, type='info') { const el = document.getElementById('save-status'); el.textContent = msg; el.className = `status-pill ${type}`; }
@@ -2138,7 +2107,7 @@ function mediaInsertSelected() {
   }
 
   // Normal insert — emit the right shortcode based on file type
-  const label = f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+  const label = Utils.filenameToAlt(f.name);
   let md;
   if (f.type === 'image') {
     md = `\n![${label}](/${f.path})\n`;
@@ -2157,7 +2126,7 @@ function mediaInsertSelected() {
 function mediaCopyUrl() {
   if (selectedMedia === null) return;
   const url = `/${mediaFiles[selectedMedia].path}`;
-  navigator.clipboard.writeText(url).then(() => log(`Copied URL: ${url}`, 'ok')).catch(() => prompt('Copy this URL:', url));
+  Utils.copyToClipboard(url).then(() => log(`Copied URL: ${url}`, 'ok')).catch(() => prompt('Copy this URL:', url));
 }
 
 async function mediaDeleteByIndex(i, e) {
@@ -2192,7 +2161,7 @@ async function mediaUploadFile(file) {
       r.readAsDataURL(file);
     });
     bar.style.width = '50%';
-    const filename = file.name.replace(/\s+/g,'-').replace(/[^a-zA-Z0-9._-]/g,'').toLowerCase();
+    const filename = Utils.sanitizeFilename(file.name);
     const repoPath = `${IMAGES_PATH}/${filename}`;
     const existing = await ghGetFile(repoPath);
     bar.style.width = '80%';
