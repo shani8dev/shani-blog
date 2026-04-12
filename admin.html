@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blog · Admin</title>
 <meta name="robots" content="noindex, nofollow">
+<link rel="icon" id="admin-favicon" type="image/svg+xml" href="/favicon.svg">
+<link rel="shortcut icon" href="/favicon.svg">
 <script>
 (function(){
   var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
@@ -360,6 +362,16 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
   .edit-area.split .preview-pane{display:none}
   #login-overlay{padding:1rem}
 }
+/* ── doc-card (mirrors style.css — needed for live preview pane) ─ */
+.doc-card{display:flex;align-items:center;gap:.75rem;padding:.65rem .9rem;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);text-decoration:none;color:var(--text);transition:border-color .15s,background .15s}
+.doc-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.doc-card__icon{flex-shrink:0;font-size:1.5rem;color:var(--accent);width:2rem;text-align:center}
+.doc-card__body{flex:1;min-width:0;display:flex;flex-direction:column;gap:.1rem}
+.doc-card__name{font-size:.9rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-card__meta{font-size:.72rem;color:var(--faint)}
+.doc-card__ext{font-family:var(--mono);font-size:.65rem;font-weight:500;padding:.08rem .3rem;border-radius:3px;background:var(--bg-elevated);color:var(--accent);border:1px solid var(--border);vertical-align:middle}
+.doc-card__dl{flex-shrink:0;font-size:.9rem;color:var(--faint);transition:color .15s}
+.doc-card:hover .doc-card__dl{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -1157,6 +1169,11 @@ async function ghFetch(path, opts = {}) {
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
+    if (res.status === 429 || (res.status === 403 && body.message?.toLowerCase().includes('rate limit'))) {
+      const reset = res.headers.get('X-RateLimit-Reset');
+      const wait  = reset ? ` Resets at ${new Date(reset * 1000).toLocaleTimeString()}.` : '';
+      throw new Error(`GitHub API rate limit exceeded.${wait}`);
+    }
     throw new Error(body.message || `GitHub API ${res.status}`);
   }
   return res.status === 204 ? null : res.json();
@@ -1165,7 +1182,9 @@ async function ghFetch(path, opts = {}) {
 async function ghGetFile(path) {
   try {
     const data = await ghFetch(`/repos/${ghOwner}/${ghRepo}/contents/${path}?ref=${encodeURIComponent(ghBranch)}`);
-    const content = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+    const raw     = atob(data.content.replace(/\n/g, ''));
+    const bytes   = Uint8Array.from(raw, c => c.charCodeAt(0));
+    const content = new TextDecoder('utf-8').decode(bytes);
     return { content, sha: data.sha, exists: true };
   } catch (e) {
     if (e.message.includes('404') || e.message.includes('Not Found')) return { content: '', sha: null, exists: false };
@@ -1309,7 +1328,14 @@ require(['vs/editor/editor.main'], () => {
   wrap.addEventListener('drop', e => {
     e.preventDefault(); dropOv.classList.remove('active');
     const f = e.dataTransfer.files[0];
-    if (f && f.type.startsWith('image/')) { openUploadModal(); switchUploadTab('github'); onGHFileSelected(f); }
+    if (!f) return;
+    if (f.type.startsWith('image/') || /\.(png|jpe?g|gif|webp|svg|avif)$/i.test(f.name)) {
+      openUploadModal(); switchUploadTab('github'); onGHFileSelected(f);
+    } else {
+      // Non-image: route to the media panel upload
+      switchSidebarTab('media');
+      mediaUploadFile(f);
+    }
   });
 
   log('Monaco editor ready.', 'info');
@@ -1647,6 +1673,13 @@ function serialise() {
 
   if (!title) { log('Title is required', 'error'); return null; }
   if (!slug)  { log('Slug is required',  'error'); return null; }
+  // Collision check — warn if slug already exists as a different post
+  const collision = allPosts.find(p => p.slug === slug && p.slug !== currentSlug);
+  if (collision) {
+    log(`Slug "${slug}" is already used by another post. Change the slug before saving.`, 'error');
+    document.getElementById('fm-slug').focus();
+    return null;
+  }
 
   const q = s => `'${s.replace(/'/g, "\\'")}'`;
   let fm = `---\ntitle: ${q(title)}\ndate: ${q(date)}\ntag: ${q(tag)}`;
@@ -1697,8 +1730,14 @@ function switchUploadTab(tab) {
   document.querySelectorAll('.upload-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
 }
 
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB — GitHub Contents API limit
+
 async function onGHFileSelected(file) {
   if (!file) return;
+  if (file.size > MAX_UPLOAD_BYTES) {
+    log(`File too large: ${(file.size / 1024 / 1024).toFixed(1)} MB. Max is 5 MB. Use Git LFS for larger assets.`, 'error');
+    return;
+  }
   const prog    = document.getElementById('gh-upload-progress');
   const bar     = document.getElementById('gh-progress-bar');
   const result  = document.getElementById('gh-upload-result');
@@ -1714,7 +1753,7 @@ async function onGHFileSelected(file) {
     });
     bar.style.width = '50%';
     const filename  = Utils.sanitizeFilename(file.name);
-    const repoPath  = `${IMAGES_PATH}/${filename}`;
+    const repoPath  = `${mediaFolderFor(file)}/${filename}`;
     const existing  = await ghGetFile(repoPath);
     bar.style.width = '75%';
     await ghPutBinary(repoPath, base64, `assets: upload ${filename}`, existing.sha || undefined);
@@ -2092,6 +2131,8 @@ function finaliseEmbed() {
   log(`Inserted ${platform} embed: ${id}`, 'info');
   closeModal('embed-modal');
 }
+
+function insertMarkdown(text) {
   if (!monacoEditor) return;
   monacoEditor.executeEdits('insert', [{ range: monacoEditor.getSelection(), text }]);
   monacoEditor.focus();
@@ -2267,7 +2308,9 @@ function updateWordCount() {
   const v = getEditorValue();
   const words = v.trim() ? v.trim().split(/\s+/).length : 0;
   const chars = v.length;
-  document.getElementById('wc-display').textContent = `${words.toLocaleString()} words · ${Utils.readTime(v)}`;
+  const manualRt = document.getElementById('fm-read-time')?.value?.trim();
+  const rt = manualRt || Utils.readTime(v);
+  document.getElementById('wc-display').textContent = `${words.toLocaleString()} words · ${rt}${manualRt ? ' (manual)' : ''}`;
   document.getElementById('wc-chars').textContent   = `${chars.toLocaleString()} chars`;
 }
 
@@ -2405,8 +2448,8 @@ async function loadMedia() {
   document.getElementById('media-selected').style.display = 'none';
   selectedMedia = null;
   try {
-    // Scan both assets/images and the configured IMAGES_PATH
-    const paths = [...new Set([IMAGES_PATH, 'assets/images', 'assets/media'])];
+    // Scan all asset subfolders (images, videos, audio, docs) + IMAGES_PATH override
+    const paths = [...new Set([IMAGES_PATH, 'assets/images', 'assets/videos', 'assets/audio', 'assets/docs'])];
     let allFiles = [];
     for (const p of paths) {
       try {
@@ -2506,7 +2549,7 @@ function mediaInsertSelected() {
   } else if (f.type === 'audio') {
     md = `\n::audio[/${f.path} | ${label}]\n`;
   } else {
-    md = `\n[${label}](/${f.path})\n`;
+    md = `\n::doc[/${f.path} | ${label}]\n`;
   }
   insertMarkdown(md);
   log(`Inserted ${f.type}: /${f.path}`, 'info');
@@ -2537,8 +2580,24 @@ function mediaDeleteSelected() {
   mediaDeleteByIndex(selectedMedia, { stopPropagation: () => {} });
 }
 
+// ── Return the correct assets subfolder for a given file ─────────
+function mediaFolderFor(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (/^(mp4|webm|ogg|ogv|mov|avi|mkv)$/.test(ext))                   return 'assets/videos';
+  if (/^(mp3|wav|flac|m4a|aac|opus)$/.test(ext))                       return 'assets/audio';
+  if (/^(pdf|doc|docx|txt|csv|md|xls|xlsx|ppt|pptx|zip)$/.test(ext))  return 'assets/docs';
+  return IMAGES_PATH; // images — respects ADMIN_IMAGES_PATH (default: assets/images)
+}
+
 async function mediaUploadFile(file) {
   if (!file) return;
+  if (file.size > MAX_UPLOAD_BYTES) {
+    const stat = document.getElementById('media-upload-status');
+    stat.style.display = 'block'; stat.style.color = 'var(--red)';
+    stat.textContent = `File too large: ${(file.size / 1024 / 1024).toFixed(1)} MB. Max is 5 MB. Use Git LFS for larger assets.`;
+    log(`File too large: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)`, 'error');
+    return;
+  }
   const prog = document.getElementById('media-upload-progress');
   const bar  = document.getElementById('media-progress-bar');
   const stat = document.getElementById('media-upload-status');
@@ -2552,7 +2611,7 @@ async function mediaUploadFile(file) {
     });
     bar.style.width = '50%';
     const filename = Utils.sanitizeFilename(file.name);
-    const repoPath = `${IMAGES_PATH}/${filename}`;
+    const repoPath = `${mediaFolderFor(file)}/${filename}`;
     const existing = await ghGetFile(repoPath);
     bar.style.width = '80%';
     await ghPutBinary(repoPath, base64, `assets: upload ${filename}`, existing.sha || undefined);
@@ -2649,11 +2708,11 @@ document.addEventListener('keydown', e => {
   const topbarTitle = document.getElementById('topbar-title');
   if (topbarTitle) topbarTitle.innerHTML = `${SITE_TITLE} <span>/ admin</span>`;
 
-  // Favicon
+  // Favicon — update both link elements set in <head>
   if (FAVICON_URL) {
-    let fav = document.querySelector('link[rel="icon"]') || document.createElement('link');
-    fav.rel = 'icon'; fav.href = FAVICON_URL;
-    document.head.appendChild(fav);
+    document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]').forEach(fav => {
+      fav.href = FAVICON_URL;
+    });
   }
 
   // AdSense is intentionally NOT loaded on admin.html — it is a private tool.

@@ -1605,6 +1605,13 @@ const Router = {
     this.render();
   },
   async render() {
+    // Guard: static asset paths must never be handled by the SPA router.
+    // The 404.html redirect can forward /assets/… here; let the browser
+    // fetch the real file instead of silently rendering the index.
+    if (/^\/(assets|images|favicon|manifest|robots)\b/.test(location.pathname)) {
+      window.location.replace(location.pathname + location.search + location.hash);
+      return;
+    }
     const slug    = this.getSlug();
     const indexEl = document.getElementById('view-index');
     const postEl  = document.getElementById('view-post');

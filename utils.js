@@ -153,6 +153,25 @@ const Utils = {
     const fig = caption ? `<figcaption>${caption}</figcaption>` : '';
     return `<figure class="media-figure media-figure--audio"><audio controls preload="metadata" loading="lazy"><source src="${src}">Your browser doesn't support HTML audio. <a href="${src}">Download it</a>.</audio>${fig}</figure>`;
   },
+  _doc(src, label) {
+    const filename = src.split('/').pop() || src;
+    const ext      = filename.split('.').pop().toLowerCase();
+    const iconMap  = {
+      pdf:  'fa-regular fa-file-pdf',
+      doc:  'fa-regular fa-file-word',  docx: 'fa-regular fa-file-word',
+      xls:  'fa-regular fa-file-excel', xlsx: 'fa-regular fa-file-excel',
+      ppt:  'fa-regular fa-file-powerpoint', pptx: 'fa-regular fa-file-powerpoint',
+      csv:  'fa-solid fa-table',
+      txt:  'fa-regular fa-file-lines',
+      zip:  'fa-solid fa-file-zipper',
+      md:   'fa-regular fa-file-code',
+    };
+    const icon      = iconMap[ext] || 'fa-regular fa-file';
+    const extBadge  = ext.toUpperCase();
+    const display   = Utils.escapeHtml(label || filename);
+    const safeSrc   = Utils.escapeHtml(src);
+    return `<figure class="media-figure media-figure--doc"><a class="doc-card" href="${safeSrc}" download aria-label="Download ${display}"><span class="doc-card__icon"><i class="${icon}" aria-hidden="true"></i></span><span class="doc-card__body"><span class="doc-card__name">${display}</span><span class="doc-card__meta"><span class="doc-card__ext">${extBadge}</span> · download</span></span><span class="doc-card__dl"><i class="fa-solid fa-download" aria-hidden="true"></i></span></a></figure>`;
+  },
   _image(src, rest) {
     const parts   = rest.split('|').map(s => s.trim());
     const alt     = parts[0] || '';
@@ -231,6 +250,10 @@ const Utils = {
     text = text.replace(/::audio\[([^\]]+)\]/g, (_, raw) => {
       const { val, caption } = Utils._cap(raw);
       return Utils._mediaToken(Utils._audio(val, caption));
+    });
+    text = text.replace(/::doc\[([^\]]+)\]/g, (_, raw) => {
+      const { val, caption } = Utils._cap(raw);
+      return Utils._mediaToken(Utils._doc(val, caption));
     });
     text = text.replace(/::image\[([^\]]+)\]/g, (_, raw) => {
       const first = raw.indexOf('|');
@@ -320,7 +343,7 @@ const Utils = {
                      'frameborder', 'loading', 'type', 'checked', 'disabled',
                      'target', 'rel', 'title', 'alt', 'scope', 'align',
                      'encoding', 'display', 'style', 'aria-hidden', 'preload',
-                     'poster', 'dnt'],
+                     'poster', 'dnt', 'download', 'aria-label'],
         });
       }
 
