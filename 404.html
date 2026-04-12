@@ -210,6 +210,20 @@
   </button>
 
   <script src="/config-shani.js"></script>
+  <script src="/utils.js"></script>
+  <script>
+    (function () {
+      var cfg = (typeof CONFIG !== 'undefined') ? CONFIG : {};
+      if (!cfg.ADSENSE_CLIENT) return;
+      if (document.getElementById('adsense-script')) return;
+      var s = document.createElement('script');
+      s.id = 'adsense-script';
+      s.async = true;
+      s.crossOrigin = 'anonymous';
+      s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(cfg.ADSENSE_CLIENT);
+      document.head.appendChild(s);
+    })();
+  </script>
   <script src="/script.js"></script>
 </body>
 </html>

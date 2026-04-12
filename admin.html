@@ -12,7 +12,6 @@
   document.documentElement.setAttribute('data-theme', t);
 })();
 </script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8268043375450773" crossorigin="anonymous"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700;800&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -33,6 +32,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
 <link rel="stylesheet" href="/brand-shani.css">
+<link rel="stylesheet" href="/style.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -202,53 +202,13 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
 .drop-overlay span{font-size:.85rem;color:var(--accent);font-weight:500}
 
 /* ── preview pane ────────────────────────────────────────────── */
-.preview-pane{flex:1;overflow-y:auto;min-height:0;background:var(--bg);display:none}
+/* All post styling (.post-body, .callout, .toc, .author-card…) comes
+   from style.css which is loaded in <head>. Only layout rules needed here. */
+.preview-pane{flex:1;overflow-y:auto;min-height:0;background:var(--color-bg,var(--bg));display:none}
 .edit-area.split .preview-pane,.edit-area.preview-only .preview-pane{display:block}
-.preview-inner{max-width:740px;margin:0 auto;padding:2rem 1.5rem 4rem;font-family:var(--sans);font-size:.95rem;line-height:1.8;color:var(--text)}
-.preview-inner h1,.preview-inner h2,.preview-inner h3,.preview-inner h4{font-family:var(--display);margin:2rem 0 .75rem;line-height:1.25}
-.preview-inner h1{font-size:2rem}
-.preview-inner h2{font-size:1.45rem;border-bottom:1px solid var(--border);padding-bottom:.4rem}
-.preview-inner h3{font-size:1.15rem}.preview-inner h4{font-size:1rem}
-.preview-inner p{margin:.85rem 0}
-.preview-inner a{color:var(--accent);text-decoration:underline}
-.preview-inner code{background:var(--bg-input);border:1px solid var(--border);border-radius:4px;padding:.1em .4em;font-family:var(--mono);font-size:.83em}
-.preview-inner pre{background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:1rem;overflow-x:auto;margin:1rem 0}
-.preview-inner pre code{background:none;border:none;padding:0}
-.preview-inner blockquote{border-left:3px solid var(--accent);margin:1rem 0;padding:.5rem 1rem;background:var(--color-accent-bg, rgba(255,127,80,.05));color:var(--text-muted);border-radius:0 4px 4px 0}
-.preview-inner ul,.preview-inner ol{padding-left:1.5rem;margin:.75rem 0}
-.preview-inner li{margin:.3rem 0}
-.preview-inner img{max-width:100%;border-radius:6px;margin:1rem 0}
-.preview-inner table{width:100%;border-collapse:collapse;margin:1.25rem 0;font-size:.88rem}
-.preview-inner th,.preview-inner td{border:1px solid var(--border);padding:.45rem .75rem;text-align:left}
-.preview-inner th{background:var(--bg-input);font-weight:600}
-.preview-inner tr:nth-child(even) td{background:color-mix(in srgb,var(--text) 4%,transparent)}
-.preview-inner hr{border:none;border-top:1px solid var(--border);margin:2rem 0}
-.preview-inner del{color:var(--muted)}
-/* Callouts — match all types from script.js CALLOUT_TYPES */
-.preview-inner .callout{padding:.75rem 1rem;border-radius:6px;margin:1.25rem 0;border-left:3px solid;font-size:.88rem}
-.preview-inner .callout-note,.preview-inner .callout--note{background:rgba(90,156,247,.08);border-color:var(--blue)}
-.preview-inner .callout-tip,.preview-inner .callout--tip{background:rgba(61,186,126,.08);border-color:var(--green)}
-.preview-inner .callout-warning,.preview-inner .callout--warning{background:rgba(232,162,21,.08);border-color:var(--warning)}
-.preview-inner .callout-caution,.preview-inner .callout--caution,.preview-inner .callout--danger,.preview-inner .callout-danger{background:rgba(237,95,95,.08);border-color:var(--red)}
-.preview-inner .callout-important,.preview-inner .callout--important{background:rgba(255,127,80,.08);border-color:var(--accent)}
-.preview-inner .callout .callout-title,.preview-inner .callout__title{font-weight:600;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.35rem;display:flex;align-items:center;gap:.3rem}
-.preview-inner figure{margin:1rem 0}
-.preview-inner figure img{border-radius:6px;max-width:100%}
-.preview-inner figcaption{font-size:.8rem;color:var(--muted);margin-top:.35rem;text-align:center}
-.preview-inner .media-embed{margin:1.5rem 0}
-.preview-inner .media-embed__ratio{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:6px}
-.preview-inner .media-embed__ratio iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.preview-inner video,.preview-inner audio{width:100%;border-radius:6px;margin:.75rem 0}
-.preview-inner .toc{background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-size:.88rem}
-.preview-inner .heading-anchor{margin-left:.4rem;opacity:0;color:var(--muted);font-size:.75em;text-decoration:none}
-.preview-inner h2:hover .heading-anchor,.preview-inner h3:hover .heading-anchor{opacity:1}
-.preview-title{font-family:var(--display);font-size:2.2rem;font-weight:800;margin-bottom:.5rem;line-height:1.2}
-.preview-meta{display:flex;gap:1rem;align-items:center;font-size:.8rem;color:var(--muted);margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);flex-wrap:wrap}
-.preview-tag{background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent);padding:.15rem .55rem;border-radius:99px;font-family:var(--mono);font-size:.72rem}
-.preview-author{display:flex;align-items:center;gap:.5rem;margin-bottom:1.5rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:8px;background:var(--bg-elevated)}
-.preview-author__avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:var(--accent-text);flex-shrink:0}
-.preview-author__name{font-weight:600;font-size:.85rem}
-.preview-author__role{font-size:.75rem;color:var(--muted)}
+.preview-inner{max-width:var(--max-prose,760px);margin:0 auto;padding:2rem 1.5rem 4rem}
+
+
 
 /* ── empty state ─────────────────────────────────────────────── */
 .empty-editor{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;color:var(--faint);text-align:center;padding:2rem}
@@ -941,6 +901,7 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
 </div>
 
 <script src="/config-shani.js"></script>
+<script src="/utils.js"></script>
 <script>
 'use strict';
 
@@ -1314,7 +1275,11 @@ function loadIntoEditor(slug, raw) {
     match[1].split(/\r?\n/).forEach(line => {
       const i = line.indexOf(':');
       if (i < 1) return;
-      fm[line.slice(0,i).trim()] = line.slice(i+1).trim().replace(/^['"`]|['"`]$/g,'');
+      const key = line.slice(0, i).trim();
+      // Preserve everything after the first colon (handles URLs, timestamps, etc.)
+      const raw = line.slice(i + 1).trim();
+      // Strip only the outermost matching quote pair: 'value' or "value" or `value`
+      fm[key] = raw.replace(/^(['"`])([\s\S]*)\1$/, '$2');
     });
     body = match[2];
   }
@@ -1805,51 +1770,84 @@ function schedulePreview() {
 }
 
 function renderPreview() {
-  const pane  = document.getElementById('preview-inner');
-  const md    = getEditorValue();
-  const title = document.getElementById('fm-title')?.value || '';
-  const date  = document.getElementById('fm-date')?.value  || '';
-  const tag   = document.getElementById('fm-tag')?.value   || '';
-  const cover = document.getElementById('fm-cover')?.value || '';
-  const series    = document.getElementById('fm-series')?.value || '';
-  const author    = document.getElementById('fm-author')?.value || AUTHOR_NAME;
-  const authorRole= document.getElementById('fm-author-role')?.value || AUTHOR_ROLE;
-  const authorInit= document.getElementById('fm-author-initials')?.value || AUTHOR_INITIALS;
+  const pane = document.getElementById('preview-inner');
+  const md   = getEditorValue();
+  const v    = id => document.getElementById(id)?.value?.trim() || '';
 
-  // Callout processing: > [!TYPE]\n> content
-  const processed = md
-    .replace(/> \[!(NOTE|WARNING|DANGER|TIP)\]\n((?:>.*\n?)*)/gi, (_, type, body) => {
-      const icons = { NOTE: '💡', WARNING: '⚠️', DANGER: '🚨', TIP: '✅' };
-      const content = body.replace(/^> ?/gm, '').trim();
-      return `<div class="callout callout--${type.toLowerCase()}"><div class="callout-title">${icons[type.toUpperCase()]} ${type}</div>${content}</div>\n\n`;
-    });
+  const title      = v('fm-title');
+  const date       = v('fm-date');
+  const updated    = v('fm-updated');
+  const tag        = v('fm-tag');
+  const cover      = v('fm-cover');
+  const excerpt    = v('fm-excerpt');
+  const series     = v('fm-series');
+  const author     = v('fm-author')          || AUTHOR_NAME;
+  const authorRole = v('fm-author-role')     || AUTHOR_ROLE;
+  const authorInit = v('fm-author-initials') || AUTHOR_INITIALS;
+  const authorBio  = v('fm-author-bio')      || AUTHOR_BIO;
+  const authorLI   = v('fm-author-linkedin');
+  const authorGH   = v('fm-author-github');
+  const authorWeb  = v('fm-author-website');
+  const readTime   = v('fm-read-time');
+  const toc        = document.getElementById('fm-toc')?.value || '';
+  const paywalled  = document.getElementById('fm-paywalled')?.value === 'true';
 
-  let html = '';
-  try { html = DOMPurify.sanitize(marked.parse(processed, { gfm: true, breaks: false })); }
-  catch { html = '<p style="color:var(--red)">Preview error</p>'; }
+  // ── Markdown → HTML via Utils.safeMarkdown (same pipeline as the live site) ──
+  let bodyMd = md;
+  if (toc === 'true' && !/\[\[?toc\]?\]/i.test(bodyMd)) bodyMd = '[[toc]]\n\n' + bodyMd;
+  const html = Utils.safeMarkdown(bodyMd);
 
+  // ── Meta helpers ────────────────────────────────────────────────
+  const rt       = readTime || Utils.readTime(md);
+  const initials = authorInit || (author ? author.substring(0, 2).toUpperCase() : '?');
+  const tagIcon  = Utils.tagIcon(tag);
+  const authorLinks = [
+    authorLI  ? `<a href="${escHtml(authorLI)}"  target="_blank" rel="noopener" class="author-card__link"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>` : '',
+    authorGH  ? `<a href="${escHtml(authorGH)}"  target="_blank" rel="noopener" class="author-card__link"><i class="fa-brands fa-github"></i> GitHub</a>` : '',
+    authorWeb ? `<a href="${escHtml(authorWeb)}" target="_blank" rel="noopener" class="author-card__link"><i class="fa-solid fa-globe"></i> Website</a>` : '',
+  ].filter(Boolean).join('');
+
+  // ── Assemble HTML — identical structure to Renderer.renderPost() in script.js ──
   let out = '';
-  if (cover) out += `<img src="${escHtml(cover)}" alt="cover" style="width:100%;border-radius:8px;margin-bottom:1.5rem;aspect-ratio:2/1;object-fit:cover">`;
-  if (title) {
-    out += `<div class="preview-title">${escHtml(title)}</div>`;
-    out += `<div class="preview-meta">
-      ${date ? `<span>${new Date(date+'T00:00:00').toLocaleDateString(typeof CFG !== 'undefined' && CFG.DATE_LOCALE || 'en-US',{year:'numeric',month:'long',day:'numeric'})}</span>` : ''}
-      ${tag  ? `<span class="preview-tag">${escHtml(tag)}</span>` : ''}
-    </div>`;
-  }
-  if (series) {
-    out += `<div class="preview-series"><strong>Series</strong>${escHtml(series)}</div>`;
-  }
-  if (author) {
-    out += `<div class="preview-author">
-      <div class="preview-author__avatar">${escHtml(authorInit || author.substring(0,2).toUpperCase())}</div>
-      <div>
-        <div class="preview-author__name">${escHtml(author)}</div>
-        ${authorRole ? `<div class="preview-author__role">${escHtml(authorRole)}</div>` : ''}
+
+  out += `<div class="post-header" style="margin-top:1.5rem;margin-bottom:1.5rem">`;
+  if (tag)     out += `<div class="post-tag">${tagIcon} ${escHtml(tag)}</div>`;
+  if (title)   out += `<h1 class="post-title">${escHtml(title)}</h1>`;
+  if (excerpt) out += `<p class="post-excerpt">${escHtml(excerpt)}</p>`;
+  out += `<div class="post-meta">
+    <span class="avatar">${escHtml(initials)}</span>
+    <div class="meta-info">
+      <div class="meta-name">${escHtml(author)}</div>
+      <div class="meta-details">
+        ${date    ? `<span><i class="fa-regular fa-calendar"></i> ${Utils.fmtDateShort(date)}</span>` : ''}
+        ${updated ? `<span class="meta-dot">·</span><span><i class="fa-regular fa-pen-to-square"></i> Updated ${Utils.fmtDateShort(updated)}</span>` : ''}
+        <span class="meta-dot">·</span>
+        <span><i class="fa-regular fa-clock"></i> ${escHtml(rt)}</span>
+        ${paywalled ? `<span class="meta-dot">·</span><span style="color:var(--color-accent)"><i class="fa-solid fa-star"></i> Members</span>` : ''}
       </div>
-    </div>`;
-  }
-  out += html;
+    </div>
+  </div></div>`;
+
+  if (series) out += `<div style="margin-bottom:1rem;padding:.5rem .85rem;background:var(--color-bg-elevated);border-left:3px solid var(--color-secondary);border-radius:0 var(--radius-md) var(--radius-md) 0;font-family:var(--font-mono);font-size:.72rem;color:var(--color-secondary)">
+    <i class="fa-solid fa-layer-group" style="margin-right:.35rem"></i> Series: <strong>${escHtml(series)}</strong></div>`;
+
+  if (cover) out += `<div class="post-cover post-cover--img" style="margin-bottom:1.5rem">
+    <img src="${escHtml(cover)}" alt="${escHtml(title)}" class="post-cover__img"
+         onerror="this.closest('.post-cover--img').style.display='none'"></div>`;
+
+  out += `<div class="post-body">${html}</div>`;
+
+  out += `<div class="author-card">
+    <span class="author-card__avatar">${escHtml(initials)}</span>
+    <div class="author-card__body">
+      <div class="author-card__label">Written by</div>
+      <div class="author-card__name">${escHtml(author)}</div>
+      ${authorRole ? `<div class="author-card__role">${escHtml(authorRole)}</div>` : ''}
+      ${authorBio  ? `<p class="author-card__bio">${escHtml(authorBio)}</p>` : ''}
+      ${authorLinks ? `<div class="author-card__links">${authorLinks}</div>` : ''}
+    </div>
+  </div>`;
+
   pane.innerHTML = out;
   pane.querySelectorAll('pre code').forEach(b => { if (typeof Prism !== 'undefined') Prism.highlightElement(b); });
 }
@@ -2232,7 +2230,11 @@ document.getElementById('fm-title').addEventListener('input', e => {
     document.getElementById('fm-slug').value = slugify(e.target.value);
   setStatus('unsaved changes', 'warn'); schedulePreview();
 });
-['fm-slug','fm-date','fm-tag','fm-paywalled','fm-cover','fm-excerpt','fm-series','fm-author','fm-author-role'].forEach(id => {
+['fm-slug','fm-date','fm-updated','fm-tag','fm-paywalled','fm-cover','fm-excerpt',
+ 'fm-series','fm-author','fm-author-role','fm-author-bio','fm-author-initials',
+ 'fm-author-linkedin','fm-author-github','fm-author-website',
+ 'fm-read-time','fm-keywords','fm-og-image','fm-canonical','fm-lang',
+ 'fm-toc','fm-noindex','fm-pinned','fm-draft','fm-featured'].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.addEventListener('change', () => { setStatus('unsaved changes','warn'); schedulePreview(); });
 });
@@ -2276,25 +2278,8 @@ document.addEventListener('keydown', e => {
     document.head.appendChild(fav);
   }
 
-  // AdSense — inject only if ADSENSE_CLIENT is configured in config-shani.js
-  (function injectAdSense() {
-    if (!ADSENSE_CLIENT) return;
-    // Update the existing async script tag's client param if it differs
-    const existing = document.querySelector('script[src*="adsbygoogle"]');
-    if (existing) {
-      const url = new URL(existing.src);
-      if (!url.searchParams.get('client')) {
-        url.searchParams.set('client', ADSENSE_CLIENT);
-        existing.src = url.toString();
-      }
-      return;
-    }
-    const s = document.createElement('script');
-    s.async = true;
-    s.crossOrigin = 'anonymous';
-    s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(ADSENSE_CLIENT)}`;
-    document.head.appendChild(s);
-  })();
+  // AdSense is intentionally NOT loaded on admin.html — it is a private tool.
+  // AdSense is injected on the public blog by script.js (reads CONFIG.ADSENSE_CLIENT).
 
   // Login box label
   const repoLabel = document.getElementById('login-repo-label');
