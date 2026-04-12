@@ -33,6 +33,7 @@ const TAG_ICONS = {
   Platform:     'fa-solid fa-layer-group',
   Incident:     'fa-solid fa-triangle-exclamation',
   Essay:        'fa-solid fa-feather-pointed',
+  'Open Source':'fa-brands fa-osi',
   Post:         'fa-solid fa-file-lines',
 };
 

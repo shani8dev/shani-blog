@@ -165,6 +165,7 @@ jobs:
           console.log('\nWritten ' + posts.length + ' post(s) to posts/manifest.json');
           SCRIPT
 
+      - name: Generate sitemap.xml
         run: |
           node - << 'SCRIPT'
           const fs   = require('fs');
