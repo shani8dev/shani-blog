@@ -276,7 +276,7 @@ const CONFIG = {
   //          privacy-safe, cookie-free beacon automatically on every page.
   //          Find it in: CF Dashboard → Websites → Analytics & Logs → Web Analytics.
   //          Leave empty to disable.
-  CF_WEB_ANALYTICS_TOKEN: '',
+  CF_WEB_ANALYTICS_TOKEN: 'cfat_66yU1YjOKU93daX06qz4wcNHEOB64SZ4V8bLsQQT84f739fd',
 
   // ── Giscus (GitHub Discussions comments) ──────────────────────
   // [script] Renders a comment section at the bottom of each post.
@@ -285,10 +285,10 @@ const CONFIG = {
   //          generated IDs below.
   //          Leave GISCUS_REPO empty to disable comments entirely.
   GISCUS_ENABLED:     true,
-  GISCUS_REPO:        '',           // e.g. 'shani8dev/shani-blog'
-  GISCUS_REPO_ID:     '',           // e.g. 'R_kgDO...'
+  GISCUS_REPO:        'shani8dev/shani-blog',           // e.g. 'shani8dev/shani-blog'
+  GISCUS_REPO_ID:     'R_kgDOR_FEJA',           // e.g. 'R_kgDO...'
   GISCUS_CATEGORY:    'General',    // Discussion category name
-  GISCUS_CATEGORY_ID: '',           // e.g. 'DIC_kwDO...'
+  GISCUS_CATEGORY_ID: 'DIC_kwDOR_FEJM4C6sMw',           // e.g. 'DIC_kwDO...'
   // 'pathname' | 'url' | 'title' — maps each post to a Discussion thread
   GISCUS_MAPPING:     'pathname',
   // 'light' | 'dark' | 'preferred_color_scheme' | 'transparent_dark'
