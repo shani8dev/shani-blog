@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Blog · Admin</title>
 <meta name="robots" content="noindex, nofollow">
-<!-- Apply saved theme before paint to avoid flash -->
 <script>
 (function(){
   var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
@@ -14,7 +13,7 @@
 })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700;800&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
@@ -35,16 +34,17 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-/* ── Brand tokens — overridden at runtime from CONFIG ── */
 :root{
   --radius:6px;
   --mono:'IBM Plex Mono',monospace;
   --sans:'DM Sans',sans-serif;
+  --display:'Playfair Display',Georgia,serif;
   --bg:#0e0d0c;--bg-card:#161514;--bg-input:#1b1a18;--bg-elevated:#262422;
   --border:#2e2c29;--border-hi:#ff7f50;
   --text:#f5f4f2;--muted:#8a8580;--faint:#504c47;
   --accent:#ff7f50;--accent-dk:#cc5522;--accent-text:#0e0d0c;
   --green:#3dba7e;--red:#ed5f5f;--blue:#5a9cf7;--violet:#9f72f5;--warning:#e8a215;
+  --sidebar-w:280px;
 }
 html[data-theme="light"]{
   --bg:#faf9f7;--bg-card:#ffffff;--bg-input:#f2f0ec;--bg-elevated:#eae8e3;
@@ -70,48 +70,36 @@ body{min-height:100vh;display:flex;flex-direction:column;overflow:hidden}
 .user-pill{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--muted)}
 .user-pill img{width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid var(--border)}
 .user-pill__name{color:var(--text);font-weight:500}
-.repo-badge{
-  font-family:var(--mono);font-size:.7rem;padding:.22rem .6rem;
-  border-radius:99px;border:1px solid var(--border);color:var(--faint);
-  display:none;align-items:center;gap:.35rem;
-}
+.repo-badge{font-family:var(--mono);font-size:.7rem;padding:.22rem .6rem;border-radius:99px;border:1px solid var(--border);color:var(--faint);display:none;align-items:center;gap:.35rem}
 .repo-badge.active{display:inline-flex;border-color:var(--green);color:var(--green)}
 
 /* ── login overlay ──────────────────────────────────────────── */
-#login-overlay{
-  position:fixed;inset:0;background:var(--bg);z-index:100;
-  display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:1.5rem;padding:2rem;
-}
-.login-box{
-  background:var(--bg-card);border:1px solid var(--border);
-  border-radius:12px;padding:2.5rem 2rem;max-width:440px;width:100%;
-  display:flex;flex-direction:column;gap:1.1rem;
-}
+#login-overlay{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;padding:2rem}
+.login-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:2.5rem 2rem;max-width:440px;width:100%;display:flex;flex-direction:column;gap:1.1rem}
 .login-box__title{font-family:var(--mono);font-size:1.05rem;font-weight:600;color:var(--accent);text-align:center}
 .login-box__sub{font-size:.8rem;color:var(--muted);text-align:center;line-height:1.6}
 .login-field{display:flex;flex-direction:column;gap:.22rem}
 .login-field label{font-size:.75rem;color:var(--muted)}
 .login-row{display:flex;gap:.4rem}
 .login-row input{flex:1}
-.login-hint{font-size:.72rem;color:var(--faint);line-height:1.55;padding:.55rem .7rem;
-  background:rgba(90,156,247,.06);border:1px solid rgba(90,156,247,.18);border-radius:var(--radius)}
+.login-hint{font-size:.72rem;color:var(--faint);line-height:1.55;padding:.55rem .7rem;background:rgba(90,156,247,.06);border:1px solid rgba(90,156,247,.18);border-radius:var(--radius)}
 .login-hint a{color:var(--blue);text-decoration:none}
 .login-hint a:hover{text-decoration:underline}
 
 /* ── workspace ──────────────────────────────────────────────── */
-.workspace{flex:1;display:grid;grid-template-columns:270px 1fr;min-height:0;overflow:hidden}
+.workspace{flex:1;display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:0;overflow:hidden}
 
 /* ── sidebar ────────────────────────────────────────────────── */
-.sidebar{
-  border-right:1px solid var(--border);
-  padding:1rem .9rem;display:flex;flex-direction:column;gap:1rem;
-  overflow-y:auto;background:var(--bg-card);flex-shrink:0;
-}
-.section-label{
-  font-family:var(--mono);font-size:.65rem;font-weight:600;
-  letter-spacing:.12em;color:var(--faint);text-transform:uppercase;margin-bottom:.4rem;
-}
+.sidebar{border-right:1px solid var(--border);padding:0;display:flex;flex-direction:column;overflow:hidden;background:var(--bg-card);flex-shrink:0;position:relative}
+.sidebar-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.sidebar-tab{flex:1;padding:.45rem 0;font-size:.68rem;font-family:var(--mono);font-weight:600;letter-spacing:.04em;border:none;cursor:pointer;background:none;color:var(--faint);border-bottom:2px solid transparent;transition:color .12s,border-color .12s;text-transform:uppercase}
+.sidebar-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.sidebar-tab:hover:not(.active){color:var(--text)}
+.sidebar-panel{display:none;flex:1;flex-direction:column;min-height:0;overflow:hidden}
+.sidebar-panel.active{display:flex}
+.sidebar-scroll{flex:1;overflow-y:auto;padding:.85rem .9rem;display:flex;flex-direction:column;gap:.85rem}
+
+.section-label{font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.12em;color:var(--faint);text-transform:uppercase;margin-bottom:.35rem}
 label{display:block;font-size:.75rem;color:var(--muted);margin-bottom:.22rem}
 input,select,textarea{
   width:100%;background:var(--bg-input);border:1px solid var(--border);
@@ -121,88 +109,73 @@ input,select,textarea{
 input:focus,select:focus,textarea:focus{border-color:var(--border-hi)}
 input[type=password]{font-family:var(--mono);letter-spacing:.1em}
 select option{background:var(--bg-card)}
+textarea{resize:vertical;min-height:60px;line-height:1.5}
 
 /* ── buttons ────────────────────────────────────────────────── */
-.btn{
-  display:inline-flex;align-items:center;gap:.3rem;
-  padding:.38rem .75rem;border-radius:var(--radius);border:none;
-  font-size:.77rem;font-family:var(--sans);font-weight:500;cursor:pointer;
-  transition:background .15s,color .15s,border-color .15s;white-space:nowrap;
-}
+.btn{display:inline-flex;align-items:center;gap:.3rem;padding:.38rem .75rem;border-radius:var(--radius);border:none;font-size:.77rem;font-family:var(--sans);font-weight:500;cursor:pointer;transition:background .15s,color .15s,border-color .15s;white-space:nowrap}
 .btn--primary{background:var(--accent);color:#0e0d0c}
 .btn--primary:hover{background:var(--accent-dk);color:#fff}
 .btn--ghost{background:var(--bg-input);color:var(--text);border:1px solid var(--border)}
 .btn--ghost:hover{border-color:var(--accent);color:var(--accent)}
 .btn--danger{background:rgba(237,95,95,.1);color:var(--red);border:1px solid rgba(237,95,95,.25)}
 .btn--danger:hover{background:rgba(237,95,95,.2)}
-.btn--new{
-  width:100%;justify-content:center;
-  background:rgba(255,127,80,.06);color:var(--accent);
-  border:1px dashed rgba(255,127,80,.25);padding:.5rem;
-}
+.btn--new{width:100%;justify-content:center;background:rgba(255,127,80,.06);color:var(--accent);border:1px dashed rgba(255,127,80,.25);padding:.5rem}
 .btn--new:hover{background:rgba(255,127,80,.12);border-color:var(--accent)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 
 /* ── post list ───────────────────────────────────────────────── */
-.post-list{display:flex;flex-direction:column;gap:.25rem;margin-top:.5rem}
-.post-item{
-  display:flex;align-items:center;gap:.35rem;
-  padding:.38rem .5rem;border-radius:var(--radius);
-  border:1px solid transparent;cursor:pointer;
-  transition:background .12s,border-color .12s;
-}
+.post-list{display:flex;flex-direction:column;gap:.25rem}
+.post-item{display:flex;align-items:center;gap:.35rem;padding:.38rem .5rem;border-radius:var(--radius);border:1px solid transparent;cursor:pointer;transition:background .12s,border-color .12s}
 .post-item:hover{background:var(--bg-input);border-color:var(--border)}
 .post-item.active{background:rgba(255,127,80,.08);border-color:var(--accent)}
-.post-item__slug{font-family:var(--mono);font-size:.72rem;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.post-item__tag{font-size:.63rem;color:var(--faint);flex-shrink:0}
-.post-item__del{
-  background:none;border:none;color:var(--red);cursor:pointer;
-  opacity:0;padding:2px 4px;border-radius:3px;font-size:.75rem;flex-shrink:0;
-  transition:opacity .12s;
-}
+.post-item__icon{font-size:.65rem;color:var(--faint);flex-shrink:0;width:14px;text-align:center}
+.post-item__slug{font-family:var(--mono);font-size:.7rem;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.post-item__tag{font-size:.6rem;color:var(--faint);flex-shrink:0;background:var(--bg-elevated);padding:.1rem .3rem;border-radius:3px}
+.post-item__del{background:none;border:none;color:var(--red);cursor:pointer;opacity:0;padding:2px 4px;border-radius:3px;font-size:.75rem;flex-shrink:0;transition:opacity .12s}
 .post-item:hover .post-item__del{opacity:1}
 .post-item__del:hover{background:rgba(237,95,95,.12)}
+
+/* ── search filter ───────────────────────────────────────────── */
+.post-search{position:relative;margin-bottom:.5rem}
+.post-search input{padding-left:1.8rem;font-size:.75rem}
+.post-search i{position:absolute;left:.55rem;top:50%;transform:translateY(-50%);color:var(--faint);font-size:.7rem;pointer-events:none}
 
 /* ── editor pane ─────────────────────────────────────────────── */
 .editor-pane{display:flex;flex-direction:column;overflow:hidden;min-height:0;flex:1}
 
 /* ── toolbar ─────────────────────────────────────────────────── */
-.editor-toolbar{
-  display:flex;align-items:center;gap:.4rem;
-  padding:.5rem 1rem;border-bottom:1px solid var(--border);
-  background:var(--bg-card);flex-wrap:nowrap;flex-shrink:0;
-  height:44px;overflow-x:auto;
-}
+.editor-toolbar{display:flex;align-items:center;gap:.3rem;padding:.45rem .85rem;border-bottom:1px solid var(--border);background:var(--bg-card);flex-wrap:nowrap;flex-shrink:0;height:46px;overflow-x:auto}
 .editor-toolbar::-webkit-scrollbar{height:0}
-.toolbar-group{display:flex;align-items:center;gap:.3rem}
-.toolbar__sep{width:1px;height:18px;background:var(--border);flex-shrink:0;margin:0 .15rem}
+.toolbar-group{display:flex;align-items:center;gap:.2rem}
+.toolbar__sep{width:1px;height:18px;background:var(--border);flex-shrink:0;margin:0 .1rem}
 .toolbar__spacer{flex:1}
 .status-pill{font-family:var(--mono);font-size:.7rem;padding:.25rem .55rem;border-radius:var(--radius);background:var(--bg-input)}
-.status-pill.ok   {color:var(--green)}
+.status-pill.ok{color:var(--green)}
 .status-pill.error{color:var(--red)}
-.status-pill.info {color:var(--muted)}
-.status-pill.warn {color:#e8a215}
+.status-pill.info{color:var(--muted)}
+.status-pill.warn{color:#e8a215}
+.tbtn{display:inline-flex;align-items:center;justify-content:center;gap:.2rem;padding:.25rem .42rem;border-radius:4px;border:none;cursor:pointer;font-size:.72rem;font-family:var(--sans);font-weight:500;background:none;color:var(--muted);transition:background .12s,color .12s;min-width:28px;height:28px}
+.tbtn:hover{background:var(--bg-elevated);color:var(--text)}
+.tbtn.active{background:var(--accent);color:#0e0d0c}
 
 /* ── view mode toggle ────────────────────────────────────────── */
 .view-toggle{display:flex;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);padding:2px;gap:2px}
-.view-toggle__btn{
-  display:flex;align-items:center;gap:.3rem;
-  padding:.22rem .55rem;border-radius:4px;border:none;cursor:pointer;
-  font-size:.72rem;font-family:var(--sans);font-weight:500;
-  background:none;color:var(--muted);transition:background .12s,color .12s;
-}
+.view-toggle__btn{display:flex;align-items:center;gap:.3rem;padding:.2rem .5rem;border-radius:4px;border:none;cursor:pointer;font-size:.7rem;font-family:var(--sans);font-weight:500;background:none;color:var(--muted);transition:background .12s,color .12s}
 .view-toggle__btn.active{background:var(--bg-card);color:var(--text)}
 .view-toggle__btn:hover:not(.active){color:var(--text)}
 
 /* ── front-matter bar ────────────────────────────────────────── */
-.fm-bar{
-  padding:.75rem 1rem;border-bottom:1px solid var(--border);
-  background:rgba(255,127,80,.02);
-  display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr;gap:.5rem;
-  align-items:end;flex-shrink:0;
-}
-.fm-bar .full{grid-column:1/-1}
-.fm-bar .half{grid-column:span 2}
+.fm-bar{padding:.65rem 1rem;border-bottom:1px solid var(--border);background:rgba(255,127,80,.02);flex-shrink:0;overflow-y:auto;max-height:calc(100vh - 200px)}
+.fm-tabs{display:flex;gap:.3rem;margin-bottom:.7rem;flex-wrap:wrap}
+.fm-tab{padding:.22rem .6rem;border-radius:var(--radius);border:none;cursor:pointer;font-size:.68rem;font-family:var(--mono);background:var(--bg-input);color:var(--muted);transition:background .12s,color .12s}
+.fm-tab.active{background:rgba(255,127,80,.12);color:var(--accent)}
+.fm-panel{display:none;flex-direction:column;gap:.5rem}
+.fm-panel.active{display:flex}
+.fm-row{display:grid;gap:.5rem}
+.fm-row.cols-2{grid-template-columns:1fr 1fr}
+.fm-row.cols-3{grid-template-columns:1fr 1fr 1fr}
+.fm-row.cols-4{grid-template-columns:2fr 1fr 1fr 1fr}
+.fm-full{grid-column:1/-1}
 
 /* ── edit area ───────────────────────────────────────────────── */
 .edit-area{flex:1;display:grid;min-height:0;overflow:hidden;grid-template-columns:1fr}
@@ -212,20 +185,18 @@ select option{background:var(--bg-card)}
 .monaco-wrap{min-height:0;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border);position:relative}
 .edit-area:not(.split) .monaco-wrap{border-right:none}
 #monaco-container{flex:1;min-height:0}
-.drop-overlay{
-  position:absolute;inset:0;background:rgba(255,127,80,.08);
-  border:2px dashed var(--accent);display:none;align-items:center;
-  justify-content:center;pointer-events:none;z-index:10;border-radius:4px;
-}
+.drop-overlay{position:absolute;inset:0;background:rgba(255,127,80,.08);border:2px dashed var(--accent);display:none;align-items:center;justify-content:center;pointer-events:none;z-index:10;border-radius:4px}
 .drop-overlay.active{display:flex}
 .drop-overlay span{font-size:.85rem;color:var(--accent);font-weight:500}
 
 /* ── preview pane ────────────────────────────────────────────── */
 .preview-pane{flex:1;overflow-y:auto;min-height:0;background:var(--bg);display:none}
 .edit-area.split .preview-pane,.edit-area.preview-only .preview-pane{display:block}
-.preview-inner{max-width:720px;margin:0 auto;padding:2rem 1.5rem 4rem;font-family:'DM Sans',sans-serif;font-size:.95rem;line-height:1.75;color:#f5f4f2}
+.preview-inner{max-width:740px;margin:0 auto;padding:2rem 1.5rem 4rem;font-family:'DM Sans',sans-serif;font-size:.95rem;line-height:1.8;color:#f5f4f2}
+html[data-theme="light"] .preview-inner{color:#1c1b19}
 .preview-inner h1,.preview-inner h2,.preview-inner h3,.preview-inner h4{font-family:'Playfair Display',Georgia,serif;margin:2rem 0 .75rem;line-height:1.25}
-.preview-inner h1{font-size:2rem}.preview-inner h2{font-size:1.45rem;border-bottom:1px solid #2e2c29;padding-bottom:.4rem}
+.preview-inner h1{font-size:2rem}
+.preview-inner h2{font-size:1.45rem;border-bottom:1px solid #2e2c29;padding-bottom:.4rem}
 .preview-inner h3{font-size:1.15rem}.preview-inner h4{font-size:1rem}
 .preview-inner p{margin:.85rem 0}
 .preview-inner a{color:#ff7f50;text-decoration:underline}
@@ -236,17 +207,25 @@ select option{background:var(--bg-card)}
 .preview-inner ul,.preview-inner ol{padding-left:1.5rem;margin:.75rem 0}
 .preview-inner li{margin:.3rem 0}
 .preview-inner img{max-width:100%;border-radius:6px;margin:1rem 0}
-.preview-inner table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.88rem}
+.preview-inner table{width:100%;border-collapse:collapse;margin:1.25rem 0;font-size:.88rem}
 .preview-inner th,.preview-inner td{border:1px solid #2e2c29;padding:.45rem .75rem;text-align:left}
-.preview-inner th{background:#1b1a18}
-.preview-inner .callout{padding:.75rem 1rem;border-radius:6px;margin:1rem 0;border-left:3px solid;font-size:.88rem}
+.preview-inner th{background:#1b1a18;font-weight:600}
+.preview-inner tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+.preview-inner hr{border:none;border-top:1px solid #2e2c29;margin:2rem 0}
+.preview-inner del{color:var(--muted)}
+.preview-inner .callout{padding:.75rem 1rem;border-radius:6px;margin:1.25rem 0;border-left:3px solid;font-size:.88rem}
 .preview-inner .callout--note{background:rgba(90,156,247,.08);border-color:#5a9cf7}
 .preview-inner .callout--warning{background:rgba(232,162,21,.08);border-color:#e8a215}
 .preview-inner .callout--danger{background:rgba(237,95,95,.08);border-color:#ed5f5f}
 .preview-inner .callout--tip{background:rgba(61,186,126,.08);border-color:#3dba7e}
+.preview-inner .callout .callout-title{font-weight:600;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.35rem;display:flex;align-items:center;gap:.3rem}
 .preview-title{font-family:'Playfair Display',Georgia,serif;font-size:2.2rem;font-weight:800;margin-bottom:.5rem;line-height:1.2}
 .preview-meta{display:flex;gap:1rem;align-items:center;font-size:.8rem;color:#8a8580;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid #2e2c29;flex-wrap:wrap}
 .preview-tag{background:rgba(255,127,80,.1);color:#ff7f50;padding:.15rem .55rem;border-radius:99px;font-family:'IBM Plex Mono',monospace;font-size:.72rem}
+.preview-author{display:flex;align-items:center;gap:.5rem;margin-bottom:1.5rem;padding:.75rem 1rem;border:1px solid #2e2c29;border-radius:8px;background:rgba(255,255,255,.02)}
+.preview-author__avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:#0e0d0c;flex-shrink:0}
+.preview-author__name{font-weight:600;font-size:.85rem}
+.preview-author__role{font-size:.75rem;color:#8a8580}
 
 /* ── empty state ─────────────────────────────────────────────── */
 .empty-editor{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;color:var(--faint);text-align:center;padding:2rem}
@@ -254,9 +233,9 @@ select option{background:var(--bg-card)}
 .empty-editor p{font-size:.83rem;max-width:280px;line-height:1.55}
 
 /* ── wc / log ────────────────────────────────────────────────── */
-.wc-bar{font-family:var(--mono);font-size:.67rem;color:var(--faint);padding:.22rem 1rem;border-top:1px solid var(--border);background:var(--bg-card);flex-shrink:0;display:flex;align-items:center;gap:1.5rem}
-.log-panel{border-top:1px solid var(--border);background:var(--bg-card);height:80px;overflow-y:auto;padding:.35rem 1rem;font-family:var(--mono);font-size:.7rem;color:var(--muted);flex-shrink:0}
-.log-entry{padding:.1rem 0;display:flex;gap:.6rem}
+.wc-bar{font-family:var(--mono);font-size:.66rem;color:var(--faint);padding:.2rem 1rem;border-top:1px solid var(--border);background:var(--bg-card);flex-shrink:0;display:flex;align-items:center;gap:1.5rem}
+.log-panel{border-top:1px solid var(--border);background:var(--bg-card);height:72px;overflow-y:auto;padding:.3rem 1rem;font-family:var(--mono);font-size:.67rem;color:var(--muted);flex-shrink:0}
+.log-entry{padding:.08rem 0;display:flex;gap:.6rem}
 .log-entry .ts{color:var(--faint)}
 .log-entry.ok .msg{color:var(--green)}
 .log-entry.error .msg{color:var(--red)}
@@ -265,15 +244,18 @@ select option{background:var(--bg-card)}
 .log-entry.gh .msg{color:var(--violet)}
 
 /* ── modal ───────────────────────────────────────────────────── */
-.modal-backdrop{position:fixed;inset:0;background:rgba(14,13,12,.88);z-index:50;display:none;align-items:center;justify-content:center;padding:2rem}
+.modal-backdrop{position:fixed;inset:0;background:rgba(14,13,12,.88);z-index:50;display:none;align-items:center;justify-content:center;padding:1rem}
 .modal-backdrop.open{display:flex}
-.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;width:100%;max-width:500px;display:flex;flex-direction:column;overflow:hidden}
-.modal__header{padding:.9rem 1.1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;width:100%;display:flex;flex-direction:column;overflow:hidden;max-height:90vh}
+.modal--sm{max-width:460px}
+.modal--md{max-width:580px}
+.modal--lg{max-width:760px}
+.modal__header{padding:.85rem 1.1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .modal__title{font-family:var(--mono);font-size:.85rem;font-weight:600;color:var(--text)}
 .modal__close{background:none;border:none;color:var(--muted);cursor:pointer;padding:.25rem;font-size:1rem;border-radius:4px}
 .modal__close:hover{color:var(--text)}
-.modal__body{padding:1.1rem;display:flex;flex-direction:column;gap:.85rem}
-.modal__footer{padding:.75rem 1.1rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:.4rem}
+.modal__body{padding:1.1rem;display:flex;flex-direction:column;gap:.85rem;overflow-y:auto}
+.modal__footer{padding:.75rem 1.1rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:.4rem;flex-shrink:0}
 
 /* ── image upload ────────────────────────────────────────────── */
 .upload-tabs{display:flex;gap:.3rem}
@@ -290,65 +272,73 @@ select option{background:var(--bg-card)}
 .upload-progress{height:3px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:.6rem;display:none}
 .upload-progress__bar{height:100%;background:var(--accent);width:0;transition:width .25s}
 
-/* ── shortcuts ───────────────────────────────────────────────── */
-.kbd-grid{display:grid;grid-template-columns:1fr 1fr;gap:.35rem .8rem}
-.kbd-row{display:flex;align-items:center;justify-content:space-between;padding:.2rem 0}
-.kbd-row code{font-family:var(--mono);font-size:.7rem;background:var(--bg-input);border:1px solid var(--border);padding:.15rem .4rem;border-radius:4px;color:var(--text);white-space:nowrap}
-.kbd-row span{font-size:.76rem;color:var(--muted)}
+/* ── table builder ───────────────────────────────────────────── */
+.table-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;width:fit-content}
+.tg-cell{width:22px;height:22px;border-radius:3px;background:var(--bg-input);border:1px solid var(--border);cursor:pointer;transition:background .1s,border-color .1s}
+.tg-cell.active{background:var(--accent);border-color:var(--accent)}
+.tg-label{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-top:.5rem;text-align:center}
 
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
-::-webkit-scrollbar-thumb:hover{background:var(--border-hi)}
+/* ── template picker ─────────────────────────────────────────── */
+.template-list{display:flex;flex-direction:column;gap:.4rem}
+.tpl-item{padding:.6rem .85rem;border-radius:var(--radius);border:1px solid var(--border);cursor:pointer;transition:background .12s,border-color .12s}
+.tpl-item:hover{background:var(--bg-input);border-color:var(--accent)}
+.tpl-item__name{font-size:.82rem;font-weight:500;color:var(--text);margin-bottom:.2rem}
+.tpl-item__desc{font-size:.72rem;color:var(--muted)}
 
-/* ── sidebar tabs ────────────────────────────────────────────── */
-.sidebar-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin:-1rem -.9rem .75rem;flex-shrink:0}
-.sidebar-tab{flex:1;padding:.45rem 0;font-size:.72rem;font-family:var(--mono);font-weight:600;
-  letter-spacing:.04em;border:none;cursor:pointer;background:none;color:var(--faint);
-  border-bottom:2px solid transparent;transition:color .12s,border-color .12s;text-transform:uppercase}
-.sidebar-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.sidebar-tab:hover:not(.active){color:var(--text)}
-.sidebar-panel{display:none;flex:1;flex-direction:column;min-height:0;overflow-y:auto}
-.sidebar-panel.active{display:flex}
+/* ── callout picker ─────────────────────────────────────────── */
+.callout-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.callout-opt{padding:.6rem .85rem;border-radius:var(--radius);border:1px solid var(--border);cursor:pointer;transition:background .12s,border-color .12s;display:flex;align-items:center;gap:.5rem}
+.callout-opt:hover{background:var(--bg-input)}
+.callout-opt.note{border-left:3px solid var(--blue)}
+.callout-opt.warning{border-left:3px solid var(--warning)}
+.callout-opt.danger{border-left:3px solid var(--red)}
+.callout-opt.tip{border-left:3px solid var(--green)}
+.callout-opt i{font-size:.85rem}
+.callout-opt span{font-size:.8rem;font-weight:500}
 
 /* ── media grid ──────────────────────────────────────────────── */
 .media-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;padding:.25rem 0}
-.media-thumb{
-  position:relative;aspect-ratio:1;border-radius:var(--radius);overflow:hidden;
-  border:1px solid var(--border);cursor:pointer;background:var(--bg-elevated);
-  transition:border-color .12s;
-}
+.media-thumb{position:relative;aspect-ratio:1;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);cursor:pointer;background:var(--bg-elevated);transition:border-color .12s}
 .media-thumb:hover{border-color:var(--accent)}
 .media-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.media-thumb__name{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:.2rem .3rem;font-size:.6rem;font-family:var(--mono);
-  background:rgba(14,13,12,.82);color:var(--muted);
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-.media-thumb__del{
-  position:absolute;top:.2rem;right:.2rem;background:rgba(237,95,95,.85);
-  border:none;border-radius:3px;color:#fff;cursor:pointer;
-  padding:2px 5px;font-size:.65rem;opacity:0;transition:opacity .12s;
-}
+.media-thumb__name{position:absolute;bottom:0;left:0;right:0;padding:.2rem .3rem;font-size:.6rem;font-family:var(--mono);background:rgba(14,13,12,.82);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.media-thumb__del{position:absolute;top:.2rem;right:.2rem;background:rgba(237,95,95,.85);border:none;border-radius:3px;color:#fff;cursor:pointer;padding:2px 5px;font-size:.65rem;opacity:0;transition:opacity .12s}
 .media-thumb:hover .media-thumb__del{opacity:1}
 .media-thumb.selected{border-color:var(--accent);box-shadow:0 0 0 2px rgba(255,127,80,.3)}
 .media-empty{font-size:.78rem;color:var(--faint);text-align:center;padding:2rem 0}
 
-/* ── theme toggle button in topbar ───────────────────────────── */
-.btn-theme{
-  background:none;border:1px solid var(--border);border-radius:var(--radius);
-  color:var(--muted);cursor:pointer;padding:.28rem .55rem;font-size:.78rem;
-  transition:border-color .15s,color .15s;
-}
+/* ── shortcuts ───────────────────────────────────────────────── */
+.kbd-grid{display:grid;grid-template-columns:1fr 1fr;gap:.3rem .8rem}
+.kbd-row{display:flex;align-items:center;justify-content:space-between;padding:.18rem 0}
+.kbd-row code{font-family:var(--mono);font-size:.68rem;background:var(--bg-input);border:1px solid var(--border);padding:.12rem .35rem;border-radius:4px;color:var(--text);white-space:nowrap}
+.kbd-row span{font-size:.73rem;color:var(--muted)}
+
+/* ── theme toggle ────────────────────────────────────────────── */
+.btn-theme{background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--muted);cursor:pointer;padding:.28rem .55rem;font-size:.78rem;transition:border-color .15s,color .15s}
 .btn-theme:hover{border-color:var(--accent);color:var(--accent)}
 
-@media(max-width:820px){
+/* ── author card preview ──────────────────────────────────────── */
+.author-preview{display:flex;align-items:center;gap:.65rem;padding:.65rem .8rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);margin-top:.3rem}
+.author-preview__avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#0e0d0c;flex-shrink:0}
+.author-preview__name{font-size:.8rem;font-weight:500;color:var(--text)}
+.author-preview__role{font-size:.7rem;color:var(--muted)}
+
+/* ── series strip in preview ─────────────────────────────────── */
+.preview-series{padding:.55rem 1rem;background:rgba(159,114,245,.07);border:1px solid rgba(159,114,245,.25);border-radius:6px;margin-bottom:1.5rem;font-size:.8rem;color:var(--violet)}
+.preview-series strong{display:block;margin-bottom:.2rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;opacity:.7}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--border-hi)}
+
+@media(max-width:900px){
+  :root{--sidebar-w:240px}
+  .fm-row.cols-4{grid-template-columns:1fr 1fr}
+}
+@media(max-width:720px){
   .workspace{grid-template-columns:1fr}
-  .sidebar{border-right:none;border-bottom:1px solid var(--border);max-height:36vh}
-  .fm-bar{grid-template-columns:1fr 1fr}
-  .fm-bar .full{grid-column:1/-1}
-  .fm-bar .half{grid-column:1/-1}
+  .sidebar{border-right:none;border-bottom:1px solid var(--border);max-height:35vh}
   .edit-area.split{grid-template-columns:1fr}
   .edit-area.split .preview-pane{display:none}
   #login-overlay{padding:1rem}
@@ -357,56 +347,44 @@ select option{background:var(--bg-card)}
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════════════
-     LOGIN  —  GitHub username + PAT only
-               repo/branch are pre-set in config-shani.js
-══════════════════════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════
+     LOGIN
+════════════════════════════════════════════════════════════ -->
 <div id="login-overlay">
   <div class="login-box">
     <div class="login-box__title">
       <i class="fa-brands fa-github" style="margin-right:.4rem"></i><span id="login-site-title">Blog</span> · Admin
     </div>
-    <div class="login-box__sub">
-      Connecting to <code id="login-repo-label" style="font-size:.78rem">…/…</code>
-    </div>
-
+    <div class="login-box__sub">Connecting to <code id="login-repo-label" style="font-size:.78rem">…/…</code></div>
     <div class="login-field">
       <label>GitHub username</label>
-      <input id="gh-username" type="text" autocomplete="username"
-             onkeydown="if(event.key==='Enter')document.getElementById('gh-pat').focus()">
+      <input id="gh-username" type="text" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('gh-pat').focus()">
     </div>
     <div class="login-field">
       <label>Personal Access Token</label>
       <div class="login-row">
-        <input id="gh-pat" type="password" placeholder="github_pat_… or ghp_…" autocomplete="current-password"
-               onkeydown="if(event.key==='Enter')connectGitHub()">
-        <button class="btn btn--primary" onclick="connectGitHub()">
-          <i class="fa-solid fa-plug"></i> Connect
-        </button>
+        <input id="gh-pat" type="password" placeholder="github_pat_… or ghp_…" autocomplete="current-password" onkeydown="if(event.key==='Enter')connectGitHub()">
+        <button class="btn btn--primary" onclick="connectGitHub()"><i class="fa-solid fa-plug"></i> Connect</button>
       </div>
     </div>
-
     <div class="login-hint">
       <i class="fa-solid fa-circle-info" style="color:var(--blue);margin-right:.3rem"></i>
       Create a <strong>fine-grained PAT</strong> at
       <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/tokens</a>
-      → set <strong>Contents: Read &amp; Write</strong> on your blog repo.
-      The token lives in <code style="font-size:.72rem">sessionStorage</code> only — cleared on tab close, never sent anywhere except GitHub's API.
+      → set <strong>Contents: Read &amp; Write</strong>. Token lives in <code style="font-size:.72rem">sessionStorage</code> only.
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════
+<!-- ═══════════════════════════════════════════════════════════
      APP
-══════════════════════════════════════════════════════════════════ -->
+════════════════════════════════════════════════════════════ -->
 <div id="app" style="display:none;flex-direction:column;flex:1;min-height:0">
 
 <header class="topbar">
-  <a class="topbar__brand" href="/" target="_blank" rel="noopener">Shanios <span>/ post admin</span></a>
+  <a class="topbar__brand" href="/" target="_blank" rel="noopener" id="topbar-title">Blog <span>/ admin</span></a>
   <div class="topbar__right">
-    <span class="repo-badge" id="repo-badge">
-      <i class="fa-brands fa-github"></i><span id="repo-badge-text"></span>
-    </span>
+    <span class="repo-badge" id="repo-badge"><i class="fa-brands fa-github"></i><span id="repo-badge-text"></span></span>
     <span class="status-pill info" id="conn-status">disconnected</span>
     <button class="btn-theme" id="theme-btn" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
       <i class="fa-solid fa-moon" id="theme-icon"></i>
@@ -416,7 +394,7 @@ select option{background:var(--bg-card)}
     </button>
     <div class="user-pill" id="user-pill" style="display:none">
       <img id="user-avatar" src="" alt="">
-      <span id="user-name"></span>
+      <span id="user-name" class="user-pill__name"></span>
       <button class="btn btn--ghost" style="padding:.22rem .5rem;font-size:.72rem" onclick="logout()" title="Sign out">
         <i class="fa-solid fa-right-from-bracket"></i>
       </button>
@@ -426,145 +404,241 @@ select option{background:var(--bg-card)}
 
 <div class="workspace" style="flex:1;min-height:0">
 
-  <!-- ── Sidebar ───────────────────────────────────────────────── -->
+  <!-- ── Sidebar ─────────────────────────────────────────── -->
   <aside class="sidebar">
-
-    <!-- Tab bar -->
     <div class="sidebar-tabs">
       <button class="sidebar-tab active" id="tab-posts-btn" onclick="switchSidebarTab('posts')">Posts</button>
       <button class="sidebar-tab"        id="tab-media-btn" onclick="switchSidebarTab('media')">Media</button>
+      <button class="sidebar-tab"        id="tab-config-btn" onclick="switchSidebarTab('config')">Config</button>
     </div>
 
-    <!-- ── POSTS PANEL ──────────────────────────────────────────── -->
+    <!-- POSTS PANEL -->
     <div class="sidebar-panel active" id="panel-posts">
-      <div>
-        <div class="section-label">Repository</div>
-        <div style="display:flex;flex-direction:column;gap:.4rem">
-          <div style="display:flex;align-items:center;gap:.45rem;padding:.35rem .55rem;
-                      border-radius:var(--radius);background:var(--bg-input);border:1px solid var(--border)">
-            <i class="fa-brands fa-github" style="color:var(--faint);font-size:.8rem;flex-shrink:0"></i>
-            <span id="sb-repo-display" style="font-family:var(--mono);font-size:.72rem;
-                  color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+      <div class="sidebar-scroll">
+        <div>
+          <div class="section-label">Repository</div>
+          <div style="display:flex;flex-direction:column;gap:.4rem">
+            <div style="display:flex;align-items:center;gap:.45rem;padding:.35rem .55rem;border-radius:var(--radius);background:var(--bg-input);border:1px solid var(--border)">
+              <i class="fa-brands fa-github" style="color:var(--faint);font-size:.8rem;flex-shrink:0"></i>
+              <span id="sb-repo-display" style="font-family:var(--mono);font-size:.72rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+            </div>
+            <div><label>Branch</label><input id="sb-branch" type="text" placeholder="main"></div>
+            <button class="btn btn--ghost" style="width:100%;justify-content:center" onclick="refreshPosts()">
+              <i class="fa-solid fa-rotate"></i> Refresh posts
+            </button>
           </div>
-          <div>
-            <label>Branch</label>
-            <input id="sb-branch" type="text" placeholder="main">
-          </div>
-          <button class="btn btn--ghost" style="width:100%;justify-content:center" onclick="refreshPosts()">
-            <i class="fa-solid fa-rotate"></i> Refresh posts
-          </button>
         </div>
-      </div>
 
-      <div style="flex:1;display:flex;flex-direction:column;min-height:0">
-        <div class="section-label">Posts</div>
-        <button class="btn btn--new" onclick="newPost()">
-          <i class="fa-solid fa-plus"></i> New post
-        </button>
-        <div class="post-list" id="post-list" style="flex:1;overflow-y:auto">
-          <p style="font-size:.75rem;color:var(--faint);text-align:center;padding:.5rem 0">Connect to load posts</p>
+        <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+          <div class="section-label">Posts (<span id="post-count">0</span>)</div>
+          <button class="btn btn--new" onclick="newPost()" style="margin-bottom:.5rem">
+            <i class="fa-solid fa-plus"></i> New post
+          </button>
+          <div class="post-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input id="post-filter" type="search" placeholder="Filter posts…" oninput="filterPosts(this.value)">
+          </div>
+          <div class="post-list" id="post-list">
+            <p style="font-size:.75rem;color:var(--faint);text-align:center;padding:.5rem 0">Connect to load posts</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ── MEDIA PANEL ───────────────────────────────────────────── -->
+    <!-- MEDIA PANEL -->
     <div class="sidebar-panel" id="panel-media" style="flex-direction:column;gap:.6rem">
-      <div>
-        <div class="section-label">Media library</div>
-        <div style="display:flex;gap:.3rem">
-          <button class="btn btn--ghost" style="flex:1;justify-content:center;font-size:.72rem" onclick="loadMedia()">
-            <i class="fa-solid fa-rotate"></i> Refresh
-          </button>
-          <label class="btn btn--ghost" style="flex:1;justify-content:center;font-size:.72rem;cursor:pointer" title="Upload image to repo">
-            <i class="fa-solid fa-upload"></i> Upload
-            <input type="file" id="media-upload-input" accept="image/*,.gif,.webp,.svg" style="display:none" onchange="mediaUploadFile(this.files[0])">
-          </label>
+      <div class="sidebar-scroll" style="gap:.6rem">
+        <div>
+          <div class="section-label">Media library</div>
+          <div style="display:flex;gap:.3rem">
+            <button class="btn btn--ghost" style="flex:1;justify-content:center;font-size:.72rem" onclick="loadMedia()">
+              <i class="fa-solid fa-rotate"></i> Refresh
+            </button>
+            <label class="btn btn--ghost" style="flex:1;justify-content:center;font-size:.72rem;cursor:pointer" title="Upload image to repo">
+              <i class="fa-solid fa-upload"></i> Upload
+              <input type="file" id="media-upload-input" accept="image/*,.gif,.webp,.svg" style="display:none" onchange="mediaUploadFile(this.files[0])">
+            </label>
+          </div>
+          <div class="upload-progress" id="media-upload-progress" style="margin-top:.5rem">
+            <div class="upload-progress__bar" id="media-progress-bar"></div>
+          </div>
+          <div id="media-upload-status" style="font-size:.72rem;color:var(--green);margin-top:.3rem;display:none"></div>
         </div>
-        <div class="upload-progress" id="media-upload-progress" style="margin-top:.5rem">
-          <div class="upload-progress__bar" id="media-progress-bar"></div>
+        <div style="flex:1;overflow-y:auto;min-height:0">
+          <div class="media-grid" id="media-grid">
+            <p class="media-empty" style="grid-column:1/-1">Connect, then open Media tab to load images.</p>
+          </div>
         </div>
-        <div id="media-upload-status" style="font-size:.72rem;color:var(--green);margin-top:.3rem;display:none"></div>
-      </div>
-      <div style="flex:1;overflow-y:auto;min-height:0">
-        <div class="media-grid" id="media-grid">
-          <p class="media-empty" style="grid-column:1/-1">Connect, then open Media tab to load images.</p>
-        </div>
-      </div>
-      <!-- Selected file info -->
-      <div id="media-selected" style="display:none;padding:.5rem .6rem;border-radius:var(--radius);
-           background:var(--bg-input);border:1px solid var(--border);font-size:.72rem">
-        <div style="font-family:var(--mono);color:var(--text);margin-bottom:.3rem;word-break:break-all" id="media-selected-name"></div>
-        <div style="display:flex;gap:.3rem">
-          <button class="btn btn--ghost" style="flex:1;font-size:.68rem;justify-content:center" onclick="mediaInsertSelected()">
-            <i class="fa-solid fa-image"></i> Insert
-          </button>
-          <button class="btn btn--ghost" style="flex:1;font-size:.68rem;justify-content:center" onclick="mediaCopyUrl()">
-            <i class="fa-solid fa-copy"></i> Copy URL
-          </button>
-          <button class="btn btn--danger" style="font-size:.68rem;padding:.3rem .5rem" onclick="mediaDeleteSelected()">
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
+        <div id="media-selected" style="display:none;padding:.5rem .6rem;border-radius:var(--radius);background:var(--bg-input);border:1px solid var(--border);font-size:.72rem">
+          <div style="font-family:var(--mono);color:var(--text);margin-bottom:.3rem;word-break:break-all" id="media-selected-name"></div>
+          <div style="display:flex;gap:.3rem">
+            <button class="btn btn--ghost" style="flex:1;font-size:.68rem;justify-content:center" onclick="mediaInsertSelected()"><i class="fa-solid fa-image"></i> Insert</button>
+            <button class="btn btn--ghost" style="flex:1;font-size:.68rem;justify-content:center" onclick="mediaCopyUrl()"><i class="fa-solid fa-copy"></i> Copy</button>
+            <button class="btn btn--danger" style="font-size:.68rem;padding:.3rem .5rem" onclick="mediaDeleteSelected()"><i class="fa-solid fa-trash-can"></i></button>
+          </div>
         </div>
       </div>
     </div>
 
+    <!-- CONFIG PANEL -->
+    <div class="sidebar-panel" id="panel-config" style="flex-direction:column">
+      <div class="sidebar-scroll">
+        <div>
+          <div class="section-label">Site info</div>
+          <div style="display:flex;flex-direction:column;gap:.5rem">
+            <div><label>Site title</label><input id="cfg-title" type="text" readonly></div>
+            <div><label>Blog URL</label><input id="cfg-url" type="text" readonly></div>
+            <div><label>Default author</label><input id="cfg-author" type="text" readonly></div>
+            <div><label>Posts per page</label><input id="cfg-ppp" type="text" readonly></div>
+          </div>
+        </div>
+        <div>
+          <div class="section-label">Tags in config</div>
+          <div id="cfg-tags" style="display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.2rem"></div>
+        </div>
+        <div>
+          <div class="section-label">Features</div>
+          <div id="cfg-features" style="display:flex;flex-direction:column;gap:.3rem;font-size:.75rem"></div>
+        </div>
+        <div>
+          <div class="section-label">Quick links</div>
+          <div style="display:flex;flex-direction:column;gap:.3rem">
+            <a id="cfg-blog-link" href="#" target="_blank" class="btn btn--ghost" style="justify-content:center;font-size:.72rem"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open blog</a>
+            <a href="https://github.com/settings/personal-access-tokens" target="_blank" class="btn btn--ghost" style="justify-content:center;font-size:.72rem"><i class="fa-brands fa-github"></i> Manage tokens</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </aside>
 
-  <!-- ── Editor pane ───────────────────────────────────────────── -->
+  <!-- ── Editor pane ────────────────────────────────────── -->
   <div class="editor-pane">
 
     <div class="editor-toolbar">
+      <!-- Save / actions -->
       <div class="toolbar-group">
-        <button class="btn btn--primary" id="btn-save" onclick="savePost()" disabled title="Commit to GitHub (Ctrl+S)">
+        <button class="btn btn--primary" id="btn-save" onclick="savePost()" disabled title="Commit to GitHub (Ctrl+S)" style="height:30px;padding:.28rem .65rem">
           <i class="fa-brands fa-github"></i> Commit
         </button>
-        <button class="btn btn--ghost" id="btn-open-blog" onclick="openInBlog()" disabled title="View on blog">
-          <i class="fa-solid fa-external-link-alt" style="font-size:.72rem"></i>
-        </button>
-        <button class="btn btn--ghost" id="btn-download" onclick="downloadMd()" disabled title="Download .md file (Ctrl+Shift+D)">
-          <i class="fa-solid fa-download" style="font-size:.72rem"></i> .md
-        </button>
+        <button class="tbtn" id="btn-open-blog" onclick="openInBlog()" disabled title="View on blog"><i class="fa-solid fa-external-link-alt"></i></button>
+        <button class="tbtn" id="btn-download" onclick="downloadMd()" disabled title="Download .md (Ctrl+Shift+D)"><i class="fa-solid fa-download"></i></button>
+        <button class="tbtn" id="btn-copy-md" onclick="copyMarkdown()" disabled title="Copy raw markdown to clipboard"><i class="fa-solid fa-clipboard"></i></button>
       </div>
       <div class="toolbar__sep"></div>
+
+      <!-- Text format -->
       <div class="toolbar-group">
-        <button class="btn btn--ghost" title="Bold (Ctrl+B)"    onclick="fmtWrap('**','**')"><b style="font-size:.8rem">B</b></button>
-        <button class="btn btn--ghost" title="Italic (Ctrl+I)"  onclick="fmtWrap('_','_')"><i style="font-size:.8rem">I</i></button>
-        <button class="btn btn--ghost" title="Inline code"      onclick="fmtWrap('`','`')"><i class="fa-solid fa-code" style="font-size:.72rem"></i></button>
-        <button class="btn btn--ghost" title="Link"             onclick="fmtLink()"><i class="fa-solid fa-link" style="font-size:.72rem"></i></button>
-        <button class="btn btn--ghost" title="Heading"          onclick="fmtHeading()"><i class="fa-solid fa-heading" style="font-size:.72rem"></i></button>
-        <button class="btn btn--ghost" title="Blockquote"       onclick="fmtQuote()"><i class="fa-solid fa-quote-right" style="font-size:.72rem"></i></button>
-        <button class="btn btn--ghost" title="Code block"       onclick="fmtCodeBlock()"><i class="fa-solid fa-terminal" style="font-size:.72rem"></i></button>
-        <button class="btn btn--ghost" title="Insert image (Ctrl+Shift+U)" onclick="openUploadModal()"><i class="fa-solid fa-image" style="font-size:.72rem"></i></button>
+        <button class="tbtn" title="Bold (Ctrl+B)" onclick="fmtWrap('**','**')"><b>B</b></button>
+        <button class="tbtn" title="Italic (Ctrl+I)" onclick="fmtWrap('_','_')"><i>I</i></button>
+        <button class="tbtn" title="Strikethrough" onclick="fmtWrap('~~','~~')"><s style="font-size:.8rem">S</s></button>
+        <button class="tbtn" title="Inline code" onclick="fmtWrap('`','`')"><i class="fa-solid fa-code"></i></button>
       </div>
       <div class="toolbar__sep"></div>
+
+      <!-- Block format -->
       <div class="toolbar-group">
-        <button class="btn btn--ghost" onclick="insertTemplate()" title="Insert template">
-          <i class="fa-solid fa-wand-magic-sparkles" style="font-size:.72rem"></i>
-        </button>
+        <button class="tbtn" title="Heading" onclick="fmtHeading()"><i class="fa-solid fa-heading"></i></button>
+        <button class="tbtn" title="Blockquote" onclick="fmtQuote()"><i class="fa-solid fa-quote-right"></i></button>
+        <button class="tbtn" title="Bullet list" onclick="fmtBulletList()"><i class="fa-solid fa-list-ul"></i></button>
+        <button class="tbtn" title="Numbered list" onclick="fmtOrderedList()"><i class="fa-solid fa-list-ol"></i></button>
+        <button class="tbtn" title="Horizontal rule" onclick="insertMarkdown('\n---\n')"><i class="fa-solid fa-minus"></i></button>
       </div>
       <div class="toolbar__sep"></div>
+
+      <!-- Rich inserts -->
+      <div class="toolbar-group">
+        <button class="tbtn" title="Insert link" onclick="fmtLink()"><i class="fa-solid fa-link"></i></button>
+        <button class="tbtn" title="Insert image (Ctrl+Shift+U)" onclick="openUploadModal()"><i class="fa-solid fa-image"></i></button>
+        <button class="tbtn" title="Insert table" onclick="openTableModal()"><i class="fa-solid fa-table"></i></button>
+        <button class="tbtn" title="Insert callout" onclick="openCalloutModal()"><i class="fa-solid fa-circle-info"></i></button>
+        <button class="tbtn" title="Code block" onclick="fmtCodeBlock()"><i class="fa-solid fa-terminal"></i></button>
+      </div>
+      <div class="toolbar__sep"></div>
+
+      <!-- Templates -->
+      <div class="toolbar-group">
+        <button class="tbtn" title="Insert snippet / template" onclick="openTemplateModal()"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+      </div>
+      <div class="toolbar__sep"></div>
+
+      <!-- View mode -->
       <div class="view-toggle">
-        <button class="view-toggle__btn active" data-mode="editor"  onclick="setViewMode('editor')"  title="Editor only (Ctrl+1)"><i class="fa-solid fa-code" style="font-size:.65rem"></i> Edit</button>
-        <button class="view-toggle__btn"         data-mode="split"   onclick="setViewMode('split')"   title="Split view (Ctrl+2)"><i class="fa-solid fa-table-columns" style="font-size:.65rem"></i> Split</button>
-        <button class="view-toggle__btn"         data-mode="preview" onclick="setViewMode('preview')" title="Preview only (Ctrl+3)"><i class="fa-solid fa-eye" style="font-size:.65rem"></i> Preview</button>
+        <button class="view-toggle__btn active" data-mode="editor"  onclick="setViewMode('editor')"  title="Editor (Ctrl+1)"><i class="fa-solid fa-code" style="font-size:.65rem"></i> Edit</button>
+        <button class="view-toggle__btn"         data-mode="split"   onclick="setViewMode('split')"   title="Split (Ctrl+2)"><i class="fa-solid fa-table-columns" style="font-size:.65rem"></i> Split</button>
+        <button class="view-toggle__btn"         data-mode="preview" onclick="setViewMode('preview')" title="Preview (Ctrl+3)"><i class="fa-solid fa-eye" style="font-size:.65rem"></i> Preview</button>
       </div>
       <div class="toolbar__spacer"></div>
       <span class="status-pill info" id="save-status">no file open</span>
     </div>
 
-    <!-- Front-matter -->
+    <!-- Front-matter bar -->
     <div class="fm-bar" id="fm-bar" style="display:none">
-      <div class="full"><label>Title</label><input id="fm-title" type="text" placeholder="My post title"></div>
-      <div class="half"><label>Slug (filename without .md)</label><input id="fm-slug" type="text" placeholder="my-post-slug" style="font-family:var(--mono);font-size:.75rem"></div>
-      <div><label>Date</label><input id="fm-date" type="date"></div>
-      <div><label>Paywalled</label>
-        <select id="fm-paywalled"><option value="false">Free</option><option value="true">Members only</option></select>
+      <div class="fm-tabs">
+        <button class="fm-tab active" onclick="switchFmTab('basic')">Basic</button>
+        <button class="fm-tab"        onclick="switchFmTab('author')">Author</button>
+        <button class="fm-tab"        onclick="switchFmTab('advanced')">Advanced</button>
       </div>
-      <div><label>Tag</label>
-        <select id="fm-tag"><!-- populated from CONFIG.TAG_ICONS --></select>
+
+      <!-- BASIC -->
+      <div class="fm-panel active" id="fm-panel-basic">
+        <div class="fm-row">
+          <div class="fm-full"><label>Title</label><input id="fm-title" type="text" placeholder="My post title"></div>
+        </div>
+        <div class="fm-row cols-4">
+          <div><label>Slug (filename)</label><input id="fm-slug" type="text" placeholder="my-post-slug" style="font-family:var(--mono);font-size:.73rem"></div>
+          <div><label>Date</label><input id="fm-date" type="date"></div>
+          <div><label>Tag</label><select id="fm-tag"><!-- populated from CONFIG.TAG_ICONS --></select></div>
+          <div><label>Access</label><select id="fm-paywalled"><option value="false">Free</option><option value="true">Members only</option></select></div>
+        </div>
+        <div class="fm-row cols-2">
+          <div><label>Cover image URL</label><input id="fm-cover" type="text" placeholder="https://…"></div>
+          <div><label>Excerpt (auto if empty)</label><input id="fm-excerpt" type="text" placeholder="Short description shown on cards"></div>
+        </div>
       </div>
-      <div class="full"><label>Cover image URL (optional)</label><input id="fm-cover" type="text" placeholder="https://…"></div>
-      <div class="full"><label>Excerpt (optional — auto-generated if empty)</label><input id="fm-excerpt" type="text" placeholder="Short description shown on cards"></div>
+
+      <!-- AUTHOR -->
+      <div class="fm-panel" id="fm-panel-author">
+        <div class="fm-row cols-2">
+          <div><label>Author name</label><input id="fm-author" type="text" placeholder="Shrinivas Kumbhar" oninput="updateAuthorPreview()"></div>
+          <div><label>Author role / company</label><input id="fm-author-role" type="text" placeholder="Shanios · shani.dev" oninput="updateAuthorPreview()"></div>
+        </div>
+        <div class="fm-row cols-2">
+          <div><label>Author initials (avatar fallback)</label><input id="fm-author-initials" type="text" placeholder="SK" maxlength="3" oninput="updateAuthorPreview()"></div>
+          <div><label>Read time override (e.g. 5 min)</label><input id="fm-read-time" type="text" placeholder="auto"></div>
+        </div>
+        <div class="fm-row">
+          <div class="fm-full"><label>Author bio</label><textarea id="fm-author-bio" placeholder="Short bio shown on the post page…" rows="2"></textarea></div>
+        </div>
+        <div class="fm-row cols-3">
+          <div><label>LinkedIn URL</label><input id="fm-author-linkedin" type="url" placeholder="https://linkedin.com/in/…"></div>
+          <div><label>GitHub URL</label><input id="fm-author-github" type="url" placeholder="https://github.com/…"></div>
+          <div><label>Website URL</label><input id="fm-author-website" type="url" placeholder="https://…"></div>
+        </div>
+        <!-- Live author card preview -->
+        <div class="author-preview" id="author-preview">
+          <div class="author-preview__avatar" id="author-preview-avatar">SK</div>
+          <div>
+            <div class="author-preview__name" id="author-preview-name">Author name</div>
+            <div class="author-preview__role" id="author-preview-role">Role</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADVANCED -->
+      <div class="fm-panel" id="fm-panel-advanced">
+        <div class="fm-row cols-2">
+          <div><label>Series name (groups posts)</label><input id="fm-series" type="text" placeholder="My Series Name"></div>
+          <div><label>Reading speed override (words/min)</label><input id="fm-wpm" type="number" placeholder="200" min="50" max="1000"></div>
+        </div>
+        <div class="fm-row cols-2">
+          <div><label>Custom keywords (comma separated)</label><input id="fm-keywords" type="text" placeholder="linux, arch, btrfs"></div>
+          <div><label>OG image override</label><input id="fm-og-image" type="url" placeholder="https://…"></div>
+        </div>
+        <div style="font-size:.73rem;color:var(--muted);padding:.3rem .5rem;background:var(--bg-elevated);border-radius:var(--radius)">
+          <i class="fa-solid fa-circle-info" style="color:var(--blue);margin-right:.3rem"></i>
+          Additional front-matter keys (series, keywords, og_image) are supported by <code style="font-size:.7rem">script.js</code> when present.
+        </div>
+      </div>
     </div>
 
     <!-- Editor + preview -->
@@ -588,6 +662,7 @@ select option{background:var(--bg-card)}
 
     <div class="wc-bar" id="wc-bar" style="display:none">
       <span id="wc-display">0 words · 0 min read</span>
+      <span id="wc-chars" style="color:var(--faint)"></span>
       <span id="cursor-pos" style="margin-left:auto"></span>
     </div>
     <div class="log-panel" id="log-panel"></div>
@@ -596,11 +671,11 @@ select option{background:var(--bg-card)}
 </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════
+<!-- ═══════════════════════════════════════════════════════════
      IMAGE MODAL
-══════════════════════════════════════════════════════════════════ -->
+════════════════════════════════════════════════════════════ -->
 <div class="modal-backdrop" id="upload-modal">
-  <div class="modal">
+  <div class="modal modal--sm">
     <div class="modal__header">
       <span class="modal__title"><i class="fa-solid fa-image" style="margin-right:.4rem;color:var(--blue)"></i>Insert Image</span>
       <button class="modal__close" onclick="closeUploadModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -610,26 +685,20 @@ select option{background:var(--bg-card)}
         <button class="upload-tab active" data-tab="url"    onclick="switchUploadTab('url')"><i class="fa-solid fa-link"></i> URL</button>
         <button class="upload-tab"        data-tab="github" onclick="switchUploadTab('github')"><i class="fa-brands fa-github"></i> Upload to repo</button>
       </div>
-
-      <!-- URL tab -->
       <div id="tab-url">
         <label>Image URL</label>
         <input id="img-url" type="url" placeholder="https://example.com/image.png" style="margin-top:.2rem">
         <label style="margin-top:.65rem">Alt text</label>
         <input id="img-alt" type="text" placeholder="Describe the image" style="margin-top:.2rem">
       </div>
-
-      <!-- GitHub upload tab -->
       <div id="tab-github" style="display:none">
         <div class="upload-drop-zone" id="gh-drop-zone">
           <input type="file" id="gh-file-input" accept="image/*,.gif,.webp,.svg" onchange="onGHFileSelected(this.files[0])">
           <i class="fa-brands fa-github"></i>
           <p><strong>Click to choose</strong> or drag &amp; drop</p>
-          <p style="font-size:.72rem;margin-top:.3rem">Commits to <code style="font-size:.72rem">assets/images/</code> in your repo, then inserts the markdown</p>
+          <p style="font-size:.72rem;margin-top:.3rem">Commits to <code style="font-size:.72rem">assets/images/</code> then inserts markdown</p>
         </div>
-        <div class="upload-progress" id="gh-upload-progress">
-          <div class="upload-progress__bar" id="gh-progress-bar"></div>
-        </div>
+        <div class="upload-progress" id="gh-upload-progress"><div class="upload-progress__bar" id="gh-progress-bar"></div></div>
         <div class="upload-result" id="gh-upload-result">
           <div style="font-size:.72rem;color:var(--muted);margin-bottom:.3rem">Committed &amp; ready to insert:</div>
           <div class="upload-result__url" id="gh-result-url"></div>
@@ -643,11 +712,79 @@ select option{background:var(--bg-card)}
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════
+<!-- ═══════════════════════════════════════════════════════════
+     TABLE MODAL
+════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="table-modal">
+  <div class="modal modal--sm">
+    <div class="modal__header">
+      <span class="modal__title"><i class="fa-solid fa-table" style="margin-right:.4rem;color:var(--green)"></i>Insert Table</span>
+      <button class="modal__close" onclick="closeModal('table-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal__body">
+      <p style="font-size:.8rem;color:var(--muted)">Hover to pick size, click to insert:</p>
+      <div class="table-grid" id="table-grid"></div>
+      <div class="tg-label" id="tg-label">—</div>
+      <div style="display:flex;gap:.5rem;margin-top:.75rem">
+        <div style="flex:1"><label>Rows</label><input id="tbl-rows" type="number" min="1" max="20" value="3"></div>
+        <div style="flex:1"><label>Columns</label><input id="tbl-cols" type="number" min="1" max="10" value="3"></div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--ghost" onclick="closeModal('table-modal')">Cancel</button>
+      <button class="btn btn--primary" onclick="insertTableFromInputs()"><i class="fa-solid fa-table"></i> Insert</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CALLOUT MODAL
+════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="callout-modal">
+  <div class="modal modal--sm">
+    <div class="modal__header">
+      <span class="modal__title"><i class="fa-solid fa-circle-info" style="margin-right:.4rem;color:var(--blue)"></i>Insert Callout</span>
+      <button class="modal__close" onclick="closeModal('callout-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal__body">
+      <div class="callout-grid">
+        <div class="callout-opt note" onclick="insertCallout('NOTE')">
+          <i class="fa-solid fa-circle-info" style="color:var(--blue)"></i><span>Note</span>
+        </div>
+        <div class="callout-opt tip" onclick="insertCallout('TIP')">
+          <i class="fa-solid fa-lightbulb" style="color:var(--green)"></i><span>Tip</span>
+        </div>
+        <div class="callout-opt warning" onclick="insertCallout('WARNING')">
+          <i class="fa-solid fa-triangle-exclamation" style="color:var(--warning)"></i><span>Warning</span>
+        </div>
+        <div class="callout-opt danger" onclick="insertCallout('DANGER')">
+          <i class="fa-solid fa-circle-xmark" style="color:var(--red)"></i><span>Danger</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TEMPLATE MODAL
+════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="template-modal">
+  <div class="modal modal--md">
+    <div class="modal__header">
+      <span class="modal__title"><i class="fa-solid fa-wand-magic-sparkles" style="margin-right:.4rem;color:var(--accent)"></i>Snippets &amp; Templates</span>
+      <button class="modal__close" onclick="closeModal('template-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal__body">
+      <div class="template-list" id="template-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
      SHORTCUTS MODAL
-══════════════════════════════════════════════════════════════════ -->
+════════════════════════════════════════════════════════════ -->
 <div class="modal-backdrop" id="shortcuts-modal">
-  <div class="modal">
+  <div class="modal modal--md">
     <div class="modal__header">
       <span class="modal__title"><i class="fa-solid fa-keyboard" style="margin-right:.4rem;color:var(--accent)"></i>Keyboard Shortcuts</span>
       <button class="modal__close" onclick="closeShortcutsModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -664,8 +801,12 @@ select option{background:var(--bg-card)}
         <div class="kbd-row"><span>Split view</span><code>Ctrl+2</code></div>
         <div class="kbd-row"><span>Preview only</span><code>Ctrl+3</code></div>
         <div class="kbd-row"><span>Find in editor</span><code>Ctrl+F</code></div>
-        <div class="kbd-row"><span>Close modal / Esc</span><code>Esc</code></div>
         <div class="kbd-row"><span>This help</span><code>?</code></div>
+        <div class="kbd-row"><span>Close modal</span><code>Esc</code></div>
+        <div class="kbd-row"><span>Strikethrough</span><code>Toolbar only</code></div>
+        <div class="kbd-row"><span>Insert table</span><code>Toolbar only</code></div>
+        <div class="kbd-row"><span>Insert callout</span><code>Toolbar only</code></div>
+        <div class="kbd-row"><span>Copy raw markdown</span><code>Toolbar only</code></div>
       </div>
     </div>
   </div>
@@ -676,7 +817,7 @@ select option{background:var(--bg-card)}
 'use strict';
 
 // ═══════════════════════════════════════════════════════════════════
-// CONFIG BRIDGE — pull values from config-shani.js
+// CONFIG BRIDGE
 // ═══════════════════════════════════════════════════════════════════
 const CFG            = (typeof CONFIG !== 'undefined') ? CONFIG : {};
 const SITE_TITLE     = CFG.SITE_TITLE    || 'Blog';
@@ -688,23 +829,11 @@ const DEFAULT_BRANCH = CFG.ADMIN_BRANCH  || 'main';
 const IMAGES_PATH    = CFG.ADMIN_IMAGES_PATH || 'assets/images';
 const TAG_ICONS      = CFG.TAG_ICONS     || {};
 const STORAGE_PREFIX = CFG.STORAGE_PREFIX || 'shani';
-
-// ── Apply brand CSS tokens from CONFIG at runtime ───────────────
-// This lets the admin match the blog's brand colour without importing
-// brand-shani.css (which also imports Google Fonts, etc.)
-(function applyBrandTokens() {
-  const r = document.documentElement;
-  if (CFG.PWA_BG_COLOR)  r.style.setProperty('--bg', CFG.PWA_BG_COLOR);
-  // Accent comes from brand-shani.css --color-accent (dark default)
-  // We detect it from a temp element if brand CSS is loaded, else fall back to CONFIG-derived guess
-  const accent = getComputedStyle(r).getPropertyValue('--color-accent').trim()
-               || getComputedStyle(r).getPropertyValue('--accent').trim()
-               || '#ff7f50';
-  if (accent && accent !== '#ff7f50') {
-    r.style.setProperty('--accent', accent);
-    r.style.setProperty('--border-hi', accent);
-  }
-})();
+const BLOG_URL       = CFG.BLOG_URL      || '';
+const AUTHOR_NAME    = CFG.AUTHOR_NAME   || '';
+const AUTHOR_ROLE    = CFG.AUTHOR_ROLE   || '';
+const AUTHOR_INITIALS= CFG.AUTHOR_INITIALS || '';
+const AUTHOR_BIO     = CFG.AUTHOR_BIO   || '';
 
 // ═══════════════════════════════════════════════════════════════════
 // THEME
@@ -731,19 +860,20 @@ let ghBranch = localStorage.getItem('admin_gh_branch') || DEFAULT_BRANCH;
 let ghToken  = sessionStorage.getItem('admin_gh_token') || '';
 let ghUser   = null;
 let posts        = [];
+let allPosts     = [];
 let currentSlug  = null;
 let currentSHA   = null;
 let monacoEditor = null;
 let viewMode     = 'editor';
 let previewTimer = null;
 let pendingImageMd = null;
+let activeFmTab  = 'basic';
 
 const GH_API = 'https://api.github.com';
 
 // ═══════════════════════════════════════════════════════════════════
 // GITHUB API LAYER
 // ═══════════════════════════════════════════════════════════════════
-
 async function ghFetch(path, opts = {}) {
   const res = await fetch(`${GH_API}${path}`, {
     ...opts,
@@ -761,11 +891,9 @@ async function ghFetch(path, opts = {}) {
   return res.status === 204 ? null : res.json();
 }
 
-// Fetch a single file — returns { content, sha, exists }
 async function ghGetFile(path) {
   try {
     const data = await ghFetch(`/repos/${ghOwner}/${ghRepo}/contents/${path}?ref=${encodeURIComponent(ghBranch)}`);
-    // GitHub returns base64 with newlines — strip them before decoding
     const content = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
     return { content, sha: data.sha, exists: true };
   } catch (e) {
@@ -774,42 +902,29 @@ async function ghGetFile(path) {
   }
 }
 
-// Create or update a text file
 async function ghPutFile(repoPath, textContent, commitMsg, sha) {
-  const body = {
-    message: commitMsg,
-    content: btoa(unescape(encodeURIComponent(textContent))),
-    branch:  ghBranch,
-  };
+  const body = { message: commitMsg, content: btoa(unescape(encodeURIComponent(textContent))), branch: ghBranch };
   if (sha) body.sha = sha;
   return ghFetch(`/repos/${ghOwner}/${ghRepo}/contents/${repoPath}`, {
-    method:  'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(body),
+    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
   });
 }
 
-// Create or update a binary file from a base64 string
 async function ghPutBinary(repoPath, base64Content, commitMsg, sha) {
   const body = { message: commitMsg, content: base64Content, branch: ghBranch };
   if (sha) body.sha = sha;
   return ghFetch(`/repos/${ghOwner}/${ghRepo}/contents/${repoPath}`, {
-    method:  'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(body),
+    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
   });
 }
 
-// Delete a file
 async function ghDeleteFile(repoPath, sha, commitMsg) {
   return ghFetch(`/repos/${ghOwner}/${ghRepo}/contents/${repoPath}`, {
-    method:  'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ message: commitMsg, sha, branch: ghBranch }),
+    method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: commitMsg, sha, branch: ghBranch }),
   });
 }
 
-// List a directory — returns [] if not found
 async function ghListDir(dirPath) {
   try {
     return await ghFetch(`/repos/${ghOwner}/${ghRepo}/contents/${dirPath}?ref=${encodeURIComponent(ghBranch)}`);
@@ -858,7 +973,7 @@ require(['vs/editor/editor.main'], () => {
     hover: { enabled: false }, folding: true, glyphMargin: false,
     overviewRulerLanes: 0, overviewRulerBorder: false,
     lineNumbersMinChars: 3, lineDecorationsWidth: 4,
-    scrollbar: { verticalScrollbarSize: 6, horizontalScrollbarSize: 6 },
+    scrollbar: { verticalScrollbarSize: 5, horizontalScrollbarSize: 5 },
   });
 
   monacoEditor.onDidChangeCursorPosition(() => {
@@ -884,9 +999,9 @@ require(['vs/editor/editor.main'], () => {
   monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyI,                       () => fmtWrap('_','_'));
 
   // Drag-drop images onto editor
-  const wrap  = document.getElementById('monaco-wrap');
+  const wrap   = document.getElementById('monaco-wrap');
   const dropOv = document.getElementById('drop-overlay');
-  wrap.addEventListener('dragenter', e => { if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); dropOv.classList.add('active'); }});
+  wrap.addEventListener('dragenter', e => { if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); dropOv.classList.add('active'); } });
   wrap.addEventListener('dragover',  e => { if (e.dataTransfer.types.includes('Files')) e.preventDefault(); });
   wrap.addEventListener('dragleave', e => { if (!wrap.contains(e.relatedTarget)) dropOv.classList.remove('active'); });
   wrap.addEventListener('drop', e => {
@@ -904,21 +1019,14 @@ require(['vs/editor/editor.main'], () => {
 async function connectGitHub() {
   const username = document.getElementById('gh-username').value.trim();
   ghToken  = document.getElementById('gh-pat').value.trim();
-
   if (!username || !ghToken) { alert('Please enter your GitHub username and token.'); return; }
   if (!ghOwner || !ghRepo)   { alert('GITHUB_USER / GITHUB_REPO are not set in config-shani.js.'); return; }
-
   sessionStorage.setItem('admin_gh_token', ghToken);
-
   const connEl = document.getElementById('conn-status');
   connEl.textContent = 'connecting…'; connEl.className = 'status-pill info';
-
   try {
     ghUser = await ghFetch('/user');
-    // Verify the entered username matches the token owner
-    if (ghUser.login.toLowerCase() !== username.toLowerCase()) {
-      throw new Error(`Token belongs to "${ghUser.login}", not "${username}"`);
-    }
+    if (ghUser.login.toLowerCase() !== username.toLowerCase()) throw new Error(`Token belongs to "${ghUser.login}", not "${username}"`);
     localStorage.setItem('admin_gh_username', ghUser.login);
     await loadPostList();
     showApp();
@@ -935,15 +1043,12 @@ async function connectGitHub() {
 function showApp() {
   document.getElementById('login-overlay').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
-
   document.getElementById('sb-repo-display').textContent = `${ghOwner}/${ghRepo}`;
   document.getElementById('sb-branch').value = ghBranch;
-
   const pill = document.getElementById('user-pill');
   pill.style.display = 'flex';
   document.getElementById('user-name').textContent = ghUser.login;
   document.getElementById('user-avatar').src = ghUser.avatar_url;
-
   const badge = document.getElementById('repo-badge');
   badge.classList.add('active');
   document.getElementById('repo-badge-text').textContent = `${ghOwner}/${ghRepo}`;
@@ -955,18 +1060,17 @@ function logout() { sessionStorage.removeItem('admin_gh_token'); location.reload
 // LOAD POSTS
 // ═══════════════════════════════════════════════════════════════════
 async function loadPostList() {
-  // Primary: read posts/manifest.json (already sorted, has tag info)
-  // Fallback: list posts/*.md directly
   try {
     const { content } = await ghGetFile('posts/manifest.json');
-    posts = JSON.parse(content);
+    allPosts = JSON.parse(content);
   } catch {
     const files = await ghListDir('posts');
-    posts = files
+    allPosts = files
       .filter(f => f.type === 'file' && f.name.endsWith('.md') && f.name !== 'index.md')
       .map(f => ({ slug: f.name.replace(/\.md$/, ''), tag: '', date: '' }))
       .reverse();
   }
+  posts = allPosts;
   renderPostList();
 }
 
@@ -978,44 +1082,47 @@ async function refreshPosts() {
     const connEl = document.getElementById('conn-status');
     connEl.textContent = `connected · ${posts.length} posts`;
     connEl.className = 'status-pill ok';
-    log(`Refreshed — ${posts.length} posts`, 'ok');
+    log(`Refreshed: ${posts.length} post(s) on ${ghBranch}`, 'ok');
   } catch (e) { log(`Refresh failed: ${e.message}`, 'error'); }
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// RENDER POST LIST
-// ═══════════════════════════════════════════════════════════════════
+function filterPosts(q) {
+  const lq = q.toLowerCase();
+  posts = lq ? allPosts.filter(p => p.slug.includes(lq) || (p.title || '').toLowerCase().includes(lq) || (p.tag || '').toLowerCase().includes(lq)) : allPosts;
+  renderPostList();
+}
+
 function renderPostList() {
   const list = document.getElementById('post-list');
+  document.getElementById('post-count').textContent = allPosts.length;
   if (!posts.length) {
-    list.innerHTML = '<p style="font-size:.75rem;color:var(--faint);text-align:center;padding:.5rem 0">No posts yet</p>';
+    list.innerHTML = '<p style="font-size:.75rem;color:var(--faint);text-align:center;padding:.5rem 0">No posts found</p>';
     return;
   }
   list.innerHTML = '';
   posts.forEach(p => {
     const div = document.createElement('div');
-    div.className = `post-item${currentSlug === p.slug ? ' active' : ''}`;
+    div.className = 'post-item' + (p.slug === currentSlug ? ' active' : '');
+    const icon = TAG_ICONS[p.tag] || 'fa-solid fa-file-lines';
     div.innerHTML = `
-      <span class="post-item__slug">${p.slug}</span>
-      <span class="post-item__tag">${p.tag || ''}</span>
-      <button class="post-item__del" title="Delete" onclick="deletePost('${p.slug}',event)">
-        <i class="fa-solid fa-trash-can"></i>
-      </button>`;
-    div.addEventListener('click', () => openPost(p.slug));
+      <i class="${icon} post-item__icon"></i>
+      <span class="post-item__slug" title="${escHtml(p.title || p.slug)}">${escHtml(p.title || p.slug)}</span>
+      ${p.tag ? `<span class="post-item__tag">${escHtml(p.tag)}</span>` : ''}
+      ${p.paywalled ? '<i class="fa-solid fa-lock" style="font-size:.6rem;color:var(--violet);flex-shrink:0" title="Members only"></i>' : ''}
+      <button class="post-item__del" onclick="deletePost('${escHtml(p.slug)}', event)" title="Delete"><i class="fa-solid fa-xmark"></i></button>`;
+    div.addEventListener('click', e => { if (!e.target.closest('.post-item__del')) openPost(p.slug); });
     list.appendChild(div);
   });
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// OPEN POST — fetch .md from GitHub
-// ═══════════════════════════════════════════════════════════════════
 async function openPost(slug) {
   setStatus('loading…', 'info');
   try {
     const { content, sha } = await ghGetFile(`posts/${slug}.md`);
     currentSHA = sha;
-    loadIntoEditor(slug, content);
-    log(`Opened posts/${slug}.md (sha: ${sha.slice(0,7)})`, 'ok');
+    const draft = sessionStorage.getItem(`draft_${slug}`);
+    loadIntoEditor(slug, draft || content);
+    log(`Opened posts/${slug}.md`, 'ok');
   } catch (e) {
     log(`Failed to open ${slug}: ${e.message}`, 'error');
     setStatus('load failed', 'error');
@@ -1034,6 +1141,7 @@ function loadIntoEditor(slug, raw) {
     });
     body = match[2];
   }
+  // Basic
   document.getElementById('fm-title').value     = fm.title     || '';
   document.getElementById('fm-slug').value      = slug;
   document.getElementById('fm-date').value      = fm.date      || today();
@@ -1041,9 +1149,23 @@ function loadIntoEditor(slug, raw) {
   document.getElementById('fm-paywalled').value = fm.paywalled || 'false';
   document.getElementById('fm-cover').value     = fm.cover     || '';
   document.getElementById('fm-excerpt').value   = fm.excerpt   || '';
+  // Author
+  document.getElementById('fm-author').value          = fm.author          || '';
+  document.getElementById('fm-author-role').value     = fm.author_role     || '';
+  document.getElementById('fm-author-bio').value      = fm.author_bio      || '';
+  document.getElementById('fm-author-initials').value = fm.author_initials || '';
+  document.getElementById('fm-author-linkedin').value = fm.author_linkedin || '';
+  document.getElementById('fm-author-github').value   = fm.author_github   || '';
+  document.getElementById('fm-author-website').value  = fm.author_website  || '';
+  document.getElementById('fm-read-time').value       = fm.readTime        || '';
+  // Advanced
+  document.getElementById('fm-series').value    = fm.series    || '';
+  document.getElementById('fm-keywords').value  = fm.keywords  || '';
+  document.getElementById('fm-og-image').value  = fm.og_image  || '';
+  document.getElementById('fm-wpm').value       = '';
 
-  const draft = sessionStorage.getItem(`draft_${slug}`);
-  setEditorValue(draft || body.replace(/^\n/, ''));
+  updateAuthorPreview();
+  setEditorValue(body.replace(/^\n/, ''));
   showEditor();
   updateWordCount();
   setStatus(`editing ${slug}.md`, 'info');
@@ -1054,11 +1176,12 @@ function loadIntoEditor(slug, raw) {
 function showEditor() {
   document.getElementById('empty-state').style.display      = 'none';
   document.getElementById('monaco-container').style.display = 'block';
-  document.getElementById('fm-bar').style.display           = 'grid';
+  document.getElementById('fm-bar').style.display           = 'block';
   document.getElementById('wc-bar').style.display           = 'flex';
   document.getElementById('btn-save').disabled              = false;
   document.getElementById('btn-open-blog').disabled         = false;
   document.getElementById('btn-download').disabled          = false;
+  document.getElementById('btn-copy-md').disabled           = false;
   if (monacoEditor) { setTimeout(() => monacoEditor.layout(), 60); monacoEditor.focus(); }
 }
 
@@ -1067,52 +1190,50 @@ function showEditor() {
 // ═══════════════════════════════════════════════════════════════════
 function newPost() {
   currentSlug = '__new__'; currentSHA = null;
-  ['fm-title','fm-slug','fm-cover','fm-excerpt'].forEach(id => document.getElementById(id).value = '');
+  ['fm-title','fm-slug','fm-cover','fm-excerpt','fm-author','fm-author-role',
+   'fm-author-bio','fm-author-initials','fm-author-linkedin','fm-author-github',
+   'fm-author-website','fm-read-time','fm-series','fm-keywords','fm-og-image','fm-wpm'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
   document.getElementById('fm-date').value      = today();
-  document.getElementById('fm-tag').value       = 'Engineering';
+  document.getElementById('fm-tag').value       = Object.keys(TAG_ICONS)[0] || 'Engineering';
   document.getElementById('fm-paywalled').value = 'false';
+  // Pre-fill default author from CONFIG
+  if (AUTHOR_NAME)     document.getElementById('fm-author').value          = AUTHOR_NAME;
+  if (AUTHOR_ROLE)     document.getElementById('fm-author-role').value     = AUTHOR_ROLE;
+  if (AUTHOR_INITIALS) document.getElementById('fm-author-initials').value = AUTHOR_INITIALS;
+  if (AUTHOR_BIO)      document.getElementById('fm-author-bio').value      = AUTHOR_BIO;
+  updateAuthorPreview();
   setEditorValue('');
   showEditor();
   updateWordCount();
   setStatus('new post — not yet committed', 'warn');
   document.getElementById('fm-title').focus();
+  switchFmTab('basic');
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// SAVE — PUT to GitHub API
+// SAVE
 // ═══════════════════════════════════════════════════════════════════
 async function savePost() {
   const result = serialise();
   if (!result) return;
   const { slug, raw } = result;
-
   setStatus('committing…', 'info');
   document.getElementById('btn-save').disabled = true;
-
   try {
     const repoPath = `posts/${slug}.md`;
-
-    // Determine SHA: use in-memory if we just opened this file, else query GitHub
     let sha = (currentSlug === slug) ? currentSHA : null;
-    if (!sha) {
-      const existing = await ghGetFile(repoPath);
-      sha = existing.sha || null;
-    }
-
+    if (!sha) { const existing = await ghGetFile(repoPath); sha = existing.sha || null; }
     const commitMsg = sha ? `post: update ${slug}` : `post: add ${slug}`;
     const res = await ghPutFile(repoPath, raw, commitMsg, sha);
-
-    currentSlug = slug;
-    currentSHA  = res.content.sha;
+    currentSlug = slug; currentSHA = res.content.sha;
     document.getElementById('fm-slug').value = slug;
     sessionStorage.removeItem(`draft_${slug}`);
-
     setStatus(`committed ✓ — building…`, 'ok');
     log(`✓ ${sha ? 'Updated' : 'Created'} posts/${slug}.md on ${ghBranch}`, 'gh');
-    log(`GitHub Pages will rebuild in ~30s. Refresh your blog to see it.`, 'info');
-
-    await loadPostList();
-    renderPostList();
+    log('GitHub Pages will rebuild in ~30s.', 'info');
+    await loadPostList(); renderPostList();
   } catch (e) {
     setStatus('commit failed', 'error');
     log(`Commit failed: ${e.message}`, 'error');
@@ -1133,13 +1254,9 @@ async function deletePost(slug, e) {
     log(`Deleted posts/${slug}.md`, 'ok');
     if (currentSlug === slug) {
       currentSlug = null; currentSHA = null;
-      document.getElementById('empty-state').style.display      = 'flex';
-      document.getElementById('monaco-container').style.display = 'none';
-      document.getElementById('fm-bar').style.display           = 'none';
-      document.getElementById('wc-bar').style.display           = 'none';
-      document.getElementById('btn-save').disabled              = true;
-      document.getElementById('btn-open-blog').disabled         = true;
-      document.getElementById('btn-download').disabled          = true;
+      ['monaco-container','fm-bar','wc-bar'].forEach(id => document.getElementById(id).style.display = 'none');
+      document.getElementById('empty-state').style.display = 'flex';
+      ['btn-save','btn-open-blog','btn-download','btn-copy-md'].forEach(id => document.getElementById(id).disabled = true);
       setStatus('no file open', 'info');
     }
     await loadPostList();
@@ -1147,31 +1264,57 @@ async function deletePost(slug, e) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// SERIALISE front-matter + body → raw .md string
+// SERIALISE — front-matter + body → raw .md string
 // ═══════════════════════════════════════════════════════════════════
 function serialise() {
-  const title     = document.getElementById('fm-title').value.trim();
-  const slug      = document.getElementById('fm-slug').value.trim();
-  const date      = document.getElementById('fm-date').value || today();
-  const tag       = document.getElementById('fm-tag').value;
-  const paywalled = document.getElementById('fm-paywalled').value;
-  const cover     = document.getElementById('fm-cover').value.trim();
-  const excerpt   = document.getElementById('fm-excerpt').value.trim();
-  const body      = getEditorValue();
+  const v = id => document.getElementById(id)?.value?.trim() || '';
+  const title     = v('fm-title');
+  const slug      = v('fm-slug');
+  const date      = v('fm-date') || today();
+  const tag       = v('fm-tag');
+  const paywalled = v('fm-paywalled');
+  const cover     = v('fm-cover');
+  const excerpt   = v('fm-excerpt');
+  // Author
+  const author     = v('fm-author');
+  const authorRole = v('fm-author-role');
+  const authorBio  = v('fm-author-bio');
+  const authorInit = v('fm-author-initials');
+  const authorLI   = v('fm-author-linkedin');
+  const authorGH   = v('fm-author-github');
+  const authorWeb  = v('fm-author-website');
+  const readTime   = v('fm-read-time');
+  // Advanced
+  const series     = v('fm-series');
+  const keywords   = v('fm-keywords');
+  const ogImage    = v('fm-og-image');
+  const body       = getEditorValue();
 
   if (!title) { log('Title is required', 'error'); return null; }
   if (!slug)  { log('Slug is required',  'error'); return null; }
 
-  let fm = `---\ntitle: '${title.replace(/'/g,"\\'")}'\ndate: '${date}'\ntag: '${tag}'`;
+  const q = s => `'${s.replace(/'/g, "\\'")}'`;
+  let fm = `---\ntitle: ${q(title)}\ndate: ${q(date)}\ntag: ${q(tag)}`;
   if (paywalled === 'true') fm += `\npaywalled: 'true'`;
-  if (cover)   fm += `\ncover: '${cover}'`;
-  if (excerpt) fm += `\nexcerpt: '${excerpt.replace(/'/g,"\\'")}' `;
+  if (cover)     fm += `\ncover: ${q(cover)}`;
+  if (excerpt)   fm += `\nexcerpt: ${q(excerpt)}`;
+  if (author)    fm += `\nauthor: ${q(author)}`;
+  if (authorRole)fm += `\nauthor_role: ${q(authorRole)}`;
+  if (authorBio) fm += `\nauthor_bio: ${q(authorBio)}`;
+  if (authorInit)fm += `\nauthor_initials: ${q(authorInit)}`;
+  if (authorLI)  fm += `\nauthor_linkedin: ${q(authorLI)}`;
+  if (authorGH)  fm += `\nauthor_github: ${q(authorGH)}`;
+  if (authorWeb) fm += `\nauthor_website: ${q(authorWeb)}`;
+  if (readTime)  fm += `\nreadTime: ${q(readTime)}`;
+  if (series)    fm += `\nseries: ${q(series)}`;
+  if (keywords)  fm += `\nkeywords: ${q(keywords)}`;
+  if (ogImage)   fm += `\nog_image: ${q(ogImage)}`;
   fm += `\n---\n`;
   return { slug, raw: fm + body };
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// IMAGE UPLOAD — commits to assets/images/ via GitHub API
+// IMAGE UPLOAD
 // ═══════════════════════════════════════════════════════════════════
 function openUploadModal() {
   pendingImageMd = null;
@@ -1182,10 +1325,7 @@ function openUploadModal() {
   document.getElementById('gh-upload-progress').style.display = 'none';
   document.getElementById('gh-file-input').value = '';
 }
-function closeUploadModal() {
-  document.getElementById('upload-modal').classList.remove('open');
-  pendingImageMd = null;
-}
+function closeUploadModal() { document.getElementById('upload-modal').classList.remove('open'); pendingImageMd = null; }
 function switchUploadTab(tab) {
   document.getElementById('tab-url').style.display    = tab === 'url'    ? 'block' : 'none';
   document.getElementById('tab-github').style.display = tab === 'github' ? 'block' : 'none';
@@ -1198,13 +1338,9 @@ async function onGHFileSelected(file) {
   const bar     = document.getElementById('gh-progress-bar');
   const result  = document.getElementById('gh-upload-result');
   const resText = document.getElementById('gh-result-url');
-
   prog.style.display = 'block'; bar.style.width = '15%';
-  result.style.display = 'none';
-  resText.style.color = 'var(--blue)';
-
+  result.style.display = 'none'; resText.style.color = 'var(--blue)';
   try {
-    // Read as base64
     const base64 = await new Promise((res, rej) => {
       const reader = new FileReader();
       reader.onload  = () => res(reader.result.split(',')[1]);
@@ -1212,30 +1348,20 @@ async function onGHFileSelected(file) {
       reader.readAsDataURL(file);
     });
     bar.style.width = '50%';
-
-    // Sanitise filename
     const filename  = file.name.replace(/\s+/g,'-').replace(/[^a-zA-Z0-9._-]/g,'').toLowerCase();
     const repoPath  = `${IMAGES_PATH}/${filename}`;
-
-    // Check if it already exists (to get SHA for update)
-    const existing = await ghGetFile(repoPath);
+    const existing  = await ghGetFile(repoPath);
     bar.style.width = '75%';
-
     await ghPutBinary(repoPath, base64, `assets: upload ${filename}`, existing.sha || undefined);
     bar.style.width = '100%';
-
-    // Build the markdown — use root-relative path (works on GitHub Pages)
     const altText = filename.replace(/\.[^.]+$/, '').replace(/[-_]/g,' ');
     pendingImageMd = `![${altText}](/${repoPath})`;
-
     result.style.display = 'block';
     resText.textContent  = pendingImageMd;
     log(`Committed ${repoPath}`, 'gh');
   } catch (e) {
-    bar.style.width = '100%';
-    result.style.display = 'block';
-    resText.style.color  = 'var(--red)';
-    resText.textContent  = `Upload failed: ${e.message}`;
+    bar.style.width = '100%'; result.style.display = 'block';
+    resText.style.color = 'var(--red)'; resText.textContent = `Upload failed: ${e.message}`;
     log(`Image upload failed: ${e.message}`, 'error');
   }
 }
@@ -1248,10 +1374,7 @@ function finaliseImageInsert() {
     if (!url) { alert('Enter a URL'); return; }
     pendingImageMd = `![${alt}](${url})`;
   }
-  if (pendingImageMd) {
-    insertMarkdown('\n' + pendingImageMd + '\n');
-    log(`Inserted: ${pendingImageMd.slice(0,60)}`, 'info');
-  }
+  if (pendingImageMd) { insertMarkdown('\n' + pendingImageMd + '\n'); log(`Inserted: ${pendingImageMd.slice(0,60)}`, 'info'); }
   closeUploadModal();
 }
 
@@ -1263,6 +1386,134 @@ ghDropZone.addEventListener('drop', e => {
   e.preventDefault(); ghDropZone.classList.remove('dragover');
   const f = e.dataTransfer.files[0]; if (f) onGHFileSelected(f);
 });
+
+// ═══════════════════════════════════════════════════════════════════
+// TABLE BUILDER
+// ═══════════════════════════════════════════════════════════════════
+function openTableModal() {
+  document.getElementById('table-modal').classList.add('open');
+  buildTableGrid();
+}
+
+function buildTableGrid() {
+  const grid = document.getElementById('table-grid');
+  grid.innerHTML = '';
+  const ROWS = 8, COLS = 8;
+  for (let r = 1; r <= ROWS; r++) {
+    for (let c = 1; c <= COLS; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'tg-cell';
+      cell.dataset.row = r; cell.dataset.col = c;
+      cell.addEventListener('mouseover', () => highlightTableGrid(r, c));
+      cell.addEventListener('click', () => { insertTableMd(r, c); closeModal('table-modal'); });
+      grid.appendChild(cell);
+    }
+  }
+  document.getElementById('tg-label').textContent = '—';
+}
+
+function highlightTableGrid(rows, cols) {
+  document.querySelectorAll('.tg-cell').forEach(cell => {
+    const r = +cell.dataset.row, c = +cell.dataset.col;
+    cell.classList.toggle('active', r <= rows && c <= cols);
+  });
+  document.getElementById('tg-label').textContent = `${rows} × ${cols} table`;
+  document.getElementById('tbl-rows').value = rows;
+  document.getElementById('tbl-cols').value = cols;
+}
+
+function insertTableFromInputs() {
+  const rows = parseInt(document.getElementById('tbl-rows').value) || 3;
+  const cols = parseInt(document.getElementById('tbl-cols').value) || 3;
+  insertTableMd(rows, cols);
+  closeModal('table-modal');
+}
+
+function insertTableMd(rows, cols) {
+  const header = '| ' + Array.from({length: cols}, (_, i) => `Header ${i+1}`).join(' | ') + ' |';
+  const sep    = '| ' + Array.from({length: cols}, () => '---').join(' | ') + ' |';
+  const dataRows = Array.from({length: rows - 1}, (_, r) =>
+    '| ' + Array.from({length: cols}, (_, c) => `Cell ${r+1}.${c+1}`).join(' | ') + ' |'
+  );
+  const table = [header, sep, ...dataRows].join('\n');
+  insertMarkdown('\n' + table + '\n');
+  log(`Inserted ${rows}×${cols} table`, 'info');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CALLOUT BUILDER
+// ═══════════════════════════════════════════════════════════════════
+function openCalloutModal() { document.getElementById('callout-modal').classList.add('open'); }
+
+function insertCallout(type) {
+  const icons = { NOTE: '> [!NOTE]', TIP: '> [!TIP]', WARNING: '> [!WARNING]', DANGER: '> [!DANGER]' };
+  const md = `\n${icons[type]}\n> Your ${type.toLowerCase()} text here.\n`;
+  insertMarkdown(md);
+  log(`Inserted ${type} callout`, 'info');
+  closeModal('callout-modal');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TEMPLATE / SNIPPET PICKER
+// ═══════════════════════════════════════════════════════════════════
+const TEMPLATES = [
+  {
+    name: 'Engineering post',
+    desc: 'Standard engineering deep-dive structure',
+    body: `## Introduction\n\nWrite your introduction here.\n\n## Background\n\nContext your readers need.\n\n## The problem\n\nDescribe the problem or challenge.\n\n## Our approach\n\nHow you solved it.\n\n\`\`\`bash\n# example command\n\`\`\`\n\n> [!NOTE]\n> Add important notes here.\n\n## Results\n\nOutcomes and benchmarks.\n\n## Conclusion\n\nKey takeaways and next steps.\n`,
+  },
+  {
+    name: 'Release notes',
+    desc: 'Structured release / changelog post',
+    body: `## What's new in v0.0.0\n\n### ✨ New features\n\n- Feature one\n- Feature two\n\n### 🐛 Bug fixes\n\n- Fixed issue where…\n\n### 🔧 Improvements\n\n- Performance improved by X%\n\n### ⚠️ Breaking changes\n\n- API changed from \`old\` to \`new\`\n\n### 📦 Upgrade\n\n\`\`\`bash\npacman -Syu\n\`\`\`\n`,
+  },
+  {
+    name: 'Incident report',
+    desc: 'Post-mortem / incident analysis',
+    body: `## Summary\n\nBrief description of the incident.\n\n> [!DANGER]\n> Severity: High — Affected: Production\n\n## Timeline\n\n| Time (UTC) | Event |\n| --- | --- |\n| 00:00 | Incident detected |\n| 00:15 | Team paged |\n| 01:30 | Resolved |\n\n## Root cause\n\nDescribe root cause here.\n\n## Impact\n\n- Users affected: ~N\n- Duration: X minutes\n\n## Resolution\n\nWhat fixed it.\n\n## Action items\n\n- [ ] Add monitoring for X\n- [ ] Update runbook\n`,
+  },
+  {
+    name: 'Tutorial / How-to',
+    desc: 'Step-by-step tutorial format',
+    body: `## Prerequisites\n\n- Requirement one\n- Requirement two\n\n## Step 1 — Install\n\n\`\`\`bash\npacman -S example\n\`\`\`\n\n## Step 2 — Configure\n\n\`\`\`yaml\nkey: value\n\`\`\`\n\n> [!TIP]\n> Pro tip here.\n\n## Step 3 — Run\n\n\`\`\`bash\nsystemctl enable --now example\n\`\`\`\n\n## Troubleshooting\n\n| Error | Solution |\n| --- | --- |\n| Error message | Fix |\n\n## Conclusion\n\nYou've now set up X. Next steps: …\n`,
+  },
+  {
+    name: 'Comparison table',
+    desc: 'Side-by-side comparison of options',
+    body: `## Overview\n\nComparing A vs B vs C.\n\n| Feature | Option A | Option B | Option C |\n| --- | --- | --- | --- |\n| Performance | ⚡ Fast | 🐢 Slow | 🟡 Medium |\n| Ease of use | Easy | Hard | Medium |\n| Cost | Free | Paid | Free |\n| License | MIT | Proprietary | GPL |\n\n## Our recommendation\n\nWe recommend **Option A** because…\n`,
+  },
+  {
+    name: 'Essay / Opinion',
+    desc: 'Long-form opinionated essay',
+    body: `> *A short epigraph or summary quote here.*\n\n## The premise\n\nOpen with a strong claim or question.\n\n## Why this matters\n\nEstablish stakes and context.\n\n## The argument\n\nDevelop your main point.\n\n## Counterarguments\n\nSteel-man the opposition.\n\n## My take\n\nYour clear, opinionated conclusion.\n`,
+  },
+  {
+    name: 'Code snippet + explanation',
+    desc: 'Technical walkthrough with annotated code',
+    body: `## The goal\n\nWhat we're building.\n\n## The code\n\n\`\`\`typescript\n// Your code here\nconst example = () => {\n  return 'hello';\n};\n\`\`\`\n\n### What's happening\n\n1. **Line 1** — Does X\n2. **Line 2** — Does Y\n\n## Usage\n\n\`\`\`bash\nnode example.js\n\`\`\`\n\n## Key takeaways\n\n- Point one\n- Point two\n`,
+  },
+];
+
+function openTemplateModal() {
+  const list = document.getElementById('template-list');
+  list.innerHTML = '';
+  TEMPLATES.forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'tpl-item';
+    div.innerHTML = `<div class="tpl-item__name">${escHtml(t.name)}</div><div class="tpl-item__desc">${escHtml(t.desc)}</div>`;
+    div.addEventListener('click', () => applyTemplate(t));
+    list.appendChild(div);
+  });
+  document.getElementById('template-modal').classList.add('open');
+}
+
+function applyTemplate(t) {
+  if (getEditorValue().trim() && !confirm(`Replace current content with "${t.name}" template?`)) return;
+  setEditorValue(t.body);
+  updateWordCount(); setStatus('unsaved changes', 'warn');
+  closeModal('template-modal');
+  log(`Applied template: ${t.name}`, 'info');
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // MARKDOWN FORMATTING
@@ -1298,11 +1549,28 @@ function fmtQuote() {
   monacoEditor.executeEdits('fmt', [{ range: sel, text: txt.split('\n').map(l => '> ' + l).join('\n') }]);
   monacoEditor.focus();
 }
+function fmtBulletList() {
+  if (!monacoEditor) return;
+  const sel = monacoEditor.getSelection();
+  const txt = monacoEditor.getModel().getValueInRange(sel);
+  const lines = (txt || 'Item 1\nItem 2\nItem 3').split('\n');
+  monacoEditor.executeEdits('fmt', [{ range: sel, text: lines.map(l => l.trim() ? '- ' + l : l).join('\n') }]);
+  monacoEditor.focus();
+}
+function fmtOrderedList() {
+  if (!monacoEditor) return;
+  const sel = monacoEditor.getSelection();
+  const txt = monacoEditor.getModel().getValueInRange(sel);
+  const lines = (txt || 'Step one\nStep two\nStep three').split('\n');
+  let n = 1;
+  monacoEditor.executeEdits('fmt', [{ range: sel, text: lines.map(l => l.trim() ? `${n++}. ` + l : l).join('\n') }]);
+  monacoEditor.focus();
+}
 function fmtCodeBlock() {
   if (!monacoEditor) return;
   const sel  = monacoEditor.getSelection();
   const txt  = monacoEditor.getModel().getValueInRange(sel);
-  const lang = prompt('Language (bash, python, js…):', 'bash') || '';
+  const lang = prompt('Language (bash, python, js, go…):', 'bash') || '';
   monacoEditor.executeEdits('fmt', [{ range: sel, text: '```' + lang + '\n' + (txt || '# code') + '\n```' }]);
   monacoEditor.focus();
 }
@@ -1323,10 +1591,12 @@ function setViewMode(mode) {
   if (mode !== 'editor') schedulePreview();
   if (monacoEditor) setTimeout(() => monacoEditor.layout(), 50);
 }
+
 function schedulePreview() {
   if (viewMode === 'editor') return;
-  clearTimeout(previewTimer); previewTimer = setTimeout(renderPreview, 300);
+  clearTimeout(previewTimer); previewTimer = setTimeout(renderPreview, 280);
 }
+
 function renderPreview() {
   const pane  = document.getElementById('preview-inner');
   const md    = getEditorValue();
@@ -1334,15 +1604,25 @@ function renderPreview() {
   const date  = document.getElementById('fm-date')?.value  || '';
   const tag   = document.getElementById('fm-tag')?.value   || '';
   const cover = document.getElementById('fm-cover')?.value || '';
+  const series    = document.getElementById('fm-series')?.value || '';
+  const author    = document.getElementById('fm-author')?.value || AUTHOR_NAME;
+  const authorRole= document.getElementById('fm-author-role')?.value || AUTHOR_ROLE;
+  const authorInit= document.getElementById('fm-author-initials')?.value || AUTHOR_INITIALS;
 
-  const processed = md.replace(/> \[!(NOTE|WARNING|DANGER|TIP)\]\n((?:>.*\n?)*)/gi, (_, type, body) =>
-    `<div class="callout callout--${type.toLowerCase()}"><strong>${type}</strong><br>${body.replace(/^> ?/gm,'').trim()}</div>\n\n`);
+  // Callout processing: > [!TYPE]\n> content
+  const processed = md
+    .replace(/> \[!(NOTE|WARNING|DANGER|TIP)\]\n((?:>.*\n?)*)/gi, (_, type, body) => {
+      const icons = { NOTE: '💡', WARNING: '⚠️', DANGER: '🚨', TIP: '✅' };
+      const content = body.replace(/^> ?/gm, '').trim();
+      return `<div class="callout callout--${type.toLowerCase()}"><div class="callout-title">${icons[type.toUpperCase()]} ${type}</div>${content}</div>\n\n`;
+    });
 
   let html = '';
   try { html = DOMPurify.sanitize(marked.parse(processed, { gfm: true, breaks: false })); }
   catch { html = '<p style="color:var(--red)">Preview error</p>'; }
 
   let out = '';
+  if (cover) out += `<img src="${escHtml(cover)}" alt="cover" style="width:100%;border-radius:8px;margin-bottom:1.5rem;aspect-ratio:2/1;object-fit:cover">`;
   if (title) {
     out += `<div class="preview-title">${escHtml(title)}</div>`;
     out += `<div class="preview-meta">
@@ -1350,19 +1630,80 @@ function renderPreview() {
       ${tag  ? `<span class="preview-tag">${escHtml(tag)}</span>` : ''}
     </div>`;
   }
-  if (cover) out += `<img src="${escHtml(cover)}" alt="cover" style="width:100%;border-radius:8px;margin-bottom:1.5rem">`;
+  if (series) {
+    out += `<div class="preview-series"><strong>Series</strong>${escHtml(series)}</div>`;
+  }
+  if (author) {
+    out += `<div class="preview-author">
+      <div class="preview-author__avatar">${escHtml(authorInit || author.substring(0,2).toUpperCase())}</div>
+      <div>
+        <div class="preview-author__name">${escHtml(author)}</div>
+        ${authorRole ? `<div class="preview-author__role">${escHtml(authorRole)}</div>` : ''}
+      </div>
+    </div>`;
+  }
   out += html;
   pane.innerHTML = out;
   pane.querySelectorAll('pre code').forEach(b => { if (typeof Prism !== 'undefined') Prism.highlightElement(b); });
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// TEMPLATE
+// FRONT-MATTER TABS
 // ═══════════════════════════════════════════════════════════════════
-function insertTemplate() {
-  if (getEditorValue().trim() && !confirm('Replace current content with template?')) return;
-  setEditorValue(`## Introduction\n\nWrite your introduction here.\n\n## Background\n\nAdd context your readers need.\n\n## Main section\n\nYour core content.\n\n\`\`\`bash\necho "Hello, Shanios"\n\`\`\`\n\n> [!NOTE]\n> Use callout blocks for important notes.\n\n## Conclusion\n\nKey takeaways.\n`);
-  updateWordCount(); setStatus('unsaved changes', 'warn');
+function switchFmTab(tab) {
+  activeFmTab = tab;
+  document.querySelectorAll('.fm-tab').forEach((btn, i) => {
+    const names = ['basic','author','advanced'];
+    btn.classList.toggle('active', names[i] === tab);
+  });
+  document.querySelectorAll('.fm-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById(`fm-panel-${tab}`);
+  if (panel) panel.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// AUTHOR PREVIEW
+// ═══════════════════════════════════════════════════════════════════
+function updateAuthorPreview() {
+  const name  = document.getElementById('fm-author')?.value || '';
+  const role  = document.getElementById('fm-author-role')?.value || '';
+  const init  = document.getElementById('fm-author-initials')?.value || '';
+  const avEl  = document.getElementById('author-preview-avatar');
+  const nmEl  = document.getElementById('author-preview-name');
+  const rlEl  = document.getElementById('author-preview-role');
+  const letters = init || (name ? name.substring(0,2).toUpperCase() : '?');
+  if (avEl) avEl.textContent = letters;
+  if (nmEl) nmEl.textContent = name || 'Author name';
+  if (rlEl) rlEl.textContent = role || 'Role / company';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MODAL HELPERS
+// ═══════════════════════════════════════════════════════════════════
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openShortcutsModal()  { document.getElementById('shortcuts-modal').classList.add('open'); }
+function closeShortcutsModal() { document.getElementById('shortcuts-modal').classList.remove('open'); }
+
+// ═══════════════════════════════════════════════════════════════════
+// WORD COUNT + COPY
+// ═══════════════════════════════════════════════════════════════════
+function updateWordCount() {
+  const v = getEditorValue();
+  const words = v.trim() ? v.trim().split(/\s+/).length : 0;
+  const chars = v.length;
+  document.getElementById('wc-display').textContent = `${words.toLocaleString()} words · ${Math.max(1,Math.ceil(words/200))} min read`;
+  document.getElementById('wc-chars').textContent   = `${chars.toLocaleString()} chars`;
+}
+
+async function copyMarkdown() {
+  const result = serialise();
+  if (!result) return;
+  try {
+    await navigator.clipboard.writeText(result.raw);
+    log('Copied full markdown to clipboard ✓', 'ok');
+  } catch {
+    prompt('Copy this:', result.raw.slice(0,200) + '…');
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1370,40 +1711,88 @@ function insertTemplate() {
 // ═══════════════════════════════════════════════════════════════════
 function slugify(t){ return t.toLowerCase().replace(/[^\w\s-]/g,'').trim().replace(/[\s_]+/g,'-').replace(/-+/g,'-'); }
 function today()   { return new Date().toISOString().split('T')[0]; }
-function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function getEditorValue(){ return monacoEditor ? monacoEditor.getValue() : ''; }
 function setEditorValue(v){ if (monacoEditor) monacoEditor.setValue(v); }
+function setStatus(msg, type='info') { const el = document.getElementById('save-status'); el.textContent = msg; el.className = `status-pill ${type}`; }
+function autosaveDraft() { if (currentSlug) sessionStorage.setItem(`draft_${currentSlug}`, getEditorValue()); }
 
-// ── Download current .md ──────────────────────────────────────────
 function downloadMd() {
-  const result = serialise();
-  if (!result) return;
+  const result = serialise(); if (!result) return;
   const { slug, raw } = result;
   const blob = new Blob([raw], { type: 'text/markdown;charset=utf-8' });
-  const a = Object.assign(document.createElement('a'), {
-    href: URL.createObjectURL(blob),
-    download: `${slug}.md`,
-  });
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `${slug}.md` });
   document.body.appendChild(a); a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
   log(`Downloaded ${slug}.md`, 'ok');
 }
 
-// ── Sidebar tab switching ─────────────────────────────────────────
+function openInBlog() {
+  const slug = document.getElementById('fm-slug').value.trim();
+  if (slug) window.open(`/post/${slug}`, '_blank');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SIDEBAR TAB SWITCHING
+// ═══════════════════════════════════════════════════════════════════
 function switchSidebarTab(tab) {
-  ['posts','media'].forEach(t => {
+  ['posts','media','config'].forEach(t => {
     document.getElementById(`tab-${t}-btn`).classList.toggle('active', t === tab);
     document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
   });
-  if (tab === 'media' && document.getElementById('media-grid').children.length <= 1 && ghToken) {
-    loadMedia();
+  if (tab === 'media' && document.getElementById('media-grid').children.length <= 1 && ghToken) loadMedia();
+  if (tab === 'config') populateConfigPanel();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CONFIG PANEL
+// ═══════════════════════════════════════════════════════════════════
+function populateConfigPanel() {
+  const setV = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+  setV('cfg-title',  SITE_TITLE);
+  setV('cfg-url',    BLOG_URL);
+  setV('cfg-author', AUTHOR_NAME);
+  setV('cfg-ppp',    CFG.POSTS_PER_PAGE || 9);
+
+  // Tags
+  const tagsEl = document.getElementById('cfg-tags');
+  if (tagsEl) {
+    tagsEl.innerHTML = Object.keys(TAG_ICONS).map(t =>
+      `<span style="font-size:.68rem;padding:.15rem .4rem;border-radius:3px;background:var(--bg-elevated);color:var(--muted)">${escHtml(t)}</span>`
+    ).join('');
   }
+
+  // Features
+  const featureMap = {
+    'Bookmarks':      CFG.BOOKMARKS_ENABLED,
+    'View counts':    CFG.VIEW_COUNT_ENABLED,
+    'Reading streak': CFG.STREAK_ENABLED,
+    'Newsletter':     CFG.NEWSLETTER_ENABLED,
+    'Comments':       !!CFG.GISCUS_REPO,
+    'Series':         CFG.SERIES_ENABLED,
+    'Fuzzy search':   CFG.FUZZY_SEARCH_ENABLED,
+    'Font controls':  CFG.FONT_SIZE_CONTROLS,
+    'RSS':            CFG.RSS_ENABLED,
+    'PWA':            true,
+  };
+  const featEl = document.getElementById('cfg-features');
+  if (featEl) {
+    featEl.innerHTML = Object.entries(featureMap).map(([k, v]) =>
+      `<div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="color:var(--muted)">${escHtml(k)}</span>
+        <span style="color:${v?'var(--green)':'var(--faint)'};">${v?'✓ on':'✗ off'}</span>
+      </div>`
+    ).join('');
+  }
+
+  const linkEl = document.getElementById('cfg-blog-link');
+  if (linkEl && BLOG_URL) linkEl.href = BLOG_URL;
 }
 
 // ═══════════════════════════════════════════════════════════════════
 // MEDIA MANAGER
 // ═══════════════════════════════════════════════════════════════════
-let mediaFiles    = [];  // { name, sha, url, path }
+let mediaFiles    = [];
 let selectedMedia = null;
 
 async function loadMedia() {
@@ -1411,18 +1800,12 @@ async function loadMedia() {
   grid.innerHTML = '<p class="media-empty" style="grid-column:1/-1"><i class="fa-solid fa-spinner fa-spin"></i> Loading…</p>';
   document.getElementById('media-selected').style.display = 'none';
   selectedMedia = null;
-
   try {
     const files = await ghListDir(IMAGES_PATH);
     const images = files.filter(f => f.type === 'file' && /\.(png|jpe?g|gif|webp|svg|avif)$/i.test(f.name));
     mediaFiles = images.map(f => ({
-      name: f.name,
-      sha:  f.sha,
-      path: f.path,
-      // Use the raw.githubusercontent URL for display (no auth needed for public repos)
-      // Falls back to GitHub API download_url
-      url:  `https://raw.githubusercontent.com/${ghOwner}/${ghRepo}/${ghBranch}/${f.path}`,
-      apiUrl: f.download_url,
+      name: f.name, sha: f.sha, path: f.path,
+      url: `https://raw.githubusercontent.com/${ghOwner}/${ghRepo}/${ghBranch}/${f.path}`,
     }));
     renderMediaGrid();
     log(`Media: ${mediaFiles.length} image(s) in ${IMAGES_PATH}/`, 'ok');
@@ -1434,41 +1817,32 @@ async function loadMedia() {
 
 function renderMediaGrid() {
   const grid = document.getElementById('media-grid');
-  if (!mediaFiles.length) {
-    grid.innerHTML = '<p class="media-empty" style="grid-column:1/-1">No images yet. Upload one above.</p>';
-    return;
-  }
+  if (!mediaFiles.length) { grid.innerHTML = '<p class="media-empty" style="grid-column:1/-1">No images yet. Upload one above.</p>'; return; }
   grid.innerHTML = '';
   mediaFiles.forEach((f, i) => {
     const div = document.createElement('div');
     div.className = 'media-thumb' + (selectedMedia === i ? ' selected' : '');
     div.innerHTML = `
       <img src="${escHtml(f.url)}" alt="${escHtml(f.name)}" loading="lazy"
-           onerror="this.style.display='none';this.nextElementSibling.style.display='none';
-                    this.parentElement.style.background='var(--bg-elevated)';
-                    this.insertAdjacentHTML('afterend','<span style=\\'font-size:.6rem;color:var(--faint);padding:.3rem;display:block\\'>${escHtml(f.name)}</span>')">
+           onerror="this.style.display='none'">
       <div class="media-thumb__name">${escHtml(f.name)}</div>
-      <button class="media-thumb__del" title="Delete" onclick="mediaDeleteByIndex(${i},event)">
-        <i class="fa-solid fa-xmark"></i>
-      </button>`;
+      <button class="media-thumb__del" title="Delete" onclick="mediaDeleteByIndex(${i},event)"><i class="fa-solid fa-xmark"></i></button>`;
     div.addEventListener('click', () => selectMedia(i));
     grid.appendChild(div);
   });
 }
 
 function selectMedia(i) {
-  selectedMedia = i;
-  renderMediaGrid();
+  selectedMedia = i; renderMediaGrid();
   const f = mediaFiles[i];
-  const sel = document.getElementById('media-selected');
-  sel.style.display = 'block';
+  document.getElementById('media-selected').style.display = 'block';
   document.getElementById('media-selected-name').textContent = `/${f.path}`;
 }
 
 function mediaInsertSelected() {
   if (selectedMedia === null) return;
   const f = mediaFiles[selectedMedia];
-  const alt = f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+  const alt = f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g,' ');
   insertMarkdown(`\n![${alt}](/${f.path})\n`);
   log(`Inserted image: /${f.path}`, 'info');
   switchSidebarTab('posts');
@@ -1477,11 +1851,7 @@ function mediaInsertSelected() {
 function mediaCopyUrl() {
   if (selectedMedia === null) return;
   const url = `/${mediaFiles[selectedMedia].path}`;
-  navigator.clipboard.writeText(url).then(() => {
-    log(`Copied URL: ${url}`, 'ok');
-  }).catch(() => {
-    prompt('Copy this URL:', url);
-  });
+  navigator.clipboard.writeText(url).then(() => log(`Copied URL: ${url}`, 'ok')).catch(() => prompt('Copy this URL:', url));
 }
 
 async function mediaDeleteByIndex(i, e) {
@@ -1492,10 +1862,7 @@ async function mediaDeleteByIndex(i, e) {
     const { sha } = await ghGetFile(f.path);
     await ghDeleteFile(f.path, sha, `assets: delete ${f.name}`);
     log(`Deleted ${f.path}`, 'ok');
-    if (selectedMedia === i) {
-      selectedMedia = null;
-      document.getElementById('media-selected').style.display = 'none';
-    }
+    if (selectedMedia === i) { selectedMedia = null; document.getElementById('media-selected').style.display = 'none'; }
     await loadMedia();
   } catch (err) { log(`Delete failed: ${err.message}`, 'error'); }
 }
@@ -1507,12 +1874,10 @@ function mediaDeleteSelected() {
 
 async function mediaUploadFile(file) {
   if (!file) return;
-  const prog  = document.getElementById('media-upload-progress');
-  const bar   = document.getElementById('media-progress-bar');
-  const stat  = document.getElementById('media-upload-status');
-  prog.style.display = 'block'; bar.style.width = '15%';
-  stat.style.display = 'none';
-
+  const prog = document.getElementById('media-upload-progress');
+  const bar  = document.getElementById('media-progress-bar');
+  const stat = document.getElementById('media-upload-status');
+  prog.style.display = 'block'; bar.style.width = '15%'; stat.style.display = 'none';
   try {
     const base64 = await new Promise((res, rej) => {
       const r = new FileReader();
@@ -1521,69 +1886,56 @@ async function mediaUploadFile(file) {
       r.readAsDataURL(file);
     });
     bar.style.width = '50%';
-    const filename = file.name.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9._-]/g, '').toLowerCase();
+    const filename = file.name.replace(/\s+/g,'-').replace(/[^a-zA-Z0-9._-]/g,'').toLowerCase();
     const repoPath = `${IMAGES_PATH}/${filename}`;
     const existing = await ghGetFile(repoPath);
     bar.style.width = '80%';
     await ghPutBinary(repoPath, base64, `assets: upload ${filename}`, existing.sha || undefined);
     bar.style.width = '100%';
-    stat.style.display = 'block';
-    stat.style.color = 'var(--green)';
-    stat.textContent = `✓ Uploaded ${filename}`;
+    stat.style.display = 'block'; stat.style.color = 'var(--green)'; stat.textContent = `✓ Uploaded ${filename}`;
     log(`Uploaded ${repoPath}`, 'gh');
     document.getElementById('media-upload-input').value = '';
     await loadMedia();
   } catch (err) {
-    bar.style.width = '100%';
-    stat.style.display = 'block';
-    stat.style.color = 'var(--red)';
-    stat.textContent = `Upload failed: ${err.message}`;
+    bar.style.width = '100%'; stat.style.display = 'block'; stat.style.color = 'var(--red)'; stat.textContent = `Upload failed: ${err.message}`;
     log(`Media upload failed: ${err.message}`, 'error');
   } finally {
     setTimeout(() => { prog.style.display = 'none'; bar.style.width = '0'; }, 1500);
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// LOG
+// ═══════════════════════════════════════════════════════════════════
 function log(msg, type='info') {
   const p = document.getElementById('log-panel');
   const d = document.createElement('div');
   d.className = `log-entry ${type}`;
   d.innerHTML = `<span class="ts">${new Date().toTimeString().slice(0,8)}</span><span class="msg">${escHtml(msg)}</span>`;
   p.prepend(d);
-  while (p.children.length > 60) p.removeChild(p.lastChild);
-}
-function setStatus(msg, type='info') {
-  const el = document.getElementById('save-status');
-  el.textContent = msg; el.className = `status-pill ${type}`;
-}
-function updateWordCount() {
-  const v = getEditorValue();
-  const w = v.trim() ? v.trim().split(/\s+/).length : 0;
-  document.getElementById('wc-display').textContent = `${w.toLocaleString()} words · ${Math.max(1,Math.ceil(w/200))} min read`;
-}
-function autosaveDraft() {
-  if (currentSlug) sessionStorage.setItem(`draft_${currentSlug}`, getEditorValue());
-}
-function openInBlog() {
-  const slug = document.getElementById('fm-slug').value.trim();
-  if (slug) window.open(`/post/${slug}`, '_blank');
+  while (p.children.length > 80) p.removeChild(p.lastChild);
 }
 
-// FM listeners
+// ═══════════════════════════════════════════════════════════════════
+// FM LISTENERS
+// ═══════════════════════════════════════════════════════════════════
 document.getElementById('fm-title').addEventListener('input', e => {
   if (!currentSlug || currentSlug === '__new__')
     document.getElementById('fm-slug').value = slugify(e.target.value);
   setStatus('unsaved changes', 'warn'); schedulePreview();
 });
-['fm-slug','fm-date','fm-tag','fm-paywalled','fm-cover','fm-excerpt'].forEach(id =>
-  document.getElementById(id).addEventListener('change', () => { setStatus('unsaved changes','warn'); schedulePreview(); })
-);
+['fm-slug','fm-date','fm-tag','fm-paywalled','fm-cover','fm-excerpt','fm-series','fm-author','fm-author-role'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('change', () => { setStatus('unsaved changes','warn'); schedulePreview(); });
+});
 
-// Shortcuts modal
-function openShortcutsModal()  { document.getElementById('shortcuts-modal').classList.add('open'); }
-function closeShortcutsModal() { document.getElementById('shortcuts-modal').classList.remove('open'); }
+// ═══════════════════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS (global)
+// ═══════════════════════════════════════════════════════════════════
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeUploadModal(); closeShortcutsModal(); }
+  if (e.key === 'Escape') {
+    ['upload-modal','table-modal','callout-modal','template-modal','shortcuts-modal'].forEach(id => closeModal(id));
+  }
   if (e.key === '?' && !e.ctrlKey && !e.metaKey &&
       document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA')
     openShortcutsModal();
@@ -1597,42 +1949,48 @@ document.addEventListener('keydown', e => {
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// BOOT — apply CONFIG branding + auto-reconnect on session restore
+// BOOT
 // ═══════════════════════════════════════════════════════════════════
 (async function boot() {
-  // ── Branding ──────────────────────────────────────────────────
   applyThemeIcon();
+
+  // Site title
   document.title = `${SITE_TITLE} · Admin`;
   const titleEl = document.getElementById('login-site-title');
   if (titleEl) titleEl.textContent = SITE_TITLE;
-  const topbarBrand = document.querySelector('.topbar__brand');
-  if (topbarBrand) topbarBrand.innerHTML = `${SITE_TITLE} <span>/ admin</span>`;
+  const topbarTitle = document.getElementById('topbar-title');
+  if (topbarTitle) topbarTitle.innerHTML = `${SITE_TITLE} <span>/ admin</span>`;
+
+  // Favicon
   if (FAVICON_URL) {
     let fav = document.querySelector('link[rel="icon"]') || document.createElement('link');
     fav.rel = 'icon'; fav.href = FAVICON_URL;
     document.head.appendChild(fav);
   }
 
-  // ── Login box: show which repo we're connecting to ────────────
+  // Login box label
   const repoLabel = document.getElementById('login-repo-label');
   if (repoLabel) repoLabel.textContent = `${ghOwner}/${ghRepo}`;
 
-  // ── Pre-fill saved username ────────────────────────────────────
+  // Pre-fill saved username
   const savedUser = localStorage.getItem('admin_gh_username') || ghOwner;
   if (savedUser) document.getElementById('gh-username').value = savedUser;
 
-  // ── Populate tag <select> from CONFIG.TAG_ICONS ───────────────
+  // Populate tag <select>
   const tagSel = document.getElementById('fm-tag');
   const tagKeys = Object.keys(TAG_ICONS).length
-    ? Object.keys(TAG_ICONS).filter(t => t !== 'Post').concat(['Post'])
+    ? Object.keys(TAG_ICONS)
     : ['Engineering','Release','Linux','News','Product','Essay','Open Source','Incident','Post'];
   tagKeys.forEach(t => { const o = document.createElement('option'); o.value = o.textContent = t; tagSel.appendChild(o); });
 
-  // ── Sidebar repo display ───────────────────────────────────────
+  // Sidebar repo display
   document.getElementById('sb-repo-display').textContent = `${ghOwner}/${ghRepo}`;
   document.getElementById('sb-branch').value = ghBranch;
 
-  // ── Auto-reconnect if session token exists ────────────────────
+  // Build table picker grid (8×8)
+  buildTableGrid();
+
+  // Auto-reconnect if session token exists
   if (ghToken && ghOwner && ghRepo) {
     try {
       ghUser = await ghFetch('/user');
