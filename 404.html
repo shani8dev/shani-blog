@@ -73,22 +73,19 @@
   <!-- ═══ FAVICON ═══════════════════════════════════════════════ -->
   <link rel="icon" type="image/svg+xml" href="https://shani.dev/assets/images/logo.svg">
 
-  <!-- GitHub Pages SPA: restore real URL if we arrived via 404.html redirect -->
+  <!-- GitHub Pages SPA: encode the current path and redirect to index.html -->
   <script>
     (function () {
-      var qs = new URLSearchParams(location.search);
-      var p  = qs.get('p');
-      if (!p) return;
-      qs.delete('p');
-      var q = qs.get('q') || '';  qs.delete('q');
-      var h = qs.get('h') || '';  qs.delete('h');
-      var url = decodeURIComponent(p);
-      // Rewrite /posts/slug or /posts/slug.md → /post/slug so the SPA renders it styled
-      var postsMatch = url.match(/^\/posts\/(.+?)(?:\.md)?(\?.*)?$/);
-      if (postsMatch) url = '/post/' + postsMatch[1];
-      if (q) url += '?' + decodeURIComponent(q);
-      if (h) url += '#' + decodeURIComponent(h);
-      history.replaceState(null, '', url);
+      var l = window.location;
+      var path = l.pathname;
+      var search = l.search ? l.search.slice(1) : '';
+      var hash   = l.hash   ? l.hash.slice(1)   : '';
+      var redirect = l.protocol + '//' + l.hostname +
+        (l.port ? ':' + l.port : '') + '/' +
+        '?p=' + encodeURIComponent(path) +
+        (search ? '&q=' + encodeURIComponent(search) : '') +
+        (hash   ? '&h=' + encodeURIComponent(hash)   : '');
+      l.replace(redirect);
     })();
   </script>
   <!-- Theme applied before CSS paints to prevent flash -->
