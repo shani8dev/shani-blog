@@ -192,33 +192,44 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
 /* ── preview pane ────────────────────────────────────────────── */
 .preview-pane{flex:1;overflow-y:auto;min-height:0;background:var(--bg);display:none}
 .edit-area.split .preview-pane,.edit-area.preview-only .preview-pane{display:block}
-.preview-inner{max-width:740px;margin:0 auto;padding:2rem 1.5rem 4rem;font-family:'DM Sans',sans-serif;font-size:.95rem;line-height:1.8;color:#f5f4f2}
-html[data-theme="light"] .preview-inner{color:#1c1b19}
+.preview-inner{max-width:740px;margin:0 auto;padding:2rem 1.5rem 4rem;font-family:'DM Sans',sans-serif;font-size:.95rem;line-height:1.8;color:var(--text)}
 .preview-inner h1,.preview-inner h2,.preview-inner h3,.preview-inner h4{font-family:'Playfair Display',Georgia,serif;margin:2rem 0 .75rem;line-height:1.25}
 .preview-inner h1{font-size:2rem}
-.preview-inner h2{font-size:1.45rem;border-bottom:1px solid #2e2c29;padding-bottom:.4rem}
+.preview-inner h2{font-size:1.45rem;border-bottom:1px solid var(--border);padding-bottom:.4rem}
 .preview-inner h3{font-size:1.15rem}.preview-inner h4{font-size:1rem}
 .preview-inner p{margin:.85rem 0}
-.preview-inner a{color:#ff7f50;text-decoration:underline}
-.preview-inner code{background:#1b1a18;border:1px solid #2e2c29;border-radius:4px;padding:.1em .4em;font-family:'IBM Plex Mono',monospace;font-size:.83em}
-.preview-inner pre{background:#1b1a18;border:1px solid #2e2c29;border-radius:6px;padding:1rem;overflow-x:auto;margin:1rem 0}
+.preview-inner a{color:var(--accent);text-decoration:underline}
+.preview-inner code{background:var(--bg-input);border:1px solid var(--border);border-radius:4px;padding:.1em .4em;font-family:'IBM Plex Mono',monospace;font-size:.83em}
+.preview-inner pre{background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:1rem;overflow-x:auto;margin:1rem 0}
 .preview-inner pre code{background:none;border:none;padding:0}
-.preview-inner blockquote{border-left:3px solid #ff7f50;margin:1rem 0;padding:.5rem 1rem;background:rgba(255,127,80,.05);color:#b0aaa4;border-radius:0 4px 4px 0}
+.preview-inner blockquote{border-left:3px solid var(--accent);margin:1rem 0;padding:.5rem 1rem;background:var(--color-accent-bg, rgba(255,127,80,.05));color:var(--text-muted);border-radius:0 4px 4px 0}
 .preview-inner ul,.preview-inner ol{padding-left:1.5rem;margin:.75rem 0}
 .preview-inner li{margin:.3rem 0}
 .preview-inner img{max-width:100%;border-radius:6px;margin:1rem 0}
 .preview-inner table{width:100%;border-collapse:collapse;margin:1.25rem 0;font-size:.88rem}
-.preview-inner th,.preview-inner td{border:1px solid #2e2c29;padding:.45rem .75rem;text-align:left}
-.preview-inner th{background:#1b1a18;font-weight:600}
-.preview-inner tr:nth-child(even) td{background:rgba(255,255,255,.02)}
-.preview-inner hr{border:none;border-top:1px solid #2e2c29;margin:2rem 0}
+.preview-inner th,.preview-inner td{border:1px solid var(--border);padding:.45rem .75rem;text-align:left}
+.preview-inner th{background:var(--bg-input);font-weight:600}
+.preview-inner tr:nth-child(even) td{background:rgba(128,128,128,.04)}
+.preview-inner hr{border:none;border-top:1px solid var(--border);margin:2rem 0}
 .preview-inner del{color:var(--muted)}
+/* Callouts — match all types from script.js CALLOUT_TYPES */
 .preview-inner .callout{padding:.75rem 1rem;border-radius:6px;margin:1.25rem 0;border-left:3px solid;font-size:.88rem}
-.preview-inner .callout--note{background:rgba(90,156,247,.08);border-color:#5a9cf7}
-.preview-inner .callout--warning{background:rgba(232,162,21,.08);border-color:#e8a215}
-.preview-inner .callout--danger{background:rgba(237,95,95,.08);border-color:#ed5f5f}
-.preview-inner .callout--tip{background:rgba(61,186,126,.08);border-color:#3dba7e}
-.preview-inner .callout .callout-title{font-weight:600;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.35rem;display:flex;align-items:center;gap:.3rem}
+.preview-inner .callout-note,.preview-inner .callout--note{background:rgba(90,156,247,.08);border-color:var(--blue)}
+.preview-inner .callout-tip,.preview-inner .callout--tip{background:rgba(61,186,126,.08);border-color:var(--green)}
+.preview-inner .callout-warning,.preview-inner .callout--warning{background:rgba(232,162,21,.08);border-color:var(--warning)}
+.preview-inner .callout-caution,.preview-inner .callout--caution,.preview-inner .callout--danger,.preview-inner .callout-danger{background:rgba(237,95,95,.08);border-color:var(--red)}
+.preview-inner .callout-important,.preview-inner .callout--important{background:rgba(255,127,80,.08);border-color:var(--accent)}
+.preview-inner .callout .callout-title,.preview-inner .callout__title{font-weight:600;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.35rem;display:flex;align-items:center;gap:.3rem}
+.preview-inner figure{margin:1rem 0}
+.preview-inner figure img{border-radius:6px;max-width:100%}
+.preview-inner figcaption{font-size:.8rem;color:var(--muted);margin-top:.35rem;text-align:center}
+.preview-inner .media-embed{margin:1.5rem 0}
+.preview-inner .media-embed__ratio{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:6px}
+.preview-inner .media-embed__ratio iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.preview-inner video,.preview-inner audio{width:100%;border-radius:6px;margin:.75rem 0}
+.preview-inner .toc{background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-size:.88rem}
+.preview-inner .heading-anchor{margin-left:.4rem;opacity:0;color:var(--muted);font-size:.75em;text-decoration:none}
+.preview-inner h2:hover .heading-anchor,.preview-inner h3:hover .heading-anchor{opacity:1}
 .preview-title{font-family:'Playfair Display',Georgia,serif;font-size:2.2rem;font-weight:800;margin-bottom:.5rem;line-height:1.2}
 .preview-meta{display:flex;gap:1rem;align-items:center;font-size:.8rem;color:#8a8580;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid #2e2c29;flex-wrap:wrap}
 .preview-tag{background:rgba(255,127,80,.1);color:#ff7f50;padding:.15rem .55rem;border-radius:99px;font-family:'IBM Plex Mono',monospace;font-size:.72rem}
@@ -296,6 +307,12 @@ html[data-theme="light"] .preview-inner{color:#1c1b19}
 .callout-opt i{font-size:.85rem}
 .callout-opt span{font-size:.8rem;font-weight:500}
 
+/* ── media type filter tabs ──────────────────────────────────── */
+.media-type-tabs{display:flex;gap:.2rem;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);padding:2px}
+.media-type-tab{flex:1;padding:.22rem 0;font-size:.68rem;border:none;cursor:pointer;background:none;color:var(--faint);border-radius:4px;transition:background .1s,color .1s;font-family:var(--mono)}
+.media-type-tab.active{background:var(--bg-card);color:var(--accent)}
+.media-type-tab:hover:not(.active){color:var(--text)}
+
 /* ── media grid ──────────────────────────────────────────────── */
 .media-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;padding:.25rem 0}
 .media-thumb{position:relative;aspect-ratio:1;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);cursor:pointer;background:var(--bg-elevated);transition:border-color .12s}
@@ -305,6 +322,12 @@ html[data-theme="light"] .preview-inner{color:#1c1b19}
 .media-thumb__del{position:absolute;top:.2rem;right:.2rem;background:rgba(237,95,95,.85);border:none;border-radius:3px;color:#fff;cursor:pointer;padding:2px 5px;font-size:.65rem;opacity:0;transition:opacity .12s}
 .media-thumb:hover .media-thumb__del{opacity:1}
 .media-thumb.selected{border-color:var(--accent);box-shadow:0 0 0 2px rgba(255,127,80,.3)}
+.media-thumb__icon{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;color:var(--muted)}
+.media-thumb__icon i{font-size:1.4rem}
+.media-thumb__icon span{font-size:.58rem;font-family:var(--mono);color:var(--faint);text-transform:uppercase;letter-spacing:.05em}
+.media-thumb--video .media-thumb__icon i{color:var(--violet)}
+.media-thumb--audio .media-thumb__icon i{color:var(--blue)}
+.media-thumb--doc   .media-thumb__icon i{color:var(--green)}
 .media-empty{font-size:.78rem;color:var(--faint);text-align:center;padding:2rem 0}
 
 /* ── shortcuts ───────────────────────────────────────────────── */
@@ -313,9 +336,9 @@ html[data-theme="light"] .preview-inner{color:#1c1b19}
 .kbd-row code{font-family:var(--mono);font-size:.68rem;background:var(--bg-input);border:1px solid var(--border);padding:.12rem .35rem;border-radius:4px;color:var(--text);white-space:nowrap}
 .kbd-row span{font-size:.73rem;color:var(--muted)}
 
-/* ── theme toggle ────────────────────────────────────────────── */
-.btn-theme{background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--muted);cursor:pointer;padding:.28rem .55rem;font-size:.78rem;transition:border-color .15s,color .15s}
-.btn-theme:hover{border-color:var(--accent);color:var(--accent)}
+/* ── theme toggle — matches .btn-icon on main site ───────────── */
+.btn-theme{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:none;border:none;border-radius:var(--radius);color:var(--muted);cursor:pointer;font-size:.88rem;transition:color .15s,background .15s;flex-shrink:0}
+.btn-theme:hover{background:var(--bg-elevated);color:var(--text)}
 
 /* ── author card preview ──────────────────────────────────────── */
 .author-preview{display:flex;align-items:center;gap:.65rem;padding:.65rem .8rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);margin-top:.3rem}
@@ -450,13 +473,23 @@ html[data-theme="light"] .preview-inner{color:#1c1b19}
       <div class="sidebar-scroll" style="gap:.6rem">
         <div>
           <div class="section-label">Media library</div>
-          <div style="display:flex;gap:.3rem">
+          <!-- Type filter tabs -->
+          <div class="media-type-tabs" id="media-type-tabs">
+            <button class="media-type-tab active" data-type="all"   onclick="setMediaTypeFilter('all')">All</button>
+            <button class="media-type-tab"        data-type="image" onclick="setMediaTypeFilter('image')"><i class="fa-regular fa-image"></i></button>
+            <button class="media-type-tab"        data-type="video" onclick="setMediaTypeFilter('video')"><i class="fa-solid fa-film"></i></button>
+            <button class="media-type-tab"        data-type="audio" onclick="setMediaTypeFilter('audio')"><i class="fa-solid fa-music"></i></button>
+            <button class="media-type-tab"        data-type="doc"   onclick="setMediaTypeFilter('doc')"><i class="fa-regular fa-file-lines"></i></button>
+          </div>
+          <div style="display:flex;gap:.3rem;margin-top:.4rem">
             <button class="btn btn--ghost" style="flex:1;justify-content:center;font-size:.72rem" onclick="loadMedia()">
               <i class="fa-solid fa-rotate"></i> Refresh
             </button>
-            <label class="btn btn--ghost" style="flex:1;justify-content:center;font-size:.72rem;cursor:pointer" title="Upload image to repo">
+            <label class="btn btn--ghost" style="flex:1;justify-content:center;font-size:.72rem;cursor:pointer" title="Upload file to repo">
               <i class="fa-solid fa-upload"></i> Upload
-              <input type="file" id="media-upload-input" accept="image/*,.gif,.webp,.svg" style="display:none" onchange="mediaUploadFile(this.files[0])">
+              <input type="file" id="media-upload-input"
+                accept="image/*,.gif,.webp,.svg,.avif,video/mp4,video/webm,video/ogg,.mp4,.webm,.ogv,.mov,audio/mpeg,audio/ogg,audio/wav,audio/flac,.mp3,.ogg,.wav,.flac,.m4a,.pdf,.md,.txt,.csv"
+                style="display:none" onchange="mediaUploadFile(this.files[0])">
             </label>
           </div>
           <div class="upload-progress" id="media-upload-progress" style="margin-top:.5rem">
@@ -466,14 +499,15 @@ html[data-theme="light"] .preview-inner{color:#1c1b19}
         </div>
         <div style="flex:1;overflow-y:auto;min-height:0">
           <div class="media-grid" id="media-grid">
-            <p class="media-empty" style="grid-column:1/-1">Connect, then open Media tab to load images.</p>
+            <p class="media-empty" style="grid-column:1/-1">Connect, then open Media tab to load files.</p>
           </div>
         </div>
         <div id="media-selected" style="display:none;padding:.5rem .6rem;border-radius:var(--radius);background:var(--bg-input);border:1px solid var(--border);font-size:.72rem">
-          <div style="font-family:var(--mono);color:var(--text);margin-bottom:.3rem;word-break:break-all" id="media-selected-name"></div>
+          <div style="font-family:var(--mono);color:var(--text);margin-bottom:.15rem;word-break:break-all" id="media-selected-name"></div>
+          <div style="color:var(--faint);margin-bottom:.35rem;font-size:.68rem" id="media-selected-meta"></div>
           <div style="display:flex;gap:.3rem">
-            <button class="btn btn--ghost" style="flex:1;font-size:.68rem;justify-content:center" onclick="mediaInsertSelected()"><i class="fa-solid fa-image"></i> Insert</button>
-            <button class="btn btn--ghost" style="flex:1;font-size:.68rem;justify-content:center" onclick="mediaCopyUrl()"><i class="fa-solid fa-copy"></i> Copy</button>
+            <button class="btn btn--ghost" style="flex:1;font-size:.68rem;justify-content:center" onclick="mediaInsertSelected()"><i class="fa-solid fa-code"></i> Insert</button>
+            <button class="btn btn--ghost" style="flex:1;font-size:.68rem;justify-content:center" onclick="mediaCopyUrl()"><i class="fa-solid fa-copy"></i> Copy URL</button>
             <button class="btn btn--danger" style="font-size:.68rem;padding:.3rem .5rem" onclick="mediaDeleteSelected()"><i class="fa-solid fa-trash-can"></i></button>
           </div>
         </div>
@@ -584,15 +618,66 @@ html[data-theme="light"] .preview-inner{color:#1c1b19}
         <div class="fm-row">
           <div class="fm-full"><label>Title</label><input id="fm-title" type="text" placeholder="My post title"></div>
         </div>
-        <div class="fm-row cols-4">
-          <div><label>Slug (filename)</label><input id="fm-slug" type="text" placeholder="my-post-slug" style="font-family:var(--mono);font-size:.73rem"></div>
-          <div><label>Date</label><input id="fm-date" type="date"></div>
-          <div><label>Tag</label><select id="fm-tag"><!-- populated from CONFIG.TAG_ICONS --></select></div>
-          <div><label>Access</label><select id="fm-paywalled"><option value="false">Free</option><option value="true">Members only</option></select></div>
+        <div class="fm-row cols-3">
+          <div><label>Slug <span style="color:var(--faint);font-weight:400">(filename)</span></label><input id="fm-slug" type="text" placeholder="my-post-slug" style="font-family:var(--mono);font-size:.73rem"></div>
+          <div><label>Tag / Category</label><select id="fm-tag"><!-- populated from CONFIG.TAG_ICONS --></select></div>
+          <div><label>Access</label>
+            <select id="fm-paywalled">
+              <option value="false">🌐 Public — free</option>
+              <option value="true">⭐ Members only</option>
+            </select>
+          </div>
         </div>
         <div class="fm-row cols-2">
-          <div><label>Cover image URL</label><input id="fm-cover" type="text" placeholder="https://…"></div>
-          <div><label>Excerpt (auto if empty)</label><input id="fm-excerpt" type="text" placeholder="Short description shown on cards"></div>
+          <div><label>Published date</label><input id="fm-date" type="date"></div>
+          <div><label>Updated date <span style="color:var(--faint);font-weight:400">(optional)</span></label><input id="fm-updated" type="date"></div>
+        </div>
+        <div class="fm-row">
+          <div class="fm-full">
+            <label>Excerpt <span style="color:var(--faint);font-weight:400">(auto-generated from body if empty)</span></label>
+            <textarea id="fm-excerpt" placeholder="Short description shown on post cards and in meta tags…" rows="2" style="resize:none"></textarea>
+          </div>
+        </div>
+        <div class="fm-row">
+          <div class="fm-full">
+            <label>Cover image</label>
+            <div style="display:flex;gap:.3rem;align-items:flex-start">
+              <div style="flex:1;display:flex;flex-direction:column;gap:.3rem">
+                <input id="fm-cover" type="text" placeholder="https://… or /assets/images/cover.jpg" oninput="updateCoverPreview()">
+                <div style="display:flex;gap:.3rem">
+                  <button class="btn btn--ghost" type="button" style="flex:1;justify-content:center;font-size:.72rem" title="Pick from media library" onclick="openCoverPicker()"><i class="fa-solid fa-photo-film"></i> Pick from library</button>
+                  <button class="btn btn--ghost" type="button" style="flex-shrink:0;padding:.35rem .55rem;font-size:.72rem" title="Clear cover" onclick="document.getElementById('fm-cover').value='';updateCoverPreview()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+              </div>
+              <div id="fm-cover-preview" style="width:72px;height:48px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-elevated);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center">
+                <i class="fa-regular fa-image" style="color:var(--faint);font-size:.9rem" id="fm-cover-icon"></i>
+                <img id="fm-cover-thumb" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fm-row cols-3">
+          <div>
+            <label>Status</label>
+            <select id="fm-draft">
+              <option value="false">✅ Published</option>
+              <option value="true">📝 Draft</option>
+            </select>
+          </div>
+          <div>
+            <label>Featured / Pinned</label>
+            <select id="fm-pinned">
+              <option value="false">Normal</option>
+              <option value="true">📌 Pinned to top</option>
+            </select>
+          </div>
+          <div>
+            <label>Featured hero</label>
+            <select id="fm-featured">
+              <option value="false">Normal</option>
+              <option value="true">⭐ Hero featured</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -603,8 +688,7 @@ html[data-theme="light"] .preview-inner{color:#1c1b19}
           <div><label>Author role / company</label><input id="fm-author-role" type="text" placeholder="Shanios · shani.dev" oninput="updateAuthorPreview()"></div>
         </div>
         <div class="fm-row cols-2">
-          <div><label>Author initials (avatar fallback)</label><input id="fm-author-initials" type="text" placeholder="SK" maxlength="3" oninput="updateAuthorPreview()"></div>
-          <div><label>Read time override (e.g. 5 min)</label><input id="fm-read-time" type="text" placeholder="auto"></div>
+          <div><label>Author initials <span style="color:var(--faint);font-weight:400">(avatar — auto from name)</span></label><input id="fm-author-initials" type="text" placeholder="SK" maxlength="3" oninput="updateAuthorPreview()"></div>
         </div>
         <div class="fm-row">
           <div class="fm-full"><label>Author bio</label><textarea id="fm-author-bio" placeholder="Short bio shown on the post page…" rows="2"></textarea></div>
@@ -627,16 +711,42 @@ html[data-theme="light"] .preview-inner{color:#1c1b19}
       <!-- ADVANCED -->
       <div class="fm-panel" id="fm-panel-advanced">
         <div class="fm-row cols-2">
-          <div><label>Series name (groups posts)</label><input id="fm-series" type="text" placeholder="My Series Name"></div>
-          <div><label>Reading speed override (words/min)</label><input id="fm-wpm" type="number" placeholder="200" min="50" max="1000"></div>
+          <div><label>Series name <span style="color:var(--faint);font-weight:400">(groups posts)</span></label><input id="fm-series" type="text" placeholder="My Series Name"></div>
+          <div><label>Read time override <span style="color:var(--faint);font-weight:400">(auto-calc if empty)</span></label><input id="fm-read-time" type="text" placeholder="5 min read"></div>
         </div>
         <div class="fm-row cols-2">
-          <div><label>Custom keywords (comma separated)</label><input id="fm-keywords" type="text" placeholder="linux, arch, btrfs"></div>
-          <div><label>OG image override</label><input id="fm-og-image" type="url" placeholder="https://…"></div>
+          <div><label>Custom keywords <span style="color:var(--faint);font-weight:400">(comma-separated)</span></label><input id="fm-keywords" type="text" placeholder="linux, arch, btrfs"></div>
+          <div><label>OG / social image <span style="color:var(--faint);font-weight:400">(defaults to cover)</span></label><input id="fm-og-image" type="url" placeholder="https://…"></div>
         </div>
-        <div style="font-size:.73rem;color:var(--muted);padding:.3rem .5rem;background:var(--bg-elevated);border-radius:var(--radius)">
+        <div class="fm-row cols-2">
+          <div>
+            <label>Canonical URL <span style="color:var(--faint);font-weight:400">(if republishing)</span></label>
+            <input id="fm-canonical" type="url" placeholder="https://original-source.com/post">
+          </div>
+          <div><label>Language <span style="color:var(--faint);font-weight:400">(overrides site default)</span></label>
+            <input id="fm-lang" type="text" placeholder="en-US, hi, de…" style="font-family:var(--mono)">
+          </div>
+        </div>
+        <div class="fm-row cols-2">
+          <div>
+            <label>Table of contents</label>
+            <select id="fm-toc">
+              <option value="">Auto (use [[toc]] shortcode)</option>
+              <option value="true">Auto-inject at top</option>
+              <option value="false">Disabled</option>
+            </select>
+          </div>
+          <div>
+            <label>Search indexing</label>
+            <select id="fm-noindex">
+              <option value="false">✅ Index (normal)</option>
+              <option value="true">🚫 No-index (private)</option>
+            </select>
+          </div>
+        </div>
+        <div style="font-size:.72rem;color:var(--muted);padding:.35rem .6rem;background:var(--bg-elevated);border-radius:var(--radius);line-height:1.6">
           <i class="fa-solid fa-circle-info" style="color:var(--blue);margin-right:.3rem"></i>
-          Additional front-matter keys (series, keywords, og_image) are supported by <code style="font-size:.7rem">script.js</code> when present.
+          Fields here write directly to the post's YAML front-matter and are read by <code style="font-size:.68rem">script.js</code> and SEO tags.
         </div>
       </div>
     </div>
@@ -757,6 +867,12 @@ html[data-theme="light"] .preview-inner{color:#1c1b19}
         <div class="callout-opt warning" onclick="insertCallout('WARNING')">
           <i class="fa-solid fa-triangle-exclamation" style="color:var(--warning)"></i><span>Warning</span>
         </div>
+        <div class="callout-opt danger" onclick="insertCallout('CAUTION')">
+          <i class="fa-solid fa-fire" style="color:var(--red)"></i><span>Caution</span>
+        </div>
+        <div class="callout-opt" style="border-left:3px solid var(--accent)" onclick="insertCallout('IMPORTANT')">
+          <i class="fa-solid fa-star" style="color:var(--accent)"></i><span>Important</span>
+        </div>
         <div class="callout-opt danger" onclick="insertCallout('DANGER')">
           <i class="fa-solid fa-circle-xmark" style="color:var(--red)"></i><span>Danger</span>
         </div>
@@ -838,17 +954,23 @@ const AUTHOR_BIO     = CFG.AUTHOR_BIO   || '';
 // ═══════════════════════════════════════════════════════════════════
 // THEME
 // ═══════════════════════════════════════════════════════════════════
-function applyThemeIcon() {
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+const PRISM_DARK  = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css';
+const PRISM_LIGHT = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css';
+
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem(STORAGE_PREFIX + '_theme', t);
   const icon = document.getElementById('theme-icon');
-  if (icon) icon.className = isDark ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+  // Sun shown in dark mode (click → go light); Moon shown in light mode (click → go dark)
+  if (icon) icon.className = t === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+  const prismLink = document.getElementById('prism-theme');
+  if (prismLink) prismLink.href = t === 'dark' ? PRISM_DARK : PRISM_LIGHT;
+}
+function applyThemeIcon() {
+  applyTheme(document.documentElement.getAttribute('data-theme') || 'dark');
 }
 function toggleTheme() {
-  const root = document.documentElement;
-  const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  root.setAttribute('data-theme', next);
-  localStorage.setItem(STORAGE_PREFIX + '_theme', next);
-  applyThemeIcon();
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1145,6 +1267,7 @@ function loadIntoEditor(slug, raw) {
   document.getElementById('fm-title').value     = fm.title     || '';
   document.getElementById('fm-slug').value      = slug;
   document.getElementById('fm-date').value      = fm.date      || today();
+  document.getElementById('fm-updated').value   = fm.updated   || '';
   document.getElementById('fm-tag').value       = fm.tag       || 'Post';
   document.getElementById('fm-paywalled').value = fm.paywalled || 'false';
   document.getElementById('fm-cover').value     = fm.cover     || '';
@@ -1157,14 +1280,21 @@ function loadIntoEditor(slug, raw) {
   document.getElementById('fm-author-linkedin').value = fm.author_linkedin || '';
   document.getElementById('fm-author-github').value   = fm.author_github   || '';
   document.getElementById('fm-author-website').value  = fm.author_website  || '';
-  document.getElementById('fm-read-time').value       = fm.readTime        || '';
   // Advanced
-  document.getElementById('fm-series').value    = fm.series    || '';
-  document.getElementById('fm-keywords').value  = fm.keywords  || '';
-  document.getElementById('fm-og-image').value  = fm.og_image  || '';
-  document.getElementById('fm-wpm').value       = '';
+  document.getElementById('fm-read-time').value  = fm.readTime   || '';
+  document.getElementById('fm-series').value     = fm.series     || '';
+  document.getElementById('fm-keywords').value   = fm.keywords   || '';
+  document.getElementById('fm-og-image').value   = fm.og_image   || '';
+  document.getElementById('fm-canonical').value  = fm.canonical  || '';
+  document.getElementById('fm-lang').value       = fm.lang       || '';
+  document.getElementById('fm-toc').value        = fm.toc        || '';
+  document.getElementById('fm-noindex').value    = fm.noindex    || 'false';
+  document.getElementById('fm-pinned').value     = fm.pinned     || 'false';
+  document.getElementById('fm-draft').value      = fm.draft      || 'false';
+  document.getElementById('fm-featured').value   = fm.featured   || 'false';
 
   updateAuthorPreview();
+  updateCoverPreview();
   setEditorValue(body.replace(/^\n/, ''));
   showEditor();
   updateWordCount();
@@ -1192,12 +1322,15 @@ function newPost() {
   currentSlug = '__new__'; currentSHA = null;
   ['fm-title','fm-slug','fm-cover','fm-excerpt','fm-author','fm-author-role',
    'fm-author-bio','fm-author-initials','fm-author-linkedin','fm-author-github',
-   'fm-author-website','fm-read-time','fm-series','fm-keywords','fm-og-image','fm-wpm'].forEach(id => {
+   'fm-author-website','fm-read-time','fm-series','fm-keywords','fm-og-image',
+   'fm-updated'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('fm-date').value      = today();
   document.getElementById('fm-tag').value       = Object.keys(TAG_ICONS)[0] || 'Engineering';
   document.getElementById('fm-paywalled').value = 'false';
+  document.getElementById('fm-pinned').value    = 'false';
+  document.getElementById('fm-draft').value     = 'false';
   // Pre-fill default author from CONFIG
   if (AUTHOR_NAME)     document.getElementById('fm-author').value          = AUTHOR_NAME;
   if (AUTHOR_ROLE)     document.getElementById('fm-author-role').value     = AUTHOR_ROLE;
@@ -1275,6 +1408,7 @@ function serialise() {
   const paywalled = v('fm-paywalled');
   const cover     = v('fm-cover');
   const excerpt   = v('fm-excerpt');
+  const updated   = v('fm-updated');
   // Author
   const author     = v('fm-author');
   const authorRole = v('fm-author-role');
@@ -1285,10 +1419,17 @@ function serialise() {
   const authorWeb  = v('fm-author-website');
   const readTime   = v('fm-read-time');
   // Advanced
-  const series     = v('fm-series');
-  const keywords   = v('fm-keywords');
-  const ogImage    = v('fm-og-image');
-  const body       = getEditorValue();
+  const series    = v('fm-series');
+  const keywords  = v('fm-keywords');
+  const ogImage   = v('fm-og-image');
+  const canonical = v('fm-canonical');
+  const lang      = v('fm-lang');
+  const toc       = v('fm-toc');
+  const noindex   = v('fm-noindex');
+  const pinned    = v('fm-pinned');
+  const draft     = v('fm-draft');
+  const featured  = v('fm-featured');
+  const body      = getEditorValue();
 
   if (!title) { log('Title is required', 'error'); return null; }
   if (!slug)  { log('Slug is required',  'error'); return null; }
@@ -1298,6 +1439,7 @@ function serialise() {
   if (paywalled === 'true') fm += `\npaywalled: 'true'`;
   if (cover)     fm += `\ncover: ${q(cover)}`;
   if (excerpt)   fm += `\nexcerpt: ${q(excerpt)}`;
+  if (updated)   fm += `\nupdated: ${q(updated)}`;
   if (author)    fm += `\nauthor: ${q(author)}`;
   if (authorRole)fm += `\nauthor_role: ${q(authorRole)}`;
   if (authorBio) fm += `\nauthor_bio: ${q(authorBio)}`;
@@ -1309,6 +1451,13 @@ function serialise() {
   if (series)    fm += `\nseries: ${q(series)}`;
   if (keywords)  fm += `\nkeywords: ${q(keywords)}`;
   if (ogImage)   fm += `\nog_image: ${q(ogImage)}`;
+  if (canonical) fm += `\ncanonical: ${q(canonical)}`;
+  if (lang)      fm += `\nlang: ${q(lang)}`;
+  if (toc)       fm += `\ntoc: ${q(toc)}`;
+  if (noindex === 'true') fm += `\nnoindex: 'true'`;
+  if (pinned  === 'true') fm += `\npinned: 'true'`;
+  if (draft   === 'true') fm += `\ndraft: 'true'`;
+  if (featured === 'true') fm += `\nfeatured: 'true'`;
   fm += `\n---\n`;
   return { slug, raw: fm + body };
 }
@@ -1446,8 +1595,10 @@ function insertTableMd(rows, cols) {
 function openCalloutModal() { document.getElementById('callout-modal').classList.add('open'); }
 
 function insertCallout(type) {
-  const icons = { NOTE: '> [!NOTE]', TIP: '> [!TIP]', WARNING: '> [!WARNING]', DANGER: '> [!DANGER]' };
-  const md = `\n${icons[type]}\n> Your ${type.toLowerCase()} text here.\n`;
+  // GFM alert syntax — matches script.js blockquote renderer
+  const validTypes = { NOTE: '> [!NOTE]', TIP: '> [!TIP]', WARNING: '> [!WARNING]', CAUTION: '> [!CAUTION]', IMPORTANT: '> [!IMPORTANT]', DANGER: '> [!CAUTION]' };
+  const prefix = validTypes[type] || '> [!NOTE]';
+  const md = `\n${prefix}\n> Your ${type.toLowerCase()} text here.\n`;
   insertMarkdown(md);
   log(`Inserted ${type} callout`, 'info');
   closeModal('callout-modal');
@@ -1794,6 +1945,23 @@ function populateConfigPanel() {
 // ═══════════════════════════════════════════════════════════════════
 let mediaFiles    = [];
 let selectedMedia = null;
+let mediaTypeFilter = 'all';
+
+// ── Classify a filename into image / video / audio / doc ─────────
+function mediaFileType(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  if (/^(png|jpe?g|gif|webp|svg|avif|ico|bmp|tiff?)$/.test(ext)) return 'image';
+  if (/^(mp4|webm|ogg|ogv|mov|avi|mkv)$/.test(ext))               return 'video';
+  if (/^(mp3|ogg|wav|flac|m4a|aac|opus)$/.test(ext))              return 'audio';
+  return 'doc';
+}
+
+function setMediaTypeFilter(type) {
+  mediaTypeFilter = type;
+  document.querySelectorAll('.media-type-tab').forEach(b =>
+    b.classList.toggle('active', b.dataset.type === type));
+  renderMediaGrid();
+}
 
 async function loadMedia() {
   const grid = document.getElementById('media-grid');
@@ -1801,14 +1969,26 @@ async function loadMedia() {
   document.getElementById('media-selected').style.display = 'none';
   selectedMedia = null;
   try {
-    const files = await ghListDir(IMAGES_PATH);
-    const images = files.filter(f => f.type === 'file' && /\.(png|jpe?g|gif|webp|svg|avif)$/i.test(f.name));
-    mediaFiles = images.map(f => ({
-      name: f.name, sha: f.sha, path: f.path,
-      url: `https://raw.githubusercontent.com/${ghOwner}/${ghRepo}/${ghBranch}/${f.path}`,
-    }));
+    // Scan both assets/images and the configured IMAGES_PATH
+    const paths = [...new Set([IMAGES_PATH, 'assets/images', 'assets/media'])];
+    let allFiles = [];
+    for (const p of paths) {
+      try {
+        const files = await ghListDir(p);
+        const media = files.filter(f => f.type === 'file' &&
+          /\.(png|jpe?g|gif|webp|svg|avif|mp4|webm|ogv?|mov|mp3|wav|flac|m4a|aac|opus|pdf|md|txt|csv)$/i.test(f.name));
+        allFiles = allFiles.concat(media.map(f => ({
+          name: f.name, sha: f.sha, path: f.path,
+          type: mediaFileType(f.name),
+          url: `https://raw.githubusercontent.com/${ghOwner}/${ghRepo}/${ghBranch}/${f.path}`,
+        })));
+      } catch { /* dir may not exist */ }
+    }
+    // Deduplicate by path
+    const seen = new Set();
+    mediaFiles = allFiles.filter(f => { if (seen.has(f.path)) return false; seen.add(f.path); return true; });
     renderMediaGrid();
-    log(`Media: ${mediaFiles.length} image(s) in ${IMAGES_PATH}/`, 'ok');
+    log(`Media: ${mediaFiles.length} file(s) loaded`, 'ok');
   } catch (e) {
     grid.innerHTML = `<p class="media-empty" style="grid-column:1/-1;color:var(--red)">Failed: ${escHtml(e.message)}</p>`;
     log(`Media load failed: ${e.message}`, 'error');
@@ -1817,14 +1997,28 @@ async function loadMedia() {
 
 function renderMediaGrid() {
   const grid = document.getElementById('media-grid');
-  if (!mediaFiles.length) { grid.innerHTML = '<p class="media-empty" style="grid-column:1/-1">No images yet. Upload one above.</p>'; return; }
+  const visible = mediaTypeFilter === 'all' ? mediaFiles : mediaFiles.filter(f => f.type === mediaTypeFilter);
+  if (!visible.length) {
+    grid.innerHTML = `<p class="media-empty" style="grid-column:1/-1">${mediaFiles.length ? 'No files match the filter.' : 'No media yet. Upload one above.'}</p>`;
+    return;
+  }
   grid.innerHTML = '';
-  mediaFiles.forEach((f, i) => {
+  visible.forEach((f) => {
+    const i = mediaFiles.indexOf(f);
     const div = document.createElement('div');
-    div.className = 'media-thumb' + (selectedMedia === i ? ' selected' : '');
-    div.innerHTML = `
-      <img src="${escHtml(f.url)}" alt="${escHtml(f.name)}" loading="lazy"
-           onerror="this.style.display='none'">
+    const typeClass = `media-thumb--${f.type}`;
+    div.className = `media-thumb ${typeClass}` + (selectedMedia === i ? ' selected' : '');
+    const iconMap = { video: 'fa-solid fa-film', audio: 'fa-solid fa-music', doc: 'fa-regular fa-file-lines' };
+    const inner = f.type === 'image'
+      ? `<img src="${escHtml(f.url)}" alt="${escHtml(f.name)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+      : '';
+    const iconEl = f.type !== 'image' || true
+      ? `<div class="media-thumb__icon" style="${f.type === 'image' ? 'display:none' : ''}">
+           <i class="${iconMap[f.type] || 'fa-regular fa-file-lines'}"></i>
+           <span>${f.name.split('.').pop().toUpperCase()}</span>
+         </div>`
+      : '';
+    div.innerHTML = `${inner}${iconEl}
       <div class="media-thumb__name">${escHtml(f.name)}</div>
       <button class="media-thumb__del" title="Delete" onclick="mediaDeleteByIndex(${i},event)"><i class="fa-solid fa-xmark"></i></button>`;
     div.addEventListener('click', () => selectMedia(i));
@@ -1837,14 +2031,49 @@ function selectMedia(i) {
   const f = mediaFiles[i];
   document.getElementById('media-selected').style.display = 'block';
   document.getElementById('media-selected-name').textContent = `/${f.path}`;
+  // Show file type in meta line
+  const metaEl = document.getElementById('media-selected-meta');
+  if (metaEl) metaEl.textContent = f.type.toUpperCase() + ' · ' + f.name;
+}
+
+// ── openCoverPicker: switch to media tab filtered to images, then insert into cover field ──
+function openCoverPicker() {
+  switchSidebarTab('media');
+  setMediaTypeFilter('image');
+  // Override insert behaviour: next selectMedia click sets the cover field
+  window._coverPickerMode = true;
+  log('Pick an image from the library to set as cover.', 'info');
 }
 
 function mediaInsertSelected() {
   if (selectedMedia === null) return;
   const f = mediaFiles[selectedMedia];
-  const alt = f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g,' ');
-  insertMarkdown(`\n![${alt}](/${f.path})\n`);
-  log(`Inserted image: /${f.path}`, 'info');
+
+  // Cover picker mode — set cover field instead of inserting markdown
+  if (window._coverPickerMode) {
+    window._coverPickerMode = false;
+    document.getElementById('fm-cover').value = `/${f.path}`;
+    updateCoverPreview();
+    switchFmTab('basic');
+    switchSidebarTab('posts');
+    log(`Set cover: /${f.path}`, 'info');
+    return;
+  }
+
+  // Normal insert — emit the right shortcode based on file type
+  const label = f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+  let md;
+  if (f.type === 'image') {
+    md = `\n![${label}](/${f.path})\n`;
+  } else if (f.type === 'video') {
+    md = `\n::video[/${f.path} | ${label}]\n`;
+  } else if (f.type === 'audio') {
+    md = `\n::audio[/${f.path} | ${label}]\n`;
+  } else {
+    md = `\n[${label}](/${f.path})\n`;
+  }
+  insertMarkdown(md);
+  log(`Inserted ${f.type}: /${f.path}`, 'info');
   switchSidebarTab('posts');
 }
 

@@ -524,6 +524,9 @@ const DataLoader = {
       authorLinkedin: item.author_linkedin || '',
       authorGithub:   item.author_github   || '',
       authorWebsite:  item.author_website  || '',
+      featured:       item.featured === true || item.featured === 'true',
+      draft:          item.draft    === true || item.draft    === 'true',
+      pinned:         item.pinned   === true || item.pinned   === 'true',
     };
     // Manifest is metadata-only — body is fetched on-demand when a post is opened.
     // If body is present (e.g. legacy manifest or local dev index.json with body),
@@ -574,6 +577,9 @@ const DataLoader = {
       authorLinkedin: fm.author_linkedin || '',
       authorGithub:   fm.author_github   || '',
       authorWebsite:  fm.author_website  || '',
+      featured:       fm.featured === 'true',
+      draft:          fm.draft    === 'true',
+      pinned:         fm.pinned   === 'true',
       // body NOT stored — fetched on-demand by fetchBody()
     };
   },
@@ -755,6 +761,9 @@ const DataLoader = {
       authorLinkedin: fm.author_linkedin  || meta.authorLinkedin  || '',
       authorGithub:   fm.author_github    || meta.authorGithub    || '',
       authorWebsite:  fm.author_website   || meta.authorWebsite   || '',
+      featured:       (fm.featured === 'true')  || meta.featured  || false,
+      draft:          (fm.draft    === 'true')  || meta.draft     || false,
+      pinned:         (fm.pinned   === 'true')  || meta.pinned    || false,
       body: (isPaywalled && !AppState.isMember) ? previewBody : body,
       _previewCached: (isPaywalled && !AppState.isMember)
     };
@@ -933,7 +942,10 @@ const Renderer = {
 
   renderHero(posts) {
     if (!posts.length) return;
-    const p = posts[0];
+    // Prefer an explicitly featured post; fall back to most recent non-draft
+    const publicPosts = posts.filter(p => !p.draft);
+    if (!publicPosts.length) return;
+    const p = publicPosts.find(p => p.featured) || publicPosts[0];
 
     const words = p.title.split(' ');
     const last  = words.length > 1 ? words.pop() : '';
@@ -975,10 +987,9 @@ const Renderer = {
     Utils.qs('#hero-read-btn').addEventListener('click', e => { e.stopPropagation(); Router.go(p.slug); });
 
     const { perPage } = AppState.pagination;
-    // Skip the hero post (index 0) and all posts visible in the main grid (indices 1..perPage-1).
-    // Sidebar shows the next batch so nothing duplicates the index view.
-    const sidebarStart = perPage;
-    const _hsc = CONFIG.HERO_SIDEBAR_COUNT || 4; const items = posts.slice(sidebarStart, sidebarStart + _hsc);
+    // Skip the featured hero post and any drafts; show the sidebar batch after that.
+    const sidebarPosts = publicPosts.filter(q => q.slug !== p.slug);
+    const _hsc = CONFIG.HERO_SIDEBAR_COUNT || 4; const items = sidebarPosts.slice(0, _hsc);
     const asideList = Utils.qs('#aside-list');
     asideList.innerHTML = items.length
       ? items.map(item => `
@@ -2042,6 +2053,15 @@ const Router = {
         ? AppState.posts
         : AppState.posts.filter(p => p.tag.toLowerCase() === AppState.filter.toLowerCase());
 
+      // Filter out draft posts (only show to admins — no admin detection here, so hide all drafts)
+      filtered = filtered.filter(p => !p.draft);
+
+      // Pinned posts float to the top (within the filtered set, before search)
+      filtered = [
+        ...filtered.filter(p => p.pinned),
+        ...filtered.filter(p => !p.pinned),
+      ];
+
       if (AppState.search) {
         const q = AppState.search.toLowerCase();
         // Use Fuse.js fuzzy results if available, else fall back to indexOf
@@ -2272,10 +2292,11 @@ const UI = {
   initFilters() {
     const bar = Utils.qs('#tag-bar');
     if (!bar) return;
-    const tags = ['all', ...new Set(AppState.posts.map(p => p.tag))];
-    const tagCounts = AppState.posts.reduce((acc, p) => { acc[p.tag] = (acc[p.tag] || 0) + 1; return acc; }, {});
+    const publicPosts = AppState.posts.filter(p => !p.draft);
+    const tags = ['all', ...new Set(publicPosts.map(p => p.tag))];
+    const tagCounts = publicPosts.reduce((acc, p) => { acc[p.tag] = (acc[p.tag] || 0) + 1; return acc; }, {});
     bar.innerHTML = tags.map(t => {
-      const count = t === 'all' ? AppState.posts.length : (tagCounts[t] || 0);
+      const count = t === 'all' ? publicPosts.length : (tagCounts[t] || 0);
       return `<button class="chip ${t === AppState.filter ? 'active' : ''}" data-tag="${t}">${t !== 'all' ? Utils.tagIcon(t) + ' ' : ''}${t === 'all' ? 'All' : t}<span class="chip__count">${count}</span></button>`;
     }).join('');
     bar.addEventListener('click', e => {
