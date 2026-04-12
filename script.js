@@ -1226,6 +1226,10 @@ const Renderer = {
       content = `<div class="post-body">${html}</div>`;
     }
 
+    // Increment view counter BEFORE render so the count shown in the header is current
+    ViewCounter.increment(post.slug);
+    RecentlyViewed.add(post.slug);
+
     const liked    = localStorage.getItem(_key('liked:' + post.slug)) === '1';
     const liked_bm = CONFIG.BOOKMARKS_ENABLED && localStorage.getItem(_key('bm:' + post.slug)) === '1';
 
@@ -1262,6 +1266,7 @@ const Renderer = {
               <button class="btn btn--icon-sm" id="font-rst" title="Reset text size" aria-label="Reset font size"><span>A</span></button>
               <button class="btn btn--icon-sm" id="font-inc" title="Larger text" aria-label="Increase font size"><span>A+</span></button>
             </div>` : ''}
+            ${CONFIG.BOOKMARKS_ENABLED ? `<button class="btn ${liked_bm ? 'bookmarked' : ''}" id="post-bookmark-btn" aria-label="Bookmark"><i class="fa-${liked_bm ? 'solid' : 'regular'} fa-bookmark"></i> ${liked_bm ? 'Saved' : 'Save'}</button>` : ''}
             ${!(paywalled && !AppState.isMember) ? '<button class="btn" id="print-btn"><i class="fa-solid fa-print"></i> Print</button>' : ''}
             <button class="btn" id="share-btn"><i class="fa-solid fa-share-nodes"></i> Share</button>
           </div>
@@ -1293,14 +1298,12 @@ const Renderer = {
         <div class="post-tags">
           <button class="tag-chip" data-back-tag="${Utils.escapeHtml(post.tag)}" title="Browse all ${Utils.escapeHtml(post.tag)} posts">${Utils.tagIcon(post.tag)} More ${Utils.escapeHtml(post.tag)}</button>
           <button class="tag-chip" id="all-posts-btn"><i class="fa-solid fa-grip"></i> All Posts</button>
-          ${CONFIG.BOOKMARKS_ENABLED ? `<button class="tag-chip ${liked_bm ? 'bookmarked' : ''}" id="post-bookmark-btn" aria-label="Bookmark"><i class="fa-${liked_bm ? 'solid' : 'regular'} fa-bookmark"></i> ${liked_bm ? 'Saved' : 'Save'}</button>` : ''}
         </div>
         <div class="meta-actions">
           <button class="btn like ${liked ? 'reacted' : ''}" id="like-btn">
             <i class="fa-${liked ? 'solid' : 'regular'} fa-heart"></i> ${liked ? 'Liked' : 'Like'}
           </button>
           <button class="btn" id="footer-copy-link-btn" aria-label="Copy link"><i class="fa-solid fa-link"></i> Copy link</button>
-          ${CONFIG.COPY_MD_LINK !== false ? `<button class="btn" id="footer-copy-md-btn" aria-label="Copy as Markdown link" title="Copy [Title](URL) for Markdown"><i class="fa-brands fa-markdown"></i> Copy MD</button>` : ''}
           <button class="btn" id="footer-share-btn"><i class="fa-solid fa-share-nodes"></i> Share</button>
           ${!(paywalled && !AppState.isMember) ? '<button class="btn" id="footer-print-btn"><i class="fa-solid fa-print"></i> Print</button>' : ''}
         </div>
@@ -1384,14 +1387,6 @@ const Renderer = {
       app.querySelector('#font-rst')?.addEventListener('click', () => applyFontSize(FS_DEFAULT));
       app.querySelector('#font-inc')?.addEventListener('click', () => applyFontSize(fsCurrent + 2));
     }
-
-    // ── Copy as Markdown link ─────────────────────────────────────
-    app.querySelector('#footer-copy-md-btn')?.addEventListener('click', () => {
-      const mdLink = `[${post.title}](${location.href})`;
-      UI.copyToClipboard(mdLink).then(() =>
-        UI.showToast('<i class="fa-brands fa-markdown"></i> Markdown link copied')
-      );
-    });
 
     app.querySelector('#share-btn')?.addEventListener('click', () => UI.share(post));
     app.querySelector('#footer-share-btn')?.addEventListener('click', () => UI.share(post));
@@ -1666,11 +1661,6 @@ const Renderer = {
 
     if (typeof Prism !== 'undefined') Prism.highlightAll();
 
-    // ── Increment view counter ────────────────────────────────────
-    ViewCounter.increment(post.slug);
-    // ── Track recently viewed ─────────────────────────────────────
-    RecentlyViewed.add(post.slug);
-
     // ── Reading progress in page title ────────────────────────────
     const _titleBase = document.title;
     const _titleScroll = () => {
@@ -1735,7 +1725,7 @@ const Renderer = {
 
           } else if (CONFIG.HOUSE_AD_ENABLED && !AppState.isMember) {
             // ── House ad — skip if dismissed this session ────────
-            if (sessionStorage.getItem('house_ad_dismissed') !== '1') {
+            if (sessionStorage.getItem(_key('house_ad_dismissed')) !== '1') {
             adWrap.innerHTML = `
               <div class="house-ad">
                 <button class="house-ad__close" aria-label="Dismiss" title="Dismiss">×</button>
@@ -1754,7 +1744,7 @@ const Renderer = {
             insertAfter.after(adWrap);
             adWrap.querySelector('.house-ad__close')?.addEventListener('click', () => {
               adWrap.style.display = 'none';
-              sessionStorage.setItem('house_ad_dismissed', '1');
+              sessionStorage.setItem(_key('house_ad_dismissed'), '1');
             });
             }
           }
@@ -1857,11 +1847,52 @@ const Router = {
               </li>`).join('')}
           </ul>` : ''}`;
       if (savedPosts.length) {
-        Renderer.renderPosts(savedPosts, false);
-        // re-target the grid rendered into #posts-grid to #bm-grid
-        const pg = document.getElementById('posts-grid');
-        const bg = document.getElementById('bm-grid');
-        if (pg && bg) { bg.innerHTML = pg.innerHTML; pg.innerHTML = ''; }
+        const bmGrid = bmView.querySelector('#bm-grid');
+        if (bmGrid) {
+          bmGrid.innerHTML = savedPosts.map((p, i) => {
+            const visual = p.cover
+              ? `<img src="${Utils.escapeHtml(p.cover)}" alt="${Utils.escapeHtml(p.title)}" class="card__cover-img" loading="lazy">`
+              : `<i class="fa-solid fa-file-lines card__icon" aria-hidden="true"></i>`;
+            const isBookmarked = true; // all cards here are bookmarked
+            return `<article class="card" role="listitem" data-idx="${i}">
+              <div class="card__visual">${visual}</div>
+              <div class="card__content">
+                <span class="card__tag" data-tag="${Utils.escapeHtml(p.tag)}"><i class="${TAG_ICONS[p.tag] || TAG_ICONS.Post}"></i> ${Utils.escapeHtml(p.tag)}</span>
+                <h2 class="card__title">${Utils.escapeHtml(p.title)}</h2>
+                <p class="card__excerpt">${Utils.escapeHtml(p.excerpt)}</p>
+                <div class="card__footer">
+                  <span class="card__author"><i class="fa-solid fa-user-pen"></i> ${Utils.escapeHtml(p.author)}</span>
+                  <span class="card__meta">
+                    <i class="fa-regular fa-calendar"></i> ${Utils.fmtDateShort(p.date)}
+                    <span class="meta-dot">·</span><i class="fa-regular fa-clock"></i> ${Utils.escapeHtml(p.readTime)}
+                  </span>
+                  <button class="card__bookmark bookmarked" data-bm="${Utils.escapeHtml(p.slug)}" aria-label="Remove bookmark" title="Remove bookmark"><i class="fa-solid fa-bookmark"></i></button>
+                </div>
+              </div>
+            </article>`;
+          }).join('');
+          bmGrid.querySelectorAll('.card').forEach((card, i) => {
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('aria-label', `Read: ${savedPosts[i].title}`);
+            card.addEventListener('click', e => {
+              const bmBtn = e.target.closest('.card__bookmark');
+              if (bmBtn) {
+                e.stopPropagation();
+                const slug = bmBtn.dataset.bm;
+                localStorage.setItem(_key('bm:' + slug), '0');
+                card.remove();
+                if (!bmGrid.children.length) bmView.querySelector('.section-header')?.insertAdjacentHTML('afterend', `<div class="empty-state"><i class="fa-regular fa-bookmark empty-icon"></i><h3>No bookmarks yet</h3><p>Hit the bookmark icon on any post or card to save it here.</p><button class="btn primary" id="bm-back-btn2"><i class="fa-solid fa-arrow-left"></i> Browse posts</button></div>`);
+                bmView.querySelector('#bm-back-btn2')?.addEventListener('click', () => Router.back());
+                UI.showToast('<i class="fa-regular fa-bookmark"></i> Removed from bookmarks');
+                return;
+              }
+              Router.go(savedPosts[i].slug);
+            });
+            card.addEventListener('keydown', e => {
+              if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); Router.go(savedPosts[i].slug); }
+            });
+          });
+        }
       }
       bmView.querySelector('#bm-back-btn')?.addEventListener('click', () => Router.back());
       bmView.querySelectorAll('.recently-viewed-btn[data-slug]').forEach(btn => {
@@ -1923,6 +1954,9 @@ const Router = {
       indexEl.style.display = '';
       postEl.style.display  = 'none';
       if (readBar) { readBar.style.display = 'none'; readBar.style.width = '0%'; }
+
+      // Scroll to top when filter or page changes (not on search input — that's live)
+      if (!AppState.search) window.scrollTo({ top: 0, behavior: 'instant' });
 
       // AppState.search is kept in sync by the input event handler; no re-read needed here.
 
@@ -2137,6 +2171,8 @@ const UI = {
       AppState.search = '';
       const input = Utils.qs('#search-input');
       if (input) input.value = '';
+      const live = Utils.qs('#search-live');
+      if (live) live.textContent = '';
       Router.setQuery({ tag: btn.dataset.tag === 'all' ? null : btn.dataset.tag, page: 1 });
     });
   },

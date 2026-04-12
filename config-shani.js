@@ -7,6 +7,11 @@
  *
  * To switch brands, swap this file for another config-*.js.
  * Do NOT edit script.js or style.css for branding changes.
+ *
+ * Keys marked [script] are read by script.js at runtime.
+ * Keys marked [build]  are read by generate-manifest.js at build time
+ *                       (sitemap, RSS feed, PWA manifest.json).
+ * Keys marked [both]   are read by both.
  */
 
 // ═══════════════════════════════════════════════════════════════
@@ -14,48 +19,104 @@
 // ═══════════════════════════════════════════════════════════════
 const CONFIG = {
 
-  // ── GitHub Pages deployment ──────────────────────────────────
+  // ── Deployment ───────────────────────────────────────────────
+  // [script] Used as fallback post-discovery via GitHub Contents API
+  //          (only when posts/manifest.json is absent on first deploy).
   GITHUB_USER: 'shani8dev',
   GITHUB_REPO: 'shani-blog',
 
-  // ── Production blog URL (no trailing slash) ──────────────────
+  // ── URLs ─────────────────────────────────────────────────────
+  // [both] Canonical site root — no trailing slash.
   BLOG_URL: 'https://blog.shani.dev',
 
-  // ── Post storage ─────────────────────────────────────────────
+  // [script] Override the /posts directory path (e.g. a CDN URL).
+  //          Leave empty to use the default '/posts' same-origin path.
   POSTS_BASE_URL: '',
-  POSTS_API_URL:  '',
+
+  // [script] Override the GitHub Contents API URL used as fallback
+  //          post discovery. Leave empty to use the default GitHub API.
+  POSTS_API_URL: '',
 
   // ── Author / team identity ───────────────────────────────────
+  // [script] Default author shown when a post has no author front-matter.
   AUTHOR_NAME:     'Shrinivas Kumbhar',
   AUTHOR_INITIALS: 'SK',
   AUTHOR_ROLE:     'Shanios · shani.dev',
   AUTHOR_BIO:      'Immutable Linux on Arch. Two OS copies, one always safe. Bad update? One reboot back. Zero telemetry. Built in India 🇮🇳',
 
-  // ── Site copy ────────────────────────────────────────────────
+  // ── Site identity ────────────────────────────────────────────
+  // [both] Used in <title>, OG tags, JSON-LD, RSS, and PWA manifest.
   SITE_TITLE:       'Shanios Blog',
   SITE_TAGLINE:     'Engineering, Linux & Open Source',
   SITE_DESCRIPTION: "Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.",
+  // [script] Injected into <meta name="keywords">.
   SITE_KEYWORDS:    'Shanios, immutable Linux, atomic updates, rollback, open source OS, Arch Linux, Btrfs, zero telemetry, shani.dev',
-  HERO_EYEBROW:     'Shanios',
-  HERO_SUB:         "Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.",
 
-  // ── Wordmark text shown next to the logo image ───────────────
-  // The small monospace label rendered next to the logo in header/footer/loader.
+  // ── Hero section ─────────────────────────────────────────────
+  // [script] Eyebrow label above the hero title on the index page.
+  HERO_EYEBROW: 'Shanios',
+  // [script] Sub-headline shown below the hero title.
+  HERO_SUB:     "Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.",
+  // [script] Number of posts shown in the hero sidebar (beside featured post).
+  HERO_SIDEBAR_COUNT: 4,
+
+  // ── Logo / favicon ───────────────────────────────────────────
+  // [both] SVG used as favicon and PWA icon.
+  FAVICON_URL:   'https://shani.dev/assets/images/logo.svg',
+  // [script] Full logo image shown in header, footer, and loader.
+  LOGO_IMG_URL:  'https://shani.dev/assets/images/about.svg',
+  // [script] Alt text for the logo image.
+  LOGO_ALT:      'Shanios',
+  // [script] Small monospace label rendered beside the logo (e.g. 'blog').
   LOGO_WORDMARK: 'blog',
 
-  // ── Locale for date formatting ───────────────────────────────
-  // Used in Utils.fmtDate / Utils.fmtDateShort.
+  // ── Top / auspicious bar ─────────────────────────────────────
+  // [script] Thin bar above the header — brand motto, link to main site.
+  AUSPICIOUS_TEXT:  '॥ श्री ॥',
+  AUSPICIOUS_URL:   'https://shani.dev',
+  AUSPICIOUS_LABEL: 'Visit Shanios',
+
+  // ── Navigation ───────────────────────────────────────────────
+  // [script] Header nav links. Bookmarks link is appended automatically
+  //          when BOOKMARKS_ENABLED is true.
+  NAV_LINKS: [
+    { label: 'Home',        href: '/'                },
+    { label: 'Engineering', href: '/?tag=Engineering' },
+    { label: 'Release',     href: '/?tag=Release'     },
+    { label: 'Linux',       href: '/?tag=Linux'       },
+    { label: 'News',        href: '/?tag=News'        },
+  ],
+
+  // ── Publisher (JSON-LD structured data) ──────────────────────
+  // [script] Used in BlogPosting and Organization schema.
+  PUBLISHER_NAME: 'Shanios',
+  PUBLISHER_URL:  'https://shani.dev',
+  PUBLISHER_LOGO: 'https://shani.dev/assets/images/logo.svg',
+
+  // ── Social / OG ──────────────────────────────────────────────
+  // [script] Default OG / Twitter card image (used when post has no cover).
+  OG_IMAGE: 'https://shani.dev/assets/images/logo.svg',
+  // [script] Twitter/X @handle injected into <meta name="twitter:site">.
+  TWITTER_HANDLE: '@shani8dev',
+  // [script] Footer social link icons.
+  SOCIAL_LINKS: [
+    { label: 'GitHub',   icon: 'fa-brands fa-github',  url: 'https://github.com/shani8dev' },
+    { label: 'LinkedIn', icon: 'fa-brands fa-linkedin', url: 'https://www.linkedin.com/in/Shrinivasvkumbhar/' },
+    { label: 'Shanios',  icon: 'fa-brands fa-linux',    url: 'https://shani.dev' },
+    { label: 'Wiki',     icon: 'fa-solid fa-book-open', url: 'https://wiki.shani.dev' },
+  ],
+
+  // ── Locale ───────────────────────────────────────────────────
+  // [both] BCP-47 locale tag. Used in JSON-LD inLanguage, RSS <language>,
+  //        and PWA manifest lang. Keep in sync with DATE_LOCALE.
+  LANG: 'en-IN',
+  // [both] Locale passed to Date.toLocaleDateString() for date display.
+  //        Keep in sync with LANG. Examples: 'en-IN', 'en-US', 'de-DE'.
   DATE_LOCALE: 'en-IN',
 
-  // ── Posts per page ────────────────────────────────────────────
-  POSTS_PER_PAGE: 9,
-
-  // ── localStorage / sessionStorage key prefix ─────────────────
-  // Change this when running two blogs on the same origin to prevent
-  // them sharing theme, membership, like, and bookmark state.
-  STORAGE_PREFIX: 'shani',
-
   // ── Tag icons (Font Awesome class strings) ────────────────────
+  // [script] Maps post tag names to FA icon class strings.
+  //          Falls back to the Post icon for any unrecognised tag.
   TAG_ICONS: {
     Product:       'fa-solid fa-box-open',
     Engineering:   'fa-solid fa-gears',
@@ -75,69 +136,51 @@ const CONFIG = {
     Post:          'fa-solid fa-file-lines',
   },
 
-  // ── Paywall copy ──────────────────────────────────────────────
-  PAYWALL_HEADING:         'Members only',
-  PAYWALL_DESCRIPTION:     "This post is for members. Purchase a membership to unlock all gated posts — you'll receive a license key instantly.",
-  PAYWALL_KEY_LABEL:       'Already a member? Enter your license key:',
-  PAYWALL_KEY_PLACEHOLDER: 'XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX',
+  // ── Pagination ───────────────────────────────────────────────
+  // [script] Posts shown per page on the index grid.
+  POSTS_PER_PAGE: 9,
 
-  // ── Navigation links ─────────────────────────────────────────
-  NAV_LINKS: [
-    { label: 'Home',        href: '/'              },
-    { label: 'Engineering', href: '/?tag=Engineering' },
-    { label: 'Release',     href: '/?tag=Release'     },
-    { label: 'Linux',       href: '/?tag=Linux'       },
-    { label: 'News',        href: '/?tag=News'        },
-  ],
+  // ── Storage ──────────────────────────────────────────────────
+  // [script] Prefix for all localStorage / sessionStorage keys.
+  //          Change when running two blogs on the same origin so they
+  //          don't share theme, membership, bookmark, or like state.
+  STORAGE_PREFIX: 'shani',
 
-  // ── Top / auspicious bar ─────────────────────────────────────
-  AUSPICIOUS_TEXT:  '॥ श्री ॥',
-  AUSPICIOUS_URL:   'https://shani.dev',
-  AUSPICIOUS_LABEL: 'Visit Shanios',
-
-  // ── Logo / favicon ───────────────────────────────────────────
-  LOGO_IMG_URL: 'https://shani.dev/assets/images/about.svg',
-  LOGO_ALT:     'Shanios',
-  FAVICON_URL:  'https://shani.dev/assets/images/logo.svg',
-
-  // ── Publisher (for JSON-LD structured data) ──────────────────
-  PUBLISHER_NAME: 'Shanios',
-  PUBLISHER_URL:  'https://shani.dev',
-  PUBLISHER_LOGO: 'https://shani.dev/assets/images/logo.svg',
-
-  // ── Default OG image (used when post has no cover) ───────────
-  OG_IMAGE: 'https://shani.dev/assets/images/logo.svg',
-
-  // ── Twitter / X handle ───────────────────────────────────────
-  TWITTER_HANDLE: '@shani8dev',
-
-  // ── Monetization ─────────────────────────────────────────────
+  // ── Monetization — Lemon Squeezy ─────────────────────────────
+  // [script] Set LEMONSQUEEZY_STORE to your store slug to enable the
+  //          paywall license-key validation flow. Leave LEMONSQUEEZY_PRODUCT
+  //          empty to validate against all products in the store.
   LEMONSQUEEZY_STORE:   'shani8dev',
   LEMONSQUEEZY_PRODUCT: '',
   MEMBERSHIP_URL:       'https://shani8dev.lemonsqueezy.com',
   MEMBERSHIP_PRICE:     '₹199 / year',
 
-  // ── Google AdSense ────────────────────────────────────────────
+  // ── Paywall copy ─────────────────────────────────────────────
+  // [script] Text shown on the paywall gate inside a members-only post.
+  PAYWALL_HEADING:         'Members only',
+  PAYWALL_DESCRIPTION:     "This post is for members. Purchase a membership to unlock all gated posts — you'll receive a license key instantly.",
+  PAYWALL_KEY_LABEL:       'Already a member? Enter your license key:',
+  PAYWALL_KEY_PLACEHOLDER: 'XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX',
+  // [script] Number of content blocks shown as a free preview before the gate.
+  PAYWALL_PREVIEW_BLOCKS: 12,
+
+  // ── Monetization — Google AdSense ────────────────────────────
+  // [script] Set both to inject an AdSense unit mid-post on free posts.
+  //          Leave empty to fall back to the house ad (if enabled).
   ADSENSE_CLIENT: '',
   ADSENSE_SLOT:   '',
 
   // ── House ad ─────────────────────────────────────────────────
+  // [script] Shown mid-post on free posts when AdSense is not configured.
+  //          Dismissed per-session. Set HOUSE_AD_ENABLED: false to hide.
   HOUSE_AD_ENABLED: true,
   HOUSE_AD_TEXT:    'Get full access to all member posts — engineering deep-dives, release notes & more.',
   HOUSE_AD_CTA:     'Become a Member →',
 
-  // ── Related posts ─────────────────────────────────────────────
-  // Number of related posts shown at the bottom of each post (same tag first).
-  // Set to 0 to disable.
-  RELATED_POSTS_COUNT: 3,
-
-  // ── Read-time on cards ────────────────────────────────────────
-  CARD_SHOW_READ_TIME: true,
-
-  // ── Bookmarks ─────────────────────────────────────────────────
-  BOOKMARKS_ENABLED: true,
-
   // ── Newsletter ────────────────────────────────────────────────
+  // [script] Shown at the bottom of every free post.
+  //          Set NEWSLETTER_ACTION to a POST endpoint (e.g. Buttondown embed URL).
+  //          Leave empty to show a success state without sending data.
   NEWSLETTER_ENABLED:     true,
   NEWSLETTER_HEADLINE:    'Stay in the loop',
   NEWSLETTER_DESCRIPTION: "Get engineering breakdowns, release notes and open-source stories from the Shanios team — no spam, unsubscribe anytime.",
@@ -146,93 +189,91 @@ const CONFIG = {
   NEWSLETTER_ACTION:      '', // e.g. 'https://buttondown.email/api/emails/embed-subscribe/shani8dev'
   NEWSLETTER_SUCCESS:     "🎉 You're subscribed! Check your inbox to confirm.",
 
-  // ── Series / multi-part posts ─────────────────────────────────
-  SERIES_ENABLED: true,
-
-  // ── RSS feed link in <head> ────────────────────────────────────
+  // ── RSS ───────────────────────────────────────────────────────
+  // [script] Injects <link rel="alternate" type="application/rss+xml"> in <head>.
   RSS_ENABLED: true,
   RSS_URL:     '/feed.xml',
 
-  // ── View count (privacy-safe, localStorage only) ────────────────
-  VIEW_COUNT_ENABLED: true,
+  // ── Series ───────────────────────────────────────────────────
+  // [script] Shows a series navigation strip on posts that share a
+  //          `series:` front-matter key.
+  SERIES_ENABLED: true,
 
-  // ── Word count in post header ─────────────────────────────────
-  SHOW_WORD_COUNT: true,
+  // ── Related posts ─────────────────────────────────────────────
+  // [script] Posts shown at the bottom of each post (same tag first,
+  //          then most recent). Set to 0 to disable.
+  RELATED_POSTS_COUNT: 3,
 
-  // ── Reading streak — consecutive-day visit tracker ────────────
-  STREAK_ENABLED: true,
-
-  // ── Keyboard shortcuts (? to open panel) ─────────────────────
-  KEYBOARD_SHORTCUTS_ENABLED: true,
-
-  // ── Language / locale ────────────────────────────────────────
-  // Used in JSON-LD structured data (inLanguage) and date formatting.
-  // Examples: 'en-IN', 'en-US', 'de-DE', 'fr-FR'
-  LANG: 'en-IN',
-
-  // ── Reading speed (words per minute) ─────────────────────────
-  // Average adult: 200–250. Technical readers: 150–180.
-  WORDS_PER_MINUTE: 200,
-
-  // ── Excerpt truncation length (characters) ───────────────────
-  EXCERPT_MAX_CHARS: 140,
-
-  // ── Hero sidebar: number of posts shown beside the featured ──
-  HERO_SIDEBAR_COUNT: 4,
-
-  // ── Paywall: free preview paragraph block count ───────────────
-  PAYWALL_PREVIEW_BLOCKS: 12,
-
-  // ── Back-to-top button: scroll offset trigger (px) ───────────
-  BACK_TO_TOP_OFFSET: 400,
-
-  // ── Toast notification duration (ms) ─────────────────────────
-  TOAST_DURATION: 2500,
-
-  // ── "New" badge: posts newer than this many days get a badge ─
-  // Set to 0 to disable freshness badges entirely.
-  NEW_POST_DAYS: 7,
-  RECENT_POST_DAYS: 30,
-
-  // ── Font size controls in post reader ─────────────────────────
-  // Adds A- / A+ buttons in post header. Set false to disable.
-  FONT_SIZE_CONTROLS: true,
-
-  // ── Search result highlighting ────────────────────────────────
-  // Wraps matched query terms in <mark> on cards. Set false to disable.
-  SEARCH_HIGHLIGHT: true,
-
-  // ── Recently viewed posts ─────────────────────────────────────
-  // Shown in the Bookmarks view. Set to 0 to disable.
+  // ── Bookmarks ─────────────────────────────────────────────────
+  // [script] Enables bookmark icons on cards and a /bookmarks page.
+  BOOKMARKS_ENABLED: true,
+  // [script] Number of recently viewed posts shown on the bookmarks page.
+  //          Set to 0 to disable the section.
   RECENTLY_VIEWED_COUNT: 5,
 
-  // ── Copy as Markdown link ─────────────────────────────────────
-  // Adds "Copy MD link" button in post footer. Set false to disable.
-  COPY_MD_LINK: true,
+  // ── View counter ──────────────────────────────────────────────
+  // [script] Privacy-safe, localStorage-only view count on cards and
+  //          in the post header. Set false to hide everywhere.
+  VIEW_COUNT_ENABLED: true,
 
-  // ── Sitemap static pages (injected alongside post URLs) ───────
-  // Each entry becomes a <url> block in sitemap.xml and feed.xml.
-  // changefreq: 'always'|'hourly'|'daily'|'weekly'|'monthly'|'yearly'|'never'
-  SITEMAP_STATIC_URLS: [
-    { path: '/',                priority: '1.0', changefreq: 'weekly'  },
-    { path: '/?tag=Engineering', priority: '0.6', changefreq: 'weekly'  },
-    { path: '/?tag=Release',     priority: '0.6', changefreq: 'weekly'  },
-    { path: '/?tag=Linux',       priority: '0.6', changefreq: 'weekly'  },
-    { path: '/?tag=News',        priority: '0.6', changefreq: 'weekly'  },
-  ],
+  // ── Reading streak ────────────────────────────────────────────
+  // [script] Tracks consecutive daily visits and shows a 🔥 badge in
+  //          the header after 2+ days in a row.
+  STREAK_ENABLED: true,
 
-  // ── PWA (Progressive Web App) metadata ───────────────────────
+  // ── Reading speed & word count ────────────────────────────────
+  // [script] Words per minute used to compute estimated read time.
+  //          Average adult: 200–250. Technical readers: 150–180.
+  WORDS_PER_MINUTE: 200,
+  // [script] Displays word count alongside read time in the post header.
+  SHOW_WORD_COUNT: true,
+
+  // ── Post cards ────────────────────────────────────────────────
+  // [script] Show read-time on index grid cards.
+  CARD_SHOW_READ_TIME: true,
+  // [script] Highlight search query terms in card titles and excerpts.
+  SEARCH_HIGHLIGHT: true,
+  // [script] Days before today a post is badged "New". Set 0 to disable.
+  NEW_POST_DAYS: 7,
+  // [script] Days before today a post is badged "Recent".
+  RECENT_POST_DAYS: 30,
+
+  // ── Post reader ───────────────────────────────────────────────
+  // [script] A− / A / A+ font-size buttons in the post header.
+  FONT_SIZE_CONTROLS: true,
+  // [script] Keyboard shortcut panel opened with the ? key.
+  KEYBOARD_SHORTCUTS_ENABLED: true,
+
+  // ── Excerpts ──────────────────────────────────────────────────
+  // [script] Max characters for auto-generated excerpts (from post body).
+  //          Only applies when no `excerpt:` field is in the front-matter.
+  EXCERPT_MAX_CHARS: 140,
+
+  // ── UI timings ────────────────────────────────────────────────
+  // [script] How long toast notifications stay visible (ms).
+  TOAST_DURATION: 2500,
+  // [script] Scroll depth in px before the back-to-top button appears.
+  BACK_TO_TOP_OFFSET: 400,
+
+  // ── PWA (Progressive Web App) ─────────────────────────────────
+  // [build] Written into manifest.json by generate-manifest.js.
+  //         PWA_THEME_COLOR / PWA_BG_COLOR should match --color-bg in
+  //         brand-shani.css (dark mode value).
   PWA_NAME:        'Shanios Blog',
   PWA_SHORT_NAME:  'Shanios',
   PWA_DESCRIPTION: "Engineering breakdowns and release notes from the Shanios team.",
   PWA_THEME_COLOR: '#161514',
   PWA_BG_COLOR:    '#161514',
 
-  // ── Footer + social links ────────────────────────────────────
-  SOCIAL_LINKS: [
-    { label: 'GitHub',   icon: 'fa-brands fa-github',  url: 'https://github.com/shani8dev' },
-    { label: 'LinkedIn', icon: 'fa-brands fa-linkedin', url: 'https://www.linkedin.com/in/Shrinivasvkumbhar/' },
-    { label: 'Shanios',  icon: 'fa-brands fa-linux',    url: 'https://shani.dev' },
-    { label: 'Wiki',     icon: 'fa-solid fa-book-open', url: 'https://wiki.shani.dev' },
+  // ── Sitemap static URLs ───────────────────────────────────────
+  // [build] Written into sitemap.xml by generate-manifest.js alongside
+  //         all post URLs. Keep in sync with NAV_LINKS.
+  // changefreq: 'always'|'hourly'|'daily'|'weekly'|'monthly'|'yearly'|'never'
+  SITEMAP_STATIC_URLS: [
+    { path: '/',                 priority: '1.0', changefreq: 'weekly' },
+    { path: '/?tag=Engineering', priority: '0.6', changefreq: 'weekly' },
+    { path: '/?tag=Release',     priority: '0.6', changefreq: 'weekly' },
+    { path: '/?tag=Linux',       priority: '0.6', changefreq: 'weekly' },
+    { path: '/?tag=News',        priority: '0.6', changefreq: 'weekly' },
   ],
 };
