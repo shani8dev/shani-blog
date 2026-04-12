@@ -527,6 +527,13 @@ const DataLoader = {
       featured:       item.featured === true || item.featured === 'true',
       draft:          item.draft    === true || item.draft    === 'true',
       pinned:         item.pinned   === true || item.pinned   === 'true',
+      updated:        item.updated        || '',
+      keywords:       item.keywords       || '',
+      ogImage:        item.og_image       || '',
+      canonical:      item.canonical      || '',
+      lang:           item.lang           || '',
+      noindex:        item.noindex === true || item.noindex === 'true',
+      toc:            item.toc            || '',
     };
     // Manifest is metadata-only — body is fetched on-demand when a post is opened.
     // If body is present (e.g. legacy manifest or local dev index.json with body),
@@ -580,6 +587,13 @@ const DataLoader = {
       featured:       fm.featured === 'true',
       draft:          fm.draft    === 'true',
       pinned:         fm.pinned   === 'true',
+      updated:        fm.updated          || '',
+      keywords:       fm.keywords         || '',
+      ogImage:        fm.og_image         || '',
+      canonical:      fm.canonical        || '',
+      lang:           fm.lang             || '',
+      noindex:        fm.noindex          === 'true',
+      toc:            fm.toc              || '',
       // body NOT stored — fetched on-demand by fetchBody()
     };
   },
@@ -764,6 +778,13 @@ const DataLoader = {
       featured:       (fm.featured === 'true')  || meta.featured  || false,
       draft:          (fm.draft    === 'true')  || meta.draft     || false,
       pinned:         (fm.pinned   === 'true')  || meta.pinned    || false,
+      updated:        fm.updated          || meta.updated        || '',
+      keywords:       fm.keywords         || meta.keywords       || '',
+      ogImage:        fm.og_image         || meta.ogImage        || '',
+      canonical:      fm.canonical        || meta.canonical      || '',
+      lang:           fm.lang             || meta.lang           || '',
+      noindex:        (fm.noindex === 'true')   || meta.noindex  || false,
+      toc:            fm.toc              || meta.toc            || '',
       body: (isPaywalled && !AppState.isMember) ? previewBody : body,
       _previewCached: (isPaywalled && !AppState.isMember)
     };
@@ -1166,39 +1187,76 @@ const Renderer = {
 
   renderPost(post) {
     const app = Utils.qs('#post-article');
-    const html = Utils.safeMarkdown(post.body || '');
+    // Auto-inject TOC at top when front-matter toc: 'true' and body has no [[toc]] shortcode
+    let bodyForRender = post.body || '';
+    if (post.toc === 'true' && !/\[\[?toc\]?\]/i.test(bodyForRender)) {
+      bodyForRender = '[[toc]]
+
+' + bodyForRender;
+    }
+    const html = Utils.safeMarkdown(bodyForRender);
     const paywalled = post.paywalled;
     const date = Utils.fmtDateShort(post.date);
 
     // ── Update all meta / SEO for this post ───────────────────
-    const postUrl  = `${CONFIG.BLOG_URL}/post/${post.slug}`;
-    const ogImg    = post.cover || CONFIG.OG_IMAGE;
+    const postUrl   = `${CONFIG.BLOG_URL}/post/${post.slug}`;
+    // og_image overrides cover; both fall back to CONFIG.OG_IMAGE
+    const ogImg     = post.ogImage || post.cover || CONFIG.OG_IMAGE;
+    // canonical: per-post override (for syndicated/republished posts) else computed URL
+    const canonical = post.canonical || postUrl;
+    // lang: per-post override else site default
+    const postLang  = post.lang || CONFIG.LANG || CONFIG.DATE_LOCALE || 'en-US';
+    // keywords: per-post override (comma-separated) else tag
+    const metaKw    = post.keywords || post.tag;
 
     document.title = `${post.title} — ${CONFIG.SITE_TITLE}`;
-    document.getElementById('canonical-url')?.setAttribute('href', postUrl);
+    document.getElementById('canonical-url')?.setAttribute('href', canonical);
     document.getElementById('meta-desc')?.setAttribute('content', post.excerpt);
     document.getElementById('og-type')?.setAttribute('content', 'article');
     ['og-title', 'tw-title'].forEach(id => Utils.qs(`#${id}`)?.setAttribute('content', post.title));
     ['og-desc',  'tw-desc' ].forEach(id => Utils.qs(`#${id}`)?.setAttribute('content', post.excerpt));
-    document.getElementById('og-url')?.setAttribute('content', postUrl);
+    document.getElementById('og-url')?.setAttribute('content', canonical);
     document.getElementById('og-image')?.setAttribute('content', ogImg);
     document.getElementById('tw-image')?.setAttribute('content', ogImg);
+
+    // Per-post keywords meta (overrides site-wide keywords)
+    document.getElementById('meta-keywords')?.setAttribute('content', metaKw);
+
+    // Per-post noindex: inject or update <meta name="robots"> if noindex is set
+    const robotsMeta = document.querySelector('meta[name="robots"]');
+    if (post.noindex) {
+      if (robotsMeta) {
+        robotsMeta.setAttribute('content', 'noindex, nofollow');
+      } else {
+        const m = document.createElement('meta');
+        m.name = 'robots'; m.content = 'noindex, nofollow';
+        document.head.appendChild(m);
+      }
+    } else if (robotsMeta) {
+      robotsMeta.setAttribute('content', 'index, follow');
+    }
 
     // JSON-LD: BlogPosting
     const ldBlogs = document.getElementById('ld-blogs');
     if (ldBlogs) ldBlogs.textContent = JSON.stringify({
       "@context": "https://schema.org", "@type": "BlogPosting",
-      "headline": post.title, "description": post.excerpt, "datePublished": post.date,
-      ...(post.cover ? { "image": post.cover } : {}),
-      "author": { "@type": "Person", "name": post.author },
+      "headline": post.title, "description": post.excerpt,
+      "datePublished": post.date,
+      ...(post.updated ? { "dateModified": post.updated } : {}),
+      ...(ogImg ? { "image": ogImg } : {}),
+      "author": { "@type": "Person", "name": post.author,
+        ...(post.authorWebsite ? { "url": post.authorWebsite } : {})
+      },
       "publisher": {
         "@type": "Organization",
         "name": CONFIG.PUBLISHER_NAME,
         "url": CONFIG.PUBLISHER_URL,
         "logo": { "@type": "ImageObject", "url": CONFIG.PUBLISHER_LOGO }
       },
-      "mainEntityOfPage": { "@type": "WebPage", "@id": postUrl },
-      "url": postUrl, "keywords": post.tag, "inLanguage": CONFIG.LANG || CONFIG.DATE_LOCALE || "en-US"
+      "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
+      "url": canonical,
+      "keywords": metaKw,
+      "inLanguage": postLang
     });
 
     // JSON-LD: BreadcrumbList
@@ -1275,6 +1333,7 @@ const Renderer = {
             <div class="meta-name">${Utils.escapeHtml(post.author)}</div>
             <div class="meta-details">
               <span title="${Utils.escapeHtml(RelDate.fmt(post.date))}"><i class="fa-regular fa-calendar"></i> ${date}</span>
+              ${post.updated ? `<span class="meta-dot">·</span><span title="Updated ${Utils.escapeHtml(Utils.fmtDateShort(post.updated))}"><i class="fa-regular fa-pen-to-square"></i> Updated</span>` : ''}
               <span class="meta-dot">·</span>
               <span><i class="fa-regular fa-clock"></i> ${Utils.escapeHtml(post.readTime)}</span>
               ${CONFIG.SHOW_WORD_COUNT !== false && post.body ? `<span class="meta-dot">·</span><span title="Word count"><i class="fa-solid fa-align-left"></i> ${WordCount.fmt(WordCount.count(post.body))}</span>` : ''}
@@ -2033,6 +2092,12 @@ const Router = {
         Utils.qs(`#${id}`)?.setAttribute('content', `${CONFIG.SITE_TITLE} — ${CONFIG.SITE_TAGLINE}`));
       ['og-desc', 'tw-desc'].forEach(id =>
         Utils.qs(`#${id}`)?.setAttribute('content', CONFIG.SITE_DESCRIPTION));
+      // Restore site-wide keywords and remove any per-post noindex
+      document.getElementById('meta-keywords')?.setAttribute('content', CONFIG.SITE_KEYWORDS || '');
+      document.getElementById('og-image')?.setAttribute('content', CONFIG.OG_IMAGE);
+      document.getElementById('tw-image')?.setAttribute('content', CONFIG.OG_IMAGE);
+      const robotsMetaIdx = document.querySelector('meta[name="robots"]');
+      if (robotsMetaIdx) robotsMetaIdx.setAttribute('content', 'index, follow');
 
       const { tag, page } = this.getParams();
       AppState.filter = tag || 'all';

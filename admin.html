@@ -1337,6 +1337,7 @@ function newPost() {
   if (AUTHOR_INITIALS) document.getElementById('fm-author-initials').value = AUTHOR_INITIALS;
   if (AUTHOR_BIO)      document.getElementById('fm-author-bio').value      = AUTHOR_BIO;
   updateAuthorPreview();
+  updateCoverPreview();
   setEditorValue('');
   showEditor();
   updateWordCount();
@@ -1826,6 +1827,29 @@ function updateAuthorPreview() {
   if (avEl) avEl.textContent = letters;
   if (nmEl) nmEl.textContent = name || 'Author name';
   if (rlEl) rlEl.textContent = role || 'Role / company';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// COVER PREVIEW
+// ═══════════════════════════════════════════════════════════════════
+function updateCoverPreview() {
+  const url   = document.getElementById('fm-cover')?.value?.trim() || '';
+  const thumb = document.getElementById('fm-cover-thumb');
+  const icon  = document.getElementById('fm-cover-icon');
+  if (!thumb || !icon) return;
+  if (url) {
+    thumb.src = url;
+    thumb.style.display = 'block';
+    icon.style.display  = 'none';
+    thumb.onerror = () => {
+      thumb.style.display = 'none';
+      icon.style.display  = '';
+    };
+  } else {
+    thumb.src = '';
+    thumb.style.display = 'none';
+    icon.style.display  = '';
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════

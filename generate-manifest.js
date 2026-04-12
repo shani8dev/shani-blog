@@ -160,10 +160,15 @@ function build() {
       title:           fm.title           || 'Untitled',
       excerpt:         fm.excerpt          || autoExcerpt(body, isPaywalled),
       date:            fm.date             || new Date().toISOString().split('T')[0],
+      updated:         fm.updated          || '',
       tag:             fm.tag              || 'Post',
       readTime:        fm.readTime         || readTime(body),
       paywalled:       isPaywalled,
       cover:           fm.cover            || '',
+      series:          fm.series           || '',
+      featured:        fm.featured         === 'true',
+      draft:           fm.draft            === 'true',
+      pinned:          fm.pinned           === 'true',
       author:          fm.author           || '',
       author_role:     fm.author_role      || '',
       author_bio:      fm.author_bio       || '',
@@ -171,6 +176,12 @@ function build() {
       author_linkedin: fm.author_linkedin  || '',
       author_github:   fm.author_github    || '',
       author_website:  fm.author_website   || '',
+      keywords:        fm.keywords         || '',
+      og_image:        fm.og_image         || '',
+      canonical:       fm.canonical        || '',
+      lang:            fm.lang             || '',
+      noindex:         fm.noindex          === 'true',
+      toc:             fm.toc              || '',
       // body intentionally omitted — the SPA fetches .md on-demand
     });
 
@@ -191,7 +202,7 @@ function build() {
   }));
   const postUrls = posts.map(p => ({
     loc:        `${BLOG_URL}/post/${p.slug}`,
-    lastmod:    p.date,
+    lastmod:    p.updated || p.date,
     priority:   '0.8',
     changefreq: 'monthly',
   }));
@@ -220,10 +231,11 @@ function build() {
     `      <guid isPermaLink="true">${BLOG_URL}/post/${p.slug}</guid>`,
     `      <description>${escXml(p.excerpt)}</description>`,
     `      <pubDate>${new Date(p.date + 'T00:00:00').toUTCString()}</pubDate>`,
+    p.updated ? `      <lastBuildDate>${new Date(p.updated + 'T00:00:00').toUTCString()}</lastBuildDate>` : null,
     `      <category>${escXml(p.tag)}</category>`,
     `      <author>${escXml(AUTHOR)}</author>`,
     '    </item>',
-  ].join('\n')).join('\n');
+  ].filter(Boolean).join('\n')).join('\n');
   const feed = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
