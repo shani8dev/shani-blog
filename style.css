@@ -1526,11 +1526,11 @@ font-style: italic; font-family: var(--font-sans);
 /* =========================================
 BOOKMARK BUTTON ON CARDS
 ========================================= */
-.card__footer {
-  position: relative;
+.card__content {
+  position: relative; 
 }
 .card__bookmark {
-  position: absolute; right: 0; bottom: 0;
+  position: absolute; right: var(--space-2); top: var(--space-2);
   width: 32px; height: 32px;
   display: grid; place-items: center;
   color: var(--color-text-faint);
