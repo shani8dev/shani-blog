@@ -19,8 +19,9 @@
  *
  * ── What it does ─────────────────────────────────────────────────
  * Reads every *.md file (except index.md) from ./posts/, parses
- * front-matter, generates excerpts + read-time, and writes a
- * compact posts/manifest.json (metadata only — no body).
+ * front-matter, generates excerpts + read-time, and writes:
+ *   posts/manifest.json  — metadata only, no bodies (~100 KB)
+ *   sitemap.xml          — all post URLs + static pages
  *
  * The SPA fetches each post's .md on-demand when a reader opens it.
  * This keeps the manifest tiny (~100 KB for hundreds of posts).
@@ -32,9 +33,14 @@ const path = require('path');
 
 // ── Config ────────────────────────────────────────────────────────
 // Change this if your posts directory is elsewhere.
-const POSTS_DIR  = path.join(__dirname, 'posts');
-const OUT_PATH   = path.join(POSTS_DIR, 'manifest.json');
-const WATCH_MODE = process.argv.includes('--watch');
+const POSTS_DIR    = path.join(__dirname, 'posts');
+const OUT_PATH     = path.join(POSTS_DIR, 'manifest.json');
+const SITEMAP_PATH = path.join(__dirname, 'sitemap.xml');
+const WATCH_MODE   = process.argv.includes('--watch');
+
+// ── Blog URL — used for sitemap generation ────────────────────────
+// Change this if you deploy to a different domain.
+const BLOG_URL = 'https://blog.shani.dev';
 
 // ── Helpers ───────────────────────────────────────────────────────
 function readTime(body) {
@@ -125,7 +131,38 @@ function build() {
   posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   fs.writeFileSync(OUT_PATH, JSON.stringify(posts, null, 2));
-  console.log(`\n  ✓ Written ${posts.length} post(s) to posts/manifest.json\n`);
+  console.log(`\n  ✓ Written ${posts.length} post(s) to posts/manifest.json`);
+
+  // ── Generate sitemap.xml ────────────────────────────────────────
+  const staticUrls = [
+    { loc: `${BLOG_URL}/`,                priority: '1.0', changefreq: 'weekly'  },
+    { loc: `${BLOG_URL}/?tag=Engineering`, priority: '0.6', changefreq: 'weekly'  },
+    { loc: `${BLOG_URL}/?tag=Release`,     priority: '0.6', changefreq: 'weekly'  },
+    { loc: `${BLOG_URL}/?tag=Linux`,       priority: '0.6', changefreq: 'weekly'  },
+    { loc: `${BLOG_URL}/?tag=News`,        priority: '0.6', changefreq: 'weekly'  },
+  ];
+  const postUrls = posts.map(p => ({
+    loc:        `${BLOG_URL}/post/${p.slug}`,
+    lastmod:    p.date,
+    priority:   '0.8',
+    changefreq: 'monthly',
+  }));
+  const allUrls = [...staticUrls, ...postUrls];
+  const xml = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...allUrls.map(u => [
+      '  <url>',
+      `    <loc>${u.loc}</loc>`,
+      u.lastmod ? `    <lastmod>${u.lastmod}</lastmod>` : null,
+      `    <changefreq>${u.changefreq}</changefreq>`,
+      `    <priority>${u.priority}</priority>`,
+      '  </url>',
+    ].filter(Boolean).join('\n')),
+    '</urlset>',
+  ].join('\n');
+  fs.writeFileSync(SITEMAP_PATH, xml);
+  console.log(`  ✓ Written sitemap.xml with ${allUrls.length} URL(s)\n`);
 }
 
 // ── Run ───────────────────────────────────────────────────────────

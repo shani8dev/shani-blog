@@ -165,12 +165,49 @@ jobs:
           console.log('\nWritten ' + posts.length + ' post(s) to posts/manifest.json');
           SCRIPT
 
-      - name: Commit manifest.json
+        run: |
+          node - << 'SCRIPT'
+          const fs   = require('fs');
+          const path = require('path');
+          const BLOG_URL = 'https://blog.shani.dev';
+          const manifest = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'posts', 'manifest.json'), 'utf8'));
+          const staticUrls = [
+            { loc: `${BLOG_URL}/`,                priority: '1.0', changefreq: 'weekly'  },
+            { loc: `${BLOG_URL}/?tag=Engineering`, priority: '0.6', changefreq: 'weekly'  },
+            { loc: `${BLOG_URL}/?tag=Release`,     priority: '0.6', changefreq: 'weekly'  },
+            { loc: `${BLOG_URL}/?tag=Linux`,       priority: '0.6', changefreq: 'weekly'  },
+            { loc: `${BLOG_URL}/?tag=News`,        priority: '0.6', changefreq: 'weekly'  },
+          ];
+          const postUrls = manifest.map(p => ({
+            loc:        `${BLOG_URL}/post/${p.slug}`,
+            lastmod:    p.date,
+            priority:   '0.8',
+            changefreq: 'monthly',
+          }));
+          const all = [...staticUrls, ...postUrls];
+          const xml = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+            ...all.map(u => [
+              '  <url>',
+              `    <loc>${u.loc}</loc>`,
+              u.lastmod ? `    <lastmod>${u.lastmod}</lastmod>` : null,
+              `    <changefreq>${u.changefreq}</changefreq>`,
+              `    <priority>${u.priority}</priority>`,
+              '  </url>',
+            ].filter(Boolean).join('\n')),
+            '</urlset>',
+          ].join('\n');
+          fs.writeFileSync(path.join(process.cwd(), 'sitemap.xml'), xml);
+          console.log('Written sitemap.xml with ' + all.length + ' URL(s)');
+          SCRIPT
+
+      - name: Commit manifest + sitemap
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add posts/manifest.json
-          git diff --staged --quiet && echo "manifest unchanged" || {
-            git commit -m "chore: rebuild posts/manifest.json [skip ci]"
+          git add posts/manifest.json sitemap.xml
+          git diff --staged --quiet && echo "nothing changed" || {
+            git commit -m "chore: rebuild manifest + sitemap [skip ci]"
             git push
           }
