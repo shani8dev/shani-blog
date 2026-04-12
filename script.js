@@ -87,6 +87,10 @@ const Utils = {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;'),
+  // safeText — use for text nodes rendered via innerHTML (NOT attributes).
+  // Only escapes & < > so apostrophes and quotes display correctly.
+  safeText: str => String(str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'),
   fmtDate: str => {
     const d = new Date(str + 'T00:00:00');
     return isNaN(d) ? str : d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -594,7 +598,7 @@ const Renderer = {
         </div>
         <span class="hero__tag" id="hero-tag">${Utils.tagIcon(p.tag)} ${Utils.escapeHtml(p.tag)}</span>
         <h1 class="hero__title" id="hero-title">${titleHtml}</h1>
-        <p class="hero__sub" id="hero-sub">${Utils.escapeHtml(p.excerpt || CONFIG.HERO_SUB)}</p>
+        <p class="hero__sub" id="hero-sub">${Utils.safeText(p.excerpt || CONFIG.HERO_SUB)}</p>
         <div class="meta" id="hero-meta">
           <span class="avatar">${Utils.escapeHtml(p.authorInitials)}</span>
           <span>${Utils.escapeHtml(p.author)}</span>
@@ -656,7 +660,7 @@ const Renderer = {
         <div class="card__content">
           <span class="card__tag" data-tag="${Utils.escapeHtml(p.tag)}"><i class="${TAG_ICONS[p.tag] || TAG_ICONS.Post}"></i> ${Utils.escapeHtml(p.tag)}</span>
           <h2 class="card__title">${Utils.escapeHtml(p.title)}</h2>
-          <p class="card__excerpt">${Utils.escapeHtml(p.excerpt)}</p>
+          <p class="card__excerpt">${Utils.safeText(p.excerpt)}</p>
           <div class="card__footer">
             <span class="card__author"><i class="fa-solid fa-user-pen"></i> ${Utils.escapeHtml(p.author)}</span>
             <span class="card__meta">
@@ -843,7 +847,7 @@ const Renderer = {
             .replace(/[*_`#>\[\]]/g, '').trim().substring(0, 80).toLowerCase();
           const excStart  = post.excerpt.replace(/[*_`#>\[\]]/g, '').trim().substring(0, 80).toLowerCase();
           if (bodyStart && excStart && bodyStart.startsWith(excStart.substring(0, 60))) return '';
-          return `<p class="post-excerpt">${Utils.escapeHtml(post.excerpt)}</p>`;
+          return `<p class="post-excerpt">${Utils.safeText(post.excerpt)}</p>`;
         })()}
         <div class="post-meta">
           <span class="avatar">${Utils.escapeHtml(post.authorInitials)}</span>
@@ -878,8 +882,8 @@ const Renderer = {
           <div class="author-card__body">
             <div class="author-card__label">Written by</div>
             <div class="author-card__name">${Utils.escapeHtml(post.author)}</div>
-            ${post.authorRole ? `<div class="author-card__role">${Utils.escapeHtml(post.authorRole)}</div>` : ''}
-            ${post.authorBio  ? `<p class="author-card__bio">${Utils.escapeHtml(post.authorBio)}</p>` : ''}
+            ${post.authorRole ? `<div class="author-card__role">${Utils.safeText(post.authorRole)}</div>` : ''}
+            ${post.authorBio  ? `<p class="author-card__bio">${Utils.safeText(post.authorBio)}</p>` : ''}
             ${links ? `<div class="author-card__links">${links}</div>` : ''}
           </div>
         </div>`;

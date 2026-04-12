@@ -1,6 +1,6 @@
 # blog.shani.dev
 
-The official Shanios Blog — a lightweight, config-driven SPA covering engineering, product releases, Linux, and open source news. No build step. No framework. Just HTML, CSS, and one JavaScript file.
+The official Shanios Blog — a lightweight, config-driven SPA covering immutable Linux, atomic updates, OS engineering, product releases, and project news. No build step. No framework. Just HTML, CSS, and one JavaScript file.
 
 Live at → **[blog.shani.dev](https://blog.shani.dev)**
 
@@ -16,15 +16,15 @@ The blog is a History API SPA: `index.html` handles both the post list (`/`) and
 
 ## Getting started
 
-### 1. Configure `script.js`
+### 1. Configure `config-shani.js`
 
-Open `script.js` and edit the `CONFIG` block at the top. This is the **only block you need to edit** — every hardcoded string, URL, and credential lives here.
+Open `config-shani.js` and edit the `CONFIG` block. This is the **only file you need to edit** — every hardcoded string, URL, and credential lives here. It is loaded before `script.js` so the engine picks up all values automatically.
 
 ```javascript
 const CONFIG = {
   // GitHub Pages deployment — uncomment for production
-  // GITHUB_USER: 'shani8dev',
-  // GITHUB_REPO: 'shani-blog',
+  GITHUB_USER: 'shani8dev',
+  GITHUB_REPO: 'shani-blog',
 
   // Production blog URL (no trailing slash)
   BLOG_URL: 'https://blog.shani.dev',
@@ -97,10 +97,10 @@ date: '2026-04-09'
 tag: 'Engineering'
 excerpt: 'One sentence that appears on the card and in search results.'
 readTime: '6 min'
-cover: 'https://shani.dev/assets/images/my-post-cover.jpg'
+cover: 'https://blog.shani.dev/assets/images/my-post-cover.jpg'
 author: 'Shrinivas Kumbhar'
 author_role: 'Shanios · shani.dev'
-author_bio: 'Immutable Linux on Arch. Two OS copies, one always safe.'
+author_bio: 'Immutable Linux on Arch. Two OS copies, one always safe. Bad update? One reboot back. Zero telemetry. Built in India 🇮🇳'
 author_initials: 'SK'
 author_linkedin: 'https://www.linkedin.com/in/Shrinivasvkumbhar/'
 author_github: 'https://github.com/shani8dev'
@@ -120,7 +120,7 @@ Content starts here. Full **Markdown** supported.
 | `tag`              | No       | Creates a filter chip automatically                                                                |
 | `excerpt`          | No       | Falls back to first ~140 chars of body; paywalled posts use first paragraph only                  |
 | `readTime`         | No       | Auto-calculated at 200 wpm from body word count if omitted                                         |
-| `cover`            | No       | URL to a cover image — shown on card, as a 21:9 banner on the post page, and as `og:image`        |
+| `cover`            | No       | URL to a cover image — shown on card, as a banner on the post page, and as `og:image`             |
 | `paywalled`        | No       | `true` to gate this post behind a Lemon Squeezy license key                                       |
 | `author`           | No       | Overrides `CONFIG.AUTHOR_NAME` for this post                                                       |
 | `author_role`      | No       | Overrides `CONFIG.AUTHOR_ROLE` — shown below the name in the bio card                             |
@@ -132,17 +132,17 @@ Content starts here. Full **Markdown** supported.
 
 All `author_*` fields fall back to their `CONFIG` equivalents if omitted. `author_initials` is auto-derived from the author name (first letter of each word, max 2) if neither the frontmatter field nor `CONFIG.AUTHOR_INITIALS` is set. The three social link fields are individually optional — only links that are set are rendered.
 
-> **Note:** Do not put email addresses in frontmatter. `.md` files are publicly readable on GitHub. Use LinkedIn, GitHub, or a website for contact instead.
+> **Note:** Do not put email addresses in frontmatter. `.md` files are publicly readable on GitHub.
 
 **Cover image tips:**
-- Recommended size: **1200×630px** (standard OG image ratio; also the 21:9 post banner aspect ratio)
+- Recommended size: **1200×630px** (standard OG image ratio)
 - Host in `assets/images/` and reference as an absolute URL, or use any CDN URL
 - If omitted, the card shows a file icon and no banner is rendered on the post page
-- The `cover` value is always used as `og:image` and `twitter:image`; posts without a cover use `CONFIG.OG_IMAGE`
+- The cover value is always used as `og:image` and `twitter:image`; posts without a cover use `CONFIG.OG_IMAGE`
 
 ### 3. No `posts/index.json` needed in production
 
-When `GITHUB_USER` and `GITHUB_REPO` are uncommented in CONFIG, the blog **auto-discovers** all `.md` files in `posts/` via the GitHub Contents API. Just push a post file and it appears.
+When `GITHUB_USER` and `GITHUB_REPO` are set in `config-shani.js`, the blog **auto-discovers** all `.md` files in `posts/` via the GitHub Contents API. Just push a post file and it appears.
 
 For **local development**, a `posts/index.json` fallback is required (browsers cannot list directory contents). It can be a simple filename array:
 
@@ -155,12 +155,12 @@ Or a **metadata objects array** (fast path — skips parallel `.md` fetches on l
 ```json
 [
   {
-    "slug": "immutable-linux-deep-dive",
-    "title": "A Deep Dive into Immutable Linux",
+    "slug": "immutable-linux-explainer",
+    "title": "Why Immutable Linux?",
     "date": "2026-04-09",
     "tag": "Engineering",
-    "excerpt": "What immutable Linux actually means, and why it matters.",
-    "readTime": "8 min"
+    "excerpt": "What immutability actually means for a desktop OS.",
+    "readTime": "7 min"
   }
 ]
 ```
@@ -188,7 +188,7 @@ The blog is deployed via **GitHub Pages** with a custom domain.
 - **robots.txt** → allows all crawlers, disallows `404.html`, points to sitemap
 - **sitemap.xml** → covers homepage + all tag filter URLs
 
-To deploy: uncomment `GITHUB_USER` / `GITHUB_REPO` in CONFIG, then push to `main`. GitHub Pages rebuilds automatically.
+To deploy: ensure `GITHUB_USER` and `GITHUB_REPO` are set in `config-shani.js`, then push to `main`. GitHub Pages rebuilds automatically.
 
 ---
 
@@ -202,15 +202,13 @@ Mark any post `paywalled: true` in frontmatter. Non-members see the **first 5 co
 
 **Setup:**
 1. Create an account at [lemonsqueezy.com](https://lemonsqueezy.com)
-2. Create a **License Key** product (e.g. "Shanios Members Pass") — set your price in INR
-3. Copy the checkout URL into `MEMBERSHIP_URL` in CONFIG
+2. Create a **License Key** product (e.g. "Shanios Members Pass") — set your price
+3. Copy the checkout URL into `MEMBERSHIP_URL` in `config-shani.js`
 4. Copy your store slug (e.g. `shani8dev` from `shani8dev.lemonsqueezy.com`) into `LEMONSQUEEZY_STORE`
 
 Buyers receive a license key by email. They paste it into the key field on any paywalled post — the blog calls the Lemon Squeezy API directly from the browser. Valid keys are stored in `localStorage`; revoked keys are silently invalidated on the next page load.
 
-**Fees:** ~8% + payment processing (~2%). On ₹199 you net ~₹190.
-
-> **Security note:** Gated content is never sent to the browser for non-members — only the 5 free preview blocks are rendered into the DOM and the full body is not cached in memory for non-members. Print is blocked with a notice. The remaining limitation is that the raw `.md` file is publicly readable at its GitHub raw URL, which is inherent to static GitHub Pages hosting. Do not use the paywall for genuinely sensitive content.
+> **Security note:** Gated content is never sent to the browser for non-members — only the 5 free preview blocks are rendered into the DOM. Print is blocked with a notice. The remaining limitation is that the raw `.md` file is publicly readable at its GitHub raw URL. Do not use the paywall for genuinely sensitive content.
 
 ### Ads — Google AdSense + house ad fallback
 
@@ -221,7 +219,7 @@ An ad unit is injected one-third into the body of every **free** post. Members n
 **Phase 2 — after AdSense approval:**
 1. Apply at [adsense.google.com](https://adsense.google.com) — get your `ca-pub-` publisher ID
 2. Create an ad unit — copy the slot ID
-3. Fill in `ADSENSE_CLIENT` and `ADSENSE_SLOT` in CONFIG
+3. Fill in `ADSENSE_CLIENT` and `ADSENSE_SLOT` in `config-shani.js`
 
 The house ad disappears automatically once both fields are set.
 
@@ -233,8 +231,9 @@ The house ad disappears automatically once both fields are set.
 blog.shani.dev/
 ├── index.html              ← Single-page app shell
 ├── 404.html                ← GitHub Pages SPA fallback (mirrors index.html)
-├── script.js               ← All logic + CONFIG  ← edit this
+├── script.js               ← All engine logic (shared across brands)
 ├── style.css               ← All styles (brand-independent)
+├── config-shani.js         ← Brand config — edit this  ← THE ONLY FILE TO EDIT
 ├── brand-shani.css         ← Brand color tokens (--color-bg, --color-accent, etc.)
 ├── CNAME                   ← blog.shani.dev
 ├── robots.txt
@@ -288,22 +287,18 @@ Standard Markdown images (`![alt](url)`) also work and render with a `<figcaptio
 
 ## Tags
 
-| Tag            | Icon                               | Use for                                              |
-|----------------|------------------------------------|------------------------------------------------------|
-| `Engineering`  | `fa-solid fa-gears`                | Technical deep-dives, architecture, infrastructure   |
-| `Release`      | `fa-solid fa-rocket`               | Changelogs, version notes                            |
-| `Linux`        | `fa-brands fa-linux`               | Linux topics, kernel, distributions                  |
-| `News`         | `fa-solid fa-newspaper`            | Announcements, press, milestones                     |
-| `Product`      | `fa-solid fa-box-open`             | Feature launches, product updates, roadmap           |
-| `Platform`     | `fa-solid fa-layer-group`          | Internal tooling, abstractions, developer experience |
-| `DevOps`       | `fa-solid fa-gears`                | CI/CD, deployment, operations                        |
-| `AWS`          | `fa-brands fa-aws`                 | AWS infrastructure and services                      |
-| `NDC`          | `fa-solid fa-plane`                | NDC standard, airline distribution, IATA topics      |
-| `Partnerships` | `fa-solid fa-handshake`            | Partner announcements                                |
-| `Careers`      | `fa-solid fa-briefcase`            | Job openings, team growth, culture                   |
-| `Culture`      | `fa-solid fa-people-group`         | Team culture, perspectives, essays                   |
-| `Incident`     | `fa-solid fa-triangle-exclamation` | Post-mortems, outage reports                         |
-| `Essay`        | `fa-solid fa-feather-pointed`      | Long-form opinion or narrative pieces                |
+Use consistent tags so the filter bar stays clean. The nav exposes: **Engineering**, **Release**, **Linux**, **News**.
+
+| Tag           | Icon                               | Use for                                              |
+|---------------|------------------------------------|------------------------------------------------------|
+| `Engineering` | `fa-solid fa-gears`                | Technical deep-dives, architecture, OS internals     |
+| `Release`     | `fa-solid fa-rocket`               | Changelogs, version notes, new builds                |
+| `Linux`       | `fa-brands fa-linux`               | Linux ecosystem, distro comparisons, kernel topics   |
+| `News`        | `fa-solid fa-newspaper`            | Project announcements, press, milestones             |
+| `DevOps`      | `fa-solid fa-gears`                | CI/CD, deployment, Btrfs, atomic tooling             |
+| `Incident`    | `fa-solid fa-triangle-exclamation` | Post-mortems, rollback stories                       |
+| `Essay`       | `fa-solid fa-feather-pointed`      | Long-form opinion or narrative pieces                |
+| `Open Source` | `fa-brands fa-osi`                 | Contributions, licensing, community                  |
 
 Tag icons are defined in the `TAG_ICONS` map at the top of `script.js`. Posts with an unrecognised tag fall back to `fa-solid fa-file-lines`.
 
@@ -313,7 +308,7 @@ Tag icons are defined in the `TAG_ICONS` map at the top of `script.js`. Posts wi
 
 ```markdown
 > [!NOTE]
-> This is a note.
+> Shanios keeps two OS copies on disk — one always clean and bootable.
 
 > [!TIP]
 > Use the metadata fast-path in index.json to avoid parallel fetches on load.
@@ -330,19 +325,19 @@ Tag icons are defined in the `TAG_ICONS` map at the top of `script.js`. Posts wi
 
 | Type        | Icon                               | Colour                       |
 |-------------|------------------------------------|------------------------------|
-| `NOTE`      | `fa-solid fa-circle-info`          | Blue (`#3b82f6`)             |
+| `NOTE`      | `fa-solid fa-circle-info`          | Blue (`--color-callout-note`)|
 | `TIP`       | `fa-solid fa-lightbulb`            | Green (`--color-success`)    |
 | `WARNING`   | `fa-solid fa-triangle-exclamation` | Amber (`--color-warning`)    |
 | `CAUTION`   | `fa-solid fa-fire`                 | Red (`--color-error`)        |
-| `IMPORTANT` | `fa-solid fa-star`                 | Violet (`--color-secondary`) |
+| `IMPORTANT` | `fa-solid fa-star`                 | Olive (`--color-secondary`)  |
 
 ---
 
 ## Features
 
 - **Zero build step** — plain HTML/CSS/JS, deploy anywhere
-- **Config-driven** — change `CONFIG` once; `applyBranding()` injects all values into the DOM: title, meta, OG/Twitter cards, JSON-LD, favicon, logo images, auspicious bar text, footer social links, and current year
-- **Cover images** — set `cover` in frontmatter; shown on the card, as a 21:9 banner, and as `og:image` / `twitter:image`; falls back to `CONFIG.OG_IMAGE` for social sharing if omitted
+- **Config-driven** — edit `config-shani.js` once; `applyBranding()` injects all values into the DOM: title, meta, OG/Twitter cards, JSON-LD, favicon, logo images, top bar text, footer social links, and current year
+- **Cover images** — set `cover` in frontmatter; shown on the card, as a banner, and as `og:image` / `twitter:image`; falls back to `CONFIG.OG_IMAGE` for social sharing if omitted
 - **GitHub Contents API** — auto-discovers `.md` files in `posts/` in production; `index.json` only needed locally
 - **History API routing** — real paths (`/` for list, `/post/slug` for articles); no reloads, no hash fragments
 - **GitHub Pages SPA support** — `404.html` intercepts unmatched paths and restores the real URL; `/posts/slug` silently rewritten to `/post/slug`
@@ -399,8 +394,8 @@ Brand colors are CSS custom properties in `brand-shani.css`, consumed by `style.
   --color-accent-hover: #ff6a33;
   --color-accent-bg:    rgba(255, 127, 80, 0.12);
   --color-accent-text:  #161514;
-  --color-secondary:    #7c3aed;   /* violet — IMPORTANT callout */
-  --color-secondary-bg: rgba(124, 58, 237, 0.1);
+  --color-secondary:    #9f72f5;   /* violet */
+  --color-secondary-bg: rgba(159, 114, 245, 0.1);
   --shadow-hover: 0 8px 36px rgba(22, 21, 20, 0.65);
 }
 ```
@@ -415,31 +410,16 @@ html[data-theme="light"] {
   --color-bg-card:      #ffffff;
   --color-text:         #1c1b19;
   --color-text-muted:   #5a5752;
-  --color-text-faint:   #8a867f;
+  --color-text-faint:   #6e6a63;
   --color-border:       #e2dfd8;
   --color-border-hover: #c8c4bb;
-  --color-accent:       #e85d2a;   /* coral, deeper for light contrast */
-  --color-accent-hover: #d44e1e;
-  --color-accent-bg:    rgba(232, 93, 42, 0.08);
+  --color-accent:       #b53309;   /* deepened coral for WCAG AA on light bg */
+  --color-accent-hover: #9a2a05;
+  --color-accent-bg:    rgba(181, 51, 9, 0.09);
   --color-accent-text:  #ffffff;
   --color-secondary:    #6d28d9;
   --color-secondary-bg: rgba(109, 40, 217, 0.08);
   --shadow-hover: 0 8px 36px rgba(28, 27, 25, 0.08);
-}
-```
-
-Brand-independent tokens in `style.css`:
-
-```css
-:root {
-  --font-display: 'Playfair Display', Georgia, serif;
-  --font-sans:    'DM Sans', system-ui, sans-serif;
-  --font-mono:    'IBM Plex Mono', Consolas, monospace;
-  --color-like:         #e05c7a;   /* like button — rose        */
-  --color-success:      #3dba7e;   /* TIP callout, unlock OK    */
-  --color-warning:      #e8a215;   /* WARNING callout, members  */
-  --color-error:        #e85555;   /* CAUTION callout, errors   */
-  --color-callout-note: #3b82f6;   /* NOTE callout — blue       */
 }
 ```
 
@@ -455,4 +435,4 @@ Prism.js theme (`prism-tomorrow` ↔ `prism`) is swapped by `UI.initTheme()` on 
 
 **Search only covers cached bodies.** Posts not yet opened in the session are searched by title, excerpt, and tag only. No extra fetches are triggered by searching.
 
-**`GITHUB_USER` and `GITHUB_REPO` must be uncommented for production.** They are commented out by default for local development. Without them, the blog falls back to `posts/index.json`; if that file is absent, no posts will load.
+**`GITHUB_USER` and `GITHUB_REPO` must be set for production.** Without them, the blog falls back to `posts/index.json`; if that file is absent, no posts will load.
