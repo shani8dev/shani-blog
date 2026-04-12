@@ -17,25 +17,34 @@ if (typeof CONFIG === 'undefined') {
   throw new Error('[Blog Engine] No CONFIG found. Load a brand config script before script.js.');
 }
 
-// ── Tag icons using Font Awesome ──────────────────────────────
-const TAG_ICONS = {
-  Product:      'fa-solid fa-box-open',
-  Engineering:  'fa-solid fa-gears',
-  News:         'fa-solid fa-newspaper',
-  Release:      'fa-solid fa-rocket',
-  Careers:      'fa-solid fa-briefcase',
-  Culture:      'fa-solid fa-people-group',
-  Partnerships: 'fa-solid fa-handshake',
-  Linux:        'fa-brands fa-linux',
-  NDC:          'fa-solid fa-plane',
-  AWS:          'fa-brands fa-aws',
-  DevOps:       'fa-solid fa-gears',
-  Platform:     'fa-solid fa-layer-group',
-  Incident:     'fa-solid fa-triangle-exclamation',
-  Essay:        'fa-solid fa-feather-pointed',
-  'Open Source':'fa-brands fa-osi',
-  Post:         'fa-solid fa-file-lines',
-};
+// ── Storage key helper — prevents key collisions on shared origins ─
+// All localStorage / sessionStorage keys are prefixed with CONFIG.STORAGE_PREFIX
+// (e.g. 'shani') so two blogs on the same domain don't clobber each other.
+const _pfx = (CONFIG.STORAGE_PREFIX || 'blogs') + '_';
+const _key  = k => _pfx + k;   // e.g. 'shani_theme', 'shani_member'
+
+// ── Tag icons — driven by CONFIG.TAG_ICONS ────────────────────
+// Falls back to a built-in set if the config does not provide TAG_ICONS.
+const TAG_ICONS = (CONFIG.TAG_ICONS && Object.keys(CONFIG.TAG_ICONS).length)
+  ? CONFIG.TAG_ICONS
+  : {
+      Product:       'fa-solid fa-box-open',
+      Engineering:   'fa-solid fa-gears',
+      News:          'fa-solid fa-newspaper',
+      Release:       'fa-solid fa-rocket',
+      Careers:       'fa-solid fa-briefcase',
+      Culture:       'fa-solid fa-people-group',
+      Partnerships:  'fa-solid fa-handshake',
+      Linux:         'fa-brands fa-linux',
+      NDC:           'fa-solid fa-plane',
+      AWS:           'fa-brands fa-aws',
+      DevOps:        'fa-solid fa-gears',
+      Platform:      'fa-solid fa-layer-group',
+      Incident:      'fa-solid fa-triangle-exclamation',
+      Essay:         'fa-solid fa-feather-pointed',
+      'Open Source': 'fa-brands fa-osi',
+      Post:          'fa-solid fa-file-lines',
+    };
 
 // =========================================
 // 1. STATE
@@ -45,9 +54,9 @@ const AppState = {
   postsCache: {},
   filter: 'all',
   search: '',
-  theme: localStorage.getItem('blogs-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
-  isMember: localStorage.getItem('blogs_member') === '1',
-  pagination: { page: 1, perPage: 9 }
+  theme: localStorage.getItem(_key('theme')) || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+  isMember: localStorage.getItem(_key('member')) === '1',
+  pagination: { page: 1, perPage: CONFIG.POSTS_PER_PAGE || 9 }
 };
 
 // ── Validate stored license key silently on page load ─────────
@@ -65,13 +74,13 @@ const LicenseCrypto = {
   },
   async store(key) {
     const digest = await LicenseCrypto.hash(key);
-    localStorage.setItem('blogs_license_hash', digest);
-    localStorage.removeItem('blogs_license'); // remove any old btoa-encoded key
+    localStorage.setItem(_key('license_hash'), digest);
+    localStorage.removeItem(_key('license')); // remove any old btoa-encoded key
   },
   clear() {
-    localStorage.removeItem('blogs_license_hash');
-    localStorage.removeItem('blogs_license'); // legacy cleanup
-    localStorage.removeItem('blogs_member');
+    localStorage.removeItem(_key('license_hash'));
+    localStorage.removeItem(_key('license')); // legacy cleanup
+    localStorage.removeItem(_key('member'));
   }
 };
 
@@ -82,13 +91,119 @@ const LicenseCrypto = {
 // state is corrupt — clear it so it can't grant free access.
 (function validateStoredLicense() {
   if (!CONFIG.LEMONSQUEEZY_STORE) return;
-  const hasHash  = !!localStorage.getItem('blogs_license_hash');
-  const isMember = localStorage.getItem('blogs_member') === '1';
+  const hasHash  = !!localStorage.getItem(_key('license_hash'));
+  const isMember = localStorage.getItem(_key('member')) === '1';
   if (isMember && !hasHash) {
     LicenseCrypto.clear();
     AppState.isMember = false;
   }
 })();
+
+// ── View counter — privacy-safe, localStorage only ────────────
+const ViewCounter = {
+  get(slug) {
+    if (CONFIG.VIEW_COUNT_ENABLED === false) return 0;
+    return parseInt(localStorage.getItem(_key('views:' + slug)) || '0');
+  },
+  increment(slug) {
+    if (CONFIG.VIEW_COUNT_ENABLED === false) return;
+    // Only count once per session per slug to avoid inflation
+    const sessionKey = 'view_counted_' + slug;
+    if (sessionStorage.getItem(sessionKey)) return;
+    sessionStorage.setItem(sessionKey, '1');
+    const count = this.get(slug) + 1;
+    localStorage.setItem(_key('views:' + slug), count);
+    return count;
+  },
+  fmt(n) {
+    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    return String(n);
+  }
+};
+
+// ── Reading streak — consecutive-day visitor tracking ─────────
+const ReadingStreak = {
+  _key: () => _key('streak'),
+  _dkey: () => _key('streak_date'),
+  get() {
+    return parseInt(localStorage.getItem(this._key()) || '0');
+  },
+  update() {
+    if (CONFIG.STREAK_ENABLED === false) return;
+    const today = new Date().toDateString();
+    const last  = localStorage.getItem(this._dkey());
+    if (last === today) return; // already counted today
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    const streak = last === yesterday ? this.get() + 1 : 1;
+    localStorage.setItem(this._key(), streak);
+    localStorage.setItem(this._dkey(), today);
+    return streak;
+  },
+  render() {
+    if (CONFIG.STREAK_ENABLED === false) return;
+    const streak = this.get();
+    if (streak < 2) return; // only show after 2+ days
+    const existing = document.getElementById('streak-badge');
+    if (existing) return;
+    const badge = document.createElement('span');
+    badge.id = 'streak-badge';
+    badge.className = 'streak-badge';
+    badge.title = `You've visited ${streak} days in a row!`;
+    badge.innerHTML = `🔥 <span>${streak}</span>`;
+    const actions = document.querySelector('.header__actions');
+    if (actions) actions.insertBefore(badge, actions.firstChild);
+  }
+};
+
+// ── Relative date helper ──────────────────────────────────────
+const RelDate = {
+  fmt(dateStr) {
+    const d   = new Date(dateStr + 'T00:00:00');
+    const now = new Date();
+    if (isNaN(d)) return '';
+    const diff = Math.floor((now - d) / 1000);
+    if (diff < 3600)   return 'just now';
+    if (diff < 86400)  return `${Math.floor(diff / 3600)}h ago`;
+    const days  = Math.floor(diff / 86400);
+    if (days < 7)   return `${days}d ago`;
+    if (days < 30)  return `${Math.floor(days / 7)}w ago`;
+    if (days < 365) return `${Math.floor(days / 30)}mo ago`;
+    return `${Math.floor(days / 365)}y ago`;
+  }
+};
+
+// ── Word count helper ─────────────────────────────────────────
+const WordCount = {
+  count(body) {
+    return body ? body.trim().split(/\s+/).filter(Boolean).length : 0;
+  },
+  fmt(n) {
+    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k words';
+    return n + ' words';
+  }
+};
+
+
+// ── Recently viewed posts tracker ─────────────────────────────
+const RecentlyViewed = {
+  _key: () => _key('recently_viewed'),
+  get() {
+    try { return JSON.parse(localStorage.getItem(this._key()) || '[]'); } catch { return []; }
+  },
+  add(slug) {
+    if (!CONFIG.RECENTLY_VIEWED_COUNT) return;
+    const max = CONFIG.RECENTLY_VIEWED_COUNT || 5;
+    const list = this.get().filter(s => s !== slug);
+    list.unshift(slug);
+    localStorage.setItem(this._key(), JSON.stringify(list.slice(0, max)));
+  },
+  getPosts() {
+    return this.get()
+      .map(slug => AppState.posts.find(p => p.slug === slug))
+      .filter(Boolean);
+  }
+};
+
 // =========================================
 // 2. UTILS
 // =========================================
@@ -104,11 +219,13 @@ const Utils = {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'),
   fmtDate: str => {
     const d = new Date(str + 'T00:00:00');
-    return isNaN(d) ? str : d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const locale = CONFIG.DATE_LOCALE || 'en-US';
+    return isNaN(d) ? str : d.toLocaleDateString(locale, { month: 'long', day: 'numeric', year: 'numeric' });
   },
   fmtDateShort: str => {
     const d = new Date(str + 'T00:00:00');
-    return isNaN(d) ? str : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const locale = CONFIG.DATE_LOCALE || 'en-US';
+    return isNaN(d) ? str : d.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' });
   },
   tagIcon: tag => `<i class="${TAG_ICONS[tag] || TAG_ICONS.Post}" aria-hidden="true"></i>`,
   parseFrontmatter: raw => {
@@ -367,7 +484,7 @@ const Utils = {
     }
     return text.replace(/\n/g, '<br>');
   },
-  readTime: body => `${Math.max(1, Math.ceil(body.trim().split(/\s+/).length / 200))} min`
+  readTime: body => { const wpm = CONFIG.WORDS_PER_MINUTE || 200; return `${Math.max(1, Math.ceil(body.trim().split(/\s+/).length / wpm))} min`; }
 };
 
 // =========================================
@@ -396,6 +513,7 @@ const DataLoader = {
       readTime:       item.readTime       || '1 min',
       paywalled:      item.paywalled === true || item.paywalled === 'true',
       cover:          item.cover          || '',
+      series:         item.series         || '',
       author:         item.author         || CONFIG.AUTHOR_NAME,
       authorRole:     item.author_role    || CONFIG.AUTHOR_ROLE,
       authorBio:      item.author_bio     || CONFIG.AUTHOR_BIO,
@@ -439,13 +557,14 @@ const DataLoader = {
           .replace(/[*_~]{1,3}([^*_~]+)[*_~]{1,3}/g, '$1')
           .replace(/^#{1,6}\s+/gm, '').replace(/^>\s*/gm, '')
           .replace(/^[-*+]\s+/gm, '').replace(/\n/g, ' ').trim();
-        return s.substring(0, 140) + (s.length > 140 ? '…' : '');
+        const _emc = CONFIG.EXCERPT_MAX_CHARS || 140; return s.substring(0, _emc) + (s.length > _emc ? '\u2026' : '');
       })(),
       date:           fm.date     || new Date().toISOString().split('T')[0],
       tag:            fm.tag      || 'Post',
       readTime:       fm.readTime || Utils.readTime(body),
       paywalled:      isPaywalled,
       cover:          fm.cover    || '',
+      series:         fm.series   || '',
       author:         fm.author         || CONFIG.AUTHOR_NAME,
       authorRole:     fm.author_role    || CONFIG.AUTHOR_ROLE,
       authorBio:      fm.author_bio     || CONFIG.AUTHOR_BIO,
@@ -618,7 +737,7 @@ const DataLoader = {
     const { fm, body } = Utils.parseFrontmatter(await r.text());
     const meta = AppState.posts.find(p => p.slug === slug) || {};
     const isPaywalled = fm.paywalled === 'true' || meta.paywalled;
-    const previewBody = Utils._stripTocBlock(body).split(/\n\n+/).slice(0, 12).join('\n\n');
+    const _ppb = CONFIG.PAYWALL_PREVIEW_BLOCKS || 12; const previewBody = Utils._stripTocBlock(body).split(/\n\n+/).slice(0, _ppb).join('\n\n');
     const full = {
       slug,
       title:          fm.title           || meta.title          || 'Untitled',
@@ -628,6 +747,7 @@ const DataLoader = {
       readTime:       fm.readTime         || meta.readTime        || Utils.readTime(body),
       paywalled:      isPaywalled,
       cover:          fm.cover            || meta.cover           || '',
+      series:         fm.series           || meta.series          || '',
       author:         fm.author           || meta.author          || CONFIG.AUTHOR_NAME,
       authorRole:     fm.author_role      || meta.authorRole      || CONFIG.AUTHOR_ROLE,
       authorBio:      fm.author_bio       || meta.authorBio       || CONFIG.AUTHOR_BIO,
@@ -664,36 +784,91 @@ const Renderer = {
       Utils.qs(`#${id}`)?.setAttribute('content', CONFIG.SITE_DESCRIPTION));
     document.getElementById('meta-desc')?.setAttribute('content', CONFIG.SITE_DESCRIPTION);
 
-    // OG image
+    // Keywords meta
+    if (CONFIG.SITE_KEYWORDS) {
+      document.getElementById('meta-keywords')?.setAttribute('content', CONFIG.SITE_KEYWORDS);
+    }
+
+    // OG site name
+    document.getElementById('og-site-name')?.setAttribute('content', CONFIG.SITE_TITLE);
+
+    // OG image + alt
     document.getElementById('og-image')?.setAttribute('content', CONFIG.OG_IMAGE);
+    document.getElementById('og-image-alt')?.setAttribute('content', `${CONFIG.LOGO_ALT} logo`);
     document.getElementById('tw-image')?.setAttribute('content', CONFIG.OG_IMAGE);
 
     // Twitter handle
+    document.getElementById('tw-site')?.setAttribute('content', CONFIG.TWITTER_HANDLE);
+    // Also catch the older attribute-selector pattern for backwards compat
     document.querySelector('meta[name="twitter:site"]')?.setAttribute('content', CONFIG.TWITTER_HANDLE);
 
-    // Favicon (dynamic update — avoids hardcoding in HTML per brand)
-    const faviconEl = document.querySelector('link[rel="icon"]');
+    // Favicon
+    const faviconEl = document.getElementById('favicon') || document.querySelector('link[rel="icon"]');
     if (faviconEl) faviconEl.href = CONFIG.FAVICON_URL;
 
     // Auspicious bar
-    const ausLink = Utils.qs('.auspicious-text');
+    const ausLink = Utils.qs('.auspicious-text') || document.getElementById('auspicious-link');
     if (ausLink) {
       ausLink.textContent = CONFIG.AUSPICIOUS_TEXT;
       ausLink.href        = CONFIG.AUSPICIOUS_URL;
       ausLink.setAttribute('aria-label', CONFIG.AUSPICIOUS_LABEL);
+      ausLink.setAttribute('target', '_blank');
+      ausLink.setAttribute('rel', 'noopener');
     }
 
-    // Logo images (all .logo__img on page)
-    document.querySelectorAll('.logo__img').forEach(img => {
+    // Logo images (header + footer + loader)
+    document.querySelectorAll('.logo__img, #loader-logo-img').forEach(img => {
       img.src = CONFIG.LOGO_IMG_URL;
       img.alt = CONFIG.LOGO_ALT;
     });
+
+    // Wordmark text (the small "blog" label next to the logo)
+    const wordmark = CONFIG.LOGO_WORDMARK || 'blog';
+    document.querySelectorAll('.logo__sub').forEach(el => el.textContent = wordmark);
+    const loaderSpan = document.querySelector('.loader__logo span');
+    if (loaderSpan) loaderSpan.textContent = wordmark;
 
     // Logo link aria-label
     const logoLink = document.getElementById('logo-link');
     if (logoLink) logoLink.setAttribute('aria-label', `${CONFIG.BLOG_URL.replace('https://', '')} home`);
 
-    // Footer
+    // ── Navigation links (desktop + mobile) — driven by CONFIG.NAV_LINKS ──
+    // Falls back gracefully if NAV_LINKS is not defined in an older config.
+    const navLinks = (CONFIG.NAV_LINKS && CONFIG.NAV_LINKS.length)
+      ? CONFIG.NAV_LINKS
+      : [
+          { label: 'Home',        href: '/'               },
+          { label: 'Engineering', href: '/?tag=Engineering' },
+          { label: 'Release',     href: '/?tag=Release'    },
+          { label: 'Linux',       href: '/?tag=Linux'      },
+          { label: 'News',        href: '/?tag=News'       },
+        ];
+
+    // Append Bookmarks link if feature is enabled
+    const allNavLinks = CONFIG.BOOKMARKS_ENABLED
+      ? [...navLinks, { label: '<i class="fa-solid fa-bookmark" aria-hidden="true"></i> Bookmarks', href: '/bookmarks', raw: true }]
+      : navLinks;
+
+    const navHtml = allNavLinks.map(({ label, href, raw }) => {
+      const isExternal = href.startsWith('http') || href.startsWith('//');
+      const ext = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+      const labelHtml = raw ? label : Utils.escapeHtml(label);
+      return `<a href="${href}"${ext}>${labelHtml}</a>`;
+    }).join('');
+
+    // PWA theme-color — sync with current theme
+    const pwaTc = document.getElementById('pwa-theme-color');
+    if (pwaTc) {
+      pwaTc.content = AppState.theme === 'light' ? '#faf9f7' : '#161514';
+    }
+
+    const desktopNav = document.getElementById('desktop-nav');
+    if (desktopNav) desktopNav.innerHTML = navHtml;
+
+    const mobileNav = document.getElementById('mobile-nav');
+    if (mobileNav) mobileNav.innerHTML = navHtml;
+
+    // Footer social links
     const footerLinks = document.getElementById('footer-links');
     if (footerLinks) {
       footerLinks.innerHTML = CONFIG.SOCIAL_LINKS
@@ -703,6 +878,18 @@ const Renderer = {
 
     // Current year
     document.querySelectorAll('[data-current-year]').forEach(el => el.textContent = new Date().getFullYear());
+
+    // RSS feed discovery link
+    if (CONFIG.RSS_ENABLED && CONFIG.RSS_URL) {
+      if (!document.querySelector('link[type="application/rss+xml"]')) {
+        const rssLink = document.createElement('link');
+        rssLink.rel   = 'alternate';
+        rssLink.type  = 'application/rss+xml';
+        rssLink.title = `${CONFIG.SITE_TITLE} RSS Feed`;
+        rssLink.href  = CONFIG.RSS_URL;
+        document.head.appendChild(rssLink);
+      }
+    }
 
     // JSON-LD: Blog (homepage)
     const ldBlogs = document.getElementById('ld-blogs');
@@ -718,7 +905,7 @@ const Renderer = {
         "url": CONFIG.PUBLISHER_URL,
         "logo": { "@type": "ImageObject", "url": CONFIG.PUBLISHER_LOGO }
       },
-      "inLanguage": "en-US"
+      "inLanguage": CONFIG.LANG || CONFIG.DATE_LOCALE || "en-US"
     });
 
     // JSON-LD: Organization
@@ -780,7 +967,7 @@ const Renderer = {
     // Skip the hero post (index 0) and all posts visible in the main grid (indices 1..perPage-1).
     // Sidebar shows the next batch so nothing duplicates the index view.
     const sidebarStart = perPage;
-    const items = posts.slice(sidebarStart, sidebarStart + 4);
+    const _hsc = CONFIG.HERO_SIDEBAR_COUNT || 4; const items = posts.slice(sidebarStart, sidebarStart + _hsc);
     const asideList = Utils.qs('#aside-list');
     asideList.innerHTML = items.length
       ? items.map(item => `
@@ -807,25 +994,50 @@ const Renderer = {
       grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-inbox empty-icon"></i><h3>No posts found</h3><p>Try a different topic or check back soon.</p></div>`;
       return;
     }
+    // ── Search term highlighting helper ──────────────────────────
+    const _hlSearch = (text) => {
+      if (!AppState.search || CONFIG.SEARCH_HIGHLIGHT === false) return Utils.escapeHtml(text);
+      const q = AppState.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return Utils.escapeHtml(text).replace(
+        new RegExp(`(${q})`, 'gi'),
+        '<mark class="search-mark">$1</mark>'
+      );
+    };
+
     grid.innerHTML = posts.map((p, i) => {
       const isFeat = showFeatured && i === 0;
       const visual = p.cover
         ? `<img src="${Utils.escapeHtml(p.cover)}" alt="${Utils.escapeHtml(p.title)}" class="card__cover-img" loading="lazy">`
         : `<i class="fa-solid fa-file-lines card__icon" aria-hidden="true"></i>`;
+      const showRT = CONFIG.CARD_SHOW_READ_TIME !== false;
+      const isBookmarked = CONFIG.BOOKMARKS_ENABLED && localStorage.getItem(_key('bm:' + p.slug)) === '1';
+      // ── Freshness badge ─────────────────────────────────────────
+      const _postAge = p.date ? Math.floor((Date.now() - new Date(p.date + 'T00:00:00')) / 86400000) : 999;
+      const _newDays = CONFIG.NEW_POST_DAYS || 7;
+      const _recentDays = CONFIG.RECENT_POST_DAYS || 30;
+      const _freshBadge = _newDays > 0 && _postAge <= _newDays
+        ? '<span class="freshness-badge freshness-badge--new">New</span>'
+        : (_recentDays > 0 && _postAge <= _recentDays
+          ? '<span class="freshness-badge freshness-badge--recent">Recent</span>'
+          : '');
       return `<article class="card ${isFeat ? 'featured' : ''}" role="listitem" data-idx="${i}">
-        <div class="card__visual">${visual}</div>
+        <div class="card__visual">
+          ${visual}
+          <button class="card__copy-link" data-url="${Utils.escapeHtml(`${CONFIG.BLOG_URL}/post/${p.slug}`)}" aria-label="Copy link" title="Copy link"><i class="fa-solid fa-link"></i></button>
+        </div>
         <div class="card__content">
           <span class="card__tag" data-tag="${Utils.escapeHtml(p.tag)}"><i class="${TAG_ICONS[p.tag] || TAG_ICONS.Post}"></i> ${Utils.escapeHtml(p.tag)}</span>
-          <h2 class="card__title">${Utils.escapeHtml(p.title)}</h2>
-          <p class="card__excerpt">${Utils.safeText(p.excerpt)}</p>
+          <h2 class="card__title">${_freshBadge}${_hlSearch(p.title)}</h2>
+          <p class="card__excerpt">${_hlSearch(p.excerpt)}</p>
           <div class="card__footer">
             <span class="card__author"><i class="fa-solid fa-user-pen"></i> ${Utils.escapeHtml(p.author)}</span>
             <span class="card__meta">
               <i class="fa-regular fa-calendar"></i> ${Utils.fmtDateShort(p.date)}
-              <span class="meta-dot">·</span>
-              <i class="fa-regular fa-clock"></i> ${Utils.escapeHtml(p.readTime)}
+              ${showRT ? `<span class="meta-dot">·</span><i class="fa-regular fa-clock"></i> ${Utils.escapeHtml(p.readTime)}` : ''}
               ${p.paywalled ? '<span class="members-badge"><i class="fa-solid fa-star"></i></span>' : ''}
+              ${CONFIG.VIEW_COUNT_ENABLED !== false ? `<span class="meta-dot">·</span><span class="view-count" title="Views"><i class="fa-regular fa-eye"></i> ${ViewCounter.fmt(ViewCounter.get(p.slug))}</span>` : ''}
             </span>
+            ${CONFIG.BOOKMARKS_ENABLED ? `<button class="card__bookmark${isBookmarked ? ' bookmarked' : ''}" data-bm="${Utils.escapeHtml(p.slug)}" aria-label="${isBookmarked ? 'Remove bookmark' : 'Bookmark'}" title="${isBookmarked ? 'Remove bookmark' : 'Save for later'}"><i class="fa-${isBookmarked ? 'solid' : 'regular'} fa-bookmark"></i></button>` : ''}
           </div>
         </div>
       </article>`;
@@ -840,6 +1052,30 @@ const Renderer = {
         if (tagChip) {
           e.stopPropagation();
           Router.setQuery({ tag: posts[idx].tag, page: 1 });
+          return;
+        }
+        const copyBtn = e.target.closest('.card__copy-link');
+        if (copyBtn) {
+          e.stopPropagation();
+          UI.copyToClipboard(copyBtn.dataset.url).then(() =>
+            UI.showToast('<i class="fa-solid fa-check"></i> Link copied')
+          );
+          return;
+        }
+        const bmBtn = e.target.closest('.card__bookmark');
+        if (bmBtn) {
+          e.stopPropagation();
+          const slug = bmBtn.dataset.bm;
+          const isBm = localStorage.getItem(_key('bm:' + slug)) === '1';
+          const next = !isBm;
+          localStorage.setItem(_key('bm:' + slug), next ? '1' : '0');
+          bmBtn.classList.toggle('bookmarked', next);
+          bmBtn.setAttribute('aria-label', next ? 'Remove bookmark' : 'Bookmark');
+          bmBtn.setAttribute('title', next ? 'Remove bookmark' : 'Save for later');
+          bmBtn.innerHTML = `<i class="fa-${next ? 'solid' : 'regular'} fa-bookmark"></i>`;
+          UI.showToast(next
+            ? '<i class="fa-solid fa-bookmark"></i> Saved to bookmarks'
+            : '<i class="fa-regular fa-bookmark"></i> Removed from bookmarks');
           return;
         }
         Router.go(posts[idx].slug);
@@ -940,7 +1176,7 @@ const Renderer = {
         "logo": { "@type": "ImageObject", "url": CONFIG.PUBLISHER_LOGO }
       },
       "mainEntityOfPage": { "@type": "WebPage", "@id": postUrl },
-      "url": postUrl, "keywords": post.tag, "inLanguage": "en-US"
+      "url": postUrl, "keywords": post.tag, "inLanguage": CONFIG.LANG || CONFIG.DATE_LOCALE || "en-US"
     });
 
     // JSON-LD: BreadcrumbList
@@ -963,14 +1199,14 @@ const Renderer = {
       // Always show TOC/h1 blocks; count only content blocks toward the preview limit
       const alwaysShow = el => el.matches('nav.toc, h1');
       const contentBlocks = blocks.filter(el => !alwaysShow(el));
-      const freeContent   = contentBlocks.slice(0, 12);
+      const freeContent   = contentBlocks.slice(0, CONFIG.PAYWALL_PREVIEW_BLOCKS || 12);
       const tocBlocks     = blocks.filter(el => alwaysShow(el));
       const free  = [...tocBlocks, ...freeContent].map(n => n.outerHTML).join('');
       content = `<div class="paywall-wrap" data-blog-url="${CONFIG.BLOG_URL}"><div class="post-body paywall-fade">${free || '<p>' + (post.excerpt || '') + '</p>'}</div></div>
          <div class="paywall-gate"><div class="paywall-card">
            <i class="fa-solid fa-lock paywall-icon"></i>
-           <h3>Members only</h3>
-           <p>This post is for members. Purchase a membership to unlock all gated posts — you'll receive a license key instantly.</p>
+           <h3>${Utils.escapeHtml(CONFIG.PAYWALL_HEADING || 'Members only')}</h3>
+           <p>${Utils.escapeHtml(CONFIG.PAYWALL_DESCRIPTION || 'This post is for members. Purchase a membership to unlock all gated posts.')}</p>
            <div class="paywall-actions">
              <a class="btn primary" href="${CONFIG.MEMBERSHIP_URL}" target="_blank" rel="noopener">
                <i class="fa-solid fa-cart-shopping"></i> Get Access — ${CONFIG.MEMBERSHIP_PRICE}
@@ -978,9 +1214,9 @@ const Renderer = {
              <button class="btn" id="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to posts</button>
            </div>
            <div class="paywall-key-wrap">
-             <p class="paywall-key-label">Already a member? Enter your license key:</p>
+             <p class="paywall-key-label">${Utils.escapeHtml(CONFIG.PAYWALL_KEY_LABEL || 'Already a member? Enter your license key:')}</p>
              <div class="paywall-key-row">
-               <input type="text" id="license-input" class="paywall-key-input" placeholder="XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX" spellcheck="false" autocomplete="off">
+               <input type="text" id="license-input" class="paywall-key-input" placeholder="${Utils.escapeHtml(CONFIG.PAYWALL_KEY_PLACEHOLDER || 'XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX')}" spellcheck="false" autocomplete="off">
                <button class="btn primary" id="unlock-btn"><i class="fa-solid fa-unlock"></i> Unlock</button>
              </div>
              <p class="paywall-key-status" id="key-status" aria-live="polite"></p>
@@ -990,7 +1226,8 @@ const Renderer = {
       content = `<div class="post-body">${html}</div>`;
     }
 
-    const liked = localStorage.getItem(`liked:${post.slug}`) === '1';
+    const liked    = localStorage.getItem(_key('liked:' + post.slug)) === '1';
+    const liked_bm = CONFIG.BOOKMARKS_ENABLED && localStorage.getItem(_key('bm:' + post.slug)) === '1';
 
     app.innerHTML = `
       <header class="post-header">
@@ -1011,13 +1248,20 @@ const Renderer = {
           <div class="meta-info">
             <div class="meta-name">${Utils.escapeHtml(post.author)}</div>
             <div class="meta-details">
-              <span><i class="fa-regular fa-calendar"></i> ${date}</span>
+              <span title="${Utils.escapeHtml(RelDate.fmt(post.date))}"><i class="fa-regular fa-calendar"></i> ${date}</span>
               <span class="meta-dot">·</span>
               <span><i class="fa-regular fa-clock"></i> ${Utils.escapeHtml(post.readTime)}</span>
+              ${CONFIG.SHOW_WORD_COUNT !== false && post.body ? `<span class="meta-dot">·</span><span title="Word count"><i class="fa-solid fa-align-left"></i> ${WordCount.fmt(WordCount.count(post.body))}</span>` : ''}
+              ${CONFIG.VIEW_COUNT_ENABLED !== false ? `<span class="meta-dot">·</span><span class="view-count" title="Views"><i class="fa-regular fa-eye"></i> ${ViewCounter.fmt(ViewCounter.get(post.slug))}</span>` : ''}
               ${paywalled ? '<span class="meta-dot">·</span><span class="members-badge"><i class="fa-solid fa-star"></i> Members</span>' : ''}
             </div>
           </div>
           <div class="meta-actions">
+            ${CONFIG.FONT_SIZE_CONTROLS !== false ? `<div class="font-size-ctrl" aria-label="Text size">
+              <button class="btn btn--icon-sm" id="font-dec" title="Smaller text" aria-label="Decrease font size"><span>A−</span></button>
+              <button class="btn btn--icon-sm" id="font-rst" title="Reset text size" aria-label="Reset font size"><span>A</span></button>
+              <button class="btn btn--icon-sm" id="font-inc" title="Larger text" aria-label="Increase font size"><span>A+</span></button>
+            </div>` : ''}
             ${!(paywalled && !AppState.isMember) ? '<button class="btn" id="print-btn"><i class="fa-solid fa-print"></i> Print</button>' : ''}
             <button class="btn" id="share-btn"><i class="fa-solid fa-share-nodes"></i> Share</button>
           </div>
@@ -1049,17 +1293,22 @@ const Renderer = {
         <div class="post-tags">
           <button class="tag-chip" data-back-tag="${Utils.escapeHtml(post.tag)}" title="Browse all ${Utils.escapeHtml(post.tag)} posts">${Utils.tagIcon(post.tag)} More ${Utils.escapeHtml(post.tag)}</button>
           <button class="tag-chip" id="all-posts-btn"><i class="fa-solid fa-grip"></i> All Posts</button>
+          ${CONFIG.BOOKMARKS_ENABLED ? `<button class="tag-chip ${liked_bm ? 'bookmarked' : ''}" id="post-bookmark-btn" aria-label="Bookmark"><i class="fa-${liked_bm ? 'solid' : 'regular'} fa-bookmark"></i> ${liked_bm ? 'Saved' : 'Save'}</button>` : ''}
         </div>
         <div class="meta-actions">
           <button class="btn like ${liked ? 'reacted' : ''}" id="like-btn">
             <i class="fa-${liked ? 'solid' : 'regular'} fa-heart"></i> ${liked ? 'Liked' : 'Like'}
           </button>
           <button class="btn" id="footer-copy-link-btn" aria-label="Copy link"><i class="fa-solid fa-link"></i> Copy link</button>
+          ${CONFIG.COPY_MD_LINK !== false ? `<button class="btn" id="footer-copy-md-btn" aria-label="Copy as Markdown link" title="Copy [Title](URL) for Markdown"><i class="fa-brands fa-markdown"></i> Copy MD</button>` : ''}
           <button class="btn" id="footer-share-btn"><i class="fa-solid fa-share-nodes"></i> Share</button>
           ${!(paywalled && !AppState.isMember) ? '<button class="btn" id="footer-print-btn"><i class="fa-solid fa-print"></i> Print</button>' : ''}
         </div>
         <div class="post-nav" id="post-nav-btns"></div>
-      </footer>`;
+      </footer>
+      <div id="post-series-strip"></div>
+      <div id="post-related"></div>
+      <div id="post-newsletter"></div>`;
 
     // ── Adaptive paywall fade ─────────────────────────────────
     // After the DOM is painted, measure the preview's natural height.
@@ -1095,7 +1344,7 @@ const Renderer = {
     app.querySelector('#like-btn')?.addEventListener('click', function () {
       const is = this.classList.toggle('reacted');
       this.innerHTML = `<i class="fa-${is ? 'solid' : 'regular'} fa-heart"></i> ${is ? 'Liked' : 'Like'}`;
-      localStorage.setItem(`liked:${post.slug}`, is ? '1' : '0');
+      localStorage.setItem(_key('liked:' + post.slug), is ? '1' : '0');
     });
 
     // Prev / Next navigation
@@ -1117,6 +1366,33 @@ const Renderer = {
       navEl.querySelector('#nav-next')?.addEventListener('click', () => Router.go(next.slug));
     }
 
+    // ── Font size controls ────────────────────────────────────────
+    if (CONFIG.FONT_SIZE_CONTROLS !== false) {
+      const postBody = app.querySelector('.post-body');
+      const FS_SIZES = [14, 16, 18, 20, 22]; // px options
+      const FS_DEFAULT = 16;
+      let fsCurrent = parseInt(localStorage.getItem(_key('font_size')) || FS_DEFAULT);
+      const applyFontSize = (sz) => {
+        fsCurrent = Math.max(FS_SIZES[0], Math.min(FS_SIZES[FS_SIZES.length-1], sz));
+        if (postBody) postBody.style.fontSize = fsCurrent + 'px';
+        localStorage.setItem(_key('font_size'), fsCurrent);
+        app.querySelector('#font-dec').disabled = fsCurrent <= FS_SIZES[0];
+        app.querySelector('#font-inc').disabled = fsCurrent >= FS_SIZES[FS_SIZES.length-1];
+      };
+      applyFontSize(fsCurrent);
+      app.querySelector('#font-dec')?.addEventListener('click', () => applyFontSize(fsCurrent - 2));
+      app.querySelector('#font-rst')?.addEventListener('click', () => applyFontSize(FS_DEFAULT));
+      app.querySelector('#font-inc')?.addEventListener('click', () => applyFontSize(fsCurrent + 2));
+    }
+
+    // ── Copy as Markdown link ─────────────────────────────────────
+    app.querySelector('#footer-copy-md-btn')?.addEventListener('click', () => {
+      const mdLink = `[${post.title}](${location.href})`;
+      UI.copyToClipboard(mdLink).then(() =>
+        UI.showToast('<i class="fa-brands fa-markdown"></i> Markdown link copied')
+      );
+    });
+
     app.querySelector('#share-btn')?.addEventListener('click', () => UI.share(post));
     app.querySelector('#footer-share-btn')?.addEventListener('click', () => UI.share(post));
     app.querySelector('#footer-copy-link-btn')?.addEventListener('click', () => {
@@ -1127,6 +1403,150 @@ const Renderer = {
     app.querySelector('#footer-print-btn')?.addEventListener('click', () => window.print());
 
     app.querySelector('#back-btn')?.addEventListener('click', () => Router.back());
+
+    // ── Bookmark toggle on post page ─────────────────────────────
+    app.querySelector('#post-bookmark-btn')?.addEventListener('click', function() {
+      const isBm = localStorage.getItem(_key('bm:' + post.slug)) === '1';
+      const next = !isBm;
+      localStorage.setItem(_key('bm:' + post.slug), next ? '1' : '0');
+      this.classList.toggle('bookmarked', next);
+      this.innerHTML = `<i class="fa-${next ? 'solid' : 'regular'} fa-bookmark"></i> ${next ? 'Saved' : 'Save'}`;
+      UI.showToast(next
+        ? '<i class="fa-solid fa-bookmark"></i> Saved to bookmarks'
+        : '<i class="fa-regular fa-bookmark"></i> Removed from bookmarks');
+    });
+
+    // ── Series navigation strip ───────────────────────────────────
+    if (CONFIG.SERIES_ENABLED && post.series && AppState.posts.length) {
+      const seriesPosts = AppState.posts
+        .filter(p => p.series && p.series === post.series)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+      if (seriesPosts.length > 1) {
+        const seriesEl = app.querySelector('#post-series-strip');
+        const currentIdx = seriesPosts.findIndex(p => p.slug === post.slug);
+        seriesEl.innerHTML = `
+          <div class="series-strip">
+            <div class="series-strip__header">
+              <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+              <span>Part of a series: <strong>${Utils.escapeHtml(post.series)}</strong></span>
+              <span class="series-strip__count">${currentIdx + 1} / ${seriesPosts.length}</span>
+            </div>
+            <ol class="series-strip__list">
+              ${seriesPosts.map((sp, si) => `
+                <li class="series-strip__item${sp.slug === post.slug ? ' active' : ''}">
+                  <button class="series-strip__btn" data-slug="${Utils.escapeHtml(sp.slug)}" ${sp.slug === post.slug ? 'disabled' : ''}>
+                    <span class="series-strip__num">${si + 1}</span>
+                    <span class="series-strip__title">${Utils.escapeHtml(sp.title)}</span>
+                    ${sp.slug === post.slug ? '<span class="series-strip__badge">Reading</span>' : ''}
+                  </button>
+                </li>`).join('')}
+            </ol>
+          </div>`;
+        seriesEl.querySelectorAll('.series-strip__btn:not([disabled])').forEach(btn => {
+          btn.addEventListener('click', () => Router.go(btn.dataset.slug));
+        });
+      }
+    }
+
+    // ── Related posts ─────────────────────────────────────────────
+    const relCount = parseInt(CONFIG.RELATED_POSTS_COUNT) || 0;
+    if (relCount > 0 && AppState.posts.length > 1) {
+      const related = AppState.posts
+        .filter(p => p.slug !== post.slug)
+        .sort((a, b) => {
+          const aScore = (a.tag === post.tag ? 2 : 0);
+          const bScore = (b.tag === post.tag ? 2 : 0);
+          return bScore - aScore || new Date(b.date) - new Date(a.date);
+        })
+        .slice(0, relCount);
+      const relEl = app.querySelector('#post-related');
+      if (related.length) {
+        relEl.innerHTML = `
+          <section class="related-posts">
+            <div class="section-header">
+              <h2 class="section-header__title">Keep reading</h2>
+              <div class="section-header__line"></div>
+            </div>
+            <div class="related-posts__grid">
+              ${related.map(rp => {
+                const visual = rp.cover
+                  ? `<img src="${Utils.escapeHtml(rp.cover)}" alt="${Utils.escapeHtml(rp.title)}" loading="lazy">`
+                  : `<i class="fa-solid fa-file-lines" aria-hidden="true"></i>`;
+                return `<button class="related-card" data-slug="${Utils.escapeHtml(rp.slug)}">
+                  <div class="related-card__visual">${visual}</div>
+                  <div class="related-card__body">
+                    <span class="related-card__tag">${Utils.tagIcon(rp.tag)} ${Utils.escapeHtml(rp.tag)}</span>
+                    <h3 class="related-card__title">${Utils.escapeHtml(rp.title)}</h3>
+                    <span class="related-card__meta"><i class="fa-regular fa-clock"></i> ${Utils.escapeHtml(rp.readTime)}</span>
+                  </div>
+                </button>`;
+              }).join('')}
+            </div>
+          </section>`;
+        relEl.querySelectorAll('.related-card').forEach(btn => {
+          btn.addEventListener('click', () => Router.go(btn.dataset.slug));
+        });
+      }
+    }
+
+    // ── Newsletter signup ─────────────────────────────────────────
+    if (CONFIG.NEWSLETTER_ENABLED && !AppState.isMember) {
+      const nlEl = app.querySelector('#post-newsletter');
+      nlEl.innerHTML = `
+        <div class="newsletter-block">
+          <div class="newsletter-block__icon"><i class="fa-solid fa-envelope-open-text" aria-hidden="true"></i></div>
+          <h3 class="newsletter-block__headline">${Utils.escapeHtml(CONFIG.NEWSLETTER_HEADLINE || 'Stay in the loop')}</h3>
+          <p class="newsletter-block__desc">${Utils.escapeHtml(CONFIG.NEWSLETTER_DESCRIPTION || '')}</p>
+          <div class="newsletter-block__form" id="nl-form">
+            <input type="email" class="newsletter-block__input" id="nl-email"
+              placeholder="${Utils.escapeHtml(CONFIG.NEWSLETTER_PLACEHOLDER || 'you@example.com')}"
+              autocomplete="email" required>
+            <button class="btn primary newsletter-block__btn" id="nl-submit">
+              <i class="fa-solid fa-paper-plane"></i> ${Utils.escapeHtml(CONFIG.NEWSLETTER_CTA || 'Subscribe')}
+            </button>
+          </div>
+          <p class="newsletter-block__status" id="nl-status" aria-live="polite"></p>
+        </div>`;
+
+      const nlForm   = nlEl.querySelector('#nl-form');
+      const nlEmail  = nlEl.querySelector('#nl-email');
+      const nlSubmit = nlEl.querySelector('#nl-submit');
+      const nlStatus = nlEl.querySelector('#nl-status');
+
+      const doSubscribe = async () => {
+        const email = nlEmail.value.trim();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          nlStatus.textContent = 'Please enter a valid email address.';
+          nlStatus.className   = 'newsletter-block__status newsletter-block__status--error';
+          return;
+        }
+        nlSubmit.disabled = true;
+        nlSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Subscribing…';
+        nlStatus.textContent = '';
+
+        if (CONFIG.NEWSLETTER_ACTION) {
+          try {
+            const fd = new FormData();
+            fd.append('email', email);
+            await fetch(CONFIG.NEWSLETTER_ACTION, { method: 'POST', body: fd, mode: 'no-cors' });
+          } catch { /* no-cors swallows errors; assume success */ }
+        }
+
+        nlStatus.textContent = CONFIG.NEWSLETTER_SUCCESS || "You're subscribed!";
+        nlStatus.className   = 'newsletter-block__status newsletter-block__status--ok';
+        nlForm.style.display = 'none';
+        sessionStorage.setItem(_key('nl_done'), '1');
+      };
+
+      if (sessionStorage.getItem(_key('nl_done')) === '1') {
+        nlForm.style.display = 'none';
+        nlStatus.textContent = CONFIG.NEWSLETTER_SUCCESS || "You're subscribed!";
+        nlStatus.className   = 'newsletter-block__status newsletter-block__status--ok';
+      } else {
+        nlSubmit.addEventListener('click', doSubscribe);
+        nlEmail.addEventListener('keydown', e => { if (e.key === 'Enter') doSubscribe(); });
+      }
+    }
 
     // ── Lemon Squeezy license key verification ───────────────────
     const unlockBtn   = app.querySelector('#unlock-btn');
@@ -1160,7 +1580,7 @@ const Renderer = {
           const data = await res.json();
 
           if (data.valid) {
-            localStorage.setItem('blogs_member', '1');
+            localStorage.setItem(_key('member'), '1');
             await LicenseCrypto.store(key); // stores SHA-256 hash only — raw key is never persisted
             AppState.isMember = true;
             // Clear the stripped cache so the full body is re-fetched
@@ -1245,6 +1665,36 @@ const Renderer = {
     });
 
     if (typeof Prism !== 'undefined') Prism.highlightAll();
+
+    // ── Increment view counter ────────────────────────────────────
+    ViewCounter.increment(post.slug);
+    // ── Track recently viewed ─────────────────────────────────────
+    RecentlyViewed.add(post.slug);
+
+    // ── Reading progress in page title ────────────────────────────
+    const _titleBase = document.title;
+    const _titleScroll = () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      if (total <= 0) return;
+      const pct = Math.round(window.scrollY / total * 100);
+      document.title = pct > 2 && pct < 99 ? `${pct}% · ${post.title}` : _titleBase;
+    };
+    window._titleScrollHandler && window.removeEventListener('scroll', window._titleScrollHandler);
+    window._titleScrollHandler = _titleScroll;
+    window.addEventListener('scroll', _titleScroll, { passive: true });
+
+    // ── Anchor deep-link toast ────────────────────────────────────
+    if (location.hash) {
+      const targetId = decodeURIComponent(location.hash.slice(1));
+      const target = document.getElementById(targetId);
+      if (target) {
+        setTimeout(() => {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          UI.showToast(`<i class="fa-solid fa-link"></i> Jumped to: ${target.textContent.replace(/#$/, '').trim().slice(0, 40)}`);
+        }, 350);
+      }
+    }
+
     window.scrollTo({ top: 0, behavior: 'instant' });
 
     // ── Ads — inject mid-post on free posts only ─────────────────
@@ -1363,6 +1813,68 @@ const Router = {
     const indexEl = document.getElementById('view-index');
     const postEl  = document.getElementById('view-post');
     const readBar = document.getElementById('reading-bar');
+
+    // ── Bookmarks view (/bookmarks) ────────────────────────────
+    if (location.pathname === '/bookmarks') {
+      indexEl.style.display = 'none';
+      postEl.style.display  = 'none';
+      if (readBar) { readBar.style.display = 'none'; readBar.style.width = '0%'; }
+      document.title = `Bookmarks — ${CONFIG.SITE_TITLE}`;
+      let bmView = document.getElementById('view-bookmarks');
+      if (!bmView) {
+        bmView = document.createElement('section');
+        bmView.id = 'view-bookmarks';
+        bmView.className = 'container';
+        document.getElementById('main-content').appendChild(bmView);
+      }
+      bmView.style.display = '';
+      const savedSlugs = AppState.posts
+        .filter(p => localStorage.getItem(_key('bm:' + p.slug)) === '1')
+        .map(p => p.slug);
+      const savedPosts = savedSlugs.map(sl => AppState.posts.find(p => p.slug === sl)).filter(Boolean);
+      const recentPosts = (CONFIG.RECENTLY_VIEWED_COUNT || 0) > 0 ? RecentlyViewed.getPosts() : [];
+      bmView.innerHTML = `
+        <div class="section-header" style="margin-top:var(--space-12)">
+          <h2 class="section-header__title"><i class="fa-solid fa-bookmark"></i> Bookmarks</h2>
+          <div class="section-header__line"></div>
+        </div>
+        ${savedPosts.length === 0
+          ? `<div class="empty-state"><i class="fa-regular fa-bookmark empty-icon"></i><h3>No bookmarks yet</h3><p>Hit the bookmark icon on any post or card to save it here.</p><button class="btn primary" id="bm-back-btn"><i class="fa-solid fa-arrow-left"></i> Browse posts</button></div>`
+          : `<div class="grid" id="bm-grid" role="list"></div>`}
+        ${recentPosts.length > 0 ? `
+          <div class="section-header" style="margin-top:var(--space-10)">
+            <h2 class="section-header__title" style="font-size:1.1rem"><i class="fa-solid fa-clock-rotate-left"></i> Recently Viewed</h2>
+            <div class="section-header__line"></div>
+          </div>
+          <ul class="recently-viewed-list">
+            ${recentPosts.map(p => `
+              <li class="recently-viewed-item">
+                <button class="recently-viewed-btn" data-slug="${Utils.escapeHtml(p.slug)}">
+                  <span class="recently-viewed-tag">${Utils.tagIcon(p.tag)}</span>
+                  <span class="recently-viewed-title">${Utils.escapeHtml(p.title)}</span>
+                  <span class="recently-viewed-meta"><i class="fa-regular fa-clock"></i> ${Utils.escapeHtml(p.readTime)}</span>
+                </button>
+              </li>`).join('')}
+          </ul>` : ''}`;
+      if (savedPosts.length) {
+        Renderer.renderPosts(savedPosts, false);
+        // re-target the grid rendered into #posts-grid to #bm-grid
+        const pg = document.getElementById('posts-grid');
+        const bg = document.getElementById('bm-grid');
+        if (pg && bg) { bg.innerHTML = pg.innerHTML; pg.innerHTML = ''; }
+      }
+      bmView.querySelector('#bm-back-btn')?.addEventListener('click', () => Router.back());
+      bmView.querySelectorAll('.recently-viewed-btn[data-slug]').forEach(btn => {
+        btn.addEventListener('click', () => Router.go(btn.dataset.slug));
+      });
+      document.querySelectorAll('.nav a, .mobile-nav a').forEach(a =>
+        a.classList.toggle('active', a.getAttribute('href') === '/bookmarks'));
+      return;
+    }
+
+    // Hide bookmarks view if visible
+    const bmView2 = document.getElementById('view-bookmarks');
+    if (bmView2) bmView2.style.display = 'none';
 
     // Close search bar only when navigating to a post, not on index re-renders (e.g. search input)
     const searchBar   = Utils.qs('#search-bar');
@@ -1513,17 +2025,20 @@ const UI = {
     const apply = t => {
       document.documentElement.setAttribute('data-theme', t);
       AppState.theme = t;
-      localStorage.setItem('blogs-theme', t);
+      localStorage.setItem(_key('theme'), t);
       if (icon) icon.className = t === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
       const prismLink = document.getElementById('prism-theme');
       if (prismLink) prismLink.href = t === 'dark' ? PRISM_DARK : PRISM_LIGHT;
+      // Update PWA theme-color
+      const pwaTc = document.getElementById('pwa-theme-color');
+      if (pwaTc) pwaTc.content = t === 'light' ? '#faf9f7' : '#161514';
     };
     apply(AppState.theme);
     btn?.addEventListener('click', () =>
       apply(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark')
     );
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-      if (!localStorage.getItem('blogs-theme')) apply(e.matches ? 'dark' : 'light');
+      if (!localStorage.getItem(_key('theme'))) apply(e.matches ? 'dark' : 'light');
     });
   },
 
@@ -1609,9 +2124,11 @@ const UI = {
     const bar = Utils.qs('#tag-bar');
     if (!bar) return;
     const tags = ['all', ...new Set(AppState.posts.map(p => p.tag))];
-    bar.innerHTML = tags.map(t =>
-      `<button class="chip ${t === AppState.filter ? 'active' : ''}" data-tag="${t}">${t !== 'all' ? Utils.tagIcon(t) + ' ' : ''}${t === 'all' ? 'All' : t}</button>`
-    ).join('');
+    const tagCounts = AppState.posts.reduce((acc, p) => { acc[p.tag] = (acc[p.tag] || 0) + 1; return acc; }, {});
+    bar.innerHTML = tags.map(t => {
+      const count = t === 'all' ? AppState.posts.length : (tagCounts[t] || 0);
+      return `<button class="chip ${t === AppState.filter ? 'active' : ''}" data-tag="${t}">${t !== 'all' ? Utils.tagIcon(t) + ' ' : ''}${t === 'all' ? 'All' : t}<span class="chip__count">${count}</span></button>`;
+    }).join('');
     bar.addEventListener('click', e => {
       const btn = e.target.closest('.chip');
       if (!btn) return;
@@ -1627,7 +2144,7 @@ const UI = {
   initBackTop() {
     const btn = Utils.qs('#back-top');
     if (!btn) return;
-    window.addEventListener('scroll', () => btn.classList.toggle('show', window.scrollY > 400), { passive: true });
+    const _bto = CONFIG.BACK_TO_TOP_OFFSET || 400; window.addEventListener('scroll', () => btn.classList.toggle('show', window.scrollY > _bto), { passive: true });
     btn.addEventListener('click', () => scrollTo({ top: 0, behavior: 'smooth' }));
   },
 
@@ -1669,7 +2186,7 @@ const UI = {
     });
     document.body.appendChild(toast);
     setTimeout(() => toast.classList.add('show'), 10);
-    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, CONFIG.TOAST_DURATION || 2500);
   },
 
   copyToClipboard(text) {
@@ -1688,6 +2205,109 @@ const UI = {
     try { document.execCommand('copy'); } catch {}
     ta.remove();
     return Promise.resolve();
+  },
+
+  initKeyboardShortcuts() {
+    if (CONFIG.KEYBOARD_SHORTCUTS_ENABLED === false) return;
+    // Wire the ? button in header
+    document.getElementById('shortcuts-hint')?.addEventListener('click', () => UI.showShortcutsModal());
+    let gPressed = false, gTimer;
+    document.addEventListener('keydown', e => {
+      // Skip if user is typing in an input/textarea
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+      if (document.activeElement.isContentEditable) return;
+
+      // ? → show shortcuts modal
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        UI.showShortcutsModal();
+        return;
+      }
+
+      // G-sequence shortcuts: G then H / B / P
+      if (e.key === 'g' || e.key === 'G') {
+        gPressed = true;
+        clearTimeout(gTimer);
+        gTimer = setTimeout(() => { gPressed = false; }, 1500);
+        return;
+      }
+      if (gPressed) {
+        gPressed = false; clearTimeout(gTimer);
+        if (e.key === 'h' || e.key === 'H') { e.preventDefault(); history.pushState({}, '', '/'); Router.render(); return; }
+        if ((e.key === 'b' || e.key === 'B') && CONFIG.BOOKMARKS_ENABLED) { e.preventDefault(); history.pushState({}, '', '/bookmarks'); Router.render(); return; }
+      }
+
+      // Arrow keys for prev/next post
+      if (e.key === 'ArrowLeft') {
+        const prev = document.getElementById('nav-prev');
+        if (prev) { e.preventDefault(); prev.click(); }
+      }
+      if (e.key === 'ArrowRight') {
+        const next = document.getElementById('nav-next');
+        if (next) { e.preventDefault(); next.click(); }
+      }
+
+      // L → like current post
+      if (e.key === 'l' || e.key === 'L') {
+        const likeBtn = document.getElementById('like-btn');
+        if (likeBtn) { e.preventDefault(); likeBtn.click(); }
+      }
+
+      // B → bookmark current post
+      if (e.key === 'b' || e.key === 'B') {
+        const bmBtn = document.getElementById('post-bookmark-btn');
+        if (bmBtn) { e.preventDefault(); bmBtn.click(); }
+      }
+    });
+  },
+
+  showShortcutsModal() {
+    if (document.getElementById('shortcuts-modal')) return;
+    const modal = document.createElement('div');
+    modal.id = 'shortcuts-modal';
+    modal.className = 'shortcuts-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Keyboard shortcuts');
+    modal.innerHTML = `
+      <div class="shortcuts-modal__card">
+        <div class="shortcuts-modal__header">
+          <h2 class="shortcuts-modal__title"><i class="fa-solid fa-keyboard"></i> Keyboard Shortcuts</h2>
+          <button class="btn-icon shortcuts-modal__close" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="shortcuts-modal__grid">
+          <div class="shortcuts-modal__group">
+            <h3>Navigation</h3>
+            <div class="shortcut-row"><kbd>G</kbd><kbd>H</kbd><span>Go home</span></div>
+            <div class="shortcut-row"><kbd>G</kbd><kbd>B</kbd><span>Go to bookmarks</span></div>
+            <div class="shortcut-row"><kbd>←</kbd><kbd>→</kbd><span>Older / Newer post</span></div>
+          </div>
+          <div class="shortcuts-modal__group">
+            <h3>Search</h3>
+            <div class="shortcut-row"><kbd>Ctrl</kbd><kbd>K</kbd><span>Open search</span></div>
+            <div class="shortcut-row"><kbd>Esc</kbd><span>Close search</span></div>
+          </div>
+          <div class="shortcuts-modal__group">
+            <h3>Post actions</h3>
+            <div class="shortcut-row"><kbd>L</kbd><span>Like post</span></div>
+            <div class="shortcut-row"><kbd>B</kbd><span>Bookmark post</span></div>
+          </div>
+          <div class="shortcuts-modal__group">
+            <h3>Interface</h3>
+            <div class="shortcut-row"><kbd>?</kbd><span>Show this panel</span></div>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.querySelector('.shortcuts-modal__close').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    document.addEventListener('keydown', function esc(e) {
+      if (e.key === 'Escape') { modal.remove(); document.removeEventListener('keydown', esc); }
+    });
+    // Focus trap
+    setTimeout(() => modal.querySelector('.shortcuts-modal__close')?.focus(), 50);
   },
 
   share(post) {
@@ -1721,6 +2341,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   UI.initReadingBar();
   UI.initSearch();
   UI.initLogoLink();
+  UI.initKeyboardShortcuts();
+  ReadingStreak.update();
+  ReadingStreak.render();
 
   const loadGrid = Utils.qs('#posts-grid');
   if (loadGrid) loadGrid.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';

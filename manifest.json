@@ -1,0 +1,22 @@
+{
+  "name": "Shanios Blog",
+  "short_name": "Shanios",
+  "description": "Engineering breakdowns and release notes from the Shanios team.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#161514",
+  "theme_color": "#161514",
+  "lang": "en-IN",
+  "icons": [
+    {
+      "src": "https://shani.dev/assets/images/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "technology",
+    "news"
+  ]
+}

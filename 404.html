@@ -1,83 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <!-- ═══ PRIMARY SEO ═══════════════════════════════════════════ -->
-  <title>Shanios Blog — Engineering, Linux &amp; Open Source</title>
-  <meta name="description" id="meta-desc" content="Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.">
-  <meta name="keywords" content="Shanios, immutable Linux, atomic updates, rollback, open source OS, Arch Linux, Btrfs, zero telemetry, shani.dev">
-  <meta name="author" content="Shanios Team">
-  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-  <link rel="canonical" id="canonical-url" href="https://blog.shani.dev/">
+  <!-- ═══ PRIMARY SEO ═══════════════════════════════════════════════════════ -->
+  <title>Blog</title>
+  <meta name="description" id="meta-desc" content="">
+  <meta name="keywords"    id="meta-keywords" content="">
+  <meta name="author"      content="Blog">
+  <meta name="robots"      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical"    id="canonical-url" href="">
 
-  <!-- ═══ OPEN GRAPH ══════════════════════════════════════════════ -->
-  <meta property="og:site_name" content="Shanios Blog">
-  <meta property="og:title" id="og-title" content="Shanios Blog — Engineering, Linux &amp; Open Source">
-  <meta property="og:description" id="og-desc" content="Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.">
-  <meta property="og:type" id="og-type" content="website">
-  <meta property="og:url" id="og-url" content="https://blog.shani.dev/">
-  <meta property="og:image" id="og-image" content="https://shani.dev/assets/images/logo.svg">
-  <meta property="og:image:alt" content="Shanios logo">
-  <meta property="og:locale" content="en_US">
+  <!-- ═══ OPEN GRAPH ════════════════════════════════════════════════════════ -->
+  <meta property="og:site_name" id="og-site-name" content="Blog">
+  <meta property="og:title"     id="og-title"     content="">
+  <meta property="og:description" id="og-desc"    content="">
+  <meta property="og:type"      id="og-type"      content="website">
+  <meta property="og:url"       id="og-url"       content="">
+  <meta property="og:image"     id="og-image"     content="">
+  <meta property="og:image:alt" id="og-image-alt" content="Blog logo">
+  <meta property="og:locale"    content="en_US">
 
-  <!-- ═══ TWITTER / X CARD ═══════════════════════════════════════ -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:site" content="@shani8dev">
-  <meta name="twitter:title" id="tw-title" content="Shanios Blog — Engineering, Linux &amp; Open Source">
-  <meta name="twitter:description" id="tw-desc" content="Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.">
-  <meta name="twitter:image" id="tw-image" content="https://shani.dev/assets/images/logo.svg">
+  <!-- ═══ TWITTER / X CARD ════════════════════════════════════════════════ -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:site"        id="tw-site"  content="">
+  <meta name="twitter:title"       id="tw-title" content="">
+  <meta name="twitter:description" id="tw-desc"  content="">
+  <meta name="twitter:image"       id="tw-image" content="">
 
-  <!-- ═══ STRUCTURED DATA (JSON-LD) ══════════════════════════════ -->
-  <script type="application/ld+json" id="ld-blogs">
-  {
-    "@context": "https://schema.org",
-    "@type": "Blog",
-    "name": "Shanios Blog",
-    "url": "https://blog.shani.dev/",
-    "description": "The official Shanios Blog covering immutable Linux, atomic updates, OS engineering, product releases, and project news.",
-    "publisher": {
-      "@type": "Organization",
-      "name": "Shanios",
-      "url": "https://shani.dev",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://shani.dev/assets/images/logo.svg"
-      }
-    },
-    "inLanguage": "en-US"
-  }
-  </script>
-  <script type="application/ld+json" id="ld-org">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Shanios",
-    "url": "https://shani.dev",
-    "logo": "https://shani.dev/assets/images/logo.svg",
-    "sameAs": [
-      "https://www.linkedin.com/in/Shrinivasvkumbhar/",
-      "https://github.com/shani8dev"
-    ]
-  }
-  </script>
+  <!-- ═══ STRUCTURED DATA ══════════════════════════════════════════════════ -->
+  <script type="application/ld+json" id="ld-blogs">{}</script>
+  <script type="application/ld+json" id="ld-org">{}</script>
 
-  <!-- ═══ PERFORMANCE / PRECONNECT ═══════════════════════════════ -->
+  <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.prod.website-files.com">
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 
-  <!-- ═══ FAVICON ═══════════════════════════════════════════════ -->
-  <link rel="icon" type="image/svg+xml" href="https://shani.dev/assets/images/logo.svg">
+  <link rel="manifest" href="/manifest.json">
 
-  <!-- GitHub Pages SPA: encode the current path and redirect to index.html -->
+  <!-- ═══ FAVICON ═════════════════════════════════════════════════════════ -->
+  <link rel="icon" id="favicon" type="image/svg+xml" href="">
+
+  <!-- ═══ GitHub Pages SPA 404 redirect ════════════════════════════════════
+       Encodes the current path + query + hash into the index page URL so the
+       SPA can restore it.  This is the ONLY script that belongs in 404.html.
+  ════════════════════════════════════════════════════════════════════════ -->
   <script>
     (function () {
       var l = window.location;
-      var path = l.pathname;
+      var path   = l.pathname;
       var search = l.search ? l.search.slice(1) : '';
       var hash   = l.hash   ? l.hash.slice(1)   : '';
       var redirect = l.protocol + '//' + l.hostname +
@@ -88,27 +62,34 @@
       l.replace(redirect);
     })();
   </script>
-  <!-- Theme applied before CSS paints to prevent flash -->
+
+  <!-- ═══ Theme — applied before CSS to prevent flash ═════════════════════ -->
   <script>
-    (function(){
-      var t = localStorage.getItem('blogs-theme') ||
+    (function () {
+      var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
+      var t = localStorage.getItem(pfx + '_theme') ||
               (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       document.documentElement.setAttribute('data-theme', t);
     })();
   </script>
 
-  <!-- ═══ BRAND + SHARED STYLES ══════════════════════════════════ -->
+  <!-- ═══ STYLES ═══════════════════════════════════════════════════════════ -->
   <link rel="stylesheet" href="/brand-shani.css">
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <!-- Prism.js — code syntax highlighting (theme swaps with dark/light mode) -->
-  <link rel="stylesheet" id="prism-theme" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
-  <!-- KaTeX — math rendering (must be synchronous, before script.js) -->
+
+  <!-- Prism.js — code syntax highlighting -->
+  <link rel="stylesheet" id="prism-theme"
+        href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+  <!-- KaTeX — math rendering (synchronous, must load before script.js) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
   <!-- Markdown Parser & Sanitizer -->
   <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+
   <!-- Prism.js Core + Languages -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
@@ -127,16 +108,15 @@
 <body>
   <noscript>
     <div style="text-align:center;padding:4rem 2rem;font-family:sans-serif">
-      <strong>JavaScript is required to view this blog.</strong><br><br>
-      Visit <a href="https://shani.dev">shani.dev</a> to learn more about Shanios.
+      <strong>JavaScript is required to view this blog.</strong>
     </div>
   </noscript>
 
-  <!-- Page load overlay — hidden by JS once posts are ready -->
+  <!-- Full-page loading overlay — hidden by JS once posts are ready -->
   <div id="page-loader" aria-hidden="true">
     <div class="loader__logo">
-      <img src="https://shani.dev/assets/images/about.svg" alt="Shanios">
-      <span>blog</span>
+      <img id="loader-logo-img" src="" alt="Blog">
+      <span class="logo__sub"></span>
     </div>
     <div class="loader__track"><div class="loader__bar"></div></div>
     <p class="loader__text">Loading posts…</p>
@@ -144,23 +124,20 @@
 
   <a href="#main-content" class="skip-link">Skip to content</a>
 
+  <!-- ═══ HEADER ══════════════════════════════════════════════════════════ -->
   <header class="site-header">
     <div class="auspicious-bar">
-      <a href="https://shani.dev" target="_blank" rel="noopener" class="auspicious-text" aria-label="Visit Shanios">॥ श्री ॥</a>
+      <a href="#" class="auspicious-text" id="auspicious-link" aria-label="Visit site"></a>
     </div>
 
     <div class="header__inner container">
-      <a href="/" class="logo logo--img" id="logo-link" aria-label="blog.shani.dev home">
-        <img src="https://shani.dev/assets/images/about.svg" alt="Shanios" class="logo__img" height="28">
+      <a href="/" class="logo logo--img" id="logo-link" aria-label="Blog home">
+        <img src="" alt="Blog" class="logo__img" height="28" id="logo-img">
         <span class="logo__sub">blog</span>
       </a>
-      <nav class="nav" aria-label="Primary">
-        <a href="/">Home</a>
-        <a href="/?tag=Engineering">Engineering</a>
-        <a href="/?tag=Release">Release</a>
-        <a href="/?tag=Linux">Linux</a>
-        <a href="/?tag=News">News</a>
-      </nav>
+
+      <nav class="nav" id="desktop-nav" aria-label="Primary"></nav>
+
       <div class="header__actions">
         <button class="btn-icon" id="search-toggle" aria-label="Search (Ctrl+K)">
           <i class="fa-solid fa-magnifying-glass"></i>
@@ -168,24 +145,25 @@
         <button class="btn-icon" id="theme-btn" aria-label="Toggle theme">
           <i class="fa-solid fa-moon" id="theme-icon"></i>
         </button>
-        <button class="btn-icon menu-btn" id="menu-toggle" aria-label="Menu" aria-expanded="false">
+        <button class="btn-icon" id="shortcuts-hint" aria-label="Keyboard shortcuts (?)" title="Keyboard shortcuts (?)">
+          <i class="fa-solid fa-keyboard"></i>
+        </button>
+        <button class="btn-icon menu-btn" id="menu-toggle"
+                aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
           <span></span><span></span><span></span>
         </button>
       </div>
     </div>
-    <nav class="mobile-nav container" id="mobile-nav" aria-hidden="true">
-      <a href="/">Home</a>
-      <a href="/?tag=Engineering">Engineering</a>
-      <a href="/?tag=Release">Release</a>
-      <a href="/?tag=Linux">Linux</a>
-      <a href="/?tag=News">News</a>
-    </nav>
+
+    <nav class="mobile-nav container" id="mobile-nav" aria-hidden="true"></nav>
   </header>
 
-  <div class="search-bar" id="search-bar" aria-hidden="true">
+  <!-- ═══ SEARCH BAR ═══════════════════════════════════════════════════════ -->
+  <div class="search-bar" id="search-bar" aria-hidden="true" role="search">
     <div class="search-bar__inner container">
-      <i class="fa-solid fa-magnifying-glass search-bar__icon"></i>
-      <input type="search" class="search" id="search-input" placeholder="Search posts…" aria-label="Search">
+      <i class="fa-solid fa-magnifying-glass search-bar__icon" aria-hidden="true"></i>
+      <input type="search" class="search" id="search-input"
+             placeholder="Search posts…" aria-label="Search posts" autocomplete="off">
       <button class="btn-icon search-bar__close" id="search-close" aria-label="Close search">
         <i class="fa-solid fa-xmark"></i>
       </button>
@@ -193,39 +171,36 @@
   </div>
   <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
+  <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
-    <!-- INDEX VIEW -->
     <section id="view-index">
       <header class="hero container">
-        <div class="hero__grid">
-          <!-- Populated by renderHero() in script.js -->
-        </div>
+        <div class="hero__grid"></div>
       </header>
-
       <section class="posts container">
         <div class="section-header">
           <h2 class="section-header__title" id="section-title">Latest Posts</h2>
           <div class="section-header__line"></div>
         </div>
-        <div class="filters__bar" id="tag-bar"></div>
+        <div class="filters__bar" id="tag-bar" role="toolbar" aria-label="Filter by tag"></div>
         <div class="grid" id="posts-grid" role="list"></div>
       </section>
     </section>
 
-    <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none">
-      <div class="reading-progress" id="reading-bar"></div>
+    <section id="view-post" class="container" style="display:none" aria-label="Post">
+      <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
       <article id="post-article"></article>
     </section>
   </main>
 
+  <!-- ═══ FOOTER ══════════════════════════════════════════════════════════ -->
   <footer class="site-footer">
     <div class="footer__inner container">
       <span class="footer__brand" id="footer-name">
-        <img src="https://shani.dev/assets/images/about.svg" alt="Shanios" class="logo__img logo__img--footer" height="20">
+        <img src="" alt="Blog" class="logo__img logo__img--footer" height="20" id="footer-logo-img">
         <span class="logo__sub">blog</span>
       </span>
-      <nav class="footer__links" id="footer-links"></nav>
+      <nav class="footer__links" id="footer-links" aria-label="Social links"></nav>
       <span class="footer__copy">© <span data-current-year></span></span>
     </div>
   </footer>

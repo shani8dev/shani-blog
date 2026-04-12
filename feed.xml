@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Shanios Blog</title>
+    <link>https://blog.shani.dev/</link>
+    <description>Engineering breakdowns, release notes, and stories from the team building India</description>
+    <language>en-IN</language>
+    <lastBuildDate>Sun, 12 Apr 2026 09:33:01 GMT</lastBuildDate>
+    <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Why Your OS Update Should Never Break Your Computer — And How Shanios Fixes This</title>
+      <link>https://blog.shani.dev/post/why-your-os-update-should-never-break-your-computer</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/why-your-os-update-should-never-break-your-computer</guid>
+      <description>Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.</description>
+      <pubDate>Thu, 09 Apr 2026 18:30:00 GMT</pubDate>
+      <category>Engineering</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+  </channel>
+</rss>

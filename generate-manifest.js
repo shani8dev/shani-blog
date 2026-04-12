@@ -22,6 +22,8 @@
  * front-matter, generates excerpts + read-time, and writes:
  *   posts/manifest.json  — metadata only, no bodies (~100 KB)
  *   sitemap.xml          — all post URLs + static pages
+ *   feed.xml             — RSS feed (latest 50 posts)
+ *   manifest.json        — PWA web app manifest
  *
  * The SPA fetches each post's .md on-demand when a reader opens it.
  * This keeps the manifest tiny (~100 KB for hundreds of posts).
@@ -31,16 +33,60 @@
 const fs   = require('fs');
 const path = require('path');
 
-// ── Config ────────────────────────────────────────────────────────
-// Change this if your posts directory is elsewhere.
+// ── Paths ─────────────────────────────────────────────────────────
 const POSTS_DIR    = path.join(__dirname, 'posts');
 const OUT_PATH     = path.join(POSTS_DIR, 'manifest.json');
 const SITEMAP_PATH = path.join(__dirname, 'sitemap.xml');
+const FEED_PATH    = path.join(__dirname, 'feed.xml');
+const PWA_PATH     = path.join(__dirname, 'manifest.json');
+const CONFIG_PATH  = path.join(__dirname, 'config-shani.js');
 const WATCH_MODE   = process.argv.includes('--watch');
 
-// ── Blog URL — used for sitemap generation ────────────────────────
-// Change this if you deploy to a different domain.
-const BLOG_URL = 'https://blog.shani.dev';
+// ── Read config values from config-shani.js ───────────────────────
+// config-shani.js is browser-only (no require/module.exports), so we
+// extract values with regex — the same technique used in build-manifest.yml.
+const configRaw = fs.existsSync(CONFIG_PATH)
+  ? fs.readFileSync(CONFIG_PATH, 'utf8')
+  : '';
+
+function getConfig(key, fallback) {
+  // Matches:  KEY: 'value'  or  KEY: "value"  or  KEY: `value`
+  const m = configRaw.match(new RegExp(key + ":\\s*['\"`]([^'\"`]+)['\"`]"));
+  return m ? m[1] : fallback;
+}
+
+// ── Config values (all sourced from config-shani.js) ─────────────
+const BLOG_URL       = getConfig('BLOG_URL',        'https://blog.shani.dev');
+const SITE_TITLE     = getConfig('SITE_TITLE',      'Blog');
+const SITE_DESC      = getConfig('SITE_DESCRIPTION','');
+const AUTHOR         = getConfig('AUTHOR_NAME',     '');
+const LANG           = getConfig('LANG', getConfig('DATE_LOCALE', 'en-US'));
+const PWA_NAME       = getConfig('PWA_NAME',        SITE_TITLE);
+const PWA_SHORT_NAME = getConfig('PWA_SHORT_NAME',  'Blog');
+const PWA_DESCRIPTION= getConfig('PWA_DESCRIPTION', SITE_DESC);
+const PWA_THEME_COLOR= getConfig('PWA_THEME_COLOR', '#000000');
+const PWA_BG_COLOR   = getConfig('PWA_BG_COLOR',    '#000000');
+const PWA_ICON_URL   = getConfig('FAVICON_URL',     '/favicon.svg');
+
+// ── SITEMAP_STATIC_URLS — parsed from the CONFIG array literal ───
+// Falls back to a sensible default if parsing fails.
+function parseSitemapStaticUrls() {
+  const m = configRaw.match(/SITEMAP_STATIC_URLS\s*:\s*\[([\s\S]*?)\]/);
+  if (!m) return [{ path: '/', priority: '1.0', changefreq: 'weekly' }];
+  const block = m[1];
+  const entries = [];
+  // Each entry looks like: { path: '/foo', priority: '0.6', changefreq: 'weekly' }
+  const entryRe = /\{([^}]+)\}/g;
+  let em;
+  while ((em = entryRe.exec(block)) !== null) {
+    const inner = em[1];
+    const get = k => { const r = inner.match(new RegExp(k + "\\s*:\\s*['\"`]([^'\"`]*)['\"`]")); return r ? r[1] : ''; };
+    entries.push({ path: get('path'), priority: get('priority'), changefreq: get('changefreq') });
+  }
+  return entries.length ? entries : [{ path: '/', priority: '1.0', changefreq: 'weekly' }];
+}
+
+const SITEMAP_STATIC_URLS = parseSitemapStaticUrls();
 
 // ── Helpers ───────────────────────────────────────────────────────
 function readTime(body) {
@@ -63,6 +109,10 @@ function autoExcerpt(body, paywalled) {
     .replace(/\n/g, ' ')
     .trim();
   return plain.substring(0, 140) + (plain.length > 140 ? '\u2026' : '');
+}
+
+function escXml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ── Build ─────────────────────────────────────────────────────────
@@ -134,13 +184,11 @@ function build() {
   console.log(`\n  ✓ Written ${posts.length} post(s) to posts/manifest.json`);
 
   // ── Generate sitemap.xml ────────────────────────────────────────
-  const staticUrls = [
-    { loc: `${BLOG_URL}/`,                priority: '1.0', changefreq: 'weekly'  },
-    { loc: `${BLOG_URL}/?tag=Engineering`, priority: '0.6', changefreq: 'weekly'  },
-    { loc: `${BLOG_URL}/?tag=Release`,     priority: '0.6', changefreq: 'weekly'  },
-    { loc: `${BLOG_URL}/?tag=Linux`,       priority: '0.6', changefreq: 'weekly'  },
-    { loc: `${BLOG_URL}/?tag=News`,        priority: '0.6', changefreq: 'weekly'  },
-  ];
+  const staticUrls = SITEMAP_STATIC_URLS.map(u => ({
+    loc: `${BLOG_URL}${u.path}`,
+    priority: u.priority,
+    changefreq: u.changefreq,
+  }));
   const postUrls = posts.map(p => ({
     loc:        `${BLOG_URL}/post/${p.slug}`,
     lastmod:    p.date,
@@ -162,7 +210,52 @@ function build() {
     '</urlset>',
   ].join('\n');
   fs.writeFileSync(SITEMAP_PATH, xml);
-  console.log(`  ✓ Written sitemap.xml with ${allUrls.length} URL(s)\n`);
+  console.log(`  ✓ Written sitemap.xml with ${allUrls.length} URL(s)`);
+
+  // ── Generate feed.xml (RSS) ─────────────────────────────────────
+  const rssItems = posts.slice(0, 50).map(p => [
+    '    <item>',
+    `      <title>${escXml(p.title)}</title>`,
+    `      <link>${BLOG_URL}/post/${p.slug}</link>`,
+    `      <guid isPermaLink="true">${BLOG_URL}/post/${p.slug}</guid>`,
+    `      <description>${escXml(p.excerpt)}</description>`,
+    `      <pubDate>${new Date(p.date + 'T00:00:00').toUTCString()}</pubDate>`,
+    `      <category>${escXml(p.tag)}</category>`,
+    `      <author>${escXml(AUTHOR)}</author>`,
+    '    </item>',
+  ].join('\n')).join('\n');
+  const feed = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+    '  <channel>',
+    `    <title>${escXml(SITE_TITLE)}</title>`,
+    `    <link>${BLOG_URL}/</link>`,
+    `    <description>${escXml(SITE_DESC)}</description>`,
+    `    <language>${LANG}</language>`,
+    `    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>`,
+    `    <atom:link href="${BLOG_URL}/feed.xml" rel="self" type="application/rss+xml"/>`,
+    rssItems,
+    '  </channel>',
+    '</rss>',
+  ].join('\n');
+  fs.writeFileSync(FEED_PATH, feed);
+  console.log(`  ✓ Written feed.xml with ${Math.min(50, posts.length)} item(s)`);
+
+  // ── Generate manifest.json (PWA) ────────────────────────────────
+  const pwa = {
+    name:             PWA_NAME,
+    short_name:       PWA_SHORT_NAME,
+    description:      PWA_DESCRIPTION,
+    start_url:        '/',
+    display:          'standalone',
+    background_color: PWA_BG_COLOR,
+    theme_color:      PWA_THEME_COLOR,
+    lang:             LANG,
+    icons: [{ src: PWA_ICON_URL, sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' }],
+    categories: ['technology', 'news'],
+  };
+  fs.writeFileSync(PWA_PATH, JSON.stringify(pwa, null, 2));
+  console.log(`  ✓ Written manifest.json (PWA)\n`);
 }
 
 // ── Run ───────────────────────────────────────────────────────────

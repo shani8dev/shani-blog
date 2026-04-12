@@ -170,7 +170,10 @@ jobs:
           node - << 'SCRIPT'
           const fs   = require('fs');
           const path = require('path');
-          const BLOG_URL = 'https://blog.shani.dev';
+          const configRaw2 = fs.existsSync(path.join(process.cwd(), 'config-shani.js'))
+            ? fs.readFileSync(path.join(process.cwd(), 'config-shani.js'), 'utf8') : '';
+          const getC = (key, fb) => { const m = configRaw2.match(new RegExp(key + ":\\s*['"`]([^'"`]+)['"`]")); return m ? m[1] : fb; };
+          const BLOG_URL = getC('BLOG_URL', 'https://blog.shani.dev');
           const manifest = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'posts', 'manifest.json'), 'utf8'));
           const staticUrls = [
             { loc: `${BLOG_URL}/`,                priority: '1.0', changefreq: 'weekly'  },
@@ -203,12 +206,94 @@ jobs:
           console.log('Written sitemap.xml with ' + all.length + ' URL(s)');
           SCRIPT
 
-      - name: Commit manifest + sitemap
+      - name: Generate RSS feed (feed.xml)
+        run: |
+          node - << 'SCRIPT'
+          const fs   = require('fs');
+          const path = require('path');
+          // ── Read site config from config-shani.js ──────────────────────────
+          // Safely extract CONFIG values without full JS execution
+          const configRaw = fs.readFileSync(path.join(process.cwd(), 'config-shani.js'), 'utf8');
+          const get = (key, fallback) => {
+            const m = configRaw.match(new RegExp(key + ":\\s*['"`]([^'"`]+)['"`]"));
+            return m ? m[1] : fallback;
+          };
+          const BLOG_URL   = get('BLOG_URL',   'https://blog.shani.dev');
+          const SITE_TITLE = get('SITE_TITLE', 'Blog');
+          const SITE_DESC  = get('SITE_DESCRIPTION', '');
+          const AUTHOR     = get('AUTHOR_NAME', '');
+          const LANG       = get('LANG', get('DATE_LOCALE', 'en-US'));
+          const manifest   = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'posts', 'manifest.json'), 'utf8'));
+          function escXml(s) {
+            return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+          }
+          const items = manifest.slice(0, 50).map(p => [
+            '    <item>',
+            `      <title>${escXml(p.title)}</title>`,
+            `      <link>${BLOG_URL}/post/${p.slug}</link>`,
+            `      <guid isPermaLink="true">${BLOG_URL}/post/${p.slug}</guid>`,
+            `      <description>${escXml(p.excerpt)}</description>`,
+            `      <pubDate>${new Date(p.date + 'T00:00:00').toUTCString()}</pubDate>`,
+            `      <category>${escXml(p.tag)}</category>`,
+            `      <author>${escXml(AUTHOR)}</author>`,
+            '    </item>',
+          ].join('
+')).join('
+');
+          const feed = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">',
+            '  <channel>',
+            `    <title>${escXml(SITE_TITLE)}</title>`,
+            `    <link>${BLOG_URL}/</link>`,
+            `    <description>${escXml(SITE_DESC)}</description>`,
+            `    <language>${LANG}</language>`,
+            `    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>`,
+            `    <atom:link href="${BLOG_URL}/feed.xml" rel="self" type="application/rss+xml"/>`,
+            `    <image><url>https://shani.dev/assets/images/logo.svg</url><title>${escXml(SITE_TITLE)}</title><link>${BLOG_URL}/</link></image>`,
+            items,
+            '  </channel>',
+            '</rss>',
+          ].join('
+');
+          fs.writeFileSync(path.join(process.cwd(), 'feed.xml'), feed);
+          console.log('Written feed.xml with ' + Math.min(50, manifest.length) + ' item(s)');
+          SCRIPT
+
+      - name: Generate PWA web app manifest (manifest.json)
+        run: |
+          node - << 'SCRIPT'
+          const fs   = require('fs');
+          const path = require('path');
+          const configRaw = fs.readFileSync(path.join(process.cwd(), 'config-shani.js'), 'utf8');
+          const get = (key, fallback) => {
+            const m = configRaw.match(new RegExp(key + ":\\s*['"`]([^'"`]+)['"`]"));
+            return m ? m[1] : fallback;
+          };
+          const pwa = {
+            name:             get('PWA_NAME',        get('SITE_TITLE', 'Blog')),
+            short_name:       get('PWA_SHORT_NAME',  'Blog'),
+            description:      get('PWA_DESCRIPTION', get('SITE_DESCRIPTION', '')),
+            start_url:        '/',
+            display:          'standalone',
+            background_color: get('PWA_BG_COLOR',    '#000000'),
+            theme_color:      get('PWA_THEME_COLOR', '#000000'),
+            lang:             get('LANG', get('DATE_LOCALE', 'en-US')),
+            icons: [
+              { src: get('FAVICON_URL', '/favicon.svg'), sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' },
+            ],
+            categories: ['technology', 'news'],
+          };
+          fs.writeFileSync(path.join(process.cwd(), 'manifest.json'), JSON.stringify(pwa, null, 2));
+          console.log('Written manifest.json (PWA) for: ' + pwa.name);
+          SCRIPT
+
+      - name: Commit manifest + sitemap + feed + PWA manifest
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add posts/manifest.json sitemap.xml
+          git add posts/manifest.json sitemap.xml feed.xml manifest.json
           git diff --staged --quiet && echo "nothing changed" || {
-            git commit -m "chore: rebuild manifest + sitemap [skip ci]"
+            git commit -m "chore: rebuild manifest, sitemap, feed & PWA [skip ci]"
             git push
           }
