@@ -1263,16 +1263,32 @@ async function openPost(slug) {
 function loadIntoEditor(slug, raw) {
   currentSlug = slug;
   const { fm, body } = Utils.parseFrontmatter(raw); // delegates to utils.js
-  // Basic
+
+  // Reset to Basic tab first so the user always sees the populated fields
+  switchFmTab('basic');
+
+  // ── Basic ──────────────────────────────────────────────────────────
   document.getElementById('fm-title').value     = fm.title     || '';
   document.getElementById('fm-slug').value      = slug;
   document.getElementById('fm-date').value      = fm.date      || today();
   document.getElementById('fm-updated').value   = fm.updated   || '';
-  document.getElementById('fm-tag').value       = fm.tag       || 'Post';
-  document.getElementById('fm-paywalled').value = fm.paywalled || 'false';
   document.getElementById('fm-cover').value     = fm.cover     || '';
   document.getElementById('fm-excerpt').value   = fm.excerpt   || '';
-  // Author
+
+  // Selects — set value then force a fallback if the option doesn't exist
+  const setSelect = (id, val, fallback) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = val || fallback;
+    if (el.value !== (val || fallback)) el.value = fallback; // option not found → use fallback
+  };
+  setSelect('fm-tag',       fm.tag,       'Post');
+  setSelect('fm-paywalled', fm.paywalled, 'false');
+  setSelect('fm-draft',     fm.draft,     'false');
+  setSelect('fm-pinned',    fm.pinned,    'false');
+  setSelect('fm-featured',  fm.featured,  'false');
+
+  // ── Author ─────────────────────────────────────────────────────────
   document.getElementById('fm-author').value          = fm.author          || '';
   document.getElementById('fm-author-role').value     = fm.author_role     || '';
   document.getElementById('fm-author-bio').value      = fm.author_bio      || '';
@@ -1280,18 +1296,16 @@ function loadIntoEditor(slug, raw) {
   document.getElementById('fm-author-linkedin').value = fm.author_linkedin || '';
   document.getElementById('fm-author-github').value   = fm.author_github   || '';
   document.getElementById('fm-author-website').value  = fm.author_website  || '';
-  // Advanced
+
+  // ── Advanced ───────────────────────────────────────────────────────
   document.getElementById('fm-read-time').value  = fm.readTime   || '';
   document.getElementById('fm-series').value     = fm.series     || '';
   document.getElementById('fm-keywords').value   = fm.keywords   || '';
   document.getElementById('fm-og-image').value   = fm.og_image   || '';
   document.getElementById('fm-canonical').value  = fm.canonical  || '';
   document.getElementById('fm-lang').value       = fm.lang       || '';
-  document.getElementById('fm-toc').value        = fm.toc        || '';
-  document.getElementById('fm-noindex').value    = fm.noindex    || 'false';
-  document.getElementById('fm-pinned').value     = fm.pinned     || 'false';
-  document.getElementById('fm-draft').value      = fm.draft      || 'false';
-  document.getElementById('fm-featured').value   = fm.featured   || 'false';
+  setSelect('fm-toc',     fm.toc,     '');
+  setSelect('fm-noindex', fm.noindex, 'false');
 
   updateAuthorPreview();
   updateCoverPreview();
@@ -1320,17 +1334,22 @@ function showEditor() {
 // ═══════════════════════════════════════════════════════════════════
 function newPost() {
   currentSlug = '__new__'; currentSHA = null;
+  // Clear all text/url/textarea inputs
   ['fm-title','fm-slug','fm-cover','fm-excerpt','fm-author','fm-author-role',
    'fm-author-bio','fm-author-initials','fm-author-linkedin','fm-author-github',
    'fm-author-website','fm-read-time','fm-series','fm-keywords','fm-og-image',
-   'fm-updated'].forEach(id => {
+   'fm-canonical','fm-lang','fm-updated'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
+  // Reset all selects to defaults
   document.getElementById('fm-date').value      = today();
   document.getElementById('fm-tag').value       = Object.keys(TAG_ICONS)[0] || 'Engineering';
   document.getElementById('fm-paywalled').value = 'false';
   document.getElementById('fm-pinned').value    = 'false';
   document.getElementById('fm-draft').value     = 'false';
+  document.getElementById('fm-featured').value  = 'false';
+  document.getElementById('fm-noindex').value   = 'false';
+  document.getElementById('fm-toc').value       = '';
   // Pre-fill default author from CONFIG
   if (AUTHOR_NAME)     document.getElementById('fm-author').value          = AUTHOR_NAME;
   if (AUTHOR_ROLE)     document.getElementById('fm-author-role').value     = AUTHOR_ROLE;
