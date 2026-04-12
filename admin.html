@@ -177,7 +177,17 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
 .view-toggle__btn:hover:not(.active){color:var(--text)}
 
 /* ── front-matter bar ────────────────────────────────────────── */
-.fm-bar{padding:.65rem 1rem;border-bottom:1px solid var(--border);background:rgba(255,127,80,.02);flex-shrink:0;overflow-y:auto;max-height:calc(100vh - 200px)}
+.fm-bar{border-bottom:1px solid var(--border);background:rgba(255,127,80,.02);flex-shrink:0}
+.fm-bar__header{display:flex;align-items:center;justify-content:space-between;padding:.38rem 1rem;cursor:pointer;user-select:none;min-height:32px}
+.fm-bar__header:hover{background:rgba(255,127,80,.03)}
+.fm-bar__label{font-family:var(--mono);font-size:.63rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);display:flex;align-items:center;gap:.4rem}
+.fm-bar__label i{font-size:.6rem}
+.fm-bar__toggle{background:none;border:none;color:var(--faint);cursor:pointer;padding:.15rem .3rem;border-radius:3px;font-size:.65rem;transition:color .12s,transform .15s;display:flex;align-items:center;gap:.25rem;font-family:var(--mono)}
+.fm-bar__toggle:hover{color:var(--text)}
+.fm-bar__toggle .fm-toggle-icon{transition:transform .2s}
+.fm-bar.collapsed .fm-toggle-icon{transform:rotate(-90deg)}
+.fm-bar__body{padding:.65rem 1rem .75rem;overflow-y:auto;max-height:calc(100vh - 200px);transition:max-height .2s ease}
+.fm-bar.collapsed .fm-bar__body{display:none}
 .fm-tabs{display:flex;gap:.3rem;margin-bottom:.7rem;flex-wrap:wrap}
 .fm-tab{padding:.22rem .6rem;border-radius:var(--radius);border:none;cursor:pointer;font-size:.68rem;font-family:var(--mono);background:var(--bg-input);color:var(--muted);transition:background .12s,color .12s}
 .fm-tab.active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}
@@ -312,7 +322,19 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
 .btn-theme{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:none;border:none;border-radius:var(--radius);color:var(--muted);cursor:pointer;font-size:.88rem;transition:color .15s,background .15s;flex-shrink:0}
 .btn-theme:hover{background:var(--bg-elevated);color:var(--text)}
 
-/* ── author card preview ──────────────────────────────────────── */
+/* ── draft restore banner ────────────────────────────────────── */
+.draft-banner{display:flex;align-items:center;gap:.6rem;padding:.35rem 1rem;background:color-mix(in srgb,var(--warning) 8%,transparent);border-bottom:1px solid color-mix(in srgb,var(--warning) 22%,transparent);font-size:.73rem;color:var(--warning);flex-shrink:0}
+.draft-banner i{flex-shrink:0}
+.draft-banner__msg{flex:1}
+.draft-banner__discard{background:none;border:1px solid color-mix(in srgb,var(--warning) 35%,transparent);color:var(--warning);border-radius:var(--radius);padding:.18rem .5rem;font-size:.68rem;cursor:pointer;font-family:var(--mono);white-space:nowrap}
+.draft-banner__discard:hover{background:color-mix(in srgb,var(--warning) 12%,transparent)}
+
+/* ── connect button spinner ──────────────────────────────────── */
+.btn--connecting{opacity:.7;cursor:not-allowed}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fa-spin-fast{animation:spin .6s linear infinite;display:inline-block}
+
+/* ── unsaved dot on page title ───────────────────────────────── */
 .author-preview{display:flex;align-items:center;gap:.65rem;padding:.65rem .8rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);margin-top:.3rem}
 .author-preview__avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:var(--accent-text);flex-shrink:0}
 .author-preview__name{font-size:.8rem;font-weight:500;color:var(--text)}
@@ -567,6 +589,15 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
       </div>
       <div class="toolbar__sep"></div>
 
+      <!-- Shortcodes -->
+      <div class="toolbar-group">
+        <button class="tbtn" title="Insert Table of Contents [[toc]]" onclick="insertMarkdown('\n[[toc]]\n')"><i class="fa-solid fa-list-ul"></i> <span style="font-size:.6rem;font-family:var(--mono)">TOC</span></button>
+        <button class="tbtn" title="Task list" onclick="fmtTaskList()"><i class="fa-regular fa-square-check"></i></button>
+        <button class="tbtn" title="Insert math (KaTeX)" onclick="openMathModal()"><i class="fa-solid fa-square-root-variable"></i></button>
+        <button class="tbtn" title="Embed YouTube / Vimeo" onclick="openEmbedModal()"><i class="fa-brands fa-youtube"></i></button>
+      </div>
+      <div class="toolbar__sep"></div>
+
       <!-- View mode -->
       <div class="view-toggle">
         <button class="view-toggle__btn active" data-mode="editor"  onclick="setViewMode('editor')"  title="Editor (Ctrl+1)"><i class="fa-solid fa-code" style="font-size:.65rem"></i> Edit</button>
@@ -577,8 +608,24 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
       <span class="status-pill info" id="save-status">no file open</span>
     </div>
 
+    <!-- Draft restore banner — shown when sessionStorage draft is loaded -->
+    <div class="draft-banner" id="draft-banner" style="display:none">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+      <span class="draft-banner__msg">Unsaved draft restored — not yet committed to GitHub.</span>
+      <button class="draft-banner__discard" onclick="discardDraft()">Discard &amp; reload from GitHub</button>
+    </div>
+
     <!-- Front-matter bar -->
     <div class="fm-bar" id="fm-bar" style="display:none">
+      <div class="fm-bar__header" onclick="toggleFmBar()" title="Toggle front-matter panel (F)">
+        <span class="fm-bar__label"><i class="fa-solid fa-sliders"></i> Front Matter</span>
+        <button class="fm-bar__toggle" id="fm-bar-toggle" tabindex="-1" aria-label="Collapse front-matter"
+                onclick="event.stopPropagation();toggleFmBar()">
+          <i class="fa-solid fa-chevron-down fm-toggle-icon"></i>
+          <span id="fm-bar-toggle-label" style="font-size:.62rem">hide</span>
+        </button>
+      </div>
+      <div class="fm-bar__body" id="fm-bar-body">
       <div class="fm-tabs">
         <button class="fm-tab active" onclick="switchFmTab('basic')">Basic</button>
         <button class="fm-tab"        onclick="switchFmTab('author')">Author</button>
@@ -591,7 +638,7 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
           <div class="fm-full"><label>Title</label><input id="fm-title" type="text" placeholder="My post title"></div>
         </div>
         <div class="fm-row cols-3">
-          <div><label>Slug <span style="color:var(--faint);font-weight:400">(filename)</span></label><input id="fm-slug" type="text" placeholder="my-post-slug" style="font-family:var(--mono);font-size:.73rem"></div>
+          <div><label>Slug <span style="color:var(--faint);font-weight:400">(filename)</span></label><input id="fm-slug" type="text" placeholder="my-post-slug" style="font-family:var(--mono);font-size:.73rem" oninput="this.value=slugify(this.value)" onblur="this.value=slugify(this.value)"></div>
           <div><label>Tag / Category</label><select id="fm-tag"><!-- populated from CONFIG.TAG_ICONS --></select></div>
           <div><label>Access</label>
             <select id="fm-paywalled">
@@ -721,6 +768,7 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
           Fields here write directly to the post's YAML front-matter and are read by <code style="font-size:.68rem">script.js</code> and SEO tags.
         </div>
       </div>
+      </div><!-- /.fm-bar__body -->
     </div>
 
     <!-- Editor + preview -->
@@ -786,6 +834,16 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
           <div class="upload-result__url" id="gh-result-url"></div>
         </div>
       </div>
+      <!-- Shared image options -->
+      <div style="display:flex;gap:.5rem;margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border)">
+        <div style="flex:1"><label>Caption <span style="color:var(--faint);font-weight:400">(optional)</span></label><input id="img-caption" type="text" placeholder="Image caption…" style="margin-top:.2rem"></div>
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center;margin-top:.4rem">
+        <label style="margin:0;display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.75rem;color:var(--muted)">
+          <input type="checkbox" id="img-wide" style="width:auto;margin:0"> Wide image (full bleed)
+        </label>
+        <span style="font-size:.65rem;color:var(--faint);margin-left:auto">Uses <code style="font-size:.65rem">::image[]</code> shortcode when caption or wide is set</span>
+      </div>
     </div>
     <div class="modal__footer">
       <button class="btn btn--ghost" onclick="closeUploadModal()">Cancel</button>
@@ -815,6 +873,56 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
     <div class="modal__footer">
       <button class="btn btn--ghost" onclick="closeModal('table-modal')">Cancel</button>
       <button class="btn btn--primary" onclick="insertTableFromInputs()"><i class="fa-solid fa-table"></i> Insert</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MATH MODAL
+════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="math-modal">
+  <div class="modal modal--sm">
+    <div class="modal__header">
+      <span class="modal__title"><i class="fa-solid fa-square-root-variable" style="margin-right:.4rem;color:var(--violet)"></i>Insert Math (KaTeX)</span>
+      <button class="modal__close" onclick="closeModal('math-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal__body">
+      <div style="display:flex;gap:.3rem;margin-bottom:.6rem">
+        <button class="btn btn--ghost math-mode-btn active" data-mode="inline" style="flex:1;justify-content:center;font-size:.73rem" onclick="setMathMode('inline')">Inline <code style="font-size:.65rem">$...$</code></button>
+        <button class="btn btn--ghost math-mode-btn"        data-mode="block"  style="flex:1;justify-content:center;font-size:.73rem" onclick="setMathMode('block')">Block <code style="font-size:.65rem">$$...$$</code></button>
+      </div>
+      <label>LaTeX expression</label>
+      <textarea id="math-expr" rows="3" placeholder="e.g.  E = mc^2  or  \frac{a}{b}" style="font-family:var(--mono);font-size:.82rem;margin-top:.2rem;resize:vertical"></textarea>
+      <div id="math-preview" style="margin-top:.6rem;padding:.5rem .75rem;background:var(--bg-elevated);border-radius:var(--radius);min-height:2rem;font-size:.95rem;text-align:center;color:var(--muted)">Preview will appear here</div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--ghost" onclick="closeModal('math-modal')">Cancel</button>
+      <button class="btn btn--primary" onclick="finaliseMath()"><i class="fa-solid fa-check"></i> Insert</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     EMBED MODAL (YouTube / Vimeo)
+════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="embed-modal">
+  <div class="modal modal--sm">
+    <div class="modal__header">
+      <span class="modal__title"><i class="fa-brands fa-youtube" style="margin-right:.4rem;color:var(--red)"></i>Embed Video</span>
+      <button class="modal__close" onclick="closeModal('embed-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal__body">
+      <label>YouTube or Vimeo URL / ID</label>
+      <input id="embed-url" type="text" placeholder="https://youtube.com/watch?v=… or video ID" style="margin-top:.2rem" onkeydown="if(event.key==='Enter')document.getElementById('embed-caption').focus()">
+      <label style="margin-top:.65rem">Caption <span style="color:var(--faint);font-weight:400">(optional)</span></label>
+      <input id="embed-caption" type="text" placeholder="Video caption…" style="margin-top:.2rem" onkeydown="if(event.key==='Enter')finaliseEmbed()">
+      <div id="embed-hint" style="font-size:.7rem;color:var(--faint);margin-top:.45rem;line-height:1.5">
+        Paste a full URL or just the video ID. Generates <code style="font-size:.67rem">::youtube[id]</code> or <code style="font-size:.67rem">::vimeo[id]</code>.
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--ghost" onclick="closeModal('embed-modal')">Cancel</button>
+      <button class="btn btn--primary" onclick="finaliseEmbed()"><i class="fa-solid fa-check"></i> Insert</button>
     </div>
   </div>
 </div>
@@ -884,18 +992,81 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
         <div class="kbd-row"><span>Bold</span><code>Ctrl+B</code></div>
         <div class="kbd-row"><span>Italic</span><code>Ctrl+I</code></div>
         <div class="kbd-row"><span>Insert image</span><code>Ctrl+Shift+U</code></div>
+        <div class="kbd-row"><span>Insert link</span><code>Toolbar only</code></div>
+        <div class="kbd-row"><span>Insert code block</span><code>Toolbar only</code></div>
+        <div class="kbd-row"><span>Insert table</span><code>Toolbar only</code></div>
+        <div class="kbd-row"><span>Insert callout</span><code>Toolbar only</code></div>
+        <div class="kbd-row"><span>Insert TOC</span><code>Toolbar only</code></div>
+        <div class="kbd-row"><span>Insert task list</span><code>Toolbar only</code></div>
+        <div class="kbd-row"><span>Insert math (KaTeX)</span><code>Toolbar only</code></div>
+        <div class="kbd-row"><span>Embed YouTube/Vimeo</span><code>Toolbar only</code></div>
         <div class="kbd-row"><span>New post</span><code>Ctrl+Shift+N</code></div>
         <div class="kbd-row"><span>Editor only</span><code>Ctrl+1</code></div>
         <div class="kbd-row"><span>Split view</span><code>Ctrl+2</code></div>
         <div class="kbd-row"><span>Preview only</span><code>Ctrl+3</code></div>
         <div class="kbd-row"><span>Find in editor</span><code>Ctrl+F</code></div>
         <div class="kbd-row"><span>This help</span><code>?</code></div>
+        <div class="kbd-row"><span>Toggle front matter</span><code>F</code></div>
         <div class="kbd-row"><span>Close modal</span><code>Esc</code></div>
-        <div class="kbd-row"><span>Strikethrough</span><code>Toolbar only</code></div>
-        <div class="kbd-row"><span>Insert table</span><code>Toolbar only</code></div>
-        <div class="kbd-row"><span>Insert callout</span><code>Toolbar only</code></div>
         <div class="kbd-row"><span>Copy raw markdown</span><code>Toolbar only</code></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LINK MODAL
+════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="link-modal">
+  <div class="modal modal--sm">
+    <div class="modal__header">
+      <span class="modal__title"><i class="fa-solid fa-link" style="margin-right:.4rem;color:var(--blue)"></i>Insert Link</span>
+      <button class="modal__close" onclick="closeModal('link-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal__body">
+      <div><label>URL</label><input id="link-url" type="url" placeholder="https://example.com" onkeydown="if(event.key==='Enter')document.getElementById('link-text').focus()"></div>
+      <div><label>Link text <span style="color:var(--faint);font-weight:400">(leave blank to use selection)</span></label>
+        <input id="link-text" type="text" placeholder="Click here" onkeydown="if(event.key==='Enter')finaliseLink()">
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--ghost" onclick="closeModal('link-modal')">Cancel</button>
+      <button class="btn btn--primary" onclick="finaliseLink()"><i class="fa-solid fa-check"></i> Insert</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CODE BLOCK MODAL
+════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="codeblock-modal">
+  <div class="modal modal--sm">
+    <div class="modal__header">
+      <span class="modal__title"><i class="fa-solid fa-terminal" style="margin-right:.4rem;color:var(--green)"></i>Insert Code Block</span>
+      <button class="modal__close" onclick="closeModal('codeblock-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal__body">
+      <div><label>Language</label>
+        <div id="codeblock-lang-pills" style="display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.5rem">
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="bash">bash</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="python">python</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="javascript">javascript</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="typescript">typescript</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="go">go</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="yaml">yaml</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="json">json</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="sql">sql</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="css">css</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="nginx">nginx</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="docker">docker</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="hcl">hcl</button>
+        </div>
+        <input id="codeblock-lang" type="text" placeholder="or type a language…" style="font-family:var(--mono)" onkeydown="if(event.key==='Enter')finaliseCodeBlock()">
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--ghost" onclick="closeModal('codeblock-modal')">Cancel</button>
+      <button class="btn btn--primary" onclick="finaliseCodeBlock()"><i class="fa-solid fa-check"></i> Insert</button>
     </div>
   </div>
 </div>
@@ -1155,6 +1326,10 @@ async function connectGitHub() {
   sessionStorage.setItem('admin_gh_token', ghToken);
   const connEl = document.getElementById('conn-status');
   connEl.textContent = 'connecting…'; connEl.className = 'status-pill info';
+  // Loading state on button
+  const btn = document.querySelector('#login-overlay .btn--primary');
+  const btnOrig = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin-fast"></i> Connecting…'; }
   try {
     ghUser = await ghFetch('/user');
     if (ghUser.login.toLowerCase() !== username.toLowerCase()) throw new Error(`Token belongs to "${ghUser.login}", not "${username}"`);
@@ -1168,6 +1343,8 @@ async function connectGitHub() {
     connEl.textContent = 'auth failed'; connEl.className = 'status-pill error';
     log(`GitHub auth failed: ${e.message}`, 'error');
     alert(`Connection failed: ${e.message}\n\nCheck your token has Contents: Read & Write on ${ghOwner}/${ghRepo}.`);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = btnOrig; }
   }
 }
 
@@ -1233,11 +1410,13 @@ function renderPostList() {
   list.innerHTML = '';
   posts.forEach(p => {
     const div = document.createElement('div');
+    const hasDraft = !!sessionStorage.getItem(`draft_${p.slug}`);
     div.className = 'post-item' + (p.slug === currentSlug ? ' active' : '');
     const icon = TAG_ICONS[p.tag] || 'fa-solid fa-file-lines';
     div.innerHTML = `
       <i class="${icon} post-item__icon"></i>
       <span class="post-item__slug" title="${escHtml(p.title || p.slug)}">${escHtml(p.title || p.slug)}</span>
+      ${hasDraft ? '<i class="fa-solid fa-circle" style="font-size:.38rem;color:var(--warning);flex-shrink:0" title="Unsaved draft"></i>' : ''}
       ${p.tag ? `<span class="post-item__tag">${escHtml(p.tag)}</span>` : ''}
       ${p.paywalled ? '<i class="fa-solid fa-lock" style="font-size:.6rem;color:var(--violet);flex-shrink:0" title="Members only"></i>' : ''}
       <button class="post-item__del" onclick="deletePost('${escHtml(p.slug)}', event)" title="Delete"><i class="fa-solid fa-xmark"></i></button>`;
@@ -1247,13 +1426,22 @@ function renderPostList() {
 }
 
 async function openPost(slug) {
+  if (!confirmNavigateAway()) return;
   setStatus('loading…', 'info');
   try {
     const { content, sha } = await ghGetFile(`posts/${slug}.md`);
     currentSHA = sha;
     const draft = sessionStorage.getItem(`draft_${slug}`);
+    const hasDraft = !!draft && draft !== content;
     loadIntoEditor(slug, draft || content);
-    log(`Opened posts/${slug}.md`, 'ok');
+    // Show/hide draft banner
+    document.getElementById('draft-banner').style.display = hasDraft ? 'flex' : 'none';
+    if (hasDraft) {
+      setStatus('draft restored — unsaved changes', 'warn');
+      log(`Draft restored for ${slug}.md — not yet committed`, 'warn');
+    } else {
+      log(`Opened posts/${slug}.md`, 'ok');
+    }
   } catch (e) {
     log(`Failed to open ${slug}: ${e.message}`, 'error');
     setStatus('load failed', 'error');
@@ -1333,6 +1521,8 @@ function showEditor() {
 // NEW POST
 // ═══════════════════════════════════════════════════════════════════
 function newPost() {
+  if (!confirmNavigateAway()) return;
+  document.getElementById('draft-banner').style.display = 'none';
   currentSlug = '__new__'; currentSHA = null;
   // Clear all text/url/textarea inputs
   ['fm-title','fm-slug','fm-cover','fm-excerpt','fm-author','fm-author-role',
@@ -1380,9 +1570,12 @@ async function savePost() {
     if (!sha) { const existing = await ghGetFile(repoPath); sha = existing.sha || null; }
     const commitMsg = sha ? `post: update ${slug}` : `post: add ${slug}`;
     const res = await ghPutFile(repoPath, raw, commitMsg, sha);
+    const oldSlug = currentSlug;
     currentSlug = slug; currentSHA = res.content.sha;
     document.getElementById('fm-slug').value = slug;
     sessionStorage.removeItem(`draft_${slug}`);
+    if (oldSlug && oldSlug !== slug) sessionStorage.removeItem(`draft_${oldSlug}`);
+    document.getElementById('draft-banner').style.display = 'none';
     setStatus(`committed ✓ — building…`, 'ok');
     log(`✓ ${sha ? 'Updated' : 'Created'} posts/${slug}.md on ${ghBranch}`, 'gh');
     log('GitHub Pages will rebuild in ~30s.', 'info');
@@ -1404,10 +1597,11 @@ async function deletePost(slug, e) {
   try {
     const { sha } = await ghGetFile(`posts/${slug}.md`);
     await ghDeleteFile(`posts/${slug}.md`, sha, `post: delete ${slug}`);
+    sessionStorage.removeItem(`draft_${slug}`);
     log(`Deleted posts/${slug}.md`, 'ok');
     if (currentSlug === slug) {
       currentSlug = null; currentSHA = null;
-      ['monaco-container','fm-bar','wc-bar'].forEach(id => document.getElementById(id).style.display = 'none');
+      ['monaco-container','fm-bar','wc-bar','draft-banner'].forEach(id => document.getElementById(id).style.display = 'none');
       document.getElementById('empty-state').style.display = 'flex';
       ['btn-save','btn-open-blog','btn-download','btn-copy-md'].forEach(id => document.getElementById(id).disabled = true);
       setStatus('no file open', 'info');
@@ -1488,8 +1682,10 @@ function serialise() {
 function openUploadModal() {
   pendingImageMd = null;
   document.getElementById('upload-modal').classList.add('open');
-  document.getElementById('img-url').value = '';
-  document.getElementById('img-alt').value = '';
+  document.getElementById('img-url').value     = '';
+  document.getElementById('img-alt').value     = '';
+  document.getElementById('img-caption').value = '';
+  document.getElementById('img-wide').checked  = false;
   document.getElementById('gh-upload-result').style.display   = 'none';
   document.getElementById('gh-upload-progress').style.display = 'none';
   document.getElementById('gh-file-input').value = '';
@@ -1536,14 +1732,33 @@ async function onGHFileSelected(file) {
 }
 
 function finaliseImageInsert() {
+  const caption = document.getElementById('img-caption').value.trim();
+  const wide    = document.getElementById('img-wide').checked;
   const activeTab = document.querySelector('.upload-tab.active')?.dataset?.tab;
+
   if (activeTab === 'url') {
     const url = document.getElementById('img-url').value.trim();
     const alt = document.getElementById('img-alt').value.trim() || 'image';
     if (!url) { alert('Enter a URL'); return; }
-    pendingImageMd = `![${alt}](${url})`;
+    // Use ::image shortcode if caption or wide is needed
+    if (caption || wide) {
+      pendingImageMd = `\n::image[${url}|${alt}${caption ? '|' + caption : ''}${wide ? '|wide' : ''}]\n`;
+    } else {
+      pendingImageMd = `![${alt}](${url})`;
+    }
+  } else if (pendingImageMd) {
+    // GitHub-uploaded: pendingImageMd is already set as ![alt](path)
+    // Upgrade to ::image shortcode if caption or wide needed
+    if (caption || wide) {
+      const m = pendingImageMd.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+      if (m) {
+        const [, alt, src] = m;
+        pendingImageMd = `\n::image[${src}|${alt}${caption ? '|' + caption : ''}${wide ? '|wide' : ''}]\n`;
+      }
+    }
   }
-  if (pendingImageMd) { insertMarkdown('\n' + pendingImageMd + '\n'); log(`Inserted: ${pendingImageMd.slice(0,60)}`, 'info'); }
+
+  if (pendingImageMd) { insertMarkdown('\n' + pendingImageMd.trim() + '\n'); log(`Inserted image`, 'info'); }
   closeUploadModal();
 }
 
@@ -1700,9 +1915,69 @@ function fmtLink() {
   if (!monacoEditor) return;
   const sel = monacoEditor.getSelection();
   const txt = monacoEditor.getModel().getValueInRange(sel);
-  const url = prompt('URL:', 'https://'); if (!url) return;
-  monacoEditor.executeEdits('fmt', [{ range: sel, text: `[${txt || 'link text'}](${url})` }]);
+  document.getElementById('link-url').value  = '';
+  document.getElementById('link-text').value = txt || '';
+  document.getElementById('link-modal').classList.add('open');
+  setTimeout(() => document.getElementById('link-url').focus(), 60);
+}
+function finaliseLink() {
+  const url  = document.getElementById('link-url').value.trim();
+  const text = document.getElementById('link-text').value.trim();
+  if (!url) { document.getElementById('link-url').focus(); return; }
+  if (!monacoEditor) return;
+  const sel = monacoEditor.getSelection();
+  const selected = monacoEditor.getModel().getValueInRange(sel);
+  monacoEditor.executeEdits('fmt', [{ range: sel, text: `[${text || selected || 'link text'}](${url})` }]);
   monacoEditor.focus();
+  closeModal('link-modal');
+}
+function fmtCodeBlock() {
+  if (!monacoEditor) return;
+  document.getElementById('codeblock-lang').value = '';
+  // Reset all quick-pick buttons to ghost style
+  document.querySelectorAll('.cb-lang-btn').forEach(b => { b.classList.remove('btn--primary'); b.classList.add('btn--ghost'); });
+  document.getElementById('codeblock-modal').classList.add('open');
+  setTimeout(() => document.getElementById('codeblock-lang').focus(), 60);
+}
+function finaliseCodeBlock() {
+  if (!monacoEditor) return;
+  const lang = document.getElementById('codeblock-lang').value.trim();
+  const sel  = monacoEditor.getSelection();
+  const txt  = monacoEditor.getModel().getValueInRange(sel);
+  monacoEditor.executeEdits('fmt', [{ range: sel, text: '```' + lang + '\n' + (txt || '# code') + '\n```' }]);
+  monacoEditor.focus();
+  closeModal('codeblock-modal');
+}
+
+// ── Unsaved changes guard ────────────────────────────────────────────
+let _hasUnsaved = false;
+function markUnsaved(v) {
+  _hasUnsaved = v;
+  document.title = (v ? '● ' : '') + `${SITE_TITLE} · Admin`;
+}
+
+function confirmNavigateAway() {
+  if (!_hasUnsaved) return true;
+  return confirm('You have unsaved changes. Leave without committing?');
+}
+
+// ── Discard draft ───────────────────────────────────────────────────
+async function discardDraft() {
+  if (!currentSlug) return;
+  if (!confirm('Discard this draft and reload the last committed version from GitHub?')) return;
+  sessionStorage.removeItem(`draft_${currentSlug}`);
+  document.getElementById('draft-banner').style.display = 'none';
+  const slug = currentSlug;
+  setStatus('reloading…', 'info');
+  try {
+    const { content, sha } = await ghGetFile(`posts/${slug}.md`);
+    currentSHA = sha;
+    loadIntoEditor(slug, content);
+    markUnsaved(false);
+    log(`Reloaded posts/${slug}.md from GitHub`, 'ok');
+  } catch (e) {
+    log(`Reload failed: ${e.message}`, 'error');
+  }
 }
 function fmtHeading() {
   if (!monacoEditor) return;
@@ -1737,15 +2012,86 @@ function fmtOrderedList() {
   monacoEditor.executeEdits('fmt', [{ range: sel, text: lines.map(l => l.trim() ? `${n++}. ` + l : l).join('\n') }]);
   monacoEditor.focus();
 }
-function fmtCodeBlock() {
+function fmtTaskList() {
   if (!monacoEditor) return;
-  const sel  = monacoEditor.getSelection();
-  const txt  = monacoEditor.getModel().getValueInRange(sel);
-  const lang = prompt('Language (bash, python, js, go…):', 'bash') || '';
-  monacoEditor.executeEdits('fmt', [{ range: sel, text: '```' + lang + '\n' + (txt || '# code') + '\n```' }]);
+  const sel   = monacoEditor.getSelection();
+  const txt   = monacoEditor.getModel().getValueInRange(sel);
+  const lines = (txt || 'First task\nSecond task\nThird task').split('\n');
+  monacoEditor.executeEdits('fmt', [{ range: sel, text: lines.map(l => l.trim() ? '- [ ] ' + l.replace(/^-\s*(\[[ x]\]\s*)?/, '') : l).join('\n') }]);
   monacoEditor.focus();
 }
-function insertMarkdown(text) {
+
+// ── Math modal ──────────────────────────────────────────────────────
+let _mathMode = 'inline';
+function openMathModal() {
+  document.getElementById('math-expr').value = '';
+  document.getElementById('math-preview').textContent = 'Preview will appear here';
+  setMathMode('inline');
+  document.getElementById('math-modal').classList.add('open');
+  setTimeout(() => document.getElementById('math-expr').focus(), 60);
+}
+function setMathMode(mode) {
+  _mathMode = mode;
+  document.querySelectorAll('.math-mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+    b.classList.toggle('btn--primary', b.dataset.mode === mode);
+    b.classList.toggle('btn--ghost',   b.dataset.mode !== mode);
+  });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('math-expr').addEventListener('input', e => {
+    const expr = e.target.value.trim();
+    const prev = document.getElementById('math-preview');
+    if (!expr) { prev.textContent = 'Preview will appear here'; return; }
+    if (typeof katex !== 'undefined') {
+      try {
+        prev.innerHTML = katex.renderToString(expr, { displayMode: _mathMode === 'block', throwOnError: false });
+      } catch(err) { prev.textContent = expr; }
+    } else { prev.textContent = expr; }
+  });
+});
+function finaliseMath() {
+  const expr = document.getElementById('math-expr').value.trim();
+  if (!expr) { document.getElementById('math-expr').focus(); return; }
+  const md = _mathMode === 'block' ? `\n$$\n${expr}\n$$\n` : `$${expr}$`;
+  insertMarkdown(md);
+  log(`Inserted ${_mathMode} math`, 'info');
+  closeModal('math-modal');
+}
+
+// ── Embed modal (YouTube / Vimeo) ──────────────────────────────────
+function openEmbedModal() {
+  document.getElementById('embed-url').value     = '';
+  document.getElementById('embed-caption').value = '';
+  document.getElementById('embed-modal').classList.add('open');
+  setTimeout(() => document.getElementById('embed-url').focus(), 60);
+}
+function finaliseEmbed() {
+  const raw     = document.getElementById('embed-url').value.trim();
+  const caption = document.getElementById('embed-caption').value.trim();
+  if (!raw) { document.getElementById('embed-url').focus(); return; }
+
+  let platform = 'youtube';
+  let id = raw;
+
+  // Detect YouTube
+  const ytMatch = raw.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  if (ytMatch) { platform = 'youtube'; id = ytMatch[1]; }
+  // Detect Vimeo
+  else {
+    const vmMatch = raw.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    if (vmMatch) { platform = 'vimeo'; id = vmMatch[1]; }
+    else if (/^\d+$/.test(raw)) { platform = 'vimeo'; id = raw; }
+    // Bare YouTube ID (11 chars, alphanumeric+_-)
+    else if (/^[A-Za-z0-9_-]{11}$/.test(raw)) { platform = 'youtube'; id = raw; }
+  }
+
+  const cap = caption ? `|${caption}` : '';
+  const md  = `\n::${platform}[${id}${cap}]\n`;
+  insertMarkdown(md);
+  log(`Inserted ${platform} embed: ${id}`, 'info');
+  closeModal('embed-modal');
+}
   if (!monacoEditor) return;
   monacoEditor.executeEdits('insert', [{ range: monacoEditor.getSelection(), text }]);
   monacoEditor.focus();
@@ -1845,6 +2191,9 @@ function renderPreview() {
 // ═══════════════════════════════════════════════════════════════════
 function switchFmTab(tab) {
   activeFmTab = tab;
+  // Auto-expand the fm bar if it's currently collapsed
+  const bar = document.getElementById('fm-bar');
+  if (bar && bar.classList.contains('collapsed')) toggleFmBar();
   document.querySelectorAll('.fm-tab').forEach((btn, i) => {
     const names = ['basic','author','advanced'];
     btn.classList.toggle('active', names[i] === tab);
@@ -1900,6 +2249,17 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 function openShortcutsModal()  { document.getElementById('shortcuts-modal').classList.add('open'); }
 function closeShortcutsModal() { document.getElementById('shortcuts-modal').classList.remove('open'); }
 
+// ── Code block language pill delegation ─────────────────────────────
+document.getElementById('codeblock-lang-pills').addEventListener('click', e => {
+  const btn = e.target.closest('.cb-lang-btn');
+  if (!btn) return;
+  const lang = btn.dataset.lang;
+  document.getElementById('codeblock-lang').value = lang;
+  document.querySelectorAll('.cb-lang-btn').forEach(b => { b.classList.remove('btn--primary'); b.classList.add('btn--ghost'); });
+  btn.classList.add('btn--primary'); btn.classList.remove('btn--ghost');
+  document.getElementById('codeblock-lang').focus();
+});
+
 // ═══════════════════════════════════════════════════════════════════
 // WORD COUNT + COPY
 // ═══════════════════════════════════════════════════════════════════
@@ -1930,7 +2290,16 @@ function today()   { return Utils.today(); }      // delegates to utils.js
 function escHtml(s){ return Utils.escapeHtml(s||''); } // delegates to utils.js
 function getEditorValue(){ return monacoEditor ? monacoEditor.getValue() : ''; }
 function setEditorValue(v){ if (monacoEditor) monacoEditor.setValue(v); }
-function setStatus(msg, type='info') { const el = document.getElementById('save-status'); el.textContent = msg; el.className = `status-pill ${type}`; }
+function setStatus(msg, type='info') {
+  const el = document.getElementById('save-status');
+  el.textContent = msg; el.className = `status-pill ${type}`;
+  // Track dirty state: warn = unsaved; ok/info = clean
+  if (type === 'warn') markUnsaved(true);
+  else if (type === 'ok' || (type === 'info' && (msg === 'no file open' || msg.includes('editing')))) markUnsaved(false);
+}
+window.addEventListener('beforeunload', e => {
+  if (_hasUnsaved) { e.preventDefault(); e.returnValue = ''; }
+});
 function autosaveDraft() { if (currentSlug) sessionStorage.setItem(`draft_${currentSlug}`, getEditorValue()); }
 
 function downloadMd() {
@@ -1945,7 +2314,9 @@ function downloadMd() {
 
 function openInBlog() {
   const slug = document.getElementById('fm-slug').value.trim();
-  if (slug) window.open(`/post/${slug}`, '_blank');
+  if (!slug) return;
+  const base = BLOG_URL ? BLOG_URL.replace(/\/$/, '') : '';
+  window.open(`${base}/post/${slug}`, '_blank');
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2211,6 +2582,18 @@ function log(msg, type='info') {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// FM BAR COLLAPSE / EXPAND
+// ═══════════════════════════════════════════════════════════════════
+function toggleFmBar(force) {
+  const bar = document.getElementById('fm-bar');
+  const lbl = document.getElementById('fm-bar-toggle-label');
+  const collapsed = force !== undefined ? !force : !bar.classList.contains('collapsed');
+  bar.classList.toggle('collapsed', collapsed);
+  if (lbl) lbl.textContent = collapsed ? 'show' : 'hide';
+  try { localStorage.setItem('admin_fm_collapsed', collapsed ? '1' : '0'); } catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // FM LISTENERS
 // ═══════════════════════════════════════════════════════════════════
 document.getElementById('fm-title').addEventListener('input', e => {
@@ -2231,14 +2614,16 @@ document.getElementById('fm-title').addEventListener('input', e => {
 // KEYBOARD SHORTCUTS (global)
 // ═══════════════════════════════════════════════════════════════════
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    ['upload-modal','table-modal','callout-modal','template-modal','shortcuts-modal'].forEach(id => closeModal(id));
-  }
-  if (e.key === '?' && !e.ctrlKey && !e.metaKey &&
-      document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA')
-    openShortcutsModal();
   const ctrl = e.ctrlKey || e.metaKey;
-  if (document.activeElement.tagName === 'INPUT') return;
+  const inInput = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
+
+  if (e.key === 'Escape') {
+    ['upload-modal','table-modal','callout-modal','template-modal','shortcuts-modal','link-modal','codeblock-modal','math-modal','embed-modal'].forEach(id => closeModal(id));
+  }
+  if (!ctrl && !inInput) {
+    if (e.key === '?') openShortcutsModal();
+    if (e.key === 'f') toggleFmBar();
+  }
   if (ctrl && e.key === '1') { e.preventDefault(); setViewMode('editor'); }
   if (ctrl && e.key === '2') { e.preventDefault(); setViewMode('split'); }
   if (ctrl && e.key === '3') { e.preventDefault(); setViewMode('preview'); }
@@ -2251,6 +2636,11 @@ document.addEventListener('keydown', e => {
 // ═══════════════════════════════════════════════════════════════════
 (async function boot() {
   applyThemeIcon();
+
+  // Restore front-matter bar collapsed state
+  try {
+    if (localStorage.getItem('admin_fm_collapsed') === '1') toggleFmBar(false);
+  } catch(e){}
 
   // Site title
   document.title = `${SITE_TITLE} · Admin`;
