@@ -619,7 +619,21 @@ const DataLoader = {
     const isPaywalled = fm.paywalled === 'true' || meta.paywalled;
     const previewBody = Utils._stripTocBlock(body).split(/\n\n+/).slice(0, 12).join('\n\n');
     const full = {
-      ...meta,
+      slug,
+      title:          fm.title           || meta.title          || 'Untitled',
+      excerpt:        fm.excerpt          || meta.excerpt         || '',
+      date:           fm.date             || meta.date            || '',
+      tag:            fm.tag              || meta.tag             || 'Post',
+      readTime:       fm.readTime         || meta.readTime        || Utils.readTime(body),
+      paywalled:      isPaywalled,
+      cover:          fm.cover            || meta.cover           || '',
+      author:         fm.author           || meta.author          || CONFIG.AUTHOR_NAME,
+      authorRole:     fm.author_role      || meta.authorRole      || CONFIG.AUTHOR_ROLE,
+      authorBio:      fm.author_bio       || meta.authorBio       || CONFIG.AUTHOR_BIO,
+      authorInitials: fm.author_initials  || meta.authorInitials  || CONFIG.AUTHOR_INITIALS,
+      authorLinkedin: fm.author_linkedin  || meta.authorLinkedin  || '',
+      authorGithub:   fm.author_github    || meta.authorGithub    || '',
+      authorWebsite:  fm.author_website   || meta.authorWebsite   || '',
       body: (isPaywalled && !AppState.isMember) ? previewBody : body,
       _previewCached: (isPaywalled && !AppState.isMember)
     };
@@ -1378,7 +1392,8 @@ const Router = {
         } else {
           throw new Error('post not found');
         }
-      } catch {
+      } catch (err) {
+        console.error("[Router] fetchBody failed:", err?.message || err);
         Utils.qs('#post-article').innerHTML = `
           <div class="empty-state">
             <i class="fa-solid fa-file-circle-xmark empty-icon"></i>

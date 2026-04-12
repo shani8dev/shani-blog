@@ -32,7 +32,7 @@ const CONFIG = {
   //   Cloudflare Worker proxy (for private repo without Pages, or Notion, etc.):
   //     POSTS_BASE_URL: 'https://blog-proxy.yourname.workers.dev/posts'
   //     POSTS_API_URL:  'https://blog-proxy.yourname.workers.dev/api/list'
-  POSTS_BASE_URL: 'https://raw.githubusercontent.com/shani8dev/shani-blog-posts/main/posts',   // ← separate posts repo
+  POSTS_BASE_URL: '',   // ← leave empty for standard GitHub Pages
   POSTS_API_URL:  '',   // ← leave empty unless using a Worker proxy
 
   // ── Author / team identity ───────────────────────────────────
