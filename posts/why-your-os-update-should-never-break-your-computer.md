@@ -2,19 +2,17 @@
 title: 'Why Your OS Update Should Never Break Your Computer — And How Shanios Fixes This'
 date: '2026-04-10'
 tag: 'Engineering'
-excerpt: 'Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.'
-readTime: '7 min'
 cover: 'https://shani.dev/assets/images/saturn-x.png'
+excerpt: 'Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.'
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shanios'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shanios.'
-author_initials: SK
-author_linkedin: https://linkedin.com/in/shrinivasvkumbhar
-author_github: https://github.com/shrinivasvkumbhar
-author_website: https://shani.dev
-paywalled: false
+author_initials: 'SK'
+author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
+author_github: 'https://github.com/shrinivasvkumbhar'
+author_website: 'https://shani.dev'
+readTime: '7 min'
 ---
-
 Every system administrator knows a rule that desktop operating systems have ignored for decades: **you never touch the running system**.
 
 When a server needs updating, you prepare the new version on a standby copy. You verify it. You test it. Then — and only then — you switch over. If something goes wrong, you switch back. The running server was never at risk.
@@ -140,3 +138,4 @@ Full documentation, including the installation guide, Secure Boot enrollment, TP
 The architecture described here is not experimental. It runs on real hardware today, shipped in verified images, updated monthly on the stable channel. The blue-green model, the immutable root, the cryptographic verification chain — these are not aspirational. They are the defaults.
 
 Your OS update should never break your computer. On Shanios, it structurally cannot.
+
