@@ -25,6 +25,12 @@ const CONFIG = {
   GITHUB_USER: 'shani8dev',
   GITHUB_REPO: 'shani-blog',
 
+  // ── Admin panel (admin.html) ──────────────────────────────────
+  // [script] Branch admin.html reads/writes posts on.
+  ADMIN_BRANCH:      'main',
+  // [script] Repo path where uploaded images are stored.
+  ADMIN_IMAGES_PATH: 'assets/images',
+
   // ── URLs ─────────────────────────────────────────────────────
   // [both] Canonical site root — no trailing slash.
   BLOG_URL: 'https://blog.shani.dev',
@@ -264,6 +270,40 @@ const CONFIG = {
   PWA_DESCRIPTION: "Engineering breakdowns and release notes from the Shanios team.",
   PWA_THEME_COLOR: '#161514',
   PWA_BG_COLOR:    '#161514',
+
+  // ── Cloudflare Web Analytics ──────────────────────────────────
+  // [script] Set to your Cloudflare Web Analytics token to inject the
+  //          privacy-safe, cookie-free beacon automatically on every page.
+  //          Find it in: CF Dashboard → Websites → Analytics & Logs → Web Analytics.
+  //          Leave empty to disable.
+  CF_WEB_ANALYTICS_TOKEN: '',
+
+  // ── Giscus (GitHub Discussions comments) ──────────────────────
+  // [script] Renders a comment section at the bottom of each post.
+  //          Setup: enable Discussions on your GitHub repo, install
+  //          the Giscus app at https://giscus.app, then paste the
+  //          generated IDs below.
+  //          Leave GISCUS_REPO empty to disable comments entirely.
+  GISCUS_ENABLED:     true,
+  GISCUS_REPO:        '',           // e.g. 'shani8dev/shani-blog'
+  GISCUS_REPO_ID:     '',           // e.g. 'R_kgDO...'
+  GISCUS_CATEGORY:    'General',    // Discussion category name
+  GISCUS_CATEGORY_ID: '',           // e.g. 'DIC_kwDO...'
+  // 'pathname' | 'url' | 'title' — maps each post to a Discussion thread
+  GISCUS_MAPPING:     'pathname',
+  // 'light' | 'dark' | 'preferred_color_scheme' | 'transparent_dark'
+  // Set 'preferred_color_scheme' to auto-follow the reader's OS theme,
+  // or leave as '' to auto-sync with the blog's own dark/light toggle.
+  GISCUS_THEME:       '',
+
+  // ── Fuse.js fuzzy search ───────────────────────────────────────
+  // [script] Replaces the built-in indexOf search with Fuse.js fuzzy
+  //          matching — handles typos and partial matches automatically.
+  //          Fuse.js is loaded from jsDelivr (already on your CDN allowlist)
+  //          only when the search bar is first opened, so it costs nothing
+  //          on page load.
+  //          Set false to keep the existing simple search.
+  FUZZY_SEARCH_ENABLED: true,
 
   // ── Sitemap static URLs ───────────────────────────────────────
   // [build] Written into sitemap.xml by generate-manifest.js alongside

@@ -2049,3 +2049,18 @@ RECENTLY VIEWED LIST (in Bookmarks view)
   color: var(--color-text-faint); flex-shrink: 0;
   display: flex; align-items: center; gap: 4px;
 }
+
+/* =========================================
+   GISCUS COMMENTS
+========================================= */
+.post-comments {
+  margin-top: var(--space-12);
+  padding-top: var(--space-8);
+}
+.post-comments .giscus,
+.post-comments .giscus-frame {
+  width: 100%;
+  border: none;
+}
+/* Give the giscus iframe a min-height while it loads */
+.post-comments .giscus { min-height: 120px; }

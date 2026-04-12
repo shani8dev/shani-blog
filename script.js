@@ -879,6 +879,17 @@ const Renderer = {
     // Current year
     document.querySelectorAll('[data-current-year]').forEach(el => el.textContent = new Date().getFullYear());
 
+    // ── Cloudflare Web Analytics beacon ──────────────────────────
+    // Privacy-safe, cookie-free. Injected once; idempotent on SPA re-renders.
+    if (CONFIG.CF_WEB_ANALYTICS_TOKEN && !document.getElementById('cf-analytics')) {
+      const cfScript = document.createElement('script');
+      cfScript.id = 'cf-analytics';
+      cfScript.defer = true;
+      cfScript.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+      cfScript.dataset.cfBeacon = JSON.stringify({ token: CONFIG.CF_WEB_ANALYTICS_TOKEN });
+      document.head.appendChild(cfScript);
+    }
+
     // RSS feed discovery link
     if (CONFIG.RSS_ENABLED && CONFIG.RSS_URL) {
       if (!document.querySelector('link[type="application/rss+xml"]')) {
@@ -1311,7 +1322,15 @@ const Renderer = {
       </footer>
       <div id="post-series-strip"></div>
       <div id="post-related"></div>
-      <div id="post-newsletter"></div>`;
+      <div id="post-newsletter"></div>
+      ${CONFIG.GISCUS_ENABLED && CONFIG.GISCUS_REPO && !(paywalled && !AppState.isMember) ? `
+      <div id="post-comments" class="post-comments">
+        <div class="section-header">
+          <h2 class="section-header__title"><i class="fa-solid fa-comments" aria-hidden="true"></i> Discussion</h2>
+          <div class="section-header__line"></div>
+        </div>
+        <div class="giscus"></div>
+      </div>` : ''}`;
 
     // ── Adaptive paywall fade ─────────────────────────────────
     // After the DOM is painted, measure the preview's natural height.
@@ -1541,6 +1560,40 @@ const Renderer = {
         nlSubmit.addEventListener('click', doSubscribe);
         nlEmail.addEventListener('keydown', e => { if (e.key === 'Enter') doSubscribe(); });
       }
+    }
+
+    // ── Giscus comments ───────────────────────────────────────────
+    if (CONFIG.GISCUS_ENABLED && CONFIG.GISCUS_REPO && !(paywalled && !AppState.isMember)) {
+      // Resolve theme: explicit config value, or follow the blog's own toggle
+      const giscusTheme = CONFIG.GISCUS_THEME ||
+        (AppState.theme === 'dark' ? 'dark_dimmed' : 'light');
+
+      // Remove any previous Giscus iframe so it re-mounts cleanly on navigation
+      const prevScript = document.getElementById('giscus-script');
+      if (prevScript) prevScript.remove();
+      document.querySelector('iframe.giscus-frame')?.remove();
+
+      const gs = document.createElement('script');
+      gs.id = 'giscus-script';
+      gs.src = 'https://giscus.app/client.js';
+      gs.async = true;
+      gs.crossOrigin = 'anonymous';
+      gs.dataset.repo           = CONFIG.GISCUS_REPO;
+      gs.dataset.repoId         = CONFIG.GISCUS_REPO_ID;
+      gs.dataset.category       = CONFIG.GISCUS_CATEGORY || 'General';
+      gs.dataset.categoryId     = CONFIG.GISCUS_CATEGORY_ID;
+      gs.dataset.mapping        = CONFIG.GISCUS_MAPPING || 'pathname';
+      gs.dataset.strict         = '0';
+      gs.dataset.reactionsEnabled = '1';
+      gs.dataset.emitMetadata   = '0';
+      gs.dataset.inputPosition  = 'top';
+      gs.dataset.theme          = giscusTheme;
+      gs.dataset.lang           = (CONFIG.LANG || 'en').split('-')[0];
+      gs.dataset.loading        = 'lazy';
+
+      // Inject into the .giscus container rendered in the post HTML
+      const giscusContainer = app.querySelector('.giscus');
+      if (giscusContainer) giscusContainer.appendChild(gs);
     }
 
     // ── Lemon Squeezy license key verification ───────────────────
@@ -1991,17 +2044,28 @@ const Router = {
 
       if (AppState.search) {
         const q = AppState.search.toLowerCase();
-        filtered = filtered.filter(p => {
-          if (p.title.toLowerCase().includes(q)) return true;
-          if (p.excerpt.toLowerCase().includes(q)) return true;
-          if (p.tag.toLowerCase().includes(q)) return true;
-          // Only search body content that is already cached in memory.
-          // Never trigger on-demand fetches during search — that would
-          // fire hundreds of requests on every keystroke.
-          if (p.paywalled && !AppState.isMember) return false;
-          const cachedBody = AppState.postsCache[p.slug]?.body;
-          return cachedBody ? cachedBody.toLowerCase().includes(q) : false;
-        });
+        // Use Fuse.js fuzzy results if available, else fall back to indexOf
+        if (typeof Fuse !== 'undefined' && CONFIG.FUZZY_SEARCH_ENABLED && q.length >= 2) {
+          const fuse = new Fuse(filtered, {
+            keys: ['title', 'excerpt', 'tag', 'author'],
+            threshold: 0.35,
+            ignoreLocation: true,
+            minMatchCharLength: 2,
+          });
+          filtered = fuse.search(q).map(r => r.item);
+        } else {
+          filtered = filtered.filter(p => {
+            if (p.title.toLowerCase().includes(q)) return true;
+            if (p.excerpt.toLowerCase().includes(q)) return true;
+            if (p.tag.toLowerCase().includes(q)) return true;
+            // Only search body content that is already cached in memory.
+            // Never trigger on-demand fetches during search — that would
+            // fire hundreds of requests on every keystroke.
+            if (p.paywalled && !AppState.isMember) return false;
+            const cachedBody = AppState.postsCache[p.slug]?.body;
+            return cachedBody ? cachedBody.toLowerCase().includes(q) : false;
+          });
+        }
       }
 
       const { perPage } = AppState.pagination;
@@ -2066,6 +2130,16 @@ const UI = {
       // Update PWA theme-color
       const pwaTc = document.getElementById('pwa-theme-color');
       if (pwaTc) pwaTc.content = t === 'light' ? '#faf9f7' : '#161514';
+      // Sync Giscus iframe theme if it's visible on the page
+      if (!CONFIG.GISCUS_THEME) {
+        const giscusFrame = document.querySelector('iframe.giscus-frame');
+        if (giscusFrame) {
+          giscusFrame.contentWindow?.postMessage(
+            { giscus: { setConfig: { theme: t === 'dark' ? 'dark_dimmed' : 'light' } } },
+            'https://giscus.app'
+          );
+        }
+      }
     };
     apply(AppState.theme);
     btn?.addEventListener('click', () =>
@@ -2100,10 +2174,46 @@ const UI = {
     const closeBtn  = Utils.qs('#search-close');
     const searchBar = Utils.qs('#search-bar');
     const input     = Utils.qs('#search-input');
+
+    // ── Fuse.js fuzzy search — lazy-loaded on first open ─────────
+    let fuseInstance = null;
+    const loadFuse = () => {
+      if (!CONFIG.FUZZY_SEARCH_ENABLED || fuseInstance || typeof Fuse !== 'undefined') return;
+      if (typeof Fuse !== 'undefined') return; // already loaded
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/fuse.js@7/dist/fuse.min.js';
+      s.onload = () => {
+        fuseInstance = new Fuse(AppState.posts, {
+          keys: ['title', 'excerpt', 'tag', 'author'],
+          threshold: 0.35,
+          ignoreLocation: true,
+          minMatchCharLength: 2,
+        });
+      };
+      document.head.appendChild(s);
+    };
+
+    const getFuseResults = (q) => {
+      if (!CONFIG.FUZZY_SEARCH_ENABLED) return null;
+      if (typeof Fuse === 'undefined') return null;
+      if (!fuseInstance) {
+        fuseInstance = new Fuse(AppState.posts, {
+          keys: ['title', 'excerpt', 'tag', 'author'],
+          threshold: 0.35,
+          ignoreLocation: true,
+          minMatchCharLength: 2,
+        });
+      }
+      return fuseInstance.search(q).map(r => r.item);
+    };
+
     toggleBtn?.addEventListener('click', () => {
       const open = searchBar.classList.toggle('open');
       searchBar.setAttribute('aria-hidden', open ? 'false' : 'true');
-      if (open) setTimeout(() => input?.focus(), 80);
+      if (open) {
+        loadFuse();
+        setTimeout(() => input?.focus(), 80);
+      }
     });
     closeBtn?.addEventListener('click', () => {
       searchBar.classList.remove('open');
@@ -2111,10 +2221,12 @@ const UI = {
       if (input) { input.value = ''; input.dispatchEvent(new Event('input')); }
     });
     input?.addEventListener('input', e => {
-      AppState.search = e.target.value.toLowerCase().trim();
+      const raw = e.target.value;
+      const q   = raw.toLowerCase().trim();
+      AppState.search = q;
       if (Router.getSlug()) return;
       AppState.pagination.page = 1;
-      const savedValue = e.target.value;
+      const savedValue  = raw;
       const savedCursor = e.target.selectionStart;
       Router.render();
       // Restore focus + cursor after render re-paints the DOM
@@ -2124,17 +2236,20 @@ const UI = {
         try { input.setSelectionRange(savedCursor, savedCursor); } catch {}
       }
       const live = Utils.qs('#search-live');
-      if (live && AppState.search) {
-        const q = AppState.search;
-        const count = AppState.posts.filter(p => {
-          if (p.title.toLowerCase().includes(q)) return true;
-          if (p.excerpt.toLowerCase().includes(q)) return true;
-          if (p.tag.toLowerCase().includes(q)) return true;
-          if (p.paywalled && !AppState.isMember) return false;
-          const cachedBody = AppState.postsCache[p.slug]?.body;
-          return cachedBody ? cachedBody.toLowerCase().includes(q) : false;
-        }).length;
-        live.textContent = `${count} result${count !== 1 ? 's' : ''} for "${AppState.search}"`;
+      if (live && q) {
+        // Count using Fuse if available, else fall back to indexOf
+        const fuseResults = getFuseResults(q);
+        const count = fuseResults
+          ? fuseResults.length
+          : AppState.posts.filter(p => {
+              if (p.title.toLowerCase().includes(q))   return true;
+              if (p.excerpt.toLowerCase().includes(q)) return true;
+              if (p.tag.toLowerCase().includes(q))     return true;
+              if (p.paywalled && !AppState.isMember)   return false;
+              const cachedBody = AppState.postsCache[p.slug]?.body;
+              return cachedBody ? cachedBody.toLowerCase().includes(q) : false;
+            }).length;
+        live.textContent = `${count} result${count !== 1 ? 's' : ''} for "${raw}"`;
       } else if (live) {
         live.textContent = '';
       }
