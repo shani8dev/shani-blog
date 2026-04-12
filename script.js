@@ -279,7 +279,7 @@ const Utils = {
 
       renderer.heading = (text, level) => {
         const id = Utils.slugify(text.replace(/<[^>]+>/g, ''));
-        return `<h${level} id="${id}"><a class="heading-anchor" href="#${id}" aria-hidden="true">#</a>${text}</h${level}>\n`;
+        return `<h${level} id="${id}">${text}<a class="heading-anchor" href="#${id}" aria-hidden="true">#</a></h${level}>\n`;
       };
 
       renderer.link = (href, title, linkText) => {
@@ -1246,7 +1246,7 @@ const Router = {
       // ── Index view ────────────────────────────────────────
       indexEl.style.display = '';
       postEl.style.display  = 'none';
-      if (readBar) readBar.style.display = 'none';
+      if (readBar) { readBar.style.display = 'none'; readBar.style.width = '0%'; }
 
       // Sync search state from the actual input value so any navigation path
       // that didn't go through a close-handler can't leave a stale filter active.
@@ -1323,7 +1323,7 @@ const Router = {
         }
       }
 
-      Renderer.renderPosts(gridPosts, false);
+      Renderer.renderPosts(gridPosts, showFeatured);
       Renderer.renderPagination(filtered.length, perPage, AppState.pagination.page);
 
       if (AppState.search) {
@@ -1574,6 +1574,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       menuBtn?.setAttribute('aria-expanded', 'false');
       mobileNav.setAttribute('aria-hidden', 'true');
     }
+    // Clear stale search state so back-navigation shows the correct listing
+    const searchInput = Utils.qs('#search-input');
+    if (searchInput) { searchInput.value = ''; }
+    AppState.search = '';
     Router.render();
   });
 });
