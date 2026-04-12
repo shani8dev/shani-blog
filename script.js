@@ -1190,9 +1190,7 @@ const Renderer = {
     // Auto-inject TOC at top when front-matter toc: 'true' and body has no [[toc]] shortcode
     let bodyForRender = post.body || '';
     if (post.toc === 'true' && !/\[\[?toc\]?\]/i.test(bodyForRender)) {
-      bodyForRender = '[[toc]]
-
-' + bodyForRender;
+      bodyForRender = '[[toc]]\n\n' + bodyForRender;
     }
     const html = Utils.safeMarkdown(bodyForRender);
     const paywalled = post.paywalled;
