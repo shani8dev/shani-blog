@@ -26,8 +26,19 @@ const CONFIG = {
   GITHUB_REPO: 'shani-blog',
 
   // ── Admin panel (admin.html) ──────────────────────────────────
-  // [script] Branch admin.html reads/writes posts on.
+  // [script] Branch admin.html reads/writes posts on when committing directly.
   ADMIN_BRANCH:      'main',
+
+  // [script] PR workflow — when enabled, "Commit & PR" pushes to a new feature
+  //          branch and opens a Pull Request targeting ADMIN_DEFAULT_BRANCH.
+  //          Set false to hide the button and always commit directly.
+  ADMIN_PR_ENABLED:      true,
+  // [script] The base (target) branch that PRs are opened against.
+  //          Typically 'main' or 'production'.
+  ADMIN_DEFAULT_BRANCH:  'main',
+  // [script] Prefix used when auto-naming feature branches, e.g. post/my-slug.
+  ADMIN_PR_BRANCH_PREFIX: 'post/',
+
   // [script] Repo path where uploaded images are stored.
   ADMIN_IMAGES_PATH: 'assets/images',
 
