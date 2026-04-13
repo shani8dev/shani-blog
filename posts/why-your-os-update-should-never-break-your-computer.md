@@ -138,4 +138,3 @@ Full documentation, including the installation guide, Secure Boot enrollment, TP
 The architecture described here is not experimental. It runs on real hardware today, shipped in verified images, updated monthly on the stable channel. The blue-green model, the immutable root, the cryptographic verification chain — these are not aspirational. They are the defaults.
 
 Your OS update should never break your computer. On Shanios, it structurally cannot.
-
