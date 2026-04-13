@@ -133,6 +133,43 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
 .btn--ghost:hover{border-color:var(--accent);color:var(--accent)}
 .btn--danger{background:var(--color-like-bg,rgba(237,95,95,.1));color:var(--red);border:1px solid color-mix(in srgb,var(--red) 25%,transparent)}
 .btn--danger:hover{background:color-mix(in srgb,var(--red) 20%,transparent)}
+.btn--secondary{background:var(--color-secondary-bg,rgba(159,114,245,.1));color:var(--violet);border:1px solid color-mix(in srgb,var(--violet) 30%,transparent)}
+.btn--secondary:hover{background:color-mix(in srgb,var(--violet) 20%,transparent);border-color:var(--violet)}
+
+/* ── Save option cards ──────────────────────────────────────── */
+.save-option{display:flex;align-items:center;gap:.75rem;width:100%;text-align:left;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);padding:.7rem .85rem;cursor:pointer;transition:border-color .15s,background .15s;font-family:var(--sans)}
+.save-option:hover{border-color:var(--accent);background:var(--bg-elevated)}
+.save-option--recommended{border-color:color-mix(in srgb,var(--violet) 35%,transparent)}
+.save-option--recommended:hover{border-color:var(--violet);background:color-mix(in srgb,var(--violet) 6%,transparent)}
+.save-option--disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
+.save-option__icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.save-option__body{flex:1;min-width:0}
+.save-option__title{font-size:.82rem;font-weight:600;color:var(--text);display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.save-option__badge{font-size:.62rem;font-weight:700;letter-spacing:.04em;background:color-mix(in srgb,var(--violet) 15%,transparent);color:var(--violet);border:1px solid color-mix(in srgb,var(--violet) 30%,transparent);border-radius:99px;padding:.1rem .4rem;text-transform:uppercase}
+.save-option__desc{font-size:.74rem;color:var(--muted);margin-top:.15rem;line-height:1.45}
+.save-option__arrow{color:var(--faint);font-size:.75rem;flex-shrink:0}
+
+/* ── Branch select dropdown ─────────────────────────────────── */
+.branch-select{position:relative;width:100%}
+.branch-select__trigger{display:flex;align-items:center;gap:.45rem;width:100%;padding:.35rem .55rem;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;color:var(--text);transition:border-color .15s;font-family:var(--sans)}
+.branch-select__trigger:hover{border-color:var(--accent)}
+.branch-select__trigger.open{border-color:var(--accent);border-bottom-left-radius:0;border-bottom-right-radius:0}
+.branch-select__chevron{transition:transform .15s}
+.branch-select__trigger.open .branch-select__chevron{transform:rotate(180deg)}
+.branch-select__dropdown{position:absolute;top:100%;left:0;right:0;background:var(--bg-elevated);border:1px solid var(--accent);border-top:none;border-bottom-left-radius:var(--radius);border-bottom-right-radius:var(--radius);z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.branch-select__search-wrap{display:flex;align-items:center;gap:.4rem;padding:.4rem .55rem;border-bottom:1px solid var(--border)}
+.branch-select__search-wrap input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:.75rem;font-family:var(--mono)}
+.branch-select__list{max-height:180px;overflow-y:auto}
+.branch-select__item{display:flex;align-items:center;gap:.45rem;padding:.38rem .6rem;font-size:.75rem;font-family:var(--mono);color:var(--text);cursor:pointer;transition:background .1s;border:none;background:none;width:100%;text-align:left}
+.branch-select__item:hover,.branch-select__item.focused{background:var(--bg-card)}
+.branch-select__item--active{color:var(--accent)}
+.branch-select__item--active .branch-select__check{opacity:1}
+.branch-select__check{opacity:0;color:var(--accent);font-size:.65rem;margin-left:auto;flex-shrink:0}
+.branch-select__badge{font-size:.6rem;padding:.08rem .3rem;border-radius:99px;font-family:var(--sans);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.branch-select__badge--default{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}
+.branch-select__badge--protected{background:color-mix(in srgb,var(--warning) 12%,transparent);color:var(--warning)}
+.branch-select__empty{padding:.6rem .6rem;font-size:.74rem;color:var(--faint);text-align:center}
+.branch-select__divider{padding:.22rem .6rem;font-size:.65rem;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;border-top:1px solid var(--border);margin-top:.15rem}
 .btn--new{width:100%;justify-content:center;background:color-mix(in srgb,var(--accent) 6%,transparent);color:var(--accent);border:1px dashed color-mix(in srgb,var(--accent) 25%,transparent);padding:.5rem}
 .btn--new:hover{background:color-mix(in srgb,var(--accent) 12%,transparent);border-color:var(--accent)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
@@ -400,7 +437,7 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
       <i class="fa-solid fa-circle-info" style="color:var(--blue);margin-right:.3rem"></i>
       Create a <strong>fine-grained PAT</strong> at
       <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/tokens</a>
-      → set <strong>Contents: Read &amp; Write</strong>. Token lives in <code style="font-size:.72rem">sessionStorage</code> only.
+      → set <strong>Contents: Read &amp; Write</strong> and <strong>Pull requests: Read &amp; Write</strong>. Token lives in <code style="font-size:.72rem">sessionStorage</code> only.
     </div>
   </div>
 </div>
@@ -451,7 +488,28 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
               <i class="fa-brands fa-github" style="color:var(--faint);font-size:.8rem;flex-shrink:0"></i>
               <span id="sb-repo-display" style="font-family:var(--mono);font-size:.72rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
             </div>
-            <div><label>Branch</label><input id="sb-branch" type="text" placeholder="main"></div>
+            <div style="display:flex;flex-direction:column;gap:.25rem">
+              <label>Branch</label>
+              <div class="branch-select" id="branch-select">
+                <button class="branch-select__trigger" id="branch-select-trigger" onclick="toggleBranchDropdown()" type="button">
+                  <i class="fa-solid fa-code-branch" style="color:var(--faint);font-size:.75rem"></i>
+                  <span id="branch-select-label" style="flex:1;text-align:left;font-family:var(--mono);font-size:.75rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+                  <i class="fa-solid fa-chevron-down branch-select__chevron" id="branch-select-chevron" style="font-size:.65rem;color:var(--faint)"></i>
+                </button>
+                <div class="branch-select__dropdown" id="branch-select-dropdown" style="display:none">
+                  <div class="branch-select__search-wrap">
+                    <i class="fa-solid fa-magnifying-glass" style="color:var(--faint);font-size:.7rem"></i>
+                    <input id="branch-select-search" type="text" placeholder="Filter or type branch…"
+                      oninput="filterBranchList(this.value)"
+                      onkeydown="branchSearchKeydown(event)"
+                      autocomplete="off" spellcheck="false">
+                  </div>
+                  <div class="branch-select__list" id="branch-select-list">
+                    <div class="branch-select__empty">Loading branches…</div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <button class="btn btn--ghost" style="width:100%;justify-content:center" onclick="refreshPosts()">
               <i class="fa-solid fa-rotate"></i> Refresh posts
             </button>
@@ -557,8 +615,8 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
     <div class="editor-toolbar">
       <!-- Save / actions -->
       <div class="toolbar-group">
-        <button class="btn btn--primary" id="btn-save" onclick="savePost()" disabled title="Commit to GitHub (Ctrl+S)" style="height:30px;padding:.28rem .65rem">
-          <i class="fa-brands fa-github"></i> Commit
+        <button class="btn btn--primary" id="btn-save" onclick="openSaveModal()" disabled title="Save to GitHub (Ctrl+S)" style="height:30px;padding:.28rem .65rem">
+          <i class="fa-brands fa-github"></i> Save
         </button>
         <button class="tbtn" id="btn-open-blog" onclick="openInBlog()" disabled title="View on blog"><i class="fa-solid fa-external-link-alt"></i></button>
         <button class="tbtn" id="btn-download" onclick="downloadMd()" disabled title="Download .md (Ctrl+Shift+D)"><i class="fa-solid fa-download"></i></button>
@@ -991,6 +1049,107 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
 <!-- ═══════════════════════════════════════════════════════════
      SHORTCUTS MODAL
 ════════════════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════
+     SAVE OPTIONS MODAL
+════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="save-modal">
+  <div class="modal modal--sm">
+    <div class="modal__header">
+      <span class="modal__title"><i class="fa-brands fa-github" style="margin-right:.4rem;color:var(--accent)"></i>Save to GitHub</span>
+      <button class="modal__close" onclick="closeModal('save-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal__body" style="display:flex;flex-direction:column;gap:.75rem">
+
+      <!-- Branch context line -->
+      <div style="font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">
+        <i class="fa-solid fa-code-branch" style="color:var(--faint)"></i>
+        Working branch: <code id="save-modal-branch" style="font-family:var(--mono);color:var(--text);font-size:.75rem;background:var(--bg-elevated);padding:.1rem .35rem;border-radius:3px"></code>
+        <span id="save-modal-protected-badge" style="display:none;background:color-mix(in srgb,var(--warning) 12%,transparent);color:var(--warning);border:1px solid color-mix(in srgb,var(--warning) 30%,transparent);border-radius:99px;font-size:.65rem;padding:.1rem .45rem;font-weight:600">
+          <i class="fa-solid fa-lock" style="font-size:.6rem"></i> PROTECTED
+        </span>
+      </div>
+
+      <!-- Option A: Direct commit -->
+      <button class="save-option" id="save-opt-direct" onclick="savePost()">
+        <div class="save-option__icon" style="background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent)">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <div class="save-option__body">
+          <div class="save-option__title">Commit directly</div>
+          <div class="save-option__desc" id="save-opt-direct-desc">Push the file straight to the working branch. Site rebuilds immediately.</div>
+        </div>
+        <i class="fa-solid fa-chevron-right save-option__arrow"></i>
+      </button>
+
+      <!-- Option B: Commit via PR -->
+      <button class="save-option save-option--recommended" id="save-opt-pr" onclick="openPRModal()">
+        <div class="save-option__icon" style="background:color-mix(in srgb,var(--violet) 10%,transparent);color:var(--violet)">
+          <i class="fa-solid fa-code-pull-request"></i>
+        </div>
+        <div class="save-option__body">
+          <div class="save-option__title">
+            Commit via Pull Request
+            <span class="save-option__badge">Recommended</span>
+          </div>
+          <div class="save-option__desc">Push to a feature branch and open a PR targeting <strong id="save-opt-pr-base">main</strong>. Safe for protected branches.</div>
+        </div>
+        <i class="fa-solid fa-chevron-right save-option__arrow"></i>
+      </button>
+
+      <!-- Protected-branch advisory (shown when detected) -->
+      <div id="save-modal-protected-hint" style="display:none" class="login-hint" style="margin:0">
+        <i class="fa-solid fa-triangle-exclamation" style="color:var(--warning);margin-right:.35rem"></i>
+        <strong id="save-modal-branch-protected-name">This branch</strong> is protected — direct commits will be rejected by GitHub. Use <strong>Commit via Pull Request</strong> instead.
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PR MODAL
+════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="pr-modal">
+  <div class="modal modal--sm">
+    <div class="modal__header">
+      <span class="modal__title"><i class="fa-solid fa-code-pull-request" style="margin-right:.4rem;color:var(--violet)"></i>Commit via Pull Request</span>
+      <button class="modal__close" onclick="closeModal('pr-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal__body" style="display:flex;flex-direction:column;gap:.85rem">
+      <div style="font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:.35rem;flex-wrap:wrap">
+        <i class="fa-solid fa-code-branch" style="color:var(--faint)"></i>
+        Feature branch → PR into <code id="pr-base-label" style="font-family:var(--mono);color:var(--text);font-size:.75rem;background:var(--bg-elevated);padding:.1rem .35rem;border-radius:3px">main</code>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.25rem">
+        <label style="font-size:.75rem;color:var(--muted)">Feature branch name</label>
+        <input id="pr-branch-input" type="text" placeholder="post/my-slug" style="font-family:var(--mono);font-size:.8rem">
+        <span style="font-size:.7rem;color:var(--faint)">Created from <strong id="pr-base-ref-label">main</strong> if it doesn't exist.</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.25rem">
+        <label style="font-size:.75rem;color:var(--muted)">PR title</label>
+        <input id="pr-title-input" type="text" placeholder="Add post: my-slug">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.25rem">
+        <label style="font-size:.75rem;color:var(--muted)">PR body <span style="color:var(--faint)">(optional)</span></label>
+        <textarea id="pr-body-input" rows="3" placeholder="Describe what changed…" style="resize:vertical;font-size:.8rem;font-family:var(--sans);background:var(--bg-input);border:1px solid var(--border);color:var(--text);border-radius:var(--radius);padding:.45rem .55rem;width:100%"></textarea>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.25rem">
+        <label style="font-size:.75rem;color:var(--muted)">Open as draft?</label>
+        <label style="display:flex;align-items:center;gap:.45rem;font-size:.8rem;cursor:pointer">
+          <input type="checkbox" id="pr-draft-check" style="accent-color:var(--violet)">
+          Reviewers won't be notified until marked ready
+        </label>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--ghost" onclick="closeModal('pr-modal')">Back</button>
+      <button class="btn btn--secondary" id="pr-submit-btn" onclick="submitPR()">
+        <i class="fa-solid fa-code-pull-request"></i> Open PR
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop" id="shortcuts-modal">
   <div class="modal modal--md">
     <div class="modal__header">
@@ -999,7 +1158,8 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
     </div>
     <div class="modal__body">
       <div class="kbd-grid">
-        <div class="kbd-row"><span>Commit to GitHub</span><code>Ctrl+S</code></div>
+        <div class="kbd-row"><span>Save (open save options)</span><code>Ctrl+S</code></div>
+        <div class="kbd-row"><span>Commit directly / via PR</span><code>In save modal</code></div>
         <div class="kbd-row"><span>Download .md</span><code>Ctrl+Shift+D</code></div>
         <div class="kbd-row"><span>Bold</span><code>Ctrl+B</code></div>
         <div class="kbd-row"><span>Italic</span><code>Ctrl+I</code></div>
@@ -1099,6 +1259,9 @@ const DEFAULT_OWNER  = CFG.GITHUB_USER       || '';
 const DEFAULT_REPO   = CFG.GITHUB_REPO       || '';
 const DEFAULT_BRANCH = CFG.ADMIN_BRANCH      || 'main';
 const IMAGES_PATH    = CFG.ADMIN_IMAGES_PATH || 'assets/images';
+const PR_ENABLED     = CFG.ADMIN_PR_ENABLED !== false; // true by default
+const PR_DEFAULT_BASE   = CFG.ADMIN_DEFAULT_BRANCH   || DEFAULT_BRANCH;
+const PR_BRANCH_PREFIX  = CFG.ADMIN_PR_BRANCH_PREFIX || 'post/';
 // TAG_ICONS — declared in utils.js (do not redeclare)
 const STORAGE_PREFIX = CFG.STORAGE_PREFIX    || 'shani';
 const BLOG_URL       = CFG.BLOG_URL          || '';
@@ -1215,6 +1378,54 @@ async function ghDeleteFile(repoPath, sha, commitMsg) {
   });
 }
 
+async function ghGetBranchSHA(branch) {
+  // Returns the HEAD commit SHA of a branch, or null if it doesn't exist.
+  try {
+    const data = await ghFetch(`/repos/${ghOwner}/${ghRepo}/git/ref/heads/${encodeURIComponent(branch)}`);
+    return data.object.sha;
+  } catch (e) {
+    if (e.message.includes('404') || e.message.includes('Not Found')) return null;
+    throw e;
+  }
+}
+
+async function ghCreateBranch(newBranch, fromSHA) {
+  return ghFetch(`/repos/${ghOwner}/${ghRepo}/git/refs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ref: `refs/heads/${newBranch}`, sha: fromSHA }),
+  });
+}
+
+async function ghPutFileOnBranch(repoPath, textContent, commitMsg, sha, targetBranch) {
+  const body = { message: commitMsg, content: btoa(unescape(encodeURIComponent(textContent))), branch: targetBranch };
+  if (sha) body.sha = sha;
+  return ghFetch(`/repos/${ghOwner}/${ghRepo}/contents/${repoPath}`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  });
+}
+
+async function ghGetFileOnBranch(repoPath, branch) {
+  try {
+    const data = await ghFetch(`/repos/${ghOwner}/${ghRepo}/contents/${repoPath}?ref=${encodeURIComponent(branch)}`);
+    const raw     = atob(data.content.replace(/\n/g, ''));
+    const bytes   = Uint8Array.from(raw, c => c.charCodeAt(0));
+    const content = new TextDecoder('utf-8').decode(bytes);
+    return { content, sha: data.sha, exists: true };
+  } catch (e) {
+    if (e.message.includes('404') || e.message.includes('Not Found')) return { content: '', sha: null, exists: false };
+    throw e;
+  }
+}
+
+async function ghCreatePR(title, body, headBranch, baseBranch, draft) {
+  return ghFetch(`/repos/${ghOwner}/${ghRepo}/pulls`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, body, head: headBranch, base: baseBranch, draft: !!draft }),
+  });
+}
+
 async function ghListDir(dirPath) {
   try {
     return await ghFetch(`/repos/${ghOwner}/${ghRepo}/contents/${dirPath}?ref=${encodeURIComponent(ghBranch)}`);
@@ -1309,7 +1520,7 @@ require(['vs/editor/editor.main'], () => {
   });
 
   // Keybindings
-  monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,                       () => savePost());
+  monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,                       () => openSaveModal());
   monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyU, () => openUploadModal());
   monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyN, () => newPost());
   monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyD, () => downloadMd());
@@ -1378,7 +1589,7 @@ function showApp() {
   document.getElementById('login-overlay').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   document.getElementById('sb-repo-display').textContent = `${ghOwner}/${ghRepo}`;
-  document.getElementById('sb-branch').value = ghBranch;
+  setBranchLabel(ghBranch);
   const pill = document.getElementById('user-pill');
   pill.style.display = 'flex';
   document.getElementById('user-name').textContent = ghUser.login;
@@ -1386,6 +1597,8 @@ function showApp() {
   const badge = document.getElementById('repo-badge');
   badge.classList.add('active');
   document.getElementById('repo-badge-text').textContent = `${ghOwner}/${ghRepo}`;
+  // Load branch list async — doesn't block the UI
+  loadBranchDropdown();
 }
 
 function logout() { sessionStorage.removeItem('admin_gh_token'); location.reload(); }
@@ -1409,14 +1622,14 @@ async function loadPostList() {
 }
 
 async function refreshPosts() {
-  ghBranch = document.getElementById('sb-branch').value.trim() || DEFAULT_BRANCH;
-  localStorage.setItem('admin_gh_branch', ghBranch);
+  // ghBranch is already set by selectBranch() or initialised from localStorage
+  setBranchLabel(ghBranch);
   try {
     await loadPostList();
     const connEl = document.getElementById('conn-status');
     connEl.textContent = `connected · ${posts.length} posts`;
     connEl.className = 'status-pill ok';
-    log(`Refreshed: ${posts.length} post(s) on ${ghBranch}`, 'ok');
+    log(`Refreshed: ${posts.length} post(s) on "${ghBranch}"`, 'ok');
   } catch (e) { log(`Refresh failed: ${e.message}`, 'error'); }
 }
 
@@ -1582,12 +1795,250 @@ function newPost() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// BRANCH DROPDOWN
+// ═══════════════════════════════════════════════════════════════════
+let _allBranches      = [];   // [{name, protected, default}]
+let _branchFocusIndex = -1;
+
+async function ghListBranches() {
+  // Fetches up to 100 branches. For repos with more, the dropdown still
+  // works — the user can type to filter to any branch name.
+  try {
+    const data = await ghFetch(`/repos/${ghOwner}/${ghRepo}/branches?per_page=100`);
+    return data.map(b => ({ name: b.name, protected: b.protected }));
+  } catch (e) {
+    log(`Could not load branches: ${e.message}`, 'error');
+    return [];
+  }
+}
+
+async function ghGetDefaultBranch() {
+  try {
+    const repo = await ghFetch(`/repos/${ghOwner}/${ghRepo}`);
+    return repo.default_branch || 'main';
+  } catch { return 'main'; }
+}
+
+async function loadBranchDropdown() {
+  setBranchLabel(ghBranch);
+  const [branches, defaultBranch] = await Promise.all([ghListBranches(), ghGetDefaultBranch()]);
+  _allBranches = branches.map(b => ({ ...b, default: b.name === defaultBranch }));
+  // Populate cache for any protected branches we just learned about
+  _allBranches.forEach(b => { _branchProtectionCache[b.name] = b.protected; });
+  renderBranchList(_allBranches, '');
+}
+
+function setBranchLabel(name) {
+  document.getElementById('branch-select-label').textContent = name || DEFAULT_BRANCH;
+}
+
+function renderBranchList(branches, filter) {
+  const list = document.getElementById('branch-select-list');
+  _branchFocusIndex = -1;
+
+  if (!branches.length) {
+    list.innerHTML = `<div class="branch-select__empty">${filter ? 'No matching branches' : 'No branches found'}</div>`;
+    return;
+  }
+
+  // Sort: current branch first, then default, then alphabetical
+  const sorted = [...branches].sort((a, b) => {
+    if (a.name === ghBranch) return -1;
+    if (b.name === ghBranch) return  1;
+    if (a.default) return -1;
+    if (b.default) return  1;
+    return a.name.localeCompare(b.name);
+  });
+
+  list.innerHTML = sorted.map(b => {
+    const isActive  = b.name === ghBranch;
+    const badges = [
+      b.default   ? `<span class="branch-select__badge branch-select__badge--default">default</span>` : '',
+      b.protected ? `<span class="branch-select__badge branch-select__badge--protected"><i class="fa-solid fa-lock" style="font-size:.55rem"></i> protected</span>` : '',
+    ].join('');
+    return `
+      <button class="branch-select__item${isActive ? ' branch-select__item--active' : ''}"
+              onclick="selectBranch(${JSON.stringify(b.name)})" type="button">
+        <i class="fa-solid fa-code-branch" style="font-size:.7rem;color:var(--faint);flex-shrink:0"></i>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(b.name)}</span>
+        ${badges}
+        <i class="fa-solid fa-check branch-select__check"></i>
+      </button>`;
+  }).join('');
+
+  // If the typed filter doesn't match any existing branch, offer to use it directly
+  const exactMatch = branches.some(b => b.name === filter);
+  if (filter && !exactMatch) {
+    list.innerHTML += `
+      <div class="branch-select__divider">or use typed name</div>
+      <button class="branch-select__item" onclick="selectBranch(${JSON.stringify(filter)})" type="button">
+        <i class="fa-solid fa-plus" style="font-size:.7rem;color:var(--faint);flex-shrink:0"></i>
+        <span style="flex:1">${escHtml(filter)}</span>
+      </button>`;
+  }
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toggleBranchDropdown() {
+  const dropdown = document.getElementById('branch-select-dropdown');
+  const trigger  = document.getElementById('branch-select-trigger');
+  const isOpen   = dropdown.style.display !== 'none';
+  if (isOpen) { closeBranchDropdown(); return; }
+  dropdown.style.display = 'block';
+  trigger.classList.add('open');
+  const search = document.getElementById('branch-select-search');
+  search.value = '';
+  renderBranchList(_allBranches, '');
+  search.focus();
+}
+
+function closeBranchDropdown() {
+  document.getElementById('branch-select-dropdown').style.display = 'none';
+  document.getElementById('branch-select-trigger').classList.remove('open');
+  _branchFocusIndex = -1;
+}
+
+function filterBranchList(val) {
+  const lv = val.toLowerCase();
+  const filtered = lv ? _allBranches.filter(b => b.name.toLowerCase().includes(lv)) : _allBranches;
+  renderBranchList(filtered, val.trim());
+}
+
+function branchSearchKeydown(e) {
+  const list  = document.getElementById('branch-select-list');
+  const items = list.querySelectorAll('.branch-select__item');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    _branchFocusIndex = Math.min(_branchFocusIndex + 1, items.length - 1);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    _branchFocusIndex = Math.max(_branchFocusIndex - 1, 0);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (_branchFocusIndex >= 0 && items[_branchFocusIndex]) {
+      items[_branchFocusIndex].click();
+    } else {
+      // Enter with no selection → use whatever is typed
+      const val = e.target.value.trim();
+      if (val) selectBranch(val);
+    }
+    return;
+  } else if (e.key === 'Escape') {
+    closeBranchDropdown(); return;
+  }
+  items.forEach((el, i) => el.classList.toggle('focused', i === _branchFocusIndex));
+  if (items[_branchFocusIndex]) items[_branchFocusIndex].scrollIntoView({ block: 'nearest' });
+}
+
+function selectBranch(name) {
+  ghBranch = name;
+  localStorage.setItem('admin_gh_branch', ghBranch);
+  // Bust the protection cache for the old branch — new branch state will be re-fetched
+  setBranchLabel(ghBranch);
+  closeBranchDropdown();
+  // Update active state without re-fetching branch list
+  renderBranchList(_allBranches, '');
+  refreshPosts();
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', e => {
+  if (!document.getElementById('branch-select')?.contains(e.target)) {
+    closeBranchDropdown();
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════
 // SAVE
+
+// Cache: null = unknown, true = protected, false = not protected
+const _branchProtectionCache = {};
+
+async function ghIsProtectedBranch(branch) {
+  if (_branchProtectionCache[branch] !== undefined) return _branchProtectionCache[branch];
+  try {
+    // The protection endpoint returns 200 if protected, 404 if not.
+    // It requires administration:read — if the token lacks it we treat as unknown (false).
+    await ghFetch(`/repos/${ghOwner}/${ghRepo}/branches/${encodeURIComponent(branch)}/protection`);
+    _branchProtectionCache[branch] = true;
+  } catch (e) {
+    // 404 = no protection rules; 403 = no permission to read protection (treat as unknown)
+    _branchProtectionCache[branch] = false;
+  }
+  return _branchProtectionCache[branch];
+}
+
+function openSaveModal() {
+  const result = serialise();
+  if (!result) return; // serialise() logs the error
+
+  const { slug } = result;
+  const branch   = ghBranch;
+  const isNew    = !currentSlug || currentSlug !== slug;
+
+  // Update branch label
+  document.getElementById('save-modal-branch').textContent = branch;
+  document.getElementById('save-opt-pr-base').textContent  = PR_DEFAULT_BASE;
+
+  // Default direct-commit description
+  const directDesc = isNew
+    ? `Creates posts/${slug}.md on "${branch}". Site rebuilds immediately.`
+    : `Updates posts/${slug}.md on "${branch}". Site rebuilds immediately.`;
+  document.getElementById('save-opt-direct-desc').textContent = directDesc;
+
+  // Check protection (async — update UI once resolved)
+  const protectedBadge = document.getElementById('save-modal-protected-badge');
+  const protectedHint  = document.getElementById('save-modal-protected-hint');
+  const directBtn      = document.getElementById('save-opt-direct');
+  const branchNameEl   = document.getElementById('save-modal-branch-protected-name');
+
+  // Reset to neutral while we check
+  protectedBadge.style.display = 'none';
+  protectedHint.style.display  = 'none';
+  directBtn.classList.remove('save-option--disabled');
+
+  document.getElementById('save-modal').classList.add('open');
+
+  ghIsProtectedBranch(branch).then(isProtected => {
+    if (!document.getElementById('save-modal').classList.contains('open')) return; // modal closed
+    if (isProtected) {
+      protectedBadge.style.display = '';
+      protectedHint.style.display  = '';
+      branchNameEl.textContent     = `"${branch}"`;
+      directBtn.classList.add('save-option--disabled');
+    }
+  });
+}
+
+function openPRModal() {
+  closeModal('save-modal');
+  const result = serialise();
+  if (!result) return;
+  const { slug } = result;
+  const isNew    = !currentSlug || currentSlug !== slug;
+
+  document.getElementById('pr-branch-input').value  = PR_BRANCH_PREFIX + slug;
+  document.getElementById('pr-title-input').value   = isNew ? `Add post: ${slug}` : `Update post: ${slug}`;
+  document.getElementById('pr-body-input').value    = '';
+  document.getElementById('pr-draft-check').checked = false;
+  document.getElementById('pr-base-label').textContent    = PR_DEFAULT_BASE;
+  document.getElementById('pr-base-ref-label').textContent = PR_DEFAULT_BASE;
+
+  document.getElementById('pr-modal').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DIRECT COMMIT
 // ═══════════════════════════════════════════════════════════════════
 async function savePost() {
+  closeModal('save-modal');
   const result = serialise();
   if (!result) return;
   const { slug, raw } = result;
+
   setStatus('committing…', 'info');
   document.getElementById('btn-save').disabled = true;
   try {
@@ -1602,13 +2053,119 @@ async function savePost() {
     sessionStorage.removeItem(`draft_${slug}`);
     if (oldSlug && oldSlug !== slug) sessionStorage.removeItem(`draft_${oldSlug}`);
     document.getElementById('draft-banner').style.display = 'none';
-    setStatus(`committed ✓ — building…`, 'ok');
-    log(`✓ ${sha ? 'Updated' : 'Created'} posts/${slug}.md on ${ghBranch}`, 'gh');
+    // Bust protection cache — the commit succeeded so it's definitely not protected
+    _branchProtectionCache[ghBranch] = false;
+    setStatus('committed ✓ — building…', 'ok');
+    log(`✓ ${sha ? 'Updated' : 'Created'} posts/${slug}.md on "${ghBranch}"`, 'gh');
     log('GitHub Pages will rebuild in ~30s.', 'info');
     await loadPostList(); renderPostList();
   } catch (e) {
+    const isProtection = /protected branch|required status|review required/i.test(e.message) ||
+                         e.message.includes('422') || e.message.includes('403');
     setStatus('commit failed', 'error');
-    log(`Commit failed: ${e.message}`, 'error');
+    if (isProtection) {
+      _branchProtectionCache[ghBranch] = true; // cache result for next open
+      log(`"${ghBranch}" is a protected branch — direct commits are not allowed.`, 'error');
+      log('→ Use <strong>Commit via PR</strong> instead.', 'info');
+      // Offer the PR path in one click
+      if (confirm(`"${ghBranch}" rejected the direct commit (branch is protected).\n\nOpen the Pull Request flow instead?`)) {
+        openPRModal();
+      }
+    } else {
+      log(`Commit failed: ${e.message}`, 'error');
+    }
+  } finally {
+    document.getElementById('btn-save').disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// COMMIT VIA PR
+// ═══════════════════════════════════════════════════════════════════
+async function submitPR() {
+  const result = serialise();
+  if (!result) { closeModal('pr-modal'); return; }
+  const { slug, raw } = result;
+
+  const featureBranch = document.getElementById('pr-branch-input').value.trim();
+  const prTitle       = document.getElementById('pr-title-input').value.trim();
+  const prBody        = document.getElementById('pr-body-input').value.trim();
+  const isDraft       = document.getElementById('pr-draft-check').checked;
+
+  if (!featureBranch) { log('Feature branch name is required.', 'error'); return; }
+  if (!prTitle)       { log('PR title is required.',            'error'); return; }
+  if (featureBranch === PR_DEFAULT_BASE) {
+    log(`Feature branch cannot be the same as the base branch ("${PR_DEFAULT_BASE}"). Choose a different name.`, 'error');
+    return;
+  }
+
+  closeModal('pr-modal');
+  setStatus('creating PR…', 'info');
+  document.getElementById('btn-save').disabled = true;
+
+  try {
+    const repoPath = `posts/${slug}.md`;
+
+    // 1. Resolve HEAD SHA of the base branch
+    log(`Resolving HEAD of "${PR_DEFAULT_BASE}"…`, 'info');
+    const baseSHA = await ghGetBranchSHA(PR_DEFAULT_BASE);
+    if (!baseSHA) throw new Error(`Base branch "${PR_DEFAULT_BASE}" not found in ${ghOwner}/${ghRepo}.`);
+
+    // 2. Create the feature branch if it doesn't exist yet
+    const existingSHA = await ghGetBranchSHA(featureBranch);
+    if (!existingSHA) {
+      log(`Creating branch "${featureBranch}" from "${PR_DEFAULT_BASE}"…`, 'info');
+      await ghCreateBranch(featureBranch, baseSHA);
+      log(`Branch "${featureBranch}" created.`, 'gh');
+    } else {
+      log(`Branch "${featureBranch}" already exists — reusing.`, 'info');
+    }
+
+    // 3. Check for an existing file SHA on the feature branch (for update commits)
+    const existing = await ghGetFileOnBranch(repoPath, featureBranch);
+    const fileSHA  = existing.sha || null;
+
+    // 4. Commit the post to the feature branch
+    const commitMsg = fileSHA ? `post: update ${slug}` : `post: add ${slug}`;
+    log(`Committing ${repoPath} to "${featureBranch}"…`, 'info');
+    const commitRes = await ghPutFileOnBranch(repoPath, raw, commitMsg, fileSHA, featureBranch);
+    log(`✓ Committed ${repoPath} to "${featureBranch}"`, 'gh');
+
+    // Update local state to track the file we just wrote
+    const oldSlug = currentSlug;
+    currentSlug = slug;
+    currentSHA  = commitRes.content.sha;
+    document.getElementById('fm-slug').value = slug;
+    sessionStorage.removeItem(`draft_${slug}`);
+    if (oldSlug && oldSlug !== slug) sessionStorage.removeItem(`draft_${oldSlug}`);
+    document.getElementById('draft-banner').style.display = 'none';
+
+    // 5. Check for an existing open PR for this head branch → reuse instead of creating a duplicate
+    let pr;
+    try {
+      const existingPRs = await ghFetch(
+        `/repos/${ghOwner}/${ghRepo}/pulls?state=open&head=${encodeURIComponent(ghOwner + ':' + featureBranch)}&base=${encodeURIComponent(PR_DEFAULT_BASE)}`
+      );
+      if (existingPRs.length > 0) {
+        pr = existingPRs[0];
+        log(`PR #${pr.number} already open for "${featureBranch}" — commit pushed to it.`, 'info');
+      }
+    } catch (_) { /* ignore — we'll try creating below */ }
+
+    if (!pr) {
+      log(`Opening PR "${prTitle}"…`, 'info');
+      pr = await ghCreatePR(prTitle, prBody, featureBranch, PR_DEFAULT_BASE, isDraft);
+    }
+
+    const prUrl = pr.html_url;
+    setStatus('PR opened ✓', 'ok');
+    log(`✓ PR #${pr.number}${isDraft ? ' (draft)' : ''}: ${prUrl}`, 'ok');
+    log(`→ <a href="${prUrl}" target="_blank" rel="noopener" style="color:var(--violet)">View PR on GitHub ↗</a>`, 'info');
+
+    await loadPostList(); renderPostList();
+  } catch (e) {
+    setStatus('PR failed', 'error');
+    log(`PR failed: ${e.message}`, 'error');
   } finally {
     document.getElementById('btn-save').disabled = false;
   }
@@ -2677,7 +3234,7 @@ document.addEventListener('keydown', e => {
   const inInput = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
 
   if (e.key === 'Escape') {
-    ['upload-modal','table-modal','callout-modal','template-modal','shortcuts-modal','link-modal','codeblock-modal','math-modal','embed-modal'].forEach(id => closeModal(id));
+    ['upload-modal','table-modal','callout-modal','template-modal','shortcuts-modal','link-modal','codeblock-modal','math-modal','embed-modal','pr-modal','save-modal'].forEach(id => closeModal(id));
   }
   if (!ctrl && !inInput) {
     if (e.key === '?') openShortcutsModal();
@@ -2735,7 +3292,7 @@ document.addEventListener('keydown', e => {
 
   // Sidebar repo display
   document.getElementById('sb-repo-display').textContent = `${ghOwner}/${ghRepo}`;
-  document.getElementById('sb-branch').value = ghBranch;
+  setBranchLabel(ghBranch);
 
   // Build table picker grid (8×8)
   buildTableGrid();
