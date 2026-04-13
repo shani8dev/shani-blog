@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Membership Checkout</title>
+  <link rel="stylesheet" href="brand-shani.css">
+  <style>
+    :root { --container: 480px; }
+    body {
+      margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: var(--color-bg); color: var(--color-text); font-family: var(--font-sans);
+    }
+    .checkout-card {
+      background: var(--color-bg-card); border: 1px solid var(--color-border);
+      border-radius: var(--radius-md); padding: 2.5rem; max-width: var(--container); width: 100%;
+      box-shadow: var(--shadow-hover); text-align: center;
+    }
+    .checkout-card h1 { font-family: var(--font-display); font-size: 2rem; margin: 0 0 0.5rem; color: var(--color-text); }
+    .checkout-card p { color: var(--color-text-muted); margin: 0 0 1.5rem; line-height: 1.6; }
+    .checkout-btn {
+      background: var(--color-accent); color: var(--color-accent-text); border: none;
+      padding: 0.85rem 1.75rem; border-radius: var(--radius-sm); font-weight: 600;
+      cursor: pointer; font-family: var(--font-sans); font-size: 1rem; width: 100%;
+      transition: background 0.2s;
+    }
+    .checkout-btn:hover { background: var(--color-accent-hover); }
+    .checkout-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .status-msg { margin-top: 1rem; font-size: 0.9rem; min-height: 1.2em; }
+    .success { color: var(--color-success); }
+    .error { color: var(--color-error); }
+    .back-link { display: inline-block; margin-top: 1.5rem; color: var(--color-text-muted); text-decoration: none; }
+    .back-link:hover { color: var(--color-accent); }
+  </style>
+</head>
+<body>
+  <div class="checkout-card">
+    <h1 id="checkout-title">Loading...</h1>
+    <p id="checkout-desc"></p>
+    <button id="checkout-btn" class="checkout-btn" disabled>Initializing...</button>
+    <p id="checkout-status" class="status-msg"></p>
+    <a href="/" class="back-link">← Back to Blog</a>
+  </div>
+
+  <script src="config-shani.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim();
+    
+    document.getElementById('checkout-title').textContent = CONFIG.MEMBERSHIP_HEADING;
+    document.getElementById('checkout-desc').textContent = CONFIG.MEMBERSHIP_DESCRIPTION;
+    
+    const btn = document.getElementById('checkout-btn');
+    const status = document.getElementById('checkout-status');
+    
+    btn.textContent = `${CONFIG.MEMBERSHIP_CTA} — ${CONFIG.MEMBERSHIP_PRICE}`;
+    btn.disabled = false;
+
+    if (!CONFIG.RAZORPAY_KEY_ID) {
+      btn.disabled = true;
+      btn.textContent = 'Payment Not Configured';
+      status.textContent = 'Please contact support to complete your membership.';
+      status.className = 'status-msg error';
+    } else {
+      btn.addEventListener('click', () => {
+        if (typeof Razorpay === 'undefined') {
+          status.textContent = 'Razorpay SDK failed to load. Check your connection.';
+          status.className = 'status-msg error';
+          return;
+        }
+        
+        const options = {
+          key: CONFIG.RAZORPAY_KEY_ID,
+          amount: CONFIG.RAZORPAY_AMOUNT,
+          currency: 'INR',
+          name: CONFIG.SITE_TITLE,
+          description: CONFIG.SITE_TAGLINE,
+          image: CONFIG.LOGO_IMG_URL || CONFIG.FAVICON_URL,
+          theme: { color: accentColor || '#b53309' },
+          handler: function () {
+            btn.textContent = '✅ Payment Successful!';
+            btn.disabled = true;
+            status.textContent = 'Check your email in a few minutes for your license key.';
+            status.className = 'status-msg success';
+          },
+          modal: { ondismiss: function () { status.textContent = ''; } },
+        };
+        status.textContent = '';
+        new Razorpay(options).open();
+      });
+    }
+  </script>
+</body>
+</html>

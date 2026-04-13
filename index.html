@@ -205,6 +205,30 @@
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
       <article id="post-article"></article>
     </section>
+
+    <!-- MEMBERSHIP PAGE -->
+    <section id="view-membership" class="container" style="display:none" aria-label="Membership">
+      <div class="membership-page">
+        <div class="membership-hero">
+          <h1 class="membership-hero__title">Shanios Members</h1>
+          <p class="membership-hero__sub">Engineering deep-dives, release notes &amp; more — ₹199/year.</p>
+        </div>
+        <div class="membership-checkout-wrap">
+          <!-- Razorpay checkout button — injected below -->
+          <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+          <button id="membership-btn" class="btn-membership">
+            <i class="fa-solid fa-star"></i> Become a Member — ₹199 / year
+          </button>
+          <p class="membership-note" id="membership-status"></p>
+        </div>
+        <ul class="membership-perks">
+          <li><i class="fa-solid fa-lock-open"></i> Unlock all members-only posts</li>
+          <li><i class="fa-solid fa-envelope"></i> License key delivered to your inbox instantly</li>
+          <li><i class="fa-solid fa-rotate-left"></i> Works across all browsers &amp; devices</li>
+          <li><i class="fa-solid fa-ban"></i> No recurring charge — one key, one year</li>
+        </ul>
+      </div>
+    </section>
   </main>
 
   <!-- ═══ FOOTER ══════════════════════════════════════════════════════════ -->

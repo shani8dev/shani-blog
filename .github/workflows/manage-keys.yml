@@ -1,0 +1,84 @@
+# .github/workflows/manage-keys.yml
+#
+# Manual admin tool: revoke or reinstate a license key directly
+# from the GitHub Actions tab.
+#
+# Usage:
+#   Actions → "Manage license key" → Run workflow
+#   Fill in: action (revoke/reinstate), key
+#
+# No secrets needed — GITHUB_TOKEN is automatic.
+
+name: Manage license key
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - revoke
+          - reinstate
+          - lookup
+      license_key:
+        description: 'License key (e.g. ABCD1234-ABCD1234-ABCD1234-ABCD1234)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  manage-key:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: ${{ github.event.inputs.action }} key
+        env:
+          ACTION: ${{ github.event.inputs.action }}
+          KEY:    ${{ github.event.inputs.license_key }}
+        run: |
+          if [ ! -f data/keys.json ]; then
+            echo "✗ data/keys.json not found"
+            exit 1
+          fi
+
+          KEY_UPPER=$(echo "$KEY" | tr '[:lower:]' '[:upper:]')
+
+          if [ "$ACTION" = "lookup" ]; then
+            echo "=== Key entry ==="
+            jq --arg k "$KEY_UPPER" '.[] | select(.key == $k)' data/keys.json
+            exit 0
+          fi
+
+          REVOKED="false"
+          if [ "$ACTION" = "revoke" ]; then
+            REVOKED="true"
+          fi
+
+          # Update the revoked field for the matching key
+          jq --arg k "$KEY_UPPER" --argjson r "$REVOKED" \
+            'map(if .key == $k then .revoked = $r else . end)' \
+            data/keys.json > data/keys.tmp
+          mv data/keys.tmp data/keys.json
+
+          echo "✓ Key $KEY_UPPER → revoked=$REVOKED"
+
+      - name: Commit if changed
+        env:
+          ACTION: ${{ github.event.inputs.action }}
+          KEY:    ${{ github.event.inputs.license_key }}
+        run: |
+          if [ "$ACTION" = "lookup" ]; then exit 0; fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/keys.json
+          git diff --staged --quiet && echo "nothing changed" || \
+            git commit -m "chore: $ACTION key ${KEY:0:8}... [skip ci]"
+          git push
