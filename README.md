@@ -16,7 +16,7 @@ The blog is a History API SPA hosted on **GitHub Pages**:
 - `404.html` intercepts unmatched GitHub Pages 404s, encodes the path into `/?p=...`, and redirects to `index.html`, which restores the real URL via `history.replaceState` before the app boots
 - `.nojekyll` disables Jekyll so `.md` files are served as raw text
 
-There is no build step, no bundler, no SSR. The entire engine is `script.js`.
+There is no build step, no bundler, no SSR. The entire engine is `script.js`. Shared markdown utilities live in `utils.js`, loaded by both `script.js` and `admin.html`.
 
 ---
 
@@ -52,6 +52,22 @@ const CONFIG = {
   //          on first deploy before posts/manifest.json exists.
   GITHUB_USER: 'shani8dev',
   GITHUB_REPO: 'shani-blog',
+
+  // ── Admin panel (admin.html) ──────────────────────────────────
+  // [script] Branch admin.html reads/writes posts to when committing directly.
+  ADMIN_BRANCH:           'main',
+
+  // [script] PR workflow — when enabled, "Commit & PR" pushes to a new feature
+  //          branch and opens a Pull Request targeting ADMIN_DEFAULT_BRANCH.
+  //          Set false to hide the button and always commit directly.
+  ADMIN_PR_ENABLED:       true,
+  // [script] The base (target) branch that PRs are opened against.
+  ADMIN_DEFAULT_BRANCH:   'main',
+  // [script] Prefix used when auto-naming feature branches, e.g. post/my-slug.
+  ADMIN_PR_BRANCH_PREFIX: 'post/',
+
+  // [script] Repo path where uploaded images are stored.
+  ADMIN_IMAGES_PATH: 'assets/images',
 
   // ── URLs ──────────────────────────────────────────────────────
   BLOG_URL: 'https://blog.shani.dev',  // [both] canonical root — no trailing slash
@@ -274,6 +290,16 @@ Content starts here. Full **Markdown** supported.
 | `cover`            | No       | Absolute URL to a cover image — used on the card, as the post banner, and as `og:image` / `twitter:image` |
 | `series`           | No       | Posts with the same `series:` value get a numbered series navigation strip |
 | `paywalled`        | No       | `true` to gate behind a Lemon Squeezy license key |
+| `featured`         | No       | `true` to pin as the hero featured post |
+| `draft`            | No       | `true` to hide the post from all lists and feeds |
+| `pinned`           | No       | `true` to keep the post at the top of the index |
+| `noindex`          | No       | `true` to add `<meta name="robots" content="noindex">` |
+| `toc`              | No       | Set to any value to force a table of contents; auto-detected from `[toc]` shortcode |
+| `canonical`        | No       | Override the canonical URL (useful when cross-posting) |
+| `og_image`         | No       | Override the OG/Twitter card image for this post |
+| `lang`             | No       | Override the `hreflang` / `inLanguage` for this post |
+| `keywords`         | No       | Comma-separated keywords for `<meta name="keywords">` |
+| `updated`          | No       | ISO `YYYY-MM-DD` — `lastmod` in sitemap and `<lastBuildDate>` in RSS |
 | `author`           | No       | Overrides `CONFIG.AUTHOR_NAME` |
 | `author_role`      | No       | Overrides `CONFIG.AUTHOR_ROLE` |
 | `author_bio`       | No       | Overrides `CONFIG.AUTHOR_BIO` |
@@ -301,6 +327,40 @@ git push origin main
 ```
 
 The GitHub Actions workflow runs automatically, generates the four output files, commits them back, and GitHub Pages redeploys. No manual steps.
+
+---
+
+## Admin panel (`admin.html`)
+
+`admin.html` is a browser-based post editor that talks directly to the GitHub API. No local tooling required. Open `/admin.html` on the deployed site to use it.
+
+### Authentication
+
+On first open, a login overlay prompts for a **GitHub Personal Access Token (classic)** with `repo` scope (or a fine-grained PAT with Contents read/write on the repo). The token is stored only in `localStorage` under the `STORAGE_PREFIX` key — it is never sent anywhere except `api.github.com`.
+
+### Features
+
+- **Post list panel** — lists all `.md` files in `posts/`, with filter, new/draft badges, and one-click open
+- **Monaco editor** — full VS Code editing experience: syntax highlighting, line numbers, cursor position indicator, keyboard shortcuts
+- **Split / preview / editor-only modes** — toggle between editor, side-by-side split, and rendered preview
+- **Live preview** — rendered using the same `Utils` markdown pipeline as the public site (Marked + DOMPurify + KaTeX + Prism)
+- **Frontmatter panel** — structured form for all frontmatter fields (title, date, tag, cover, excerpt, author fields, paywalled, featured, draft, pinned, noindex, series, canonical, keywords, updated, toc); synced bidirectionally with the editor
+- **Author preview card** — live preview of the author bio card as it will appear on the post
+- **Branch selector** — dropdown to switch the target branch; shows default and protected badges; falls back to `ADMIN_BRANCH` from config
+- **Commit & PR workflow** — when `ADMIN_PR_ENABLED: true`, the "Commit & PR" button pushes to a new branch (`ADMIN_PR_BRANCH_PREFIX` + slug) and opens a Pull Request against `ADMIN_DEFAULT_BRANCH`; the direct "Commit" button always writes to `ADMIN_BRANCH`
+- **Image upload** — drag-and-drop or file picker; uploads to `ADMIN_IMAGES_PATH` in the repo via the GitHub Contents API; inserts the Markdown image shortcode at the cursor
+- **GitHub image CDN picker** — paste any image URL and generate a `::image[...]` shortcode with alt, caption, and wide-bleed options
+- **Media library panel** — browse and select images already in `assets/images/`
+- **Shortcode modals** — toolbar buttons to insert YouTube, Vimeo, video, audio, image, callout block, code block, math (KaTeX preview), and link shortcodes
+- **Copy Markdown / Download** — copy the raw Markdown to clipboard or download as a `.md` file
+- **Draft banner** — yellow warning shown when `draft: true` is set in frontmatter
+- **Config panel** — read-only view of key `CONFIG` values (site title, URL, tags, features) for quick reference
+- **Activity log** — scrollable log panel at the bottom showing all API calls and their results
+- **Theme toggle** — dark/light mode synced with the public site's theme preference
+
+### Access control
+
+`admin.html` has `<meta name="robots" content="noindex, nofollow">` and is not linked from the public site. Security relies on the GitHub PAT — anyone with the URL but without a valid token cannot read or write posts.
 
 ---
 
@@ -468,7 +528,9 @@ The sitemap is rebuilt automatically on every post push by the GitHub Action.
 blog.shani.dev/
 ├── index.html              ← SPA shell — post list + post view
 ├── 404.html                ← GitHub Pages SPA fallback — encodes path, redirects to index.html
+├── admin.html              ← Browser-based post editor (GitHub API, Monaco editor)
 ├── script.js               ← Full engine: State / DataLoader / Renderer / Router / UI
+├── utils.js                ← Shared markdown pipeline — used by script.js and admin.html
 ├── style.css               ← All styles (brand-independent)
 ├── config-shani.js         ← Brand config — THE ONLY FILE TO EDIT
 ├── brand-shani.css         ← CSS brand tokens (colors, fonts, radii)
@@ -616,6 +678,7 @@ Unrecognised tags fall back to `fa-solid fa-file-lines`. Add new tags to `TAG_IC
 - **History API routing** — real paths (`/`, `/post/slug`, `/bookmarks`); no hash fragments, no full reloads
 - **GitHub Pages SPA** — `404.html` catches all unmatched paths; `/posts/slug` rewritten silently to `/post/slug`
 - **No Jekyll interference** — `.nojekyll` ensures `.md` files are served raw
+- **Admin panel** — `admin.html` is a Monaco-powered browser editor that reads and writes posts directly via the GitHub API; supports draft/preview, frontmatter forms, image upload, shortcode insertion, and a Commit & PR workflow
 - **Auto tag filter** — chips generated from frontmatter; synced with `?tag=` URL param
 - **Pagination** — `POSTS_PER_PAGE` per page, smart ellipsis, URL-persisted `?page=`
 - **Hero section** — featured latest post + "Also reading" sidebar (`HERO_SIDEBAR_COUNT` posts); hidden during filter/search
@@ -730,3 +793,5 @@ Prism.js theme (`prism-tomorrow` in dark, `prism` in light) is swapped on every 
 **On first deploy before the Action has run**, `posts/manifest.json` doesn't exist. The engine falls back to the unauthenticated GitHub Contents API (60 req/hr). Once the Action runs once and commits the file, this fallback is never reached again.
 
 **Newsletter is fire-and-forget.** The form POSTs with `mode: 'no-cors'`, so the response is opaque. The success message is always shown after submission. Verify actual deliveries in your newsletter provider's dashboard.
+
+**Admin panel requires a GitHub PAT.** `admin.html` uses the GitHub Contents API and needs a Personal Access Token with `repo` scope (classic) or Contents read/write (fine-grained). The token is stored in `localStorage` — do not use `admin.html` on a shared or public device.

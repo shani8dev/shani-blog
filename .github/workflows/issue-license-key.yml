@@ -1,0 +1,290 @@
+# .github/workflows/issue-license-key.yml
+#
+# ──────────────────────────────────────────────────────────────────────────────
+#  ZERO CLOUDFLARE WORKER — FULL PIPELINE IN GITHUB ACTIONS ONLY
+# ──────────────────────────────────────────────────────────────────────────────
+#
+#  THREE TRIGGER MODES
+#  ────────────────────
+#  A) repository_dispatch (type: new-license-key)
+#       Payload: { email, name, order_id, amount, issued_at }
+#       GitHub does NOT expose a public webhook URL, so Razorpay cannot call
+#       this directly. Use mode B below for production.
+#
+#  B) workflow_dispatch (manual or via GitHub REST API)
+#       You can also set up a lightweight GitHub Pages endpoint that converts
+#       Razorpay webhook → GitHub API call using a free static host + JS.
+#       See SETUP NOTES below.
+#
+#       For production without any external server at all: deploy a free
+#       Pipedream / Make.com / n8n workflow that receives the Razorpay webhook,
+#       verifies the HMAC (using the RAZORPAY_WEBHOOK_SECRET you set there),
+#       and calls the GitHub API to trigger this workflow.
+#
+#       Alternatively, use the included razorpay-webhook-receiver.yml
+#       (see below) which is a separate Actions workflow triggered by
+#       schedule + polling a KV store — or simply redirect Razorpay's webhook
+#       to a Pipedream endpoint (free, no server needed).
+#
+#  C) Direct: Razorpay → GitHub API via Pipedream (RECOMMENDED, truly zero-server)
+#       1. Create a free Pipedream.com account.
+#       2. New workflow → HTTP trigger → copy the endpoint URL.
+#       3. Set it as the Razorpay webhook URL in your Razorpay dashboard.
+#       4. Add a step: verify HMAC, then call GitHub API:
+#            POST https://api.github.com/repos/OWNER/REPO/actions/workflows/issue-license-key.yml/dispatches
+#            { "ref": "main", "inputs": { "email": "...", "name": "...", ... } }
+#       5. Done — no CF Worker, no server, truly free.
+#
+#  What this workflow does once triggered:
+#    1. Verifies Razorpay webhook HMAC (only in repository_dispatch mode;
+#       skipped for workflow_dispatch since you control the trigger).
+#    2. Generates a license key (random UUID-style hex, if not supplied).
+#    3. Appends the entry to data/keys.json and commits it.
+#    4. Sends the key to the buyer via Resend email API.
+#
+#  VALIDATION (client-side, no server):
+#    • keys.json is committed to the repo and served via jsDelivr CDN.
+#    • script.js fetches it and validates the key locally in the browser.
+#    • No CF Worker /validate endpoint is needed.
+#
+#  SECRETS (Settings → Secrets → Actions):
+#    RESEND_API_KEY            — from resend.com (free tier: 3 000 emails/month)
+#    EMAIL_FROM                — verified sender, e.g. keys@shani.dev
+#    BLOG_URL                  — e.g. https://blog.shani.dev
+#    RAZORPAY_WEBHOOK_SECRET   — from Razorpay Dashboard → Webhooks
+#                                (only needed for repository_dispatch mode)
+#    PIPEDREAM_TOKEN           — your GitHub PAT for Pipedream to trigger this
+#                                workflow (only used by Pipedream, not here)
+#
+#  GITHUB_TOKEN is automatic — no extra PAT required for this workflow.
+# ──────────────────────────────────────────────────────────────────────────────
+
+name: Issue license key
+
+on:
+  # ── A: Triggered by an external relay (Pipedream, Make.com, n8n, etc.)
+  #       that receives the Razorpay webhook and calls the GitHub API.
+  repository_dispatch:
+    types: [new-license-key]
+
+  # ── B: Manual trigger for testing / re-issuing
+  workflow_dispatch:
+    inputs:
+      email:
+        description: 'Buyer email'
+        required: true
+        type: string
+      name:
+        description: 'Buyer name'
+        required: false
+        default: 'Member'
+        type: string
+      order_id:
+        description: 'Razorpay order / payment ID'
+        required: false
+        default: 'manual'
+        type: string
+      amount:
+        description: 'Amount paid (e.g. 199.00)'
+        required: false
+        default: '199.00'
+        type: string
+      license_key:
+        description: 'Pre-generated license key (leave blank to auto-generate)'
+        required: false
+        default: ''
+        type: string
+      razorpay_signature:
+        description: 'Razorpay HMAC signature (optional — for verification in repository_dispatch relay)'
+        required: false
+        default: ''
+        type: string
+      razorpay_payload:
+        description: 'Raw Razorpay webhook JSON (optional — used with signature for verification)'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  issue-key:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Step 1: Verify Razorpay HMAC (repository_dispatch only) ───────────
+      # For workflow_dispatch the caller is trusted (GitHub token required),
+      # so we skip verification. For repository_dispatch, the relay must pass
+      # the raw body + signature so we can verify server-side.
+      - name: Verify Razorpay signature (repository_dispatch only)
+        if: github.event_name == 'repository_dispatch'
+        env:
+          SECRET:    ${{ secrets.RAZORPAY_WEBHOOK_SECRET }}
+          SIGNATURE: ${{ github.event.client_payload.razorpay_signature }}
+          PAYLOAD:   ${{ github.event.client_payload.razorpay_payload }}
+        run: |
+          # Skip verification if the relay did not pass signature/payload
+          # (e.g. the relay already verified before calling repository_dispatch)
+          if [ -z "$SIGNATURE" ] || [ -z "$PAYLOAD" ] || [ -z "$SECRET" ]; then
+            echo "⚠ Skipping HMAC check (signature/payload/secret not supplied by relay)"
+            exit 0
+          fi
+
+          node - <<'NODE'
+          const crypto = require('crypto');
+          const secret    = process.env.SECRET;
+          const signature = process.env.SIGNATURE;
+          const payload   = process.env.PAYLOAD;
+          const expected  = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+          if (expected !== signature) {
+            console.error('✗ HMAC signature mismatch — rejecting webhook');
+            process.exit(1);
+          }
+          console.log('✓ Razorpay HMAC signature verified');
+          NODE
+
+      # ── Step 2: Resolve inputs from either trigger ─────────────────────────
+      - name: Resolve inputs
+        id: inputs
+        env:
+          RD_KEY:       ${{ github.event.client_payload.key }}
+          RD_EMAIL:     ${{ github.event.client_payload.email }}
+          RD_NAME:      ${{ github.event.client_payload.name }}
+          RD_ORDER_ID:  ${{ github.event.client_payload.order_id }}
+          RD_AMOUNT:    ${{ github.event.client_payload.amount }}
+          WD_KEY:       ${{ github.event.inputs.license_key }}
+          WD_EMAIL:     ${{ github.event.inputs.email }}
+          WD_NAME:      ${{ github.event.inputs.name }}
+          WD_ORDER_ID:  ${{ github.event.inputs.order_id }}
+          WD_AMOUNT:    ${{ github.event.inputs.amount }}
+          EVENT:        ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" = "repository_dispatch" ]; then
+            KEY="$RD_KEY"
+            EMAIL="$RD_EMAIL"
+            NAME="${RD_NAME:-Member}"
+            ORDER_ID="$RD_ORDER_ID"
+            AMOUNT="$RD_AMOUNT"
+          else
+            KEY="$WD_KEY"
+            EMAIL="$WD_EMAIL"
+            NAME="${WD_NAME:-Member}"
+            ORDER_ID="${WD_ORDER_ID:-manual}"
+            AMOUNT="${WD_AMOUNT:-199.00}"
+          fi
+
+          # Auto-generate key if not supplied
+          if [ -z "$KEY" ]; then
+            KEY=$(cat /proc/sys/kernel/random/uuid | tr -d '-' | tr '[:lower:]' '[:upper:]')
+            KEY="${KEY:0:8}-${KEY:8:8}-${KEY:16:8}-${KEY:24:8}"
+          fi
+
+          echo "key=$KEY"           >> "$GITHUB_OUTPUT"
+          echo "email=$EMAIL"       >> "$GITHUB_OUTPUT"
+          echo "name=$NAME"         >> "$GITHUB_OUTPUT"
+          echo "order_id=$ORDER_ID" >> "$GITHUB_OUTPUT"
+          echo "amount=$AMOUNT"     >> "$GITHUB_OUTPUT"
+          echo "issued_at=$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" >> "$GITHUB_OUTPUT"
+          echo "✓ Key: $KEY  Email: $EMAIL"
+
+      # ── Step 3: Append key to data/keys.json ──────────────────────────────
+      - name: Append key to keys.json
+        env:
+          KEY:       ${{ steps.inputs.outputs.key }}
+          EMAIL:     ${{ steps.inputs.outputs.email }}
+          NAME:      ${{ steps.inputs.outputs.name }}
+          ORDER_ID:  ${{ steps.inputs.outputs.order_id }}
+          AMOUNT:    ${{ steps.inputs.outputs.amount }}
+          ISSUED_AT: ${{ steps.inputs.outputs.issued_at }}
+        run: |
+          mkdir -p data
+          if [ ! -f data/keys.json ]; then echo '[]' > data/keys.json; fi
+
+          NEW_ENTRY=$(jq -n \
+            --arg key       "$KEY" \
+            --arg email     "$EMAIL" \
+            --arg name      "$NAME" \
+            --arg order_id  "$ORDER_ID" \
+            --arg amount    "$AMOUNT" \
+            --arg issued_at "$ISSUED_AT" \
+            '{
+              key:       $key,
+              email:     $email,
+              name:      $name,
+              order_id:  $order_id,
+              amount:    $amount,
+              issued_at: $issued_at,
+              revoked:   false
+            }')
+
+          jq --argjson entry "$NEW_ENTRY" '. += [$entry]' data/keys.json > data/keys.tmp
+          mv data/keys.tmp data/keys.json
+          echo "✓ Appended key for $EMAIL"
+
+      # ── Step 4: Commit updated keys.json ──────────────────────────────────
+      - name: Commit keys.json
+        env:
+          ORDER_ID: ${{ steps.inputs.outputs.order_id }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/keys.json
+          git diff --staged --quiet && echo "nothing changed" || \
+            git commit -m "chore: add license key for order $ORDER_ID [skip ci]"
+          git push
+
+      # ── Step 5: Send license key email via Resend ─────────────────────────
+      - name: Send license key email
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_FROM:     ${{ secrets.EMAIL_FROM }}
+          BLOG_URL:       ${{ secrets.BLOG_URL }}
+          KEY:            ${{ steps.inputs.outputs.key }}
+          EMAIL:          ${{ steps.inputs.outputs.email }}
+          NAME:           ${{ steps.inputs.outputs.name }}
+          AMOUNT:         ${{ steps.inputs.outputs.amount }}
+        run: |
+          HTML_BODY=$(cat <<HTMLEOF
+          <!DOCTYPE html>
+          <html>
+          <body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:32px 16px;color:#1c1b19">
+            <h2 style="color:#b53309">Your Shanios Blog membership key</h2>
+            <p>Hi ${NAME},</p>
+            <p>Thank you for becoming a member! Here is your license key:</p>
+            <div style="background:#f2f0ec;border-left:4px solid #b53309;padding:16px 20px;font-family:monospace;font-size:18px;letter-spacing:2px;border-radius:4px;margin:24px 0">
+              ${KEY}
+            </div>
+            <p><strong>How to unlock member posts:</strong></p>
+            <ol>
+              <li>Open any members-only post on <a href="${BLOG_URL}">${BLOG_URL}</a></li>
+              <li>Click <em>"Already a member? Enter your license key"</em></li>
+              <li>Paste the key above and click <strong>Unlock</strong></li>
+            </ol>
+            <p style="color:#5a5752;font-size:13px">
+              Keep this key safe — it unlocks all member content.<br>
+              If you lose it, reply to this email and we'll resend it.
+            </p>
+            <hr style="border:none;border-top:1px solid #e2dfd8;margin:32px 0">
+            <p style="color:#5a5752;font-size:12px">Shanios · <a href="https://shani.dev">shani.dev</a></p>
+          </body>
+          </html>
+          HTMLEOF
+          )
+
+          curl -s -X POST https://api.resend.com/emails \
+            -H "Authorization: Bearer $RESEND_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg from    "$EMAIL_FROM" \
+              --arg to      "$EMAIL" \
+              --arg subject "Your Shanios Blog membership key" \
+              --arg html    "$HTML_BODY" \
+              '{from:$from, to:[$to], subject:$subject, html:$html}')" \
+            | jq .
+
+          echo "✓ Email sent to $EMAIL"
