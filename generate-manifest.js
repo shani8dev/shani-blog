@@ -150,7 +150,11 @@ function build() {
     fmMatch[1].split(/\r?\n/).forEach(line => {
       const i = line.indexOf(':');
       if (i < 1) return;
-      fm[line.slice(0, i).trim()] = line.slice(i + 1).trim().replace(/^['"`]|['"`]$/g, '');
+      const key = line.slice(0, i).trim();
+      // Preserve everything after the FIRST colon (handles URLs, timestamps, subtitles)
+      const raw = line.slice(i + 1).trim();
+      // Strip only the outermost matching quote pair: 'value' or "value" or `value`
+      fm[key] = raw.replace(/^(['"`])([\s\S]*)\1$/, '$2');
     });
 
     const isPaywalled = fm.paywalled === 'true';

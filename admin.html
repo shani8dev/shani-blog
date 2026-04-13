@@ -6,7 +6,16 @@
 <title>Blog · Admin</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" id="admin-favicon" type="image/svg+xml" href="/favicon.svg">
-<link rel="shortcut icon" href="/favicon.svg">
+<link rel="shortcut icon" id="admin-favicon-2" href="/favicon.svg">
+<script>
+// Update favicon from CONFIG as soon as it loads (CONFIG loads after utils.js below)
+document.addEventListener('DOMContentLoaded', function() {
+  var fUrl = (typeof CONFIG !== 'undefined' && CONFIG.FAVICON_URL) ? CONFIG.FAVICON_URL : '';
+  if (fUrl) {
+    document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]').forEach(function(el) { el.href = fUrl; });
+  }
+});
+</script>
 <script>
 (function(){
   var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
@@ -665,6 +674,7 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
         <button class="tbtn" title="Task list" onclick="fmtTaskList()"><i class="fa-regular fa-square-check"></i></button>
         <button class="tbtn" title="Insert math (KaTeX)" onclick="openMathModal()"><i class="fa-solid fa-square-root-variable"></i></button>
         <button class="tbtn" title="Embed YouTube / Vimeo" onclick="openEmbedModal()"><i class="fa-brands fa-youtube"></i></button>
+        <button class="tbtn" title="Insert CDN / external media URL" onclick="openCdnModal()"><i class="fa-solid fa-globe"></i> <span style="font-size:.6rem;font-family:var(--mono)">CDN</span></button>
       </div>
       <div class="toolbar__sep"></div>
 
@@ -1046,9 +1056,6 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     SHORTCUTS MODAL
-════════════════════════════════════════════════════════════ -->
 <!-- ═══════════════════════════════════════════════════════════
      SAVE OPTIONS MODAL
 ════════════════════════════════════════════════════════════ -->
@@ -1462,7 +1469,6 @@ function buildMonacoTheme(mode) {
   const borderHov  = cssVar('--color-border-hover').replace('#','');
   const accent     = cssVar('--color-accent').replace('#','');
   const success    = cssVar('--color-success').replace('#','');
-  const textFaint  = cssVar('--color-text-faint').replace('#','');
   document.documentElement.setAttribute('data-theme', prev);
   return {
     base: dark ? 'vs-dark' : 'vs',
@@ -1470,7 +1476,7 @@ function buildMonacoTheme(mode) {
     rules: [
       { token: 'keyword',  foreground: accent },
       { token: 'string',   foreground: success },
-      { token: 'comment',  foreground: textFaint, fontStyle: 'italic' },
+      { token: 'comment',  foreground: fgFaint, fontStyle: 'italic' },
     ],
     colors: {
       'editor.background':                 '#' + bg,
@@ -2427,7 +2433,7 @@ function openCalloutModal() { document.getElementById('callout-modal').classList
 
 function insertCallout(type) {
   // GFM alert syntax — matches script.js blockquote renderer
-  const validTypes = { NOTE: '> [!NOTE]', TIP: '> [!TIP]', WARNING: '> [!WARNING]', CAUTION: '> [!CAUTION]', IMPORTANT: '> [!IMPORTANT]', DANGER: '> [!CAUTION]' };
+  const validTypes = { NOTE: '> [!NOTE]', TIP: '> [!TIP]', WARNING: '> [!WARNING]', CAUTION: '> [!CAUTION]', IMPORTANT: '> [!IMPORTANT]', DANGER: '> [!WARNING]' };
   const prefix = validTypes[type] || '> [!NOTE]';
   const md = `\n${prefix}\n> Your ${type.toLowerCase()} text here.\n`;
   insertMarkdown(md);
@@ -2452,7 +2458,7 @@ const TEMPLATES = [
   {
     name: 'Incident report',
     desc: 'Post-mortem / incident analysis',
-    body: `## Summary\n\nBrief description of the incident.\n\n> [!DANGER]\n> Severity: High — Affected: Production\n\n## Timeline\n\n| Time (UTC) | Event |\n| --- | --- |\n| 00:00 | Incident detected |\n| 00:15 | Team paged |\n| 01:30 | Resolved |\n\n## Root cause\n\nDescribe root cause here.\n\n## Impact\n\n- Users affected: ~N\n- Duration: X minutes\n\n## Resolution\n\nWhat fixed it.\n\n## Action items\n\n- [ ] Add monitoring for X\n- [ ] Update runbook\n`,
+    body: `## Summary\n\nBrief description of the incident.\n\n> [!WARNING]\n> Severity: High — Affected: Production\n\n## Timeline\n\n| Time (UTC) | Event |\n| --- | --- |\n| 00:00 | Incident detected |\n| 00:15 | Team paged |\n| 01:30 | Resolved |\n\n## Root cause\n\nDescribe root cause here.\n\n## Impact\n\n- Users affected: ~N\n- Duration: X minutes\n\n## Resolution\n\nWhat fixed it.\n\n## Action items\n\n- [ ] Add monitoring for X\n- [ ] Update runbook\n`,
   },
   {
     name: 'Tutorial / How-to',
@@ -3207,6 +3213,8 @@ function toggleFmBar(force) {
   bar.classList.toggle('collapsed', collapsed);
   if (lbl) lbl.textContent = collapsed ? 'show' : 'hide';
   try { localStorage.setItem('admin_fm_collapsed', collapsed ? '1' : '0'); } catch(e){}
+  // Re-layout Monaco so it fills the newly gained / released space
+  if (monacoEditor) setTimeout(() => monacoEditor.layout(), 220);
 }
 
 // ═══════════════════════════════════════════════════════════════════

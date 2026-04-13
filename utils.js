@@ -94,7 +94,7 @@ const Utils = {
   },
 
   slugify: text => text.toLowerCase()
-    .replace(/[^\w\s-]/g, '').trim()
+    .replace(/[^\p{L}\p{N}\s-]/gu, '').trim()
     .replace(/[\s_]+/g, '-').replace(/-+/g, '-'),
 
   CALLOUT_TYPES: {
@@ -110,13 +110,13 @@ const Utils = {
     const parts = html.split(/(<pre[\s\S]*?<\/pre>|<code[\s\S]*?<\/code>)/);
     return parts.map((part, i) => {
       if (i % 2 === 1) return part;
-      part = part.replace(/\$\$([\s\S]+?)\$\$/g, (_, expr) => {
+      part = part.replace(/\$\$([\s\S]+?)\$\$/g, (match, expr) => {
         try { return katex.renderToString(expr.trim(), { displayMode: true, throwOnError: false }); }
-        catch { return ''; }
+        catch { return match; }
       });
-      part = part.replace(/(?<!\$)\$([^\n$]+?)\$(?!\$)/g, (_, expr) => {
+      part = part.replace(/(?<!\$)\$([^\n$]+?)\$(?!\$)/g, (match, expr) => {
         try { return katex.renderToString(expr.trim(), { displayMode: false, throwOnError: false }); }
-        catch { return ''; }
+        catch { return match; }
       });
       return part;
     }).join('');
@@ -181,8 +181,9 @@ const Utils = {
     return `<figure class="media-figure${wide ? ' media-figure--wide' : ''}"><img src="${src}" alt="${alt}" loading="lazy">${fig}</figure>`;
   },
   _stripTocBlock(text) {
+    // Only strip an explicit [[toc]] shortcode line — do NOT use a greedy
+    // section-strip regex here since it can consume legitimate body content.
     return text
-      .replace(/^#{1,3}\s+(?:table\s+of\s+)?contents?\s*\n[\s\S]*?(?=\n(?=#{1,3}\s))/im, '')
       .replace(/^\[\[?toc\]?\]\s*$/im, '')
       .trim();
   },
@@ -278,12 +279,12 @@ const Utils = {
       renderer.code = (codeOrToken, lang) => {
         const code    = (codeOrToken && typeof codeOrToken === 'object') ? codeOrToken.text : codeOrToken;
         const rawLang = (codeOrToken && typeof codeOrToken === 'object') ? codeOrToken.lang : lang;
-        const safeLang = ((rawLang || '').split(/\s/)[0]);
-        const cls = safeLang ? `class="language-${safeLang}"` : '';
+        const safeLang = (rawLang || '').split(/\s/)[0];
+        const cls = safeLang ? ` class="language-${safeLang}"` : '';
         const escaped = (code || '')
           .replace(/&/g, '&amp;').replace(/</g, '&lt;')
           .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        return `<pre><code ${cls}>${escaped}</code></pre>\n`;
+        return `<pre><code${cls}>${escaped}</code></pre>\n`;
       };
 
       renderer.heading = (textOrToken, level) => {
@@ -322,7 +323,7 @@ const Utils = {
         if (match) {
           const type = match[1].toUpperCase();
           const cfg  = Utils.CALLOUT_TYPES[type] || Utils.CALLOUT_TYPES.NOTE;
-          const body = match[2].replace(/<\/p>$/, '').replace(/^(\s*<br\s*\/?>\s*|\n)/i, '').trim();
+          const body = match[2].replace(/<\/p>$/, '').replace(/^(\s*<br\s*\/?>\s*)/i, '').trim();
           return `<div class="callout ${cfg.cls}" role="note"><div class="callout__title"><i class="${cfg.icon}" aria-hidden="true"></i>${type}</div><div class="callout__body">${body}</div></div>\n`;
         }
         return `<blockquote>${quote}</blockquote>\n`;

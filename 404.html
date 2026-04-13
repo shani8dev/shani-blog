@@ -3,51 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-
-  <!-- ═══ PRIMARY SEO ═══════════════════════════════════════════════════════ -->
   <title>Blog</title>
-  <meta name="description" id="meta-desc" content="">
-  <meta name="keywords"    id="meta-keywords" content="">
-  <meta name="author"      content="Blog">
-  <meta name="robots"      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-  <link rel="canonical"    id="canonical-url" href="">
-
-  <!-- ═══ OPEN GRAPH ════════════════════════════════════════════════════════ -->
-  <meta property="og:site_name" id="og-site-name" content="Blog">
-  <meta property="og:title"     id="og-title"     content="">
-  <meta property="og:description" id="og-desc"    content="">
-  <meta property="og:type"      id="og-type"      content="website">
-  <meta property="og:url"       id="og-url"       content="">
-  <meta property="og:image"     id="og-image"     content="">
-  <meta property="og:image:alt" id="og-image-alt" content="Blog logo">
-  <meta property="og:locale"    content="en_US">
-
-  <!-- ═══ TWITTER / X CARD ════════════════════════════════════════════════ -->
-  <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:site"        id="tw-site"  content="">
-  <meta name="twitter:title"       id="tw-title" content="">
-  <meta name="twitter:description" id="tw-desc"  content="">
-  <meta name="twitter:image"       id="tw-image" content="">
-
-  <!-- ═══ STRUCTURED DATA ══════════════════════════════════════════════════ -->
-  <script type="application/ld+json" id="ld-blogs">{}</script>
-  <script type="application/ld+json" id="ld-org">{}</script>
-
-  <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-
+  <meta name="robots" content="noindex">
   <link rel="manifest" href="/manifest.json">
 
-  <!-- ═══ FAVICON ═════════════════════════════════════════════════════════ -->
-  <link rel="icon" id="favicon" type="image/svg+xml" href="">
-
-  <!-- ═══ GitHub Pages SPA 404 redirect ════════════════════════════════════
-       Encodes the current path + query + hash into the index page URL so the
-       SPA can restore it.  This is the ONLY script that belongs in 404.html.
-  ════════════════════════════════════════════════════════════════════════ -->
+  <!-- ═══ GitHub Pages SPA 404 redirect ════════════════════════════════
+       Encodes the current path + query + hash into the index page URL so
+       the SPA router on index.html can restore it.
+       This is the ONLY script needed in 404.html — no CSS, no heavy libs.
+  ════════════════════════════════════════════════════════════════════ -->
   <script>
     (function () {
       var l = window.location;
@@ -63,7 +27,7 @@
     })();
   </script>
 
-  <!-- ═══ Theme — applied before CSS to prevent flash ═════════════════════ -->
+  <!-- Apply saved theme before redirect fires to prevent any flash -->
   <script>
     (function () {
       var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
@@ -72,158 +36,14 @@
       document.documentElement.setAttribute('data-theme', t);
     })();
   </script>
-
-  <!-- ═══ STYLES ═══════════════════════════════════════════════════════════ -->
-  <link rel="stylesheet" href="/brand-shani.css">
-  <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <!-- Prism.js — code syntax highlighting -->
-  <link rel="stylesheet" id="prism-theme"
-        href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
-
-  <!-- KaTeX — math rendering (synchronous, must load before script.js) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-
-  <!-- Markdown Parser & Sanitizer -->
-  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
-
-  <!-- Prism.js Core + Languages -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hcl.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-nginx.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
 </head>
 <body>
+  <!-- Page is immediately redirected by the script above.
+       This fallback is only visible if JS is completely disabled. -->
   <noscript>
     <div style="text-align:center;padding:4rem 2rem;font-family:sans-serif">
       <strong>JavaScript is required to view this blog.</strong>
     </div>
   </noscript>
-
-  <!-- Full-page loading overlay — hidden by JS once posts are ready -->
-  <div id="page-loader" aria-hidden="true">
-    <div class="loader__logo">
-      <img id="loader-logo-img" src="" alt="Blog">
-      <span class="logo__sub"></span>
-    </div>
-    <div class="loader__track"><div class="loader__bar"></div></div>
-    <p class="loader__text">Loading posts…</p>
-  </div>
-
-  <a href="#main-content" class="skip-link">Skip to content</a>
-
-  <!-- ═══ HEADER ══════════════════════════════════════════════════════════ -->
-  <header class="site-header">
-    <div class="auspicious-bar">
-      <a href="#" class="auspicious-text" id="auspicious-link" aria-label="Visit site"></a>
-    </div>
-
-    <div class="header__inner container">
-      <a href="/" class="logo logo--img" id="logo-link" aria-label="Blog home">
-        <img src="" alt="Blog" class="logo__img" height="28" id="logo-img">
-        <span class="logo__sub">blog</span>
-      </a>
-
-      <nav class="nav" id="desktop-nav" aria-label="Primary"></nav>
-
-      <div class="header__actions">
-        <button class="btn-icon" id="search-toggle" aria-label="Search (Ctrl+K)">
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
-        <button class="btn-icon" id="theme-btn" aria-label="Toggle theme">
-          <i class="fa-solid fa-moon" id="theme-icon"></i>
-        </button>
-        <button class="btn-icon" id="shortcuts-hint" aria-label="Keyboard shortcuts (?)" title="Keyboard shortcuts (?)">
-          <i class="fa-solid fa-keyboard"></i>
-        </button>
-        <button class="btn-icon menu-btn" id="menu-toggle"
-                aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </div>
-
-    <nav class="mobile-nav container" id="mobile-nav" aria-hidden="true"></nav>
-  </header>
-
-  <!-- ═══ SEARCH BAR ═══════════════════════════════════════════════════════ -->
-  <div class="search-bar" id="search-bar" aria-hidden="true" role="search">
-    <div class="search-bar__inner container">
-      <i class="fa-solid fa-magnifying-glass search-bar__icon" aria-hidden="true"></i>
-      <input type="search" class="search" id="search-input"
-             placeholder="Search posts…" aria-label="Search posts" autocomplete="off">
-      <button class="btn-icon search-bar__close" id="search-close" aria-label="Close search">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-  </div>
-  <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
-
-  <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
-  <main id="main-content">
-    <section id="view-index">
-      <header class="hero container">
-        <div class="hero__grid"></div>
-      </header>
-      <section class="posts container">
-        <div class="section-header">
-          <h2 class="section-header__title" id="section-title">Latest Posts</h2>
-          <div class="section-header__line"></div>
-        </div>
-        <div class="filters__bar" id="tag-bar" role="toolbar" aria-label="Filter by tag"></div>
-        <div class="grid" id="posts-grid" role="list"></div>
-      </section>
-    </section>
-
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
-      <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
-    </section>
-  </main>
-
-  <!-- ═══ FOOTER ══════════════════════════════════════════════════════════ -->
-  <footer class="site-footer">
-    <div class="footer__inner container">
-      <span class="footer__brand" id="footer-name">
-        <img src="" alt="Blog" class="logo__img logo__img--footer" height="20" id="footer-logo-img">
-        <span class="logo__sub">blog</span>
-      </span>
-      <nav class="footer__links" id="footer-links" aria-label="Social links"></nav>
-      <span class="footer__copy">© <span data-current-year></span></span>
-    </div>
-  </footer>
-
-  <button class="to-top" id="back-top" aria-label="Back to top">
-    <i class="fa-solid fa-arrow-up"></i>
-  </button>
-
-  <script src="/config-shani.js"></script>
-  <script src="/utils.js"></script>
-  <script>
-    (function () {
-      var cfg = (typeof CONFIG !== 'undefined') ? CONFIG : {};
-      if (!cfg.ADSENSE_CLIENT) return;
-      if (document.getElementById('adsense-script')) return;
-      var s = document.createElement('script');
-      s.id = 'adsense-script';
-      s.async = true;
-      s.crossOrigin = 'anonymous';
-      s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(cfg.ADSENSE_CLIENT);
-      document.head.appendChild(s);
-    })();
-  </script>
-  <script src="/script.js"></script>
 </body>
 </html>

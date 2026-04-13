@@ -65,12 +65,10 @@ const LicenseCrypto = {
 };
 
 // ── Validate stored membership state on page load ─────────────
-// We only stored a hash, not the raw key, so we cannot re-hit the
-// LS API here. We trust blogs_member and let the next key entry
-// re-verify. If the hash is missing but member flag is set, the
-// state is corrupt — clear it so it can't grant free access.
+// If member flag is set but no hash exists the state is corrupt —
+// clear it so it cannot grant free access.
 (function validateStoredLicense() {
-  if (!CONFIG.LEMONSQUEEZY_STORE) return;
+  if (!CONFIG.MEMBERSHIP_VALIDATE_URL) return;
   const hasHash  = !!localStorage.getItem(_key('license_hash'));
   const isMember = localStorage.getItem(_key('member')) === '1';
   if (isMember && !hasHash) {
@@ -268,7 +266,8 @@ const DataLoader = {
           .replace(/[*_~]{1,3}([^*_~]+)[*_~]{1,3}/g, '$1')
           .replace(/^#{1,6}\s+/gm, '').replace(/^>\s*/gm, '')
           .replace(/^[-*+]\s+/gm, '').replace(/\n/g, ' ').trim();
-        const _emc = CONFIG.EXCERPT_MAX_CHARS || 140; return s.substring(0, _emc) + (s.length > _emc ? '\u2026' : '');
+        const _emc = CONFIG.EXCERPT_MAX_CHARS || 140;
+        return s.substring(0, _emc) + (s.length > _emc ? '\u2026' : '');
       })(),
       date:           fm.date     || Utils.today(),
       tag:            fm.tag      || 'Post',
@@ -458,7 +457,8 @@ const DataLoader = {
     const { fm, body } = Utils.parseFrontmatter(await r.text());
     const meta = AppState.posts.find(p => p.slug === slug) || {};
     const isPaywalled = fm.paywalled === 'true' || meta.paywalled;
-    const _ppb = CONFIG.PAYWALL_PREVIEW_BLOCKS || 12; const previewBody = Utils._stripTocBlock(body).split(/\n\n+/).slice(0, _ppb).join('\n\n');
+    const _ppb = CONFIG.PAYWALL_PREVIEW_BLOCKS || 12;
+    const previewBody = Utils._stripTocBlock(body).split(/\n\n+/).slice(0, _ppb).join('\n\n');
     const full = {
       slug,
       title:          fm.title           || meta.title          || 'Untitled',
@@ -711,7 +711,8 @@ const Renderer = {
     const { perPage } = AppState.pagination;
     // Skip the featured hero post and any drafts; show the sidebar batch after that.
     const sidebarPosts = publicPosts.filter(q => q.slug !== p.slug);
-    const _hsc = CONFIG.HERO_SIDEBAR_COUNT || 4; const items = sidebarPosts.slice(0, _hsc);
+    const _hsc = CONFIG.HERO_SIDEBAR_COUNT || 4;
+    const items = sidebarPosts.slice(0, _hsc);
     const asideList = Utils.qs('#aside-list');
     asideList.innerHTML = items.length
       ? items.map(item => `
@@ -1296,7 +1297,11 @@ const Renderer = {
             const fd = new FormData();
             fd.append('email', email);
             await fetch(CONFIG.NEWSLETTER_ACTION, { method: 'POST', body: fd, mode: 'no-cors' });
-          } catch { /* no-cors swallows errors; assume success */ }
+            // Note: no-cors responses are always opaque — errors cannot be detected here.
+            // If subscriptions seem to go missing, verify your endpoint in DevTools Network tab.
+          } catch { /* no-cors swallows network errors */ }
+        } else {
+          console.warn('[Newsletter] NEWSLETTER_ACTION is not configured — subscription not sent.');
         }
 
         nlStatus.textContent = CONFIG.NEWSLETTER_SUCCESS || "You're subscribed!";
@@ -1317,39 +1322,54 @@ const Renderer = {
 
     // ── Giscus comments ───────────────────────────────────────────
     if (CONFIG.GISCUS_ENABLED && CONFIG.GISCUS_REPO && !(paywalled && !AppState.isMember)) {
-      // Resolve theme: explicit config value, or follow the blog's own toggle
       const giscusTheme = CONFIG.GISCUS_THEME ||
         (AppState.theme === 'dark' ? 'dark_dimmed' : 'light');
 
-      // Remove any previous Giscus iframe so it re-mounts cleanly on navigation
-      const prevScript = document.getElementById('giscus-script');
-      if (prevScript) prevScript.remove();
-      document.querySelector('iframe.giscus-frame')?.remove();
+      const existingFrame = document.querySelector('iframe.giscus-frame');
+      if (existingFrame) {
+        // Already mounted — just update the term and theme via postMessage (no flash)
+        existingFrame.contentWindow?.postMessage({
+          giscus: {
+            setConfig: {
+              term: CONFIG.GISCUS_MAPPING === 'pathname' ? location.pathname : location.href,
+              theme: giscusTheme,
+            }
+          }
+        }, 'https://giscus.app');
+        // Move the iframe into the current post's .giscus container
+        const giscusContainer = app.querySelector('.giscus');
+        if (giscusContainer && !giscusContainer.contains(existingFrame)) {
+          giscusContainer.appendChild(existingFrame);
+        }
+      } else {
+        // First mount — inject the script
+        const prevScript = document.getElementById('giscus-script');
+        if (prevScript) prevScript.remove();
 
-      const gs = document.createElement('script');
-      gs.id = 'giscus-script';
-      gs.src = 'https://giscus.app/client.js';
-      gs.async = true;
-      gs.crossOrigin = 'anonymous';
-      gs.dataset.repo           = CONFIG.GISCUS_REPO;
-      gs.dataset.repoId         = CONFIG.GISCUS_REPO_ID;
-      gs.dataset.category       = CONFIG.GISCUS_CATEGORY || 'General';
-      gs.dataset.categoryId     = CONFIG.GISCUS_CATEGORY_ID;
-      gs.dataset.mapping        = CONFIG.GISCUS_MAPPING || 'pathname';
-      gs.dataset.strict         = '0';
-      gs.dataset.reactionsEnabled = '1';
-      gs.dataset.emitMetadata   = '0';
-      gs.dataset.inputPosition  = 'top';
-      gs.dataset.theme          = giscusTheme;
-      gs.dataset.lang           = (CONFIG.LANG || 'en').split('-')[0];
-      gs.dataset.loading        = 'lazy';
+        const gs = document.createElement('script');
+        gs.id = 'giscus-script';
+        gs.src = 'https://giscus.app/client.js';
+        gs.async = true;
+        gs.crossOrigin = 'anonymous';
+        gs.dataset.repo           = CONFIG.GISCUS_REPO;
+        gs.dataset.repoId         = CONFIG.GISCUS_REPO_ID;
+        gs.dataset.category       = CONFIG.GISCUS_CATEGORY || 'General';
+        gs.dataset.categoryId     = CONFIG.GISCUS_CATEGORY_ID;
+        gs.dataset.mapping        = CONFIG.GISCUS_MAPPING || 'pathname';
+        gs.dataset.strict         = '0';
+        gs.dataset.reactionsEnabled = '1';
+        gs.dataset.emitMetadata   = '0';
+        gs.dataset.inputPosition  = 'top';
+        gs.dataset.theme          = giscusTheme;
+        gs.dataset.lang           = (CONFIG.LANG || 'en').split('-')[0];
+        gs.dataset.loading        = 'lazy';
 
-      // Inject into the .giscus container rendered in the post HTML
-      const giscusContainer = app.querySelector('.giscus');
-      if (giscusContainer) giscusContainer.appendChild(gs);
+        const giscusContainer = app.querySelector('.giscus');
+        if (giscusContainer) giscusContainer.appendChild(gs);
+      }
     }
 
-    // ── Lemon Squeezy license key verification ───────────────────
+    // ── License key / membership validation ─────────────────────
     const unlockBtn   = app.querySelector('#unlock-btn');
     const licenseInput = app.querySelector('#license-input');
     const keyStatus   = app.querySelector('#key-status');
@@ -1369,20 +1389,28 @@ const Renderer = {
         unlockBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking…';
         setStatus('', false);
 
+        const validateUrl = CONFIG.MEMBERSHIP_VALIDATE_URL;
+        if (!validateUrl) {
+          // No validation endpoint configured — show helpful message
+          setStatus('License validation is not configured. Contact support.', true);
+          unlockBtn.disabled = false;
+          unlockBtn.innerHTML = '<i class="fa-solid fa-unlock"></i> Unlock';
+          return;
+        }
+
         try {
-          // Lemon Squeezy license validate — CORS-enabled, no server needed
-          const lsParams = { license_key: key };
-          if (CONFIG.LEMONSQUEEZY_PRODUCT) lsParams.product_id = CONFIG.LEMONSQUEEZY_PRODUCT;
-          const res = await fetch('https://api.lemonsqueezy.com/v1/licenses/validate', {
+          // Generic POST → { valid: bool, error?: string }
+          // Works with any backend: Gumroad webhook, Paddle, custom CF Worker, etc.
+          const res = await fetch(validateUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams(lsParams)
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ license_key: key }),
           });
           const data = await res.json();
 
           if (data.valid) {
             localStorage.setItem(_key('member'), '1');
-            await LicenseCrypto.store(key); // stores SHA-256 hash only — raw key is never persisted
+            await LicenseCrypto.store(key); // stores SHA-256 hash only — raw key never persisted
             AppState.isMember = true;
             // Clear the stripped cache so the full body is re-fetched
             delete AppState.postsCache[post.slug];
@@ -1394,7 +1422,7 @@ const Renderer = {
             unlockBtn.innerHTML = '<i class="fa-solid fa-unlock"></i> Unlock';
           }
         } catch (err) {
-          setStatus('Could not reach the license server. Check your connection.', true);
+          setStatus('Could not reach the validation server. Check your connection.', true);
           unlockBtn.disabled = false;
           unlockBtn.innerHTML = '<i class="fa-solid fa-unlock"></i> Unlock';
         }
@@ -1577,7 +1605,12 @@ const Router = {
     this.render();
   },
   back(tag) {
-    this.setQuery({ tag: tag || null, page: 1 });
+    // Go back in history if possible and no tag override, otherwise set query.
+    if (!tag && window.history.length > 1) {
+      history.back();
+    } else {
+      this.setQuery({ tag: tag || null, page: 1 });
+    }
   },
   getSlug() {
     // Handle /posts/slug (raw GitHub Pages path) → silently rewrite to /post/slug
@@ -1666,7 +1699,6 @@ const Router = {
             const visual = p.cover
               ? `<img src="${Utils.escapeHtml(p.cover)}" alt="${Utils.escapeHtml(p.title)}" class="card__cover-img" loading="lazy">`
               : `<i class="fa-solid fa-file-lines card__icon" aria-hidden="true"></i>`;
-            const isBookmarked = true; // all cards here are bookmarked
             return `<article class="card" role="listitem" data-idx="${i}">
               <div class="card__visual">${visual}</div>
               <div class="card__content">
@@ -1851,9 +1883,10 @@ const Router = {
 
       const showFeatured = AppState.filter === 'all' && AppState.pagination.page === 1 && !AppState.search;
 
-      // Hero already features posts[0], so strip it from the grid
-      const gridPosts = (showFeatured && visible.length > 1)
-        ? visible.slice(1)
+      // Hero already features the first public post — strip it from the grid by slug
+      const heroPost = AppState.posts.filter(p => !p.draft).find(p => p.featured) || AppState.posts.filter(p => !p.draft)[0];
+      const gridPosts = (showFeatured && heroPost && visible.length > 1)
+        ? visible.filter(p => p.slug !== heroPost.slug)
         : visible;
 
       const st = Utils.qs('#section-title');
@@ -1861,7 +1894,7 @@ const Router = {
         ? `Results for "${AppState.search}"`
         : (AppState.filter === 'all' ? 'Latest Posts' : AppState.filter);
 
-      const heroEl = Utils.qs('.hero');
+      const heroEl = Utils.qs('.hero.container');
       const heroVisible = !AppState.search && AppState.filter === 'all';
       if (heroEl) {
         if (heroVisible) {
@@ -1946,35 +1979,27 @@ const UI = {
     const input     = Utils.qs('#search-input');
 
     // ── Fuse.js fuzzy search — lazy-loaded on first open ─────────
-    let fuseInstance = null;
+    let _fuseInstance = null; // shared between loadFuse and getFuseResults
+    const _buildFuse = () => new Fuse(AppState.posts, {
+      keys: ['title', 'excerpt', 'tag', 'author'],
+      threshold: 0.35,
+      ignoreLocation: true,
+      minMatchCharLength: 2,
+    });
     const loadFuse = () => {
-      if (!CONFIG.FUZZY_SEARCH_ENABLED || fuseInstance || typeof Fuse !== 'undefined') return;
-      if (typeof Fuse !== 'undefined') return; // already loaded
+      if (!CONFIG.FUZZY_SEARCH_ENABLED) return;
+      if (typeof Fuse !== 'undefined') { if (!_fuseInstance) _fuseInstance = _buildFuse(); return; }
       const s = document.createElement('script');
       s.src = 'https://cdn.jsdelivr.net/npm/fuse.js@7/dist/fuse.min.js';
-      s.onload = () => {
-        fuseInstance = new Fuse(AppState.posts, {
-          keys: ['title', 'excerpt', 'tag', 'author'],
-          threshold: 0.35,
-          ignoreLocation: true,
-          minMatchCharLength: 2,
-        });
-      };
+      s.onload = () => { _fuseInstance = _buildFuse(); };
       document.head.appendChild(s);
     };
 
     const getFuseResults = (q) => {
       if (!CONFIG.FUZZY_SEARCH_ENABLED) return null;
       if (typeof Fuse === 'undefined') return null;
-      if (!fuseInstance) {
-        fuseInstance = new Fuse(AppState.posts, {
-          keys: ['title', 'excerpt', 'tag', 'author'],
-          threshold: 0.35,
-          ignoreLocation: true,
-          minMatchCharLength: 2,
-        });
-      }
-      return fuseInstance.search(q).map(r => r.item);
+      if (!_fuseInstance) _fuseInstance = _buildFuse();
+      return _fuseInstance.search(q).map(r => r.item);
     };
 
     toggleBtn?.addEventListener('click', () => {
@@ -2027,9 +2052,17 @@ const UI = {
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
-        searchBar.classList.add('open');
-        searchBar.setAttribute('aria-hidden', 'false');
-        setTimeout(() => input?.focus(), 80);
+        const isOpen = searchBar.classList.contains('open');
+        if (isOpen) {
+          searchBar.classList.remove('open');
+          searchBar.setAttribute('aria-hidden', 'true');
+          if (input) { input.value = ''; input.dispatchEvent(new Event('input')); }
+        } else {
+          searchBar.classList.add('open');
+          searchBar.setAttribute('aria-hidden', 'false');
+          loadFuse();
+          setTimeout(() => input?.focus(), 80);
+        }
       }
       if (e.key === 'Escape' && searchBar.classList.contains('open')) {
         searchBar.classList.remove('open');

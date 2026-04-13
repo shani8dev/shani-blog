@@ -1264,6 +1264,39 @@ margin-top: var(--space-2); font-style: italic; font-family: var(--font-sans);
 }
 /* Strikethrough */
 .post-body del { text-decoration: line-through; color: var(--color-text-faint); }
+/* Highlighted text ==mark== (via marked extensions or raw HTML) */
+.post-body mark {
+background: var(--color-accent-bg); color: var(--color-text);
+padding: 0.1em 0.25em; border-radius: 2px; font-style: normal;
+}
+html[data-theme="light"] .post-body mark { background: rgba(181, 51, 9, 0.12); }
+/* Superscript / subscript */
+.post-body sup, .post-body sub {
+font-size: 0.75em; line-height: 0; position: relative; vertical-align: baseline;
+}
+.post-body sup { top: -0.5em; }
+.post-body sub { bottom: -0.25em; }
+/* Abbreviations */
+.post-body abbr[title] {
+text-decoration: underline dotted; text-underline-offset: 3px;
+cursor: help; color: inherit;
+}
+/* Inline keyboard keys inside post body */
+.post-body kbd {
+display: inline-flex; align-items: center; justify-content: center;
+min-width: 22px; height: 20px; padding: 0 5px;
+background: var(--color-bg-elevated);
+border: 1px solid var(--color-border-hover);
+border-bottom-width: 2px;
+border-radius: var(--radius-sm);
+font-family: var(--font-mono); font-size: 0.75em; font-weight: 600;
+color: var(--color-text);
+}
+/* Nested lists — preserve accent marker colour at all depths */
+.post-body ul ul, .post-body ol ul { list-style: circle; margin-bottom: 0; }
+.post-body ul ul ul { list-style: square; }
+.post-body ol ol, .post-body ul ol { list-style: lower-alpha; margin-bottom: 0; }
+.post-body ol ol ol { list-style: lower-roman; }
 /* =========================================
 19b. TABLE OF CONTENTS
 ========================================= */

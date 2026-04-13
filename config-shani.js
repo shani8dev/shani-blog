@@ -26,7 +26,7 @@ const CONFIG = {
   GITHUB_REPO: 'shani-blog',
 
   // ── Admin panel (admin.html) ──────────────────────────────────
-  // [script] Branch admin.html reads/writes posts on when committing directly.
+  // [script] Branch admin.html reads/writes posts to when committing directly.
   ADMIN_BRANCH:      'main',
 
   // [script] PR workflow — when enabled, "Commit & PR" pushes to a new feature
@@ -163,29 +163,41 @@ const CONFIG = {
   //          don't share theme, membership, bookmark, or like state.
   STORAGE_PREFIX: 'shani',
 
-  // ── Monetization — Lemon Squeezy ─────────────────────────────
-  // [script] Set LEMONSQUEEZY_STORE to your store slug to enable the
-  //          paywall license-key validation flow. Leave LEMONSQUEEZY_PRODUCT
-  //          empty to validate against all products in the store.
-  LEMONSQUEEZY_STORE:   'shani8dev',
-  LEMONSQUEEZY_PRODUCT: '',
-  MEMBERSHIP_URL:       'https://shani8dev.lemonsqueezy.com',
-  MEMBERSHIP_PRICE:     '₹199 / year',
+  // ── Membership / Paywall ──────────────────────────────────────
+  // [script] Enables the paywall gate on posts marked paywalled: true.
+  //
+  //   MEMBERSHIP_VALIDATE_URL — optional POST endpoint for license-key
+  //     validation. Your endpoint receives { license_key: string } and
+  //     must return { valid: true|false, error?: string }.
+  //     Works with any provider (Gumroad, Paddle, custom webhook, etc.).
+  //     Leave empty to disable key validation (paywall shows upgrade CTA only).
+  //
+  //   Examples:
+  //     Gumroad:  '/api/validate-gumroad'  (your own CF Worker or Vercel fn)
+  //     Custom:   'https://your-api.com/validate'
+  //
+  //   NOTE: Never put secret API keys in this file — it is a public repo.
+  //   Handle secrets only in your server-side function / Worker env vars.
+  MEMBERSHIP_VALIDATE_URL: '', // POST → { valid, error }. Leave '' to show paywall gate only.
+  MEMBERSHIP_URL:          'https://your-store.gumroad.com/l/your-product',
+  MEMBERSHIP_PRICE:        '₹199 / year',
 
   // ── Paywall copy ─────────────────────────────────────────────
   // [script] Text shown on the paywall gate inside a members-only post.
   PAYWALL_HEADING:         'Members only',
-  PAYWALL_DESCRIPTION:     "This post is for members. Purchase a membership to unlock all gated posts — you'll receive a license key instantly.",
+  PAYWALL_DESCRIPTION:     "This post is for members. Purchase a membership to unlock all gated posts.",
   PAYWALL_KEY_LABEL:       'Already a member? Enter your license key:',
   PAYWALL_KEY_PLACEHOLDER: 'XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX',
   // [script] Number of content blocks shown as a free preview before the gate.
   PAYWALL_PREVIEW_BLOCKS: 12,
 
   // ── Monetization — Google AdSense ────────────────────────────
-  // [script] Set both to inject an AdSense unit mid-post on free posts.
-  //          Leave empty to fall back to the house ad (if enabled).
+  // [script] Set BOTH ADSENSE_CLIENT and ADSENSE_SLOT to inject an AdSense
+  //          unit mid-post on free posts.
+  //          Leave ADSENSE_SLOT empty to fall back to the house ad instead.
+  //          NOTE: client ID is public (it's in your page HTML already).
   ADSENSE_CLIENT: 'ca-pub-8268043375450773',
-  ADSENSE_SLOT:   '',
+  ADSENSE_SLOT:   '',   // ← REQUIRED: set your ad-slot ID to enable AdSense
 
   // ── House ad ─────────────────────────────────────────────────
   // [script] Shown mid-post on free posts when AdSense is not configured.
@@ -285,9 +297,11 @@ const CONFIG = {
   // ── Cloudflare Web Analytics ──────────────────────────────────
   // [script] Set to your Cloudflare Web Analytics token to inject the
   //          privacy-safe, cookie-free beacon automatically on every page.
-  //          Find it in: CF Dashboard → Websites → Analytics & Logs → Web Analytics.
+  //          Find it in: CF Dashboard → Web Analytics → your site.
+  //          This token is public (it's in your page HTML already — same as
+  //          Google Analytics measurement IDs). Safe to commit.
   //          Leave empty to disable.
-  CF_WEB_ANALYTICS_TOKEN: 'cfat_66yU1YjOKU93daX06qz4wcNHEOB64SZ4V8bLsQQT84f739fd',
+  CF_WEB_ANALYTICS_TOKEN: '',
 
   // ── Giscus (GitHub Discussions comments) ──────────────────────
   // [script] Renders a comment section at the bottom of each post.
