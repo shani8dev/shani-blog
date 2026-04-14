@@ -1,15 +1,20 @@
 # .github/workflows/manage-keys.yml
 #
-# Manual admin tool: revoke or reinstate a license key directly
-# from the GitHub Actions tab.
+# Manual admin tool: revoke, reinstate, or look up a license key
+# directly from the GitHub Actions tab.
 #
 # Usage:
 #   Actions → "Manage license key" → Run workflow
-#   Fill in: action (revoke/reinstate), key
+#   Fill in: action (revoke / reinstate / lookup), license_key
 #
 # No secrets needed — GITHUB_TOKEN is automatic.
 
 name: Manage license key
+
+# Prevent concurrent runs from racing on data/keys.json.
+concurrency:
+  group: issue-license-key   # same group as issue-license-key.yml — they share the file
+  cancel-in-progress: false
 
 on:
   workflow_dispatch:
@@ -33,6 +38,7 @@ permissions:
 jobs:
   manage-key:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,8 +50,9 @@ jobs:
           ACTION: ${{ github.event.inputs.action }}
           KEY:    ${{ github.event.inputs.license_key }}
         run: |
+          mkdir -p data
           if [ ! -f data/keys.json ]; then
-            echo "✗ data/keys.json not found"
+            echo "✗ data/keys.json not found — run issue-license-key.yml first to create it"
             exit 1
           fi
 
@@ -53,8 +60,20 @@ jobs:
 
           if [ "$ACTION" = "lookup" ]; then
             echo "=== Key entry ==="
-            jq --arg k "$KEY_UPPER" '.[] | select(.key == $k)' data/keys.json
+            RESULT=$(jq --arg k "$KEY_UPPER" '.[] | select(.key == $k)' data/keys.json)
+            if [ -z "$RESULT" ]; then
+              echo "✗ Key not found: $KEY_UPPER"
+              exit 1
+            fi
+            echo "$RESULT"
             exit 0
+          fi
+
+          # ── Check the key actually exists before trying to update it ───────
+          MATCH=$(jq -r --arg k "$KEY_UPPER" '.[] | select(.key == $k) | .key' data/keys.json)
+          if [ -z "$MATCH" ]; then
+            echo "✗ Key not found: $KEY_UPPER — nothing updated"
+            exit 1
           fi
 
           REVOKED="false"

@@ -21,11 +21,6 @@
 #       verifies the HMAC (using the RAZORPAY_WEBHOOK_SECRET you set there),
 #       and calls the GitHub API to trigger this workflow.
 #
-#       Alternatively, use the included razorpay-webhook-receiver.yml
-#       (see below) which is a separate Actions workflow triggered by
-#       schedule + polling a KV store — or simply redirect Razorpay's webhook
-#       to a Pipedream endpoint (free, no server needed).
-#
 #  C) Direct: Razorpay → GitHub API via Pipedream (RECOMMENDED, truly zero-server)
 #       1. Create a free Pipedream.com account.
 #       2. New workflow → HTTP trigger → copy the endpoint URL.
@@ -39,8 +34,9 @@
 #    1. Verifies Razorpay webhook HMAC (only in repository_dispatch mode;
 #       skipped for workflow_dispatch since you control the trigger).
 #    2. Generates a license key (random UUID-style hex, if not supplied).
-#    3. Appends the entry to data/keys.json and commits it.
-#    4. Sends the key to the buyer via Resend email API.
+#    3. Deduplicates: skips append if a key for the same order_id already exists.
+#    4. Appends the entry to data/keys.json and commits it.
+#    5. Sends the key to the buyer via Resend email API.
 #
 #  VALIDATION (client-side, no server):
 #    • keys.json is committed to the repo and served via jsDelivr CDN.
@@ -56,10 +52,21 @@
 #    PIPEDREAM_TOKEN           — your GitHub PAT for Pipedream to trigger this
 #                                workflow (only used by Pipedream, not here)
 #
+#  VARIABLES (Settings → Variables → Actions  — not Secrets, these aren't sensitive):
+#    BLOG_URL can optionally be moved to a repository variable instead of a secret
+#    so its value is visible in workflow logs. Secrets are redacted, which makes
+#    debugging URL issues harder.
+#
 #  GITHUB_TOKEN is automatic — no extra PAT required for this workflow.
 # ──────────────────────────────────────────────────────────────────────────────
 
 name: Issue license key
+
+# Prevent concurrent runs from racing on data/keys.json.
+# 'wait' queues a second trigger rather than cancelling it.
+concurrency:
+  group: issue-license-key
+  cancel-in-progress: false
 
 on:
   # ── A: Triggered by an external relay (Pipedream, Make.com, n8n, etc.)
@@ -111,6 +118,7 @@ permissions:
 jobs:
   issue-key:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -148,7 +156,7 @@ jobs:
           console.log('✓ Razorpay HMAC signature verified');
           NODE
 
-      # ── Step 2: Resolve inputs from either trigger ─────────────────────────
+      # ── Step 2: Resolve and sanitize inputs from either trigger ────────────
       - name: Resolve inputs
         id: inputs
         env:
@@ -178,21 +186,54 @@ jobs:
             AMOUNT="${WD_AMOUNT:-199.00}"
           fi
 
-          # Auto-generate key if not supplied
+          # ── Validate email is present ──────────────────────────────────────
+          if [ -z "$EMAIL" ]; then
+            echo "✗ EMAIL is empty — cannot issue key without a recipient address"
+            exit 1
+          fi
+
+          # ── Sanitize NAME for safe HTML embedding in the email body ────────
+          # Strip angle brackets and ampersands to prevent HTML injection.
+          NAME=$(echo "$NAME" | tr -d '<>&"')
+          # Clamp to 120 chars so it can't overflow the email template.
+          NAME="${NAME:0:120}"
+          # Fall back to 'Member' if sanitization left it empty.
+          NAME="${NAME:-Member}"
+
+          # ── Sanitize AMOUNT — must be a bare decimal number ────────────────
+          # Reject anything that isn't digits and an optional single dot.
+          if ! echo "$AMOUNT" | grep -qE '^[0-9]+(\.[0-9]+)?$'; then
+            echo "⚠ Invalid AMOUNT '$AMOUNT' — resetting to 199.00"
+            AMOUNT="199.00"
+          fi
+
+          # ── Auto-generate key if not supplied ──────────────────────────────
           if [ -z "$KEY" ]; then
             KEY=$(cat /proc/sys/kernel/random/uuid | tr -d '-' | tr '[:lower:]' '[:upper:]')
             KEY="${KEY:0:8}-${KEY:8:8}-${KEY:16:8}-${KEY:24:8}"
           fi
 
-          echo "key=$KEY"           >> "$GITHUB_OUTPUT"
-          echo "email=$EMAIL"       >> "$GITHUB_OUTPUT"
-          echo "name=$NAME"         >> "$GITHUB_OUTPUT"
-          echo "order_id=$ORDER_ID" >> "$GITHUB_OUTPUT"
-          echo "amount=$AMOUNT"     >> "$GITHUB_OUTPUT"
-          echo "issued_at=$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" >> "$GITHUB_OUTPUT"
-          echo "✓ Key: $KEY  Email: $EMAIL"
+          # ── Validate key format: XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX ───────
+          if ! echo "$KEY" | grep -qE '^[A-Z0-9]{8}-[A-Z0-9]{8}-[A-Z0-9]{8}-[A-Z0-9]{8}$'; then
+            echo "✗ KEY '$KEY' does not match expected format XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX"
+            exit 1
+          fi
 
-      # ── Step 3: Append key to data/keys.json ──────────────────────────────
+          # ── Write outputs using printf + delimiter to prevent injection ─────
+          # Plain 'echo key=VALUE' is unsafe if VALUE contains newlines.
+          # The EOF delimiter approach is the GitHub-recommended safe pattern.
+          {
+            printf 'key=%s\n'       "$KEY"
+            printf 'email=%s\n'     "$EMAIL"
+            printf 'name=%s\n'      "$NAME"
+            printf 'order_id=%s\n'  "$ORDER_ID"
+            printf 'amount=%s\n'    "$AMOUNT"
+            printf 'issued_at=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "✓ Key: $KEY  Email: $EMAIL  Order: $ORDER_ID"
+
+      # ── Step 3: Append key to data/keys.json (with deduplication) ─────────
       - name: Append key to keys.json
         env:
           KEY:       ${{ steps.inputs.outputs.key }}
@@ -204,6 +245,20 @@ jobs:
         run: |
           mkdir -p data
           if [ ! -f data/keys.json ]; then echo '[]' > data/keys.json; fi
+
+          # ── Deduplication: skip if this order_id already has a key ─────────
+          # Razorpay can fire duplicate webhook events; this prevents issuing
+          # two keys for the same payment.
+          if [ "$ORDER_ID" != "manual" ]; then
+            EXISTING=$(jq -r --arg oid "$ORDER_ID" \
+              '.[] | select(.order_id == $oid) | .key' data/keys.json)
+            if [ -n "$EXISTING" ]; then
+              echo "⚠ Order $ORDER_ID already has key ${EXISTING:0:8}… — skipping append"
+              # Still send the email below so the buyer gets their key
+              # even if the webhook fired twice.
+              exit 0
+            fi
+          fi
 
           NEW_ENTRY=$(jq -n \
             --arg key       "$KEY" \
@@ -234,9 +289,10 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/keys.json
-          git diff --staged --quiet && echo "nothing changed" || \
+          git diff --staged --quiet && echo "nothing changed" || {
             git commit -m "chore: add license key for order $ORDER_ID [skip ci]"
-          git push
+            git push
+          }
 
       # ── Step 5: Send license key email via Resend ─────────────────────────
       - name: Send license key email
@@ -249,6 +305,16 @@ jobs:
           NAME:           ${{ steps.inputs.outputs.name }}
           AMOUNT:         ${{ steps.inputs.outputs.amount }}
         run: |
+          # ── Guard: fail clearly if Resend is not configured ────────────────
+          if [ -z "$RESEND_API_KEY" ]; then
+            echo "✗ RESEND_API_KEY secret is not set — cannot send email"
+            exit 1
+          fi
+          if [ -z "$EMAIL_FROM" ]; then
+            echo "✗ EMAIL_FROM secret is not set — cannot send email"
+            exit 1
+          fi
+
           HTML_BODY=$(cat <<HTMLEOF
           <!DOCTYPE html>
           <html>
@@ -276,7 +342,9 @@ jobs:
           HTMLEOF
           )
 
-          curl -s -X POST https://api.resend.com/emails \
+          # ── Send and check the HTTP response code ──────────────────────────
+          HTTP_STATUS=$(curl -s -o /tmp/resend_response.json -w "%{http_code}" \
+            -X POST https://api.resend.com/emails \
             -H "Authorization: Bearer $RESEND_API_KEY" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
@@ -284,7 +352,14 @@ jobs:
               --arg to      "$EMAIL" \
               --arg subject "Your Shanios Blog membership key" \
               --arg html    "$HTML_BODY" \
-              '{from:$from, to:[$to], subject:$subject, html:$html}')" \
-            | jq .
+              '{from:$from, to:[$to], subject:$subject, html:$html}')")
+
+          echo "Resend HTTP status: $HTTP_STATUS"
+          cat /tmp/resend_response.json | jq . || cat /tmp/resend_response.json
+
+          if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ]; then
+            echo "✗ Resend API returned HTTP $HTTP_STATUS — email not sent"
+            exit 1
+          fi
 
           echo "✓ Email sent to $EMAIL"

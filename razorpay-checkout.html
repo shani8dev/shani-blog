@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Membership Checkout</title>
   <link rel="stylesheet" href="brand-shani.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     :root { --container: 480px; }
     body {
@@ -53,12 +54,12 @@
     const btn = document.getElementById('checkout-btn');
     const status = document.getElementById('checkout-status');
     
-    btn.textContent = `${CONFIG.MEMBERSHIP_CTA} — ${CONFIG.MEMBERSHIP_PRICE}`;
+    btn.innerHTML = `<i class="fa-solid fa-star"></i> ${CONFIG.MEMBERSHIP_CTA} — ${CONFIG.MEMBERSHIP_PRICE}`;
     btn.disabled = false;
 
     if (!CONFIG.RAZORPAY_KEY_ID) {
       btn.disabled = true;
-      btn.textContent = 'Payment Not Configured';
+      btn.innerHTML = '<i class="fa-solid fa-ban"></i> Payment Not Configured';
       status.textContent = 'Please contact support to complete your membership.';
       status.className = 'status-msg error';
     } else {
@@ -74,11 +75,13 @@
           amount: CONFIG.RAZORPAY_AMOUNT,
           currency: 'INR',
           name: CONFIG.SITE_TITLE,
-          description: CONFIG.SITE_TAGLINE,
+          description: CONFIG.MEMBERSHIP_DESCRIPTION,
           image: CONFIG.LOGO_IMG_URL || CONFIG.FAVICON_URL,
-          theme: { color: accentColor || '#b53309' },
+          prefill:     { name: '', email: '', contact: '' },
+          notes:       { product: 'blog-membership' },
+          theme:       { color: accentColor || '#b53309' },
           handler: function () {
-            btn.textContent = '✅ Payment Successful!';
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Payment Successful!';
             btn.disabled = true;
             status.textContent = 'Check your email in a few minutes for your license key.';
             status.className = 'status-msg success';
@@ -86,7 +89,12 @@
           modal: { ondismiss: function () { status.textContent = ''; } },
         };
         status.textContent = '';
-        new Razorpay(options).open();
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+          status.textContent = 'Payment failed: ' + (response.error?.description || 'Unknown error');
+          status.className = 'status-msg error';
+        });
+        rzp.open();
       });
     }
   </script>

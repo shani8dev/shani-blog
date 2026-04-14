@@ -45,6 +45,7 @@ permissions:
 jobs:
   build-manifest:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -52,6 +53,14 @@ jobs:
           # secrets.GITHUB_TOKEN is provided automatically by GitHub.
           # You do not need to create this secret yourself.
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Pin Node.js version explicitly ───────────────────────────
+      # ubuntu-latest ships Node 20 but pinning avoids surprises when
+      # the runner image is updated.
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       # ── If posts live in a SEPARATE private repo, add this step ──
       # Uncomment, fill in the repo name, create a fine-grained PAT

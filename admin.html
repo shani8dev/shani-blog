@@ -41,6 +41,14 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+<!-- Java / Spring Boot / Kotlin / Groovy / XML / Properties -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-groovy.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-gradle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-properties.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
 <link rel="stylesheet" href="/brand-shani.css">
 <link rel="stylesheet" href="/style.css">
@@ -1251,6 +1259,12 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
           <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="nginx">nginx</button>
           <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="docker">docker</button>
           <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="hcl">hcl</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="java">java</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="kotlin">kotlin</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="groovy">groovy</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="gradle">gradle</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="xml">xml</button>
+          <button class="btn btn--ghost cb-lang-btn" style="padding:.2rem .45rem;font-size:.68rem;font-family:var(--mono)" data-lang="properties">properties</button>
         </div>
         <input id="codeblock-lang" type="text" placeholder="or type a language…" style="font-family:var(--mono)" onkeydown="if(event.key==='Enter')finaliseCodeBlock()">
       </div>

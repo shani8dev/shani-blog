@@ -12,7 +12,7 @@ if (typeof CONFIG === 'undefined') {
   throw new Error('[Blog Engine] No CONFIG found. Load a brand config script before script.js.');
 }
 if (typeof Utils === 'undefined' || typeof TAG_ICONS === 'undefined') {
-  throw new Error('[Blog Engine] utils.js not loaded. Add <script src="utils.js"> before script.js.');
+  throw new Error('[Blog Engine] utils.js not loaded. Add <script src="/utils.js"></script> before script.js.');
 }
 
 // ── Storage key helper ─────────────────────────────────────────────
@@ -1667,16 +1667,38 @@ const Router = {
         memberBtn.innerHTML = '<i class="fa-solid fa-check"></i> You are a member';
         statusEl.textContent = 'Your membership is active. Enjoy all member posts!';
         statusEl.style.color = 'var(--color-success)';
-      } else if (typeof Razorpay !== 'undefined' && CONFIG.RAZORPAY_KEY_ID) {
+      } else if (CONFIG.RAZORPAY_KEY_ID) {
+        // Lazy-load Razorpay checkout SDK only when the membership page is first visited.
+        // checkout.js is NOT loaded in index.html so it costs nothing on every other page.
+        if (!document.getElementById('razorpay-checkout-script') && typeof Razorpay === 'undefined') {
+          const rzpScript = document.createElement('script');
+          rzpScript.id  = 'razorpay-checkout-script';
+          rzpScript.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          document.head.appendChild(rzpScript);
+        }
+
         memberBtn.addEventListener('click', function () {
+          // If the lazy-loaded SDK hasn't resolved yet, wait for it then re-trigger.
+          if (typeof Razorpay === 'undefined') {
+            const sdkScript = document.getElementById('razorpay-checkout-script');
+            if (sdkScript) {
+              sdkScript.addEventListener('load', () => memberBtn.click(), { once: true });
+            } else {
+              if (statusEl) { statusEl.textContent = 'Payment gateway unavailable. Please refresh and try again.'; statusEl.style.color = 'var(--color-error)'; }
+            }
+            return;
+          }
+
           const options = {
-            key: CONFIG.RAZORPAY_KEY_ID,
-            amount: CONFIG.RAZORPAY_AMOUNT,
-            currency: 'INR',
-            name: CONFIG.SITE_TITLE,
-            description: CONFIG.SITE_TAGLINE,
-            image: CONFIG.LOGO_IMG_URL || CONFIG.FAVICON_URL,
-            theme: { color: accentColor },
+            key:         CONFIG.RAZORPAY_KEY_ID,
+            amount:      CONFIG.RAZORPAY_AMOUNT,
+            currency:    'INR',
+            name:        CONFIG.SITE_TITLE,
+            description: CONFIG.MEMBERSHIP_DESCRIPTION,
+            image:       CONFIG.LOGO_IMG_URL || CONFIG.FAVICON_URL,
+            prefill:     { name: '', email: '', contact: '' },
+            notes:       { product: 'blog-membership' },
+            theme:       { color: accentColor },
             handler: function () {
               memberBtn.innerHTML = '<i class="fa-solid fa-check"></i> Payment received!';
               memberBtn.disabled = true;
