@@ -759,66 +759,65 @@ border-radius: 0;
 AUTHOR BIO CARD
 ========================================= */
 .author-card {
-display: flex; gap: var(--space-6); align-items: flex-start;
+display: flex; gap: var(--space-4); align-items: flex-start;
 width: 100%;
 max-width: var(--max-prose);
 margin: 0 auto var(--space-8);
-/* Horizontal padding mirrors .post-header / .post-body so all three align */
-padding: var(--space-6) var(--space-5);
+padding: var(--space-4) var(--space-5);
 background: var(--color-bg-alt);
 border-top: 1px solid var(--color-border);
 border-bottom: 1px solid var(--color-border);
 border-left: 3px solid var(--color-accent);
 }
 @media (min-width: 1024px) {
-  .author-card { padding: var(--space-6) var(--space-8); }
+  .author-card { padding: var(--space-4) var(--space-8); }
 }
 @media (max-width: 600px) {
-  .author-card { flex-direction: column; gap: var(--space-4); padding: var(--space-5); }
+  .author-card { gap: var(--space-3); padding: var(--space-4) var(--space-5); }
 }
 .author-card__avatar {
-width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
 background: var(--color-accent); color: var(--color-accent-text);
 display: grid; place-items: center;
-font-family: var(--font-sans); font-weight: 700; font-size: 1rem;
+font-family: var(--font-sans); font-weight: 700; font-size: 0.82rem;
 letter-spacing: 0.02em;
 }
 .author-card__body { flex: 1; min-width: 0; }
 .author-card__label {
-font-family: var(--font-mono); font-size: 0.65rem; font-weight: 600;
+font-family: var(--font-mono); font-size: 0.6rem; font-weight: 600;
 letter-spacing: 0.12em; text-transform: uppercase;
-color: var(--color-text-faint); margin-bottom: var(--space-2);
+color: var(--color-text-faint); margin-bottom: var(--space-1);
 }
 .author-card__name {
-font-family: var(--font-display); font-weight: 700; font-size: 1.05rem;
+font-family: var(--font-sans); font-weight: 600; font-size: 0.9rem;
 color: var(--color-text); margin-bottom: var(--space-1);
 }
 .author-card__role {
-font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500;
+font-family: var(--font-mono); font-size: 0.65rem; font-weight: 500;
 letter-spacing: 0.08em; text-transform: uppercase;
-color: var(--color-accent); margin-bottom: var(--space-3);
+color: var(--color-accent); margin-bottom: var(--space-2);
 }
 .author-card__bio {
-font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7;
-margin-bottom: var(--space-4);
+font-size: 0.82rem; color: var(--color-text-muted); line-height: 1.6;
+margin-bottom: var(--space-3);
 }
 .author-card__links {
-display: flex; flex-wrap: wrap; gap: var(--space-3);
+display: flex; flex-wrap: wrap; gap: var(--space-2);
 }
 .author-card__link {
-display: inline-flex; align-items: center; gap: var(--space-2);
-font-family: var(--font-mono); font-size: 0.68rem; font-weight: 600;
+display: inline-flex; align-items: center; gap: var(--space-1);
+font-family: var(--font-mono); font-size: 0.62rem; font-weight: 600;
 letter-spacing: 0.1em; text-transform: uppercase;
 color: var(--color-text-muted);
 border: 1px solid var(--color-border);
-padding: var(--space-1) var(--space-3);
+padding: 2px var(--space-2);
 transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 .author-card__link:hover {
 color: var(--color-accent); border-color: var(--color-accent);
 background: var(--color-accent-bg);
 }
-.author-card__link i { font-size: 0.85rem; }
+.author-card__link i { font-size: 0.78rem; }
 /* Post Footer & Nav — matches .posts bottom padding */
 .post-footer {
 margin-top: var(--space-8);
@@ -1653,6 +1652,20 @@ BOOKMARK BUTTON ON CARDS
 /* =========================================
 SERIES STRIP
 ========================================= */
+#post-series-strip,
+#post-related,
+#post-comments {
+  padding-left: var(--space-8);
+  padding-right: var(--space-8);
+}
+@media (max-width: 600px) {
+  #post-series-strip,
+  #post-related,
+  #post-comments {
+    padding-left: var(--space-5);
+    padding-right: var(--space-5);
+  }
+}
 .series-strip {
   width: 100%;
   max-width: var(--max-prose);
@@ -1661,16 +1674,6 @@ SERIES STRIP
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--color-bg-alt);
-}
-@media (max-width: 600px) {
-  .series-strip {
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-    margin-left: 0;
-    margin-right: 0;
-    max-width: 100%;
-  }
 }
 .series-strip__header {
   display: flex; align-items: center; gap: var(--space-2);
@@ -1737,15 +1740,10 @@ RELATED POSTS
   max-width: var(--max-prose);
   margin: var(--space-12) auto 0;
   padding-top: var(--space-8);
-  padding-left: var(--space-8);
-  padding-right: var(--space-8);
   border-top: 1px solid var(--color-border);
 }
 @media (max-width: 600px) {
-  .related-posts {
-    padding-left: var(--space-5);
-    padding-right: var(--space-5);
-  }
+  .related-posts { padding-left: 0; padding-right: 0; }
 }
 .related-posts__grid {
   display: grid;
@@ -1807,11 +1805,21 @@ RELATED POSTS
 /* =========================================
 NEWSLETTER BLOCK
 ========================================= */
+#post-newsletter {
+  padding-left: var(--space-8);
+  padding-right: var(--space-8);
+}
+@media (max-width: 600px) {
+  #post-newsletter {
+    padding-left: var(--space-5);
+    padding-right: var(--space-5);
+  }
+}
 .newsletter-block {
   width: 100%;
   max-width: var(--max-prose);
   margin: var(--space-12) auto 0;
-  padding: var(--space-10) var(--space-8);
+  padding: var(--space-8) var(--space-8);
   /* horizontal margin keeps it off the screen edge on mobile */
   background: var(--color-bg-alt);
   border: 1px solid var(--color-border);
@@ -1861,7 +1869,7 @@ NEWSLETTER BLOCK
 .newsletter-block__status--ok    { color: var(--color-success); }
 .newsletter-block__status--error { color: var(--color-error); }
 @media (max-width: 480px) {
-  .newsletter-block { padding: var(--space-8) var(--space-5); margin-left: var(--space-5); margin-right: var(--space-5); }
+  .newsletter-block { padding: var(--space-6) var(--space-5); }
   .newsletter-block__input { max-width: 100%; }
   .newsletter-block__btn { width: 100%; justify-content: center; }
 }
@@ -2176,14 +2184,6 @@ RECENTLY VIEWED LIST (in Bookmarks view)
   max-width: var(--max-prose);
   margin: var(--space-12) auto 0;
   padding-top: var(--space-8);
-  padding-left: var(--space-8);
-  padding-right: var(--space-8);
-}
-@media (max-width: 600px) {
-  .post-comments {
-    padding-left: var(--space-5);
-    padding-right: var(--space-5);
-  }
 }
 .post-comments .giscus,
 .post-comments .giscus-frame {
