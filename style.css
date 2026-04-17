@@ -372,7 +372,7 @@ width: 100%;
 }
 .sidebar__link:hover { color: var(--color-accent); }
 .sidebar__date { font-family: var(--font-mono); font-size: 0.68rem; color: var(--color-text-faint); display: flex; align-items: center; gap: var(--space-2); }
-.loading-text { padding: var(--space-4) var(--space-5); color: var(--color-text-faint); animation: pulse 1.5s infinite; font-family: var(--font-mono); font-size: 0.78rem; align-items: center; }
+.loading-text { padding: var(--space-4) var(--space-5); color: var(--color-text-faint); animation: pulse 1.5s infinite; font-family: var(--font-mono); font-size: 0.78rem; display: flex; align-items: center; }
 /* Legacy .badge still used in section headers / other spots */
 .badge {
 display: inline-flex; align-items: center; gap: var(--space-3);
@@ -449,7 +449,7 @@ background: var(--color-bg-alt);
 display: grid; place-items: center;
 font-size: 1.8rem; color: var(--color-text-faint);
 border-bottom: 2px solid var(--color-accent);
-position: relative; overflow: hidden;
+position: relative; overflow: hidden; /* position: relative also required for .card__copy-link absolute positioning */
 }
 .card__visual::after {
 content: ''; position: absolute; inset: 0;
@@ -518,7 +518,7 @@ horizontal padding, which would cause double-padding (narrower than index).
   margin-right: auto;
 }
 /* Header and footer span full container width; body respects prose width */
-.post-header, .post-footer { max-width: var(--container); }
+/* post-header and post-footer already constrained by the shared rule above */
 .post-body { max-width: var(--max-prose); }
 
 /* Cover sits outside the padding system — it spans edge-to-edge within #view-post */
@@ -827,7 +827,7 @@ border-top: 1px solid var(--color-border);
 .nav-title { font-weight: 500; font-size: 0.88rem; color: var(--color-text); }
 .post-nav-btn--right { text-align: right; }
 /* =========================================
-13. READING PROGRESS BAR
+11. READING PROGRESS BAR
 */
 .reading-progress {
 position: fixed; top: 0; left: 0; height: 3px; width: 0%;
@@ -836,7 +836,7 @@ z-index: 101; /* above sticky header (z-index: 100) */
 transition: width 0.1s linear; pointer-events: none;
 }
 /* =========================================
-11. CODE BLOCKS & SYNTAX HIGHLIGHTING
+12. CODE BLOCKS & SYNTAX HIGHLIGHTING
 ========================================= */
 .code-block {
 position: relative; margin: var(--space-8) 0; border-radius: var(--radius-md);
@@ -871,7 +871,7 @@ font-family: var(--font-mono); font-size: inherit; background: transparent;
 padding: 0; border: none; display: block; color: inherit; margin: 0; white-space: pre;
 }
 /* =========================================
-12. PAYWALL
+13. PAYWALL
 ========================================= */
 .paywall-wrap { position: relative; }
 .paywall-fade {
@@ -1155,12 +1155,6 @@ transition: color 0.15s;
 .post-back:hover i { transform: translateX(-3px); }
 .meta-role { color: var(--color-text-muted); }
 /* .post-cover-icon removed — fallback cover icon no longer rendered */
-.post-nav-btn {
-padding: var(--space-5); border: 1px solid var(--color-border);
-background: var(--color-bg-alt); cursor: pointer; text-align: left;
-transition: all 0.15s; width: 100%; font-family: var(--font-sans);
-}
-.post-nav-btn:hover { border-color: var(--color-accent); background: var(--color-bg-elevated); }
 .tag-chip {
 display: inline-flex; align-items: center; gap: var(--space-2);
 padding: var(--space-1) var(--space-4); font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500;
@@ -1629,7 +1623,9 @@ BOOKMARK BUTTON ON CARDS
 SERIES STRIP
 ========================================= */
 .series-strip {
-  margin: var(--space-10) 0;
+  width: 100%;
+  max-width: var(--max-prose);
+  margin: var(--space-10) auto 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -1696,7 +1692,9 @@ SERIES STRIP
 RELATED POSTS
 ========================================= */
 .related-posts {
-  margin-top: var(--space-12);
+  width: 100%;
+  max-width: var(--max-prose);
+  margin: var(--space-12) auto 0;
   padding-top: var(--space-8);
   border-top: 1px solid var(--color-border);
 }
@@ -1761,7 +1759,9 @@ RELATED POSTS
 NEWSLETTER BLOCK
 ========================================= */
 .newsletter-block {
-  margin-top: var(--space-12);
+  width: 100%;
+  max-width: var(--max-prose);
+  margin: var(--space-12) auto 0;
   padding: var(--space-10) var(--space-8);
   background: var(--color-bg-alt);
   border: 1px solid var(--color-border);
@@ -1834,9 +1834,6 @@ POST BOOKMARK CHIP IN FOOTER
 /* =========================================
 CARD COPY-LINK HOVER BUTTON
 ========================================= */
-.card__visual {
-  position: relative;
-}
 .card__copy-link {
   position: absolute; top: var(--space-2); right: var(--space-2);
   width: 30px; height: 30px;
@@ -2125,7 +2122,9 @@ RECENTLY VIEWED LIST (in Bookmarks view)
    GISCUS COMMENTS
 ========================================= */
 .post-comments {
-  margin-top: var(--space-12);
+  width: 100%;
+  max-width: var(--max-prose);
+  margin: var(--space-12) auto 0;
   padding-top: var(--space-8);
 }
 .post-comments .giscus,
