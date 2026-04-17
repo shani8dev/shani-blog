@@ -516,14 +516,6 @@ horizontal padding, which would cause double-padding (narrower than index).
   max-width: var(--container);
   margin-left: auto;
   margin-right: auto;
-  padding-left: var(--space-5);
-  padding-right: var(--space-5);
-}
-@media (min-width: 1024px) {
-  .post-header, .post-body, .post-footer {
-    padding-left: var(--space-8);
-    padding-right: var(--space-8);
-  }
 }
 /* Header and footer span full container width; body respects prose width */
 .post-header, .post-footer { max-width: var(--container); }

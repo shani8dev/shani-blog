@@ -5,14 +5,24 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Tue, 14 Apr 2026 03:24:54 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 17 Apr 2026 04:25:47 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
-      <title>Why Your OS Update Should Never Break Your Computer — And How Shanios Fixes This</title>
-      <link>https://blog.shani.dev/post/why-your-os-update-should-never-break-your-computer</link>
-      <guid isPermaLink="true">https://blog.shani.dev/post/why-your-os-update-should-never-break-your-computer</guid>
+      <title>Shani OS 2026.04.15 — Release Notes</title>
+      <link>https://blog.shani.dev/post/2026-04-15-release-notes</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/2026-04-15-release-notes</guid>
+      <description>The April 2026 stable release: fixed UEFI installer, improved shani-deploy reliability, refreshed GNOME 50 and KDE Plasma 6 ISOs, and a full package manifest.</description>
+      <pubDate>Tue, 14 Apr 2026 18:30:00 GMT</pubDate>
+      <lastBuildDate>Tue, 14 Apr 2026 18:30:00 GMT</lastBuildDate>
+      <category>Release</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+    <item>
+      <title>Why Your OS Update Should Never Break Your Computer — And How Shani OS Fixes This</title>
+      <link>https://blog.shani.dev/post/why-os-updates-should-never-break</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/why-os-updates-should-never-break</guid>
       <description>Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.</description>
-      <pubDate>Fri, 10 Apr 2026 00:00:00 GMT</pubDate>
+      <pubDate>Thu, 09 Apr 2026 18:30:00 GMT</pubDate>
       <category>Engineering</category>
       <author>Shrinivas Kumbhar</author>
     </item>

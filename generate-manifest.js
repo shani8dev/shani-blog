@@ -147,15 +147,83 @@ function build() {
 
     const fm   = {};
     const body = fmMatch[2];
-    fmMatch[1].split(/\r?\n/).forEach(line => {
-      const i = line.indexOf(':');
-      if (i < 1) return;
-      const key = line.slice(0, i).trim();
-      // Preserve everything after the FIRST colon (handles URLs, timestamps, subtitles)
-      const raw = line.slice(i + 1).trim();
-      // Strip only the outermost matching quote pair: 'value' or "value" or `value`
-      fm[key] = raw.replace(/^(['"`])([\s\S]*)\1$/, '$2');
-    });
+
+    // ── Robust front-matter parser ────────────────────────────────
+    // Handles:
+    //   - Values with colons (URLs, timestamps, subtitles)
+    //   - Quoted multi-line values: "title: 'Foo: Bar: Baz'"
+    //   - Bare values, single/double/backtick quoted values
+    //   - Trailing whitespace / Windows line endings
+    const fmLines = fmMatch[1].split(/\r?\n/);
+    let i = 0;
+    while (i < fmLines.length) {
+      const line = fmLines[i];
+      // Skip blank lines and comment lines
+      if (!line.trim() || line.trim().startsWith('#')) { i++; continue; }
+
+      // Only parse TOP-LEVEL keys (zero indentation).
+      // Indented lines are nested values (e.g. items inside `related:`,
+      // `tags:`, or any YAML list). Without this guard, nested `title:`
+      // entries would overwrite the post's top-level title.
+      if (/^\s/.test(line)) { i++; continue; }
+
+      const colonIdx = line.indexOf(':');
+      if (colonIdx < 1) { i++; continue; }
+
+      const key    = line.slice(0, colonIdx).trim();
+      let   rawVal = line.slice(colonIdx + 1).trim();
+
+      // Detect block scalars (| or >) — collect continuation lines
+      if (rawVal === '|' || rawVal === '>') {
+        const joiner = rawVal === '>' ? ' ' : '\n';
+        const parts  = [];
+        const baseIndent = (fmLines[i + 1] || '').match(/^(\s*)/)[1].length;
+        i++;
+        while (i < fmLines.length) {
+          const next = fmLines[i];
+          if (next.trim() === '' || next.match(/^(\s*)/)[1].length >= baseIndent) {
+            parts.push(next.slice(baseIndent));
+            i++;
+          } else {
+            break;
+          }
+        }
+        fm[key] = parts.join(joiner).trimEnd();
+        continue;
+      }
+
+      // Detect opening of a flow/quoted multi-line value
+      // e.g.  excerpt: "This spans
+      //        multiple lines"
+      const quoteMatch = rawVal.match(/^(['"`])([\s\S]*)$/);
+      if (quoteMatch) {
+        const q    = quoteMatch[1];
+        let   val  = quoteMatch[2];
+        // Check if closing quote is already on this line
+        if (val.endsWith(q)) {
+          fm[key] = val.slice(0, -1);
+        } else {
+          // Accumulate continuation lines until closing quote found
+          i++;
+          while (i < fmLines.length) {
+            const next = fmLines[i].trimEnd();
+            if (next.endsWith(q)) {
+              val += '\n' + next.slice(0, -1);
+              i++;
+              break;
+            }
+            val += '\n' + next;
+            i++;
+          }
+          fm[key] = val;
+        }
+      } else {
+        // Plain unquoted value — everything after the first colon
+        fm[key] = rawVal;
+      }
+
+      i++;
+    }
 
     const isPaywalled = fm.paywalled === 'true';
 
@@ -190,6 +258,19 @@ function build() {
     });
 
     console.log(`  ${isPaywalled ? '[members]' : '[free]   '} ${slug}`);
+  }
+
+  // ── Warn on duplicate titles (common sign of copy-paste front-matter errors) ──
+  const titleCount = {};
+  posts.forEach(p => { titleCount[p.title] = (titleCount[p.title] || 0) + 1; });
+  const dupes = Object.entries(titleCount).filter(([, n]) => n > 1);
+  if (dupes.length) {
+    console.warn('\n  ⚠  Duplicate titles detected (likely wrong title: in front-matter):');
+    dupes.forEach(([title, n]) => {
+      const slugs = posts.filter(p => p.title === title).map(p => p.slug).join(', ');
+      console.warn(`     "${title}" appears ${n}×  →  ${slugs}`);
+    });
+    console.warn('');
   }
 
   // Sort newest first (same as GitHub Actions output)
