@@ -60,6 +60,9 @@ Several reliability issues in the update and rollback pipeline have been resolve
 - `shani-deploy --storage-info` now reports accurate compressed sizes using `compsize`
 - `shani-update` background notification service (user-level systemd service) now more reliably detects new images and sends desktop notifications
 
+### shani-health
+- `shani-health` new cli for the check the health of shanios
+
 ### Hardware Support
 
 Firmware packages updated to `20260309-1` (AMD and Intel microcode included). GPU compatibility improvements cover recent AMD RDNA 3 and Intel Arc cards. Bluetooth and audio handling improvements target common laptop hardware — specifically Intel DSP audio via updated `sof-firmware`.
@@ -98,7 +101,6 @@ Firmware packages updated to `20260309-1` (AMD and Intel microcode included). GP
 | Qt 6 | `6.11.0-2` |
 | KWin | `6.6.4-1` |
 | Dolphin | `25.12.3-1` |
-| SDDM | `0.21.0-3` |
 
 ---
 
@@ -113,7 +115,7 @@ Shani OS uses a multi-runtime model. Applications run entirely outside the base 
 | Nix | `2.34.6-1` | Reproducible dev environments (`@nix` subvolume, shared across slots) |
 | Distrobox | `1.8.2.4-1` | Full mutable Linux containers (Ubuntu, Arch, Fedora) |
 | Podman | `5.8.1-2` | Rootless containers — Docker-compatible |
-| AppImage | `libappimage 1.0.4.5-12` | Portable apps via Gear Lever |
+| AppImage | - | Portable apps via Gear Lever |
 
 ---
 
@@ -233,7 +235,7 @@ nix-channel --update
 sudo gen-efi enroll-tpm2
 
 # Update the system
-sudo shani-deploy update
+sudo shani-deploy
 
 # Check which slot you're running
 cat /data/current-slot
@@ -243,7 +245,7 @@ cat /data/current-slot
 
 ## Documentation & Community
 
-- [wiki.shani.dev](https://wiki.shani.dev) — full technical documentation
+- [wiki.shani.dev](https://docs.shani.dev) — full technical documentation
 - [shani.dev](https://shani.dev) — download, overview, and feature details
 - [github.com/shani8dev](https://github.com/shani8dev) — source code
 - [Telegram community](https://t.me/shani8dev)
