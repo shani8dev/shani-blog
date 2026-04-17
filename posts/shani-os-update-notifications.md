@@ -16,7 +16,7 @@ readTime: '4 min'
 series: 'Shani OS Guides'
 ---
 
-`shani-update` is a user-level background service that monitors for new Shani OS images on your configured update channel and sends a desktop notification when one is available. It does not apply the update — you always decide when to run `sudo shnai-deploy`. It just makes sure you know when something new is waiting.
+`shani-update` is a user-level background service that monitors for new Shani OS images on your configured update channel and sends a desktop notification when one is available. It does not apply the update — you always decide when to run `sudo shani-deploy`. It just makes sure you know when something new is waiting.
 
 The service is enabled by default at first boot. It runs as a systemd user service, not as root, and makes a lightweight metadata check against the CDN rather than downloading the full image.
 
@@ -36,7 +36,7 @@ Full reference: [docs.shani.dev — System Updates](https://docs.shani.dev/doc/u
 The notification appears as a standard desktop notification:
 
 > **Shani OS update available**
-> Version 2026.05.01 is ready. Run `sudo shnai-deploy` when convenient.
+> Version 2026.05.01 is ready. Run `sudo shani-deploy` when convenient.
 
 Clicking the notification (on GNOME) opens a terminal. On KDE, the notification action can be configured to open Konsole.
 
@@ -114,7 +114,7 @@ When you are ready to apply an available update:
 
 ```bash
 # Download, verify, and stage the update (reboot required to activate)
-sudo shnai-deploy
+sudo shani-deploy
 
 # Simulate without changing anything
 sudo shani-deploy --dry-run
