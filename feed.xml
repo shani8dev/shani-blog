@@ -5,14 +5,14 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Fri, 17 Apr 2026 17:11:24 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 17 Apr 2026 17:11:55 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>Update Notifications on Shani OS — How shani-update Works</title>
       <link>https://blog.shani.dev/post/shani-os-update-notifications</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-update-notifications</guid>
       <description>shani-update is a lightweight background service that watches for new Shani OS images and sends a desktop notification when one is ready — no polling every boot, no forced updates, just a quiet tap on the shoulder when something new is available.</description>
-      <pubDate>Sun, 10 May 2026 18:30:00 GMT</pubDate>
+      <pubDate>Mon, 11 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -21,7 +21,7 @@
       <link>https://blog.shani.dev/post/shani-os-luks-after-installation</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-luks-after-installation</guid>
       <description>Did not enable LUKS2 encryption during installation? This guide walks through adding full-disk encryption to an existing unencrypted Shani OS installation — backing up data, repartitioning with LUKS2, restoring, and enrolling TPM2 for passwordless unlock.</description>
-      <pubDate>Fri, 08 May 2026 18:30:00 GMT</pubDate>
+      <pubDate>Sat, 09 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -30,7 +30,7 @@
       <link>https://blog.shani.dev/post/shani-os-vs-alternatives</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-vs-alternatives</guid>
       <description>An honest technical comparison of immutable Linux distributions. Where Shani OS wins, where others genuinely win, and how to pick the right one for your situation. Btrfs send/receive vs OSTree vs OCI images, gaming focus, enterprise needs, and declarative vs imperative philosophy.</description>
-      <pubDate>Thu, 07 May 2026 18:30:00 GMT</pubDate>
+      <pubDate>Fri, 08 May 2026 00:00:00 GMT</pubDate>
       <category>Engineering</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -39,7 +39,7 @@
       <link>https://blog.shani.dev/post/lxc-lxd-on-shani-os</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/lxc-lxd-on-shani-os</guid>
       <description>LXC and LXD run full Linux system containers on Shani OS — complete OS environments sharing the host kernel, stored in dedicated @lxc and @lxd Btrfs subvolumes that survive every OS update. Lighter than VMs, more complete than Distrobox.</description>
-      <pubDate>Wed, 06 May 2026 18:30:00 GMT</pubDate>
+      <pubDate>Thu, 07 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -48,7 +48,7 @@
       <link>https://blog.shani.dev/post/shani-os-system-configuration</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-system-configuration</guid>
       <description>The /etc OverlayFS on Shani OS means all your configuration changes persist normally across every OS update and rollback. This guide covers editing config files, managing systemd services, enabling services, kernel parameters, and inspecting what you have customised.</description>
-      <pubDate>Tue, 05 May 2026 18:30:00 GMT</pubDate>
+      <pubDate>Wed, 06 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -57,7 +57,7 @@
       <link>https://blog.shani.dev/post/shani-os-audio-pipewire</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-audio-pipewire</guid>
       <description>Shani OS uses PipeWire 1.4.x as its audio stack — simultaneously compatible with ALSA, PulseAudio, and JACK. This guide covers everyday audio management, Bluetooth codec selection, fixing common issues, and setting up low-latency professional audio workflows.</description>
-      <pubDate>Mon, 04 May 2026 18:30:00 GMT</pubDate>
+      <pubDate>Tue, 05 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -66,7 +66,7 @@
       <link>https://blog.shani.dev/post/shani-os-kde-connect</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-kde-connect</guid>
       <description>KDE Connect (KDE edition) and GSConnect (GNOME edition) link your Android phone to your Shani OS desktop — notifications mirrored, files shared, clipboard synced, remote input, SMS from desktop, and media control. Firewall rules are pre-configured.</description>
-      <pubDate>Sun, 03 May 2026 18:30:00 GMT</pubDate>
+      <pubDate>Mon, 04 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -75,7 +75,7 @@
       <link>https://blog.shani.dev/post/shani-os-indian-language-support</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-indian-language-support</guid>
       <description>Indian language support on Shani OS is designed in from the start — not bolted on. Devanagari, Tamil, Telugu, Kannada, Malayalam, Gujarati, Punjabi, Bengali, and more: correct font rendering, IBus multilingual input, and Indian-English locale all configured at first boot.</description>
-      <pubDate>Sat, 02 May 2026 18:30:00 GMT</pubDate>
+      <pubDate>Sun, 03 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -84,7 +84,7 @@
       <link>https://blog.shani.dev/post/appimage-on-shani-os</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/appimage-on-shani-os</guid>
       <description>AppImages are self-contained portable executables that need no installation and work on any Linux system. Gear Lever (pre-installed) integrates them into your desktop launcher, manages updates, and keeps them in persistent storage that survives OS updates.</description>
-      <pubDate>Fri, 01 May 2026 18:30:00 GMT</pubDate>
+      <pubDate>Sat, 02 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -93,7 +93,7 @@
       <link>https://blog.shani.dev/post/snap-on-shani-os</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/snap-on-shani-os</guid>
       <description>Snap is pre-configured on Shani OS with its own @snapd Btrfs subvolume. When to use Snap versus Flatpak, how to install from the Snap Store, and how the two ecosystems coexist.</description>
-      <pubDate>Thu, 30 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Fri, 01 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -102,7 +102,7 @@
       <link>https://blog.shani.dev/post/gen-efi-and-secure-boot</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/gen-efi-and-secure-boot</guid>
       <description>gen-efi is the tool that builds and signs Unified Kernel Images, manages MOK keys for Secure Boot, and enrolls LUKS keys into TPM2. This is the complete reference for every gen-efi operation and the Secure Boot chain on Shani OS.</description>
-      <pubDate>Wed, 29 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Thu, 30 Apr 2026 00:00:00 GMT</pubDate>
       <category>Engineering</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -111,7 +111,7 @@
       <link>https://blog.shani.dev/post/shani-os-accessibility</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-accessibility</guid>
       <description>Shani OS ships a complete accessibility stack at first boot — Orca screen reader with espeak-ng TTS, braille display support via brltty, display magnification, high-contrast themes, keyboard navigation, and assistive technology infrastructure. Nothing to install.</description>
-      <pubDate>Tue, 28 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -120,7 +120,7 @@
       <link>https://blog.shani.dev/post/homebrew-on-shani-os</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/homebrew-on-shani-os</guid>
       <description>Homebrew works on Shani OS exactly as it does on macOS — install it once, use brew install for any of the thousands of formulae. A comparison with Nix to help you choose, and how both coexist.</description>
-      <pubDate>Mon, 27 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -129,7 +129,7 @@
       <link>https://blog.shani.dev/post/shani-os-btrfs-snapshots-and-backup</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-btrfs-snapshots-and-backup</guid>
       <description>How to use Btrfs snapshots for instant point-in-time copies of your home directory, and how to set up real off-device backups with restic and rclone — both pre-installed on Shani OS. Snapshots are not backups. Here is the difference and how to do both.</description>
-      <pubDate>Sun, 26 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Mon, 27 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -138,7 +138,7 @@
       <link>https://blog.shani.dev/post/shani-deploy-reference</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-deploy-reference</guid>
       <description>The complete reference for shani-deploy — the atomic update and rollback tool at the heart of Shani OS. Every flag, every use case, every edge case covered: update, rollback, dry-run, storage-info, cleanup, optimize, and more.</description>
-      <pubDate>Sat, 25 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Sun, 26 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -147,7 +147,7 @@
       <link>https://blog.shani.dev/post/shani-os-bluetooth</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-bluetooth</guid>
       <description>Bluetooth on Shani OS works at first boot for audio, gaming controllers, keyboards, mice, file transfer, and tethering. Paired devices persist across every OS update and rollback. Here is everything you need to know.</description>
-      <pubDate>Fri, 24 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Sat, 25 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -156,7 +156,7 @@
       <link>https://blog.shani.dev/post/shani-os-printing-and-scanning</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-printing-and-scanning</guid>
       <description>How printing and scanning work on Shani OS — driverless IPP-over-USB and network discovery, CUPS configuration, manufacturer-specific drivers for HP, Epson, Brother, Canon, and scanner setup via SANE and sane-airscan.</description>
-      <pubDate>Thu, 23 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Fri, 24 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -165,7 +165,7 @@
       <link>https://blog.shani.dev/post/shani-os-power-management</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-power-management</guid>
       <description>Shani OS configures hibernation automatically at install, manages power profiles out of the box, and handles TPM2-sealed LUKS so the disk unlocks silently on your own hardware. Everything a laptop user needs — with nothing to configure.</description>
-      <pubDate>Wed, 22 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Thu, 23 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -174,7 +174,7 @@
       <link>https://blog.shani.dev/post/shani-os-shell-and-terminal</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-shell-and-terminal</guid>
       <description>Shani OS ships a fully configured, modern shell environment — Zsh with syntax highlighting and autosuggestions, Starship prompt, McFly neural-network history, FZF fuzzy search, and a complete toolkit of CLI tools. Here is how it all fits together.</description>
-      <pubDate>Tue, 21 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Wed, 22 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -183,7 +183,7 @@
       <link>https://blog.shani.dev/post/podman-containers-on-shani-os</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/podman-containers-on-shani-os</guid>
       <description>How to use Podman on Shani OS for rootless containers, Docker Compose workflows, and containerised services — with the Pods GUI, persistent storage in @containers, and full compatibility with the Docker ecosystem.</description>
-      <pubDate>Mon, 20 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Tue, 21 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -192,7 +192,7 @@
       <link>https://blog.shani.dev/post/distrobox-on-shani-os</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/distrobox-on-shani-os</guid>
       <description>How to use Distrobox to run any Linux distribution inside Shani OS — full pacman, apt, dnf, AUR helpers, and GUI apps — without touching the immutable host OS. With BoxBuddy for graphical management.</description>
-      <pubDate>Sun, 19 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Mon, 20 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -201,7 +201,7 @@
       <link>https://blog.shani.dev/post/migrating-to-shani-os</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/migrating-to-shani-os</guid>
       <description>A workflow-by-workflow migration guide for users coming from traditional mutable Linux distributions. Every pacman, apt, and dnf habit has a clean equivalent on Shani OS — here is the full map.</description>
-      <pubDate>Sat, 18 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Sun, 19 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -210,7 +210,7 @@
       <link>https://blog.shani.dev/post/waydroid-android-on-shani-os</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/waydroid-android-on-shani-os</guid>
       <description>Waydroid runs a full hardware-accelerated Android stack inside a lightweight container on Shani OS — full Play Store access, ARM app compatibility, and native GPU performance. Here is how to set it up and get the most out of it.</description>
-      <pubDate>Fri, 17 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Sat, 18 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -219,7 +219,7 @@
       <link>https://blog.shani.dev/post/flatpak-on-shani-os</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/flatpak-on-shani-os</guid>
       <description>How Flatpak works on Shani OS, what apps are pre-installed, how to install more from Flathub, manage permissions with Flatseal, and why sandboxing is the right model for an immutable system.</description>
-      <pubDate>Thu, 16 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Fri, 17 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -228,7 +228,7 @@
       <link>https://blog.shani.dev/post/shani-os-for-researchers-and-hpc</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-for-researchers-and-hpc</guid>
       <description>How Shani OS makes scientific computing reproducible from the ground up — Apptainer for cluster workloads, Nix for pinned environments, GPU passthrough for ML, AMD ROCm for open-source GPU compute, and a GPG-signed host OS that is itself a verifiable artefact.</description>
-      <pubDate>Wed, 15 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Thu, 16 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -237,7 +237,7 @@
       <link>https://blog.shani.dev/post/shani-os-gaming-deep-dive</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-gaming-deep-dive</guid>
       <description>Everything pre-installed on the KDE Plasma edition and why it matters: Steam + Proton, MangoHud, GameScope, Ananicy, kernel tuning, NVIDIA setup, peripheral support, and why immutability makes Shani OS the most reliable gaming OS on Linux.</description>
-      <pubDate>Wed, 15 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Thu, 16 Apr 2026 00:00:00 GMT</pubDate>
       <category>Gaming</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -246,7 +246,7 @@
       <link>https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment</guid>
       <description>How Shani OS eliminates per-device drift, enables one-command remote rollback, automates firmware updates, and makes fleet management genuinely simple — whether you are an OEM shipping hardware or an IT team managing hundreds of machines.</description>
-      <pubDate>Wed, 15 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Thu, 16 Apr 2026 00:00:00 GMT</pubDate>
       <category>Enterprise</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -255,7 +255,7 @@
       <link>https://blog.shani.dev/post/shani-os-virtual-machines</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-virtual-machines</guid>
       <description>How to run fast, hardware-accelerated VMs on Shani OS — setting up KVM with virt-manager, running Windows with VirtIO drivers, GPU passthrough for gaming or ML, and why the @libvirt subvolume keeps your VMs safe across every OS update.</description>
-      <pubDate>Wed, 15 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Thu, 16 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -264,8 +264,8 @@
       <link>https://blog.shani.dev/post/2026-04-15-release-notes</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/2026-04-15-release-notes</guid>
       <description>The April 2026 stable release: fixed UEFI installer, improved shani-deploy reliability, refreshed GNOME 50 and KDE Plasma 6 ISOs, and a full package manifest.</description>
-      <pubDate>Tue, 14 Apr 2026 18:30:00 GMT</pubDate>
-      <lastBuildDate>Tue, 14 Apr 2026 18:30:00 GMT</lastBuildDate>
+      <pubDate>Wed, 15 Apr 2026 00:00:00 GMT</pubDate>
+      <lastBuildDate>Wed, 15 Apr 2026 00:00:00 GMT</lastBuildDate>
       <category>Release</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -274,7 +274,7 @@
       <link>https://blog.shani.dev/post/shani-os-security-deep-dive</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-security-deep-dive</guid>
       <description>Six Linux Security Modules running simultaneously, an immutable root that survives root access, TPM2-sealed encryption, and zero telemetry. Here is exactly how each layer works and why it is on by default.</description>
-      <pubDate>Mon, 13 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Tue, 14 Apr 2026 00:00:00 GMT</pubDate>
       <category>Security</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -283,7 +283,7 @@
       <link>https://blog.shani.dev/post/shani-os-for-everyone</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-for-everyone</guid>
       <description>A practical guide to who Shani OS is for and what it looks like in daily use — whether you are coming from Windows, running a game library, managing a fleet, or doing serious dev work.</description>
-      <pubDate>Sun, 12 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Mon, 13 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -292,7 +292,7 @@
       <link>https://blog.shani.dev/post/shani-os-architecture-deep-dive</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-architecture-deep-dive</guid>
       <description>A detailed walkthrough of how Shani OS is structured on disk — every Btrfs subvolume, every mount, every step from image signing to your running desktop.</description>
-      <pubDate>Sat, 11 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Sun, 12 Apr 2026 00:00:00 GMT</pubDate>
       <category>Engineering</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -301,7 +301,7 @@
       <link>https://blog.shani.dev/post/shani-os-getting-started</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-getting-started</guid>
       <description>A complete walkthrough: download, verify, install, and configure Shani OS from scratch — including Flatpak apps, Nix packages, Distrobox containers, and TPM2 encryption setup.</description>
-      <pubDate>Fri, 10 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Sat, 11 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -310,7 +310,7 @@
       <link>https://blog.shani.dev/post/why-os-updates-should-never-break</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/why-os-updates-should-never-break</guid>
       <description>Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.</description>
-      <pubDate>Thu, 09 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Fri, 10 Apr 2026 00:00:00 GMT</pubDate>
       <category>Engineering</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -319,7 +319,7 @@
       <link>https://blog.shani.dev/post/nix-on-shani-os</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/nix-on-shani-os</guid>
       <description>Why Nix and immutable Linux are a natural match, how to set it up on Shani OS in five minutes, and practical workflows for developers, researchers, and power users.</description>
-      <pubDate>Wed, 08 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Thu, 09 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -328,7 +328,7 @@
       <link>https://blog.shani.dev/post/shani-os-networking-guide</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-networking-guide</guid>
       <description>A practical guide to every network capability built into Shani OS — from WireGuard and Tailscale mesh VPNs to Caddy web server, SSH hardening, remote desktop, and NFS file sharing.</description>
-      <pubDate>Tue, 07 Apr 2026 18:30:00 GMT</pubDate>
+      <pubDate>Wed, 08 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
