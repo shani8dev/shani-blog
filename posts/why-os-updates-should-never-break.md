@@ -3,7 +3,7 @@ title: 'Why Your OS Update Should Never Break Your Computer — And How Shani OS
 slug: why-your-os-update-should-never-break-your-computer
 date: '2026-04-10'
 tag: 'Engineering'
-cover: '/assets/images/shani-os-update-model.png'
+cover: ''
 excerpt: 'Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.'
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
