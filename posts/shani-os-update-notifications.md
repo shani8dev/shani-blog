@@ -4,7 +4,7 @@ title: 'Update Notifications on Shani OS — How shani-update Works'
 date: '2026-05-11'
 tag: 'Guide'
 excerpt: 'shani-update is a lightweight background service that watches for new Shani OS images and sends a desktop notification when one is ready — no polling every boot, no forced updates, just a quiet tap on the shoulder when something new is available.'
-cover: '.png'
+cover: ''
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -16,7 +16,7 @@ readTime: '4 min'
 series: 'Shani OS Guides'
 ---
 
-`shani-update` is a user-level background service that monitors for new Shani OS images on your configured update channel and sends a desktop notification when one is available. It does not apply the update — you always decide when to run `sudo shani-deploy update`. It just makes sure you know when something new is waiting.
+`shani-update` is a user-level background service that monitors for new Shani OS images on your configured update channel and sends a desktop notification when one is available. It does not apply the update — you always decide when to run `sudo shnai-deploy`. It just makes sure you know when something new is waiting.
 
 The service is enabled by default at first boot. It runs as a systemd user service, not as root, and makes a lightweight metadata check against the CDN rather than downloading the full image.
 
@@ -36,7 +36,7 @@ Full reference: [docs.shani.dev — System Updates](https://docs.shani.dev/doc/u
 The notification appears as a standard desktop notification:
 
 > **Shani OS update available**
-> Version 2026.05.01 is ready. Run `sudo shani-deploy update` when convenient.
+> Version 2026.05.01 is ready. Run `sudo shnai-deploy` when convenient.
 
 Clicking the notification (on GNOME) opens a terminal. On KDE, the notification action can be configured to open Konsole.
 
@@ -114,14 +114,12 @@ When you are ready to apply an available update:
 
 ```bash
 # Download, verify, and stage the update (reboot required to activate)
-sudo shani-deploy update
+sudo shnai-deploy
 
 # Simulate without changing anything
 sudo shani-deploy --dry-run
 
-# Check what is available without applying
-sudo shani-deploy --status
-```
+``
 
 For the full update workflow, see [shani-deploy Reference](https://blog.shani.dev/post/shani-deploy-reference).
 
@@ -138,7 +136,6 @@ systemctl --user disable --now shani-update.timer
 You can still check manually at any time:
 
 ```bash
-sudo shani-deploy --status
 sudo shani-deploy --dry-run
 ```
 

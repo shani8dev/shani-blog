@@ -4,7 +4,7 @@ title: 'Migrating to Shani OS from Ubuntu, Fedora, or Arch — A Practical Guide
 date: '2026-04-19'
 tag: 'Guide'
 excerpt: 'A workflow-by-workflow migration guide for users coming from traditional mutable Linux distributions. Every pacman, apt, and dnf habit has a clean equivalent on Shani OS — here is the full map.'
-cover: '/'
+cover: ''
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
