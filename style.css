@@ -516,6 +516,14 @@ horizontal padding, which would cause double-padding (narrower than index).
   max-width: var(--container);
   margin-left: auto;
   margin-right: auto;
+  padding-left: var(--space-8);
+  padding-right: var(--space-8);
+}
+@media (max-width: 600px) {
+  .post-header, .post-body, .post-footer {
+    padding-left: var(--space-5);
+    padding-right: var(--space-5);
+  }
 }
 /* Header and footer span full container width; body respects prose width */
 /* post-header and post-footer already constrained by the shared rule above */
@@ -820,6 +828,10 @@ border-top: 1px solid var(--color-border);
 }
 .post-tags { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-6); }
 .post-nav { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+@media (max-width: 480px) {
+  .post-nav { grid-template-columns: 1fr; }
+  .post-nav-btn--right { text-align: left; }
+}
 .post-nav-btn--empty { border-color: transparent; background: transparent; cursor: default; pointer-events: none; }
 .post-nav-btn { padding: var(--space-5); border: 1px solid var(--color-border); background: var(--color-bg-card); transition: all 0.15s; width: 100%; text-align: left; font-family: var(--font-sans); cursor: pointer; }
 .post-nav-btn:hover { border-color: var(--color-accent); background: var(--color-bg-elevated); }
@@ -886,10 +898,14 @@ padding: 0; border: none; display: block; color: inherit; margin: 0; white-space
   -webkit-mask-image: linear-gradient(to bottom, black 0%, black 50%, transparent 88%);
 }
 .paywall-gate { max-width: var(--max-prose); margin: var(--space-8) auto var(--space-12); padding: 0 var(--space-5); text-align: center; }
+@media (min-width: 601px) { .paywall-gate { padding: 0 var(--space-8); } }
 @media (min-width: 1024px) { .paywall-gate { padding: 0 var(--space-8); } }
 .paywall-card {
 background: var(--color-bg-alt); border: 1px solid var(--color-border);
 border-top: 2px solid var(--color-accent); padding: var(--space-10) var(--space-8);
+}
+@media (max-width: 480px) {
+  .paywall-card { padding: var(--space-8) var(--space-5); }
 }
 .paywall-card h3 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; margin-bottom: var(--space-3); color: var(--color-text); }
 .paywall-card p { color: var(--color-text-muted); margin-bottom: var(--space-6); max-width: 44ch; margin-left: auto; margin-right: auto; line-height: 1.72; }
@@ -1032,12 +1048,19 @@ border-top: 2px solid var(--color-accent); padding: var(--space-10) var(--space-
 .footer__links { display: flex; gap: var(--space-5); margin-left: auto; }
 .footer__links a:hover { color: var(--color-accent); }
 .footer__copy { letter-spacing: 0.04em; }
+@media (max-width: 600px) {
+  .footer__inner { gap: var(--space-3); }
+  .footer__copy { width: 100%; text-align: center; }
+}
 .to-top {
 position: fixed; bottom: var(--space-6); right: var(--space-6);
 width: 36px; height: 36px; border: 1px solid var(--color-border); background: var(--color-bg-elevated);
 color: var(--color-text-muted); display: grid; place-items: center;
 box-shadow: var(--shadow-hover); transition: opacity 0.2s, visibility 0.2s, transform 0.2s, border-color 0.2s, color 0.2s;
 opacity: 0; visibility: hidden; pointer-events: none; z-index: 90; font-size: 0.9rem;
+}
+@media (max-width: 600px) {
+  .to-top { bottom: var(--space-5); right: var(--space-4); }
 }
 .to-top.show { opacity: 1; visibility: visible; pointer-events: auto; }
 .to-top:hover { transform: translateY(-2px); border-color: var(--color-accent); color: var(--color-accent); }
@@ -1174,6 +1197,8 @@ font-family: var(--font-mono); font-size: 0.8rem;
 display: flex; align-items: center; gap: var(--space-2);
 z-index: 9999; opacity: 0; transition: opacity 0.25s, transform 0.25s;
 pointer-events: none;
+max-width: calc(100vw - 2 * var(--space-5));
+white-space: nowrap;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 /* .toast i inherits color: var(--color-bg) from parent — perfect contrast on inverted bg */
@@ -1509,6 +1534,12 @@ margin-left: calc(-1 * var(--space-5));
 margin-right: calc(-1 * var(--space-5));
 }
 }
+@media (max-width: 600px) {
+.post-body .media-figure--wide {
+margin-left: calc(-1 * var(--space-5));
+margin-right: calc(-1 * var(--space-5));
+}
+}
 /* Local video */
 .post-body .media-figure--video video {
 width: 100%; height: auto; display: block;
@@ -1631,6 +1662,16 @@ SERIES STRIP
   overflow: hidden;
   background: var(--color-bg-alt);
 }
+@media (max-width: 600px) {
+  .series-strip {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+  }
+}
 .series-strip__header {
   display: flex; align-items: center; gap: var(--space-2);
   padding: var(--space-3) var(--space-5);
@@ -1696,7 +1737,15 @@ RELATED POSTS
   max-width: var(--max-prose);
   margin: var(--space-12) auto 0;
   padding-top: var(--space-8);
+  padding-left: var(--space-8);
+  padding-right: var(--space-8);
   border-top: 1px solid var(--color-border);
+}
+@media (max-width: 600px) {
+  .related-posts {
+    padding-left: var(--space-5);
+    padding-right: var(--space-5);
+  }
 }
 .related-posts__grid {
   display: grid;
@@ -1763,6 +1812,7 @@ NEWSLETTER BLOCK
   max-width: var(--max-prose);
   margin: var(--space-12) auto 0;
   padding: var(--space-10) var(--space-8);
+  /* horizontal margin keeps it off the screen edge on mobile */
   background: var(--color-bg-alt);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -1811,7 +1861,7 @@ NEWSLETTER BLOCK
 .newsletter-block__status--ok    { color: var(--color-success); }
 .newsletter-block__status--error { color: var(--color-error); }
 @media (max-width: 480px) {
-  .newsletter-block { padding: var(--space-8) var(--space-5); }
+  .newsletter-block { padding: var(--space-8) var(--space-5); margin-left: var(--space-5); margin-right: var(--space-5); }
   .newsletter-block__input { max-width: 100%; }
   .newsletter-block__btn { width: 100%; justify-content: center; }
 }
@@ -2126,6 +2176,14 @@ RECENTLY VIEWED LIST (in Bookmarks view)
   max-width: var(--max-prose);
   margin: var(--space-12) auto 0;
   padding-top: var(--space-8);
+  padding-left: var(--space-8);
+  padding-right: var(--space-8);
+}
+@media (max-width: 600px) {
+  .post-comments {
+    padding-left: var(--space-5);
+    padding-right: var(--space-5);
+  }
 }
 .post-comments .giscus,
 .post-comments .giscus-frame {
