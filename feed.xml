@@ -5,7 +5,7 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Fri, 17 Apr 2026 17:11:55 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 17 Apr 2026 17:14:17 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>Update Notifications on Shani OS — How shani-update Works</title>
