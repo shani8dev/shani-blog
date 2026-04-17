@@ -184,7 +184,7 @@ const CONFIG = {
   //          Leave ADSENSE_SLOT empty to fall back to the house ad instead.
   //          NOTE: client ID is public (it's in your page HTML already).
   ADSENSE_CLIENT: 'ca-pub-8268043375450773',
-  ADSENSE_SLOT:   '',   // ← REQUIRED: set your ad-slot ID to enable AdSense
+  ADSENSE_SLOT:   '8074583713',
   // ── House ad ─────────────────────────────────────────────────
   // [script] Shown mid-post on free posts when AdSense is not configured.
   //          Dismissed per-session. Set HOUSE_AD_ENABLED: false to hide.

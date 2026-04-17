@@ -1498,6 +1498,10 @@ const Renderer = {
 
           if (CONFIG.ADSENSE_CLIENT && CONFIG.ADSENSE_SLOT) {
             // ── Google AdSense unit ───────────────────────────────
+            // The AdSense library is pre-loaded by index.html as soon as
+            // CONFIG is available. By the time a post is opened it is
+            // already loaded (or loading), so we only need to insert the
+            // <ins> element and push it — no second script injection needed.
             adWrap.innerHTML = `
               <ins class="adsbygoogle ad-unit"
                   style="display:block"
@@ -1506,20 +1510,11 @@ const Renderer = {
                   data-ad-format="auto"
                   data-full-width-responsive="true"></ins>`;
             insertAfter.after(adWrap);
-            const pushAd = () => {
+            // Push after a rAF so the <ins> is in the live DOM and
+            // adsbygoogle is initialised (avoids "already defined" errors).
+            requestAnimationFrame(() => {
               try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
-            };
-            if (!document.getElementById('adsense-script')) {
-              const s = document.createElement('script');
-              s.id = 'adsense-script';
-              s.async = true;
-              s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${CONFIG.ADSENSE_CLIENT}`;
-              s.crossOrigin = 'anonymous';
-              s.onload = pushAd;
-              document.head.appendChild(s);
-            } else {
-              pushAd();
-            }
+            });
 
           } else if (CONFIG.HOUSE_AD_ENABLED && !AppState.isMember) {
             // ── House ad — skip if dismissed this session ────────
