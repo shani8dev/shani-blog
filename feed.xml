@@ -5,7 +5,7 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Sat, 18 Apr 2026 10:27:23 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 18 Apr 2026 10:38:38 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>shani-update — The Shani OS Update Manager</title>
@@ -47,7 +47,7 @@
       <title>GPU Compute on Shani OS — NVIDIA CUDA, AMD ROCm, and Intel oneAPI</title>
       <link>https://blog.shani.dev/post/gpu-compute-on-shani-os</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/gpu-compute-on-shani-os</guid>
-      <description>How to run GPU compute workloads on Shani OS — AMD ROCm with PyTorch and TensorFlow, NVIDIA CUDA via Distrobox, Intel oneAPI, HIP for cross-vendor portability, and Nix for pure ML environments. Works for ML, simulation, data science, and scientific computing.</description>
+      <description>How to run GPU compute workloads on Shani OS — setting up AMD ROCm with PyTorch and TensorFlow via Distrobox, NVIDIA CUDA via Distrobox, Intel oneAPI, HIP for cross-vendor portability, and Nix for pure ML environments. Works for ML, simulation, data science, and scientific computing.</description>
       <pubDate>Thu, 07 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
@@ -254,7 +254,7 @@
       <title>Shani OS for Researchers and HPC — Reproducible Environments from Desktop to Cluster</title>
       <link>https://blog.shani.dev/post/shani-os-for-researchers-and-hpc</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-for-researchers-and-hpc</guid>
-      <description>How Shani OS makes scientific computing reproducible from the ground up — Apptainer for cluster workloads, Nix for pinned environments, AMD ROCm and NVIDIA CUDA for GPU compute, DVC for data versioning, and a GPG-signed host OS that is itself a verifiable artefact.</description>
+      <description>How Shani OS makes scientific computing reproducible from the ground up — Apptainer for cluster workloads, Nix for pinned environments, AMD ROCm and NVIDIA CUDA via Distrobox containers, DVC for data versioning, and a GPG-signed host OS that is itself a verifiable artefact.</description>
       <pubDate>Thu, 16 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>

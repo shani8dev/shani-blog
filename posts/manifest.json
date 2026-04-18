@@ -114,7 +114,7 @@
   {
     "slug": "gpu-compute-on-shani-os",
     "title": "GPU Compute on Shani OS — NVIDIA CUDA, AMD ROCm, and Intel oneAPI",
-    "excerpt": "How to run GPU compute workloads on Shani OS — AMD ROCm with PyTorch and TensorFlow, NVIDIA CUDA via Distrobox, Intel oneAPI, HIP for cross-vendor portability, and Nix for pure ML environments. Works for ML, simulation, data science, and scientific computing.",
+    "excerpt": "How to run GPU compute workloads on Shani OS — setting up AMD ROCm with PyTorch and TensorFlow via Distrobox, NVIDIA CUDA via Distrobox, Intel oneAPI, HIP for cross-vendor portability, and Nix for pure ML environments. Works for ML, simulation, data science, and scientific computing.",
     "date": "2026-05-07",
     "updated": "",
     "tag": "Guide",
@@ -758,7 +758,7 @@
   {
     "slug": "shani-os-for-researchers-and-hpc",
     "title": "Shani OS for Researchers and HPC — Reproducible Environments from Desktop to Cluster",
-    "excerpt": "How Shani OS makes scientific computing reproducible from the ground up — Apptainer for cluster workloads, Nix for pinned environments, AMD ROCm and NVIDIA CUDA for GPU compute, DVC for data versioning, and a GPG-signed host OS that is itself a verifiable artefact.",
+    "excerpt": "How Shani OS makes scientific computing reproducible from the ground up — Apptainer for cluster workloads, Nix for pinned environments, AMD ROCm and NVIDIA CUDA via Distrobox containers, DVC for data versioning, and a GPG-signed host OS that is itself a verifiable artefact.",
     "date": "2026-04-16",
     "updated": "",
     "tag": "Guide",
