@@ -5,7 +5,7 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Sat, 18 Apr 2026 09:02:13 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 18 Apr 2026 09:08:04 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>shani-update — The Shani OS Update Manager</title>
@@ -303,15 +303,6 @@
       <description>A complete walkthrough: download, verify, install, and configure Shani OS from scratch — including Flatpak apps, Nix packages, Distrobox containers, and TPM2 encryption setup.</description>
       <pubDate>Sat, 11 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
-      <author>Shrinivas Kumbhar</author>
-    </item>
-    <item>
-      <title>Why Your OS Update Should Never Break Your Computer — And How Shani OS Fixes This</title>
-      <link>https://blog.shani.dev/post/why-os-updates-should-never-break-v2</link>
-      <guid isPermaLink="true">https://blog.shani.dev/post/why-os-updates-should-never-break-v2</guid>
-      <description>Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.</description>
-      <pubDate>Fri, 10 Apr 2026 00:00:00 GMT</pubDate>
-      <category>Engineering</category>
       <author>Shrinivas Kumbhar</author>
     </item>
     <item>

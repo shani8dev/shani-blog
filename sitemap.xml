@@ -224,12 +224,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://blog.shani.dev/post/why-os-updates-should-never-break-v2</loc>
-    <lastmod>2026-04-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://blog.shani.dev/post/why-os-updates-should-never-break</loc>
     <lastmod>2026-04-10</lastmod>
     <changefreq>monthly</changefreq>
