@@ -5,7 +5,7 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Sat, 18 Apr 2026 17:29:35 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 18 Apr 2026 18:11:41 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>shani-update — The Shani OS Update Manager</title>
@@ -17,10 +17,10 @@
       <author>Shrinivas Kumbhar</author>
     </item>
     <item>
-      <title>Adding LUKS2 Encryption After Installation on Shani OS</title>
+      <title>LUKS2 Encryption on Shani OS — Setup, Management, and Recovery</title>
       <link>https://blog.shani.dev/post/shani-os-luks-after-installation</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-luks-after-installation</guid>
-      <description>Did not enable LUKS2 encryption during installation? This guide walks through adding full-disk encryption to an existing unencrypted Shani OS installation — backing up data, repartitioning with LUKS2, restoring, and enrolling TPM2 for passwordless unlock.</description>
+      <description>Full-disk encryption must be enabled at install time on Shani OS. This guide covers what to do if you missed it, and the complete reference for managing LUKS2 on an already-encrypted system: keyslots, passphrases, keyfiles, header backup, TPM2, and emergency recovery.</description>
       <pubDate>Sat, 09 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
