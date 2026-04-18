@@ -5,7 +5,7 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Sat, 18 Apr 2026 11:23:04 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 18 Apr 2026 11:47:08 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>shani-update — The Shani OS Update Manager</title>
@@ -202,6 +202,15 @@
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-power-management</guid>
       <description>Shani OS configures hibernation automatically at install, manages power profiles out of the box, and handles TPM2-sealed LUKS so the disk unlocks silently on your own hardware. Everything a laptop user needs — with nothing to configure.</description>
       <pubDate>Thu, 23 Apr 2026 00:00:00 GMT</pubDate>
+      <category>Guide</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+    <item>
+      <title>Shani OS as a Home Server — Self-Host Everything, No Public IP Required</title>
+      <link>https://blog.shani.dev/post/shani-os-home-server</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-home-server</guid>
+      <description>Turn any PC, mini PC, or old laptop into a modern home server running Shani OS. Media streaming, file sync, AI models, home automation, password management, and more — all accessible from anywhere without a public IP address or port forwarding.</description>
+      <pubDate>Wed, 22 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
