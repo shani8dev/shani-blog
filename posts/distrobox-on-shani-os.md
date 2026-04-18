@@ -311,7 +311,7 @@ All of these are available on Shani OS simultaneously and serve distinct roles:
 
 **Use Podman when:**
 - You want OCI containers for services, databases, or development — rootless and Docker-compatible
-- Guide: [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os)
+- Guide: [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os) · What to run: [Shani OS as a Home Server](https://blog.shani.dev/post/shani-os-home-server)
 
 **Use LXC/LXD or systemd-nspawn when:**
 - You need a full isolated Linux system with its own init, services, and network stack — lighter than a VM but more complete than Distrobox
@@ -394,6 +394,8 @@ Full troubleshooting reference: [docs.shani.dev — Distrobox](https://docs.shan
 
 - [docs.shani.dev — Distrobox](https://docs.shani.dev/doc/software/distrobox) — full reference
 - [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — Podman and all container runtimes
+- [Shani OS as a Home Server](https://blog.shani.dev/post/shani-os-home-server) — what to self-host with Podman
+- [docs.shani.dev/servers](https://docs.shani.dev/servers) — self-hosting wiki with ready-to-run commands for every service
 - [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — GUI applications
 - [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os) — Snap Store apps
 - [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os) — portable apps with Gear Lever

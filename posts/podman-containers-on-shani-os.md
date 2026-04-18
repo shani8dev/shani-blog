@@ -102,16 +102,14 @@ export DOCKER_HOST=unix:///run/user/$UID/podman/podman.sock
 ### PostgreSQL
 
 ```bash
-# Create a persistent volume for data
 podman volume create postgres-data
 
-# Run PostgreSQL
 podman run -d \
   --name postgres \
   -e POSTGRES_PASSWORD=secret \
   -e POSTGRES_DB=mydb \
   -v postgres-data:/var/lib/postgresql/data \
-  -p 5432:5432 \
+  -p 127.0.0.1:5432:5432 \
   postgres:16
 
 # Connect with psql
@@ -129,8 +127,8 @@ systemctl --user enable --now container-postgres.service
 ```bash
 podman run -d \
   --name redis \
-  -p 6379:6379 \
-  redis:latest
+  -p 127.0.0.1:6379:6379 \
+  redis:7-alpine redis-server --appendonly yes
 
 # Test it
 podman exec -it redis redis-cli ping
@@ -143,13 +141,15 @@ podman volume create gitea-data
 
 podman run -d \
   --name gitea \
-  -p 3000:3000 \
-  -p 222:22 \
+  -p 127.0.0.1:3000:3000 \
+  -p 127.0.0.1:2222:22 \
   -v gitea-data:/data \
   gitea/gitea:latest
 
 # Access at http://localhost:3000
 ```
+
+For the full catalogue of self-hosted services you can run with Podman — media, AI, home automation, security, productivity, databases, mail, VPNs, and more — see [Shani OS as a Home Server](https://blog.shani.dev/post/shani-os-home-server) and the self-hosting wiki at [docs.shani.dev/servers](https://docs.shani.dev/servers).
 
 ---
 
@@ -351,7 +351,7 @@ podman system prune -af --volumes
 
 Podman is one of several container and app options on Shani OS. Here is where each one fits:
 
-**Podman** (this guide) — OCI containers for services, databases, and development workflows. Rootless, Docker-compatible, daemon-free. Persistent data lives in `@containers`.
+**Podman** (this guide) — OCI containers for services, databases, and development workflows. Rootless, Docker-compatible, daemon-free. Persistent data lives in `@containers`. For what you can self-host with it, see [Shani OS as a Home Server](https://blog.shani.dev/post/shani-os-home-server).
 
 **Distrobox** — a layer on top of Podman that provides a mutable Linux environment with home directory sharing. For `apt install`, `pacman -S`, AUR access, and tools that need a traditional filesystem layout. Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
 
@@ -368,6 +368,8 @@ Podman is one of several container and app options on Shani OS. Here is where ea
 ## Resources
 
 - [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — full Podman and container reference
+- [Shani OS as a Home Server](https://blog.shani.dev/post/shani-os-home-server) — what to self-host and how to access it remotely
+- [docs.shani.dev/servers](https://docs.shani.dev/servers) — self-hosting wiki with ready-to-run commands for every service
 - [docs.shani.dev — Distrobox](https://docs.shani.dev/doc/software/distrobox) — mutable dev containers with full distro package managers
 - [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — using apt, pacman, yay inside Shani OS
 - [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os) — full system containers

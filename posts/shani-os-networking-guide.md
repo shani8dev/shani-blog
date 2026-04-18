@@ -50,6 +50,19 @@ The available protocols are: OpenVPN, WireGuard, L2TP/IPsec, PPTP, IKEv2/strongS
 
 For detailed setup including certificate configuration: [docs.shani.dev — VPN Protocols](https://docs.shani.dev/doc/networking/networkmanager-vpn).
 
+### Self-Hosted VPN Servers
+
+Beyond client VPN connections, you can run your own VPN server on Shani OS using Podman. Options include:
+
+- **WG-Easy** — WireGuard with a web UI for managing peers and QR codes
+- **Headscale + Headplane** — fully self-hosted Tailscale-compatible control server with dashboard
+- **Pritunl** — enterprise-grade WireGuard/OpenVPN server with SSO and audit logging
+- **Firezone** — zero-trust WireGuard access with OIDC/SAML integration
+- **Cloudflared** — expose services through Cloudflare's network without opening any inbound ports
+- **Nebula, ZeroTier, NetBird** — decentralized mesh networking alternatives
+
+Full guide with ready-to-run Podman commands for all of these: [docs.shani.dev/servers/vpn-tunnels](https://docs.shani.dev/servers/vpn-tunnels).
+
 ---
 
 ## Tailscale
@@ -143,7 +156,7 @@ Full guide: [docs.shani.dev — OpenSSH](https://docs.shani.dev/doc/networking/o
 
 Caddy is pre-installed with automatic HTTPS via Let's Encrypt. It is the simplest way to serve a web application or host a local service with a valid TLS certificate.
 
-The configuration file is `/etc/caddy/Caddyfile`. Changes persist via the `/etc` OverlayFS.
+The configuration file is `/etc/caddy/Caddyfile`. Changes persist via the `/etc` OverlayFS. TLS certificates and ACME state are stored in `/var/lib/caddy/.local/share/caddy/` and survive OS updates and rollbacks automatically.
 
 ### Basic configuration examples
 
@@ -159,11 +172,23 @@ app.yourdomain.com {
     reverse_proxy localhost:3000
 }
 
-# Local-only service (no HTTPS needed)
-:8080 {
-    reverse_proxy localhost:8000
+# Local-only service with internal TLS (no public domain needed)
+myapp.lan {
+    tls internal
+    reverse_proxy localhost:8080
+}
+
+# Load balance across replicas
+lb.example.com {
+    reverse_proxy localhost:3001 localhost:3002 localhost:3003 {
+        lb_policy round_robin
+        health_uri /health
+        health_interval 10s
+    }
 }
 ```
+
+> 💡 **Tip**: Always bind container ports to `127.0.0.1` (e.g., `-p 127.0.0.1:3000:3000`) and proxy them through Caddy. This ensures services are only accessible via HTTPS.
 
 ```bash
 # Enable and start Caddy
@@ -172,12 +197,28 @@ sudo systemctl enable --now caddy
 # Reload configuration without downtime
 sudo systemctl reload caddy
 
+# Validate syntax before reloading
+caddy validate --config /etc/caddy/Caddyfile
+
 # Check status and certificate info
 systemctl status caddy
 sudo caddy certificates
 ```
 
-For Cloudflare DNS validation (needed for internal/private domains): [docs.shani.dev — Caddy Web Server](https://docs.shani.dev/doc/servers/caddy).
+### Caddy + Authelia (SSO for self-hosted services)
+
+Caddy pairs well with Authelia to add two-factor authentication in front of any self-hosted service:
+
+```caddyfile
+service.example.com {
+    forward_auth localhost:9091 {
+        uri /api/verify?rd=https://auth.example.com
+    }
+    reverse_proxy localhost:8080
+}
+```
+
+For Cloudflare DNS validation (needed for internal/private domains), internal CA trust setup, and advanced auth configuration: [docs.shani.dev/servers/caddy](https://docs.shani.dev/servers/caddy).
 
 ---
 
@@ -426,7 +467,21 @@ restic -r s3:s3.amazonaws.com/mybucket backup ~/Documents ~/Projects
 restic -r s3:s3.amazonaws.com/mybucket snapshots
 ```
 
-Full guide: [docs.shani.dev — Backup (rclone/restic)](https://docs.shani.dev/doc/networking/backup).
+For self-hosted backup targets, MinIO provides an S3-compatible object storage server you can run locally via Podman — making it possible to keep backups entirely on-premises with no third-party cloud involved. For Restic, Borgmatic, Duplicati, Rclone, and MinIO with full container commands: [docs.shani.dev/servers/backups-sync](https://docs.shani.dev/servers/backups-sync).
+
+Full host-level guide: [docs.shani.dev — Backup (rclone/restic)](https://docs.shani.dev/doc/networking/backup).
+
+---
+
+## Network Services via Podman
+
+Any network service can also run as a rootless Podman container on Shani OS — surviving every OS update untouched. The self-hosting wiki at [docs.shani.dev/servers](https://docs.shani.dev/servers) covers ready-to-run commands for:
+
+- **[VPN & Tunnels](https://docs.shani.dev/servers/vpn-tunnels)** — WireGuard/WG-Easy, Headscale + Headplane (self-hosted Tailscale), Cloudflared, Pritunl, Firezone, Nebula, ZeroTier, NetBird
+- **[Network & Analytics](https://docs.shani.dev/servers/networking)** — Pi-hole, AdGuard Home, Nginx Proxy Manager, Traefik, SearXNG, Plausible, Umami, Unbound, Homepage dashboard, Speedtest Tracker
+- **[Caddy](https://docs.shani.dev/servers/caddy)** — reverse proxy reference with auth, load balancing, and TLS configuration
+- **[Mail Servers](https://docs.shani.dev/servers/mail)** — Mailcow, Mailu, Stalwart, Roundcube, SnappyMail
+- **[Backups & Sync](https://docs.shani.dev/servers/backups-sync)** — Restic, Rclone, MinIO, Duplicati, Borgmatic
 
 ---
 
