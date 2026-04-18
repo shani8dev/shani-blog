@@ -17,7 +17,7 @@ readTime: '9 min'
 series: 'Shani OS Guides'
 ---
 
-QEMU/KVM on Shani OS runs VMs with near-native performance. The virtualisation stack — QEMU, libvirt, virt-manager, OVMF (UEFI for VMs), VirtIO drivers, Spice, and looking-glass — is pre-installed on the KDE Plasma edition and available via Flatpak on GNOME.
+QEMU/KVM on Shani OS runs VMs with near-native performance. The virtualisation stack is delivered via Flatpak on both editions: the KDE Plasma edition ships `org.virt_manager.virt-manager` and `org.virt_manager.virt_manager.Extension.Qemu` pre-installed; the GNOME edition ships GNOME Boxes (`org.gnome.Boxes`) pre-installed as a Flatpak. OVMF (UEFI for VMs), VirtIO drivers, Spice, and looking-glass are available via Flatpak on both. There is no system QEMU package — all VM tooling runs through the Flatpak stack, which bundles its own QEMU.
 
 VM disk images live in the `@libvirt` and `@qemu` Btrfs subvolumes, which use the `nodatacow` mount option — CoW is disabled for VM disks to avoid write amplification and improve I/O performance. These subvolumes are completely independent of the OS slots; your VMs survive every OS update and rollback untouched.
 
@@ -53,25 +53,33 @@ dmesg | grep -i iommu | head -5
 
 ## Setting Up virt-manager
 
-virt-manager is the GUI frontend for libvirt and QEMU/KVM. On KDE Plasma, it is pre-installed. On GNOME:
+virt-manager is the GUI frontend for libvirt and QEMU/KVM. On the KDE Plasma edition it is pre-installed as a Flatpak. On the GNOME edition, GNOME Boxes is pre-installed instead — see the GNOME Boxes section below. To install virt-manager on the GNOME edition:
 
 ```bash
-# Install via Flatpak on GNOME
 flatpak install flathub org.virt_manager.virt-manager
+flatpak install flathub org.virt_manager.virt_manager.Extension.Qemu
 ```
 
-Enable the libvirt daemon:
+Launch virt-manager:
 
 ```bash
-sudo systemctl enable --now libvirtd
-sudo usermod -aG libvirt $USER
-# Log out and back in for the group change to take effect
+flatpak run org.virt_manager.virt-manager
 ```
 
-Launch virt-manager from the applications menu or:
+---
+
+## GNOME Boxes (GNOME Edition)
+
+GNOME Boxes is pre-installed on the GNOME edition as a Flatpak (`org.gnome.Boxes`) and provides a simple interface for creating and running VMs. It handles QEMU/KVM automatically without manual libvirt configuration.
+
+To create a VM in GNOME Boxes: open Boxes → click **+** → **Create a Virtual Machine** → select your ISO. Boxes configures sensible defaults automatically.
+
+For advanced VM configuration (CPU pinning, GPU passthrough, custom XML), use virt-manager instead — install it via Flatpak:
 
 ```bash
-virt-manager
+flatpak install flathub org.virt_manager.virt-manager
+flatpak install flathub org.virt_manager.virt_manager.Extension.Qemu
+flatpak run org.virt_manager.virt-manager
 ```
 
 ---
@@ -237,7 +245,7 @@ nix-env -iA nixpkgs.looking-glass-client
 looking-glass-client
 ```
 
-Full GPU passthrough guide: [docs.shani.dev — Virtual Machines](https://docs.shani.dev/doc/software/vms).
+Full GPU passthrough guide: [docs.shani.dev — Virtual Machines](https://docs.shani.dev/doc/software/vms). For gaming-specific passthrough setup (single-GPU, Looking Glass, Proton integration): [Gaming on Shani OS](https://blog.shani.dev/post/shani-os-gaming-deep-dive).
 
 ---
 
@@ -258,55 +266,26 @@ macOS VMs are useful for iOS development, cross-platform testing, and running ma
 
 ---
 
-## systemd-nspawn Containers
-
-For lighter-weight isolation — closer to containers than VMs — `systemd-nspawn` provides OS-level virtualisation using the host kernel. It is pre-installed and state lives in `@machines`:
-
-```bash
-# Create an Arch Linux container
-sudo machinectl pull-tar --verify=no \
-    https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-basic.tar.zst \
-    archlinux
-
-# Start the container
-sudo machinectl start archlinux
-
-# Log in
-sudo machinectl login archlinux
-
-# List running containers
-machinectl list
-```
-
-nspawn containers are faster to start than full VMs and share the host kernel, but provide less isolation. Use Distrobox for development containers with full home directory integration, and nspawn for system-level isolation.
-
----
-
 ## VM Snapshots and Backup
 
+Snapshots are managed through virt-manager's GUI: right-click a VM → **Manage Snapshots** → **+** to create, or select a snapshot and click **Revert** to restore.
+
+VM disk images are qcow2 files stored in the `@libvirt` subvolume. To back one up, shut down the VM first then copy the image:
+
 ```bash
-# Create a VM snapshot via virsh
-virsh snapshot-create-as --domain vmname \
-    --name "before-update-$(date +%Y%m%d)" \
-    --description "Pre-update snapshot"
+# Find your VM disk image location in virt-manager:
+# VM details → Storage → note the image path (e.g. /var/lib/libvirt/images/vmname.qcow2)
 
-# List snapshots
-virsh snapshot-list vmname
-
-# Revert to a snapshot
-virsh snapshot-revert vmname snapshot-name
-
-# Delete a snapshot
-virsh snapshot-delete vmname snapshot-name
-
-# Backup a VM disk image
-rsync -avz /var/lib/libvirt/images/vmname.qcow2 backup-destination/
+# Back up the disk image (VM must be shut down)
+rsync -avz /var/lib/libvirt/images/vmname.qcow2 /path/to/backup/
 ```
 
-VM disk images live in `/var/lib/libvirt/images/`, which maps to the `@libvirt` subvolume. Btrfs snapshots of this subvolume provide instant, space-efficient backups:
+Note: `qemu-img` is bundled inside the virt-manager Flatpak and is not on your system PATH. For image conversion or compression, use the Btrfs snapshot approach below — it is faster, space-efficient, and covers all VMs at once.
+
+Btrfs snapshots of the `@libvirt` subvolume provide instant, space-efficient backups of all VMs at once:
 
 ```bash
-# Snapshot the entire @libvirt subvolume
+# Snapshot all VM disks at once (VMs should be shut down for consistency)
 sudo btrfs subvolume snapshot /var/lib/libvirt /snapshots/libvirt-$(date +%Y%m%d)
 ```
 
@@ -314,23 +293,18 @@ sudo btrfs subvolume snapshot /var/lib/libvirt /snapshots/libvirt-$(date +%Y%m%d
 
 ## Networking VMs
 
-By default, libvirt creates a NAT network (`virbr0`) — VMs can access the internet but are not accessible from outside the host. For VMs that need to be directly accessible on your LAN, use a bridge:
+virt-manager's Flatpak uses QEMU's user-mode networking (slirp) by default — VMs can access the internet and the host can reach the VM via its local IP, but the VM is not directly visible on your LAN.
+
+To find the VM's IP address, check inside the guest:
 
 ```bash
-# Create a bridge via NetworkManager
-nmcli connection add type bridge con-name br0 ifname br0
-nmcli connection add type bridge-slave con-name br0-eth ifname eth0 master br0
-nmcli connection up br0
-
-# Use br0 in virt-manager: VM → Add Hardware → NIC → Source: br0
+# Inside a Linux VM
+ip addr show
 ```
 
-For a simpler setup where only the host needs to access the VM, the default NAT network works fine. Access the VM via its local IP:
+For a Windows VM, check Settings → Network or run `ipconfig` in cmd.
 
-```bash
-# List VMs and their IP addresses
-virsh net-dhcp-leases default
-```
+For VMs that need to be accessible from other machines on your LAN, a macvtap interface is the practical option without a system libvirt installation. In virt-manager → VM details → NIC → change Source to **macvtap** and mode to **Bridge**.
 
 Full networking guide: [Networking on Shani OS](https://blog.shani.dev/post/shani-os-networking-guide).
 
@@ -352,6 +326,8 @@ These activate automatically when the relevant hypervisor is detected. No manual
 
 - [docs.shani.dev — Virtual Machines](https://docs.shani.dev/doc/software/vms) — full KVM/libvirt reference
 - [docs.shani.dev — VM Issues](https://docs.shani.dev/doc/troubleshooting) — troubleshooting
+- [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os) — lightweight system containers without a daemon
+- [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os) — full system containers lighter than VMs
 - [Distrobox on Shani OS](https://docs.shani.dev/doc/software/distrobox) — lighter-weight containers with full distro package managers
 - [Gaming on Shani OS — GPU Passthrough](https://blog.shani.dev/post/shani-os-gaming-deep-dive) — gaming-focused GPU passthrough details
 

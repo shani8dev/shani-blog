@@ -141,6 +141,7 @@ cd squashfs-root
 - [docs.shani.dev — AppImage](https://docs.shani.dev/doc/software/appimage) — full reference
 - [appimagehub.com](https://www.appimagehub.com) — AppImage catalogue
 - [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — the primary GUI app ecosystem
+- [Telegram community](https://t.me/shani8dev)
 
 ---
 

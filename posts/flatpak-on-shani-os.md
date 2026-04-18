@@ -53,7 +53,7 @@ Both editions ship with these apps pre-installed and ready at first boot:
 
 **GNOME Edition additionally includes:** GNOME's full suite of productivity and utility apps — Calculator, Calendar, Clocks, Maps, Weather, Text Editor, Loupe (image viewer), Papers (PDF viewer), Decibels (audio), Showtime (video), Snapshot (camera), Simple Scan, Sound Recorder, Font Viewer, Characters, Notes (Gnote), Seahorse (keys), Secrets (passwords), Connections (remote desktop), Network Displays, Extension Manager, Meld (diff), Impression (USB writer), Drawing, Fragments (torrents), Shortwave (internet radio), and a selection of games.
 
-**KDE Plasma Edition additionally includes:** The complete gaming stack (Steam, Heroic, Lutris, RetroArch, Bottles, GOverlay, Oversteer, Piper, OpenRGB, AntiMicroX), KDE productivity apps (Okular, Gwenview, Elisa, Haruna, Kate, KolourPaint, Kompare, Kamoso, KRDC, ISO Image Writer, KGet, KTorrent, KCalc, Skanlite), a selection of KDE games, virt-manager with QEMU extension, and the Kvantum theme engine.
+**KDE Plasma Edition additionally includes:** The complete gaming stack (Steam, Heroic, Lutris, RetroArch, Bottles, GOverlay, Oversteer, Piper, OpenRGB, AntiMicroX), KDE productivity apps (Okular, Gwenview, Elisa, Haruna, Kate, KolourPaint, Kompare, Kamoso, KRDC, ISO Image Writer, KGet, KTorrent, KCalc, Skanlite), a selection of KDE games, virt-manager with QEMU extension (the Flatpak bundles its own QEMU — there is no system QEMU package; see [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines)), and the Kvantum theme engine.
 
 ---
 

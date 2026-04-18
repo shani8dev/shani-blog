@@ -7,8 +7,13 @@ excerpt: 'Everything pre-installed on the KDE Plasma edition and why it matters:
 cover: ''
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
+author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
+author_initials: 'SK'
+author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
+author_github: 'https://github.com/shrinivasvkumbhar'
+author_website: 'https://shani.dev'
 readTime: '10 min'
-series: 'Shani OS Guides'
+series: 'Shani OS Deep Dives'
 ---
 
 The KDE Plasma edition of Shani OS ships a complete, pre-configured gaming stack. Not a collection of packages you need to configure — a stack that works at first boot, tuned for low-latency gaming, with every major launcher ready, NVIDIA drivers configured, and peripherals detected automatically.
@@ -116,6 +121,8 @@ prime-run game-binary
 ```
 
 If NVIDIA drivers do not load on first boot, check Secure Boot configuration: [docs.shani.dev — NVIDIA Setup](https://docs.shani.dev/doc/troubleshooting).
+
+For GPU passthrough — dedicating a discrete GPU entirely to a Windows VM for native gaming performance — see the full VFIO setup in [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
 
 ---
 

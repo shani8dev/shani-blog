@@ -249,6 +249,8 @@ distrobox enter dev
 
 Distrobox containers live in `@containers` and also survive OS updates. Guide: [docs.shani.dev — Distrobox](https://docs.shani.dev/doc/software/distrobox).
 
+If you are coming from macOS and `brew install` is muscle memory, Homebrew also works on Shani OS — it installs to `/home/linuxbrew/.linuxbrew`, completely outside the read-only root. See [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os).
+
 ---
 
 ## Resources

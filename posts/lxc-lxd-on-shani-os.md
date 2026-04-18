@@ -24,24 +24,28 @@ Full reference: [docs.shani.dev — Containers](https://docs.shani.dev/doc/softw
 
 ---
 
-## LXC vs LXD vs Distrobox vs Podman
+## LXC vs LXD vs Distrobox vs Podman vs nspawn
 
 Choosing the right container type:
 
-| | Distrobox | Podman | LXD | QEMU/KVM |
-|---|---|---|---|---|
-| Purpose | Dev/app containers | OCI app containers | System containers | Full VMs |
-| Shares home dir | Yes (by default) | No | No | No |
-| Full init system | No | No | Yes | Yes |
-| Kernel | Host | Host | Host | Own kernel |
-| Startup time | ~1s | ~0.1s | ~3s | ~30s |
-| Isolation | Low–medium | Medium | High | Full |
+| | Distrobox | Podman | systemd-nspawn | LXD | QEMU/KVM |
+|---|---|---|---|---|---|
+| Purpose | Dev/app containers | OCI app containers | Lightweight system containers | Full system containers | Full VMs |
+| Shares home dir | Yes (by default) | No | No | No | No |
+| Full init system | No | No | Yes | Yes | Yes |
+| Kernel | Host | Host | Host | Host | Own kernel |
+| Startup time | ~1s | ~0.1s | ~1s | ~3s | ~30s |
+| Daemon required | No | No | No | Yes (socket) | Yes |
+| Isolation | Low–medium | Medium | High | High | Full |
 
 **Use LXD when:**
 - You need a complete isolated server environment (web server, database, multiple services)
 - You want strong isolation but not the overhead of a full VM
 - You are testing system configurations, init systems, or system-level software
 - You want multiple isolated "machines" that boot quickly
+- You need LXD's image catalog, built-in port forwarding devices, or remote container management
+
+**Use systemd-nspawn when** you want the same full-system isolation as LXD with less setup — no init wizard, no daemon, no image format. Pull a tar and start. See [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os).
 
 ---
 
@@ -216,37 +220,11 @@ lxc exec pg16 -- apt install -y postgresql-16
 
 ---
 
-## systemd-nspawn (Lighter Alternative)
-
-`systemd-nspawn` is a lighter container mechanism pre-installed on Shani OS. Containers live in `@machines` subvolume:
-
-```bash
-# Create an Arch container with machinectl
-sudo machinectl pull-tar --verify=no \
-  https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-basic.tar.zst \
-  archlinux
-
-# Start the container
-sudo machinectl start archlinux
-
-# Login
-sudo machinectl login archlinux
-
-# List running containers
-machinectl list
-
-# Stop
-sudo machinectl stop archlinux
-```
-
-systemd-nspawn containers start in about one second and use less memory than LXD containers, but have fewer features (no built-in networking bridge, no snapshot GUI, no image management).
-
----
-
 ## Resources
 
 - [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — LXC/LXD and all container runtimes reference
 - [LXD documentation](https://documentation.ubuntu.com/lxd/)
+- [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os) — lighter system containers with no daemon or setup
 - [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — dev containers with home directory sharing
 - [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full VMs for hardware-level isolation
 - [Telegram community](https://t.me/shani8dev)
