@@ -164,6 +164,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://blog.shani.dev/post/shani-os-networking-guide</loc>
+    <lastmod>2026-04-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://blog.shani.dev/post/shani-os-shell-and-terminal</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>monthly</changefreq>
@@ -262,12 +268,6 @@
   <url>
     <loc>https://blog.shani.dev/post/nix-on-shani-os</loc>
     <lastmod>2026-04-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://blog.shani.dev/post/shani-os-networking-guide</loc>
-    <lastmod>2026-04-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

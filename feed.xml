@@ -5,7 +5,7 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Sat, 18 Apr 2026 14:11:51 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 18 Apr 2026 16:36:06 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>shani-update — The Shani OS Update Manager</title>
@@ -215,6 +215,15 @@
       <author>Shrinivas Kumbhar</author>
     </item>
     <item>
+      <title>Networking on Shani OS — VPNs, Tailscale, SSH, Caddy, and More</title>
+      <link>https://blog.shani.dev/post/shani-os-networking-guide</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-networking-guide</guid>
+      <description>A practical guide to every network capability built into Shani OS — from WireGuard and Tailscale mesh VPNs to Caddy reverse proxy, SSH hardening, Cloudflare tunnels, LAN file sharing, brute-force protection, and enterprise services.</description>
+      <pubDate>Wed, 22 Apr 2026 00:00:00 GMT</pubDate>
+      <category>Guide</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+    <item>
       <title>The Shell Experience on Shani OS — Zsh, Starship, McFly, FZF, and More</title>
       <link>https://blog.shani.dev/post/shani-os-shell-and-terminal</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-shell-and-terminal</guid>
@@ -365,15 +374,6 @@
       <guid isPermaLink="true">https://blog.shani.dev/post/nix-on-shani-os</guid>
       <description>Why Nix and immutable Linux are a natural match, how to set it up on Shani OS in five minutes, and practical workflows for developers, researchers, and power users.</description>
       <pubDate>Thu, 09 Apr 2026 00:00:00 GMT</pubDate>
-      <category>Guide</category>
-      <author>Shrinivas Kumbhar</author>
-    </item>
-    <item>
-      <title>Networking on Shani OS — VPNs, Tailscale, SSH, Caddy, and More</title>
-      <link>https://blog.shani.dev/post/shani-os-networking-guide</link>
-      <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-networking-guide</guid>
-      <description>A practical guide to every network capability built into Shani OS — from WireGuard and Tailscale mesh VPNs to Caddy web server, SSH hardening, remote desktop, and NFS file sharing.</description>
-      <pubDate>Wed, 08 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
