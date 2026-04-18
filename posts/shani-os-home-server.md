@@ -148,6 +148,61 @@ Full setup: [docs.shani.dev — VPN & Tunnels](https://docs.shani.dev/doc/server
 
 ---
 
+## HTTPS for Local Services — Caddy
+
+Every service on your home server should be reachable via HTTPS — even on your LAN. Without it, browsers warn about insecure connections, WebSockets behave inconsistently, and some apps (like Vaultwarden) require HTTPS for full functionality.
+
+Caddy is pre-installed on Shani OS and handles this automatically. It provisions and renews TLS certificates via Let's Encrypt for public domains, and via its own built-in CA for private `.home.local` addresses — no certificate warnings, no manual renewal, no Certbot cron job.
+
+Always bind container ports to `127.0.0.1` so services are not directly exposed to the network, then proxy through Caddy:
+
+```bash
+sudo systemctl enable --now caddy
+caddy validate --config /etc/caddy/Caddyfile    # validate before reloading
+sudo systemctl reload caddy                      # zero-downtime reload
+```
+
+Config file: `/etc/caddy/Caddyfile`. Changes persist across OS updates.
+
+```caddyfile
+# Public domain — HTTPS via Let's Encrypt (DNS must point to your server)
+jellyfin.yourdomain.com {
+    reverse_proxy localhost:8096
+}
+
+# Private .home.local domain — HTTPS via Caddy's internal CA (LAN only)
+jellyfin.home.local {
+    tls internal
+    reverse_proxy localhost:8096
+}
+
+nextcloud.home.local {
+    tls internal
+    reverse_proxy localhost:8080
+}
+
+# Protect any service with SSO via Authelia
+vault.yourdomain.com {
+    forward_auth localhost:9091 {
+        uri /api/verify?rd=https://auth.yourdomain.com
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
+    reverse_proxy localhost:8180
+}
+```
+
+For `.home.local` addresses, trust Caddy's internal CA once so browsers accept the certificates:
+
+```bash
+sudo trust anchor \
+  /var/lib/caddy/.local/share/caddy/pki/authorities/local/root.crt
+sudo update-ca-trust
+```
+
+Full guide: [docs.shani.dev — Caddy](https://docs.shani.dev/doc/networking/caddy).
+
+---
+
 ## What You Can Run
 
 The self-hosting wiki at [docs.shani.dev/doc/servers](https://docs.shani.dev/doc/servers) has ready-to-run Podman commands for every service below.
@@ -355,7 +410,7 @@ podman auto-update
 Shani OS updates atomically in the background. The new OS image is staged while everything keeps running, then activated on the next reboot. Your containers are entirely untouched. If something is wrong after an update:
 
 ```bash
-sudo shani-deploy --rollback
+sudo shani-deploy -r
 ```
 
 That is the entire recovery procedure. No rescue mode, no package manager archaeology, no manual state reconstruction.
@@ -376,7 +431,7 @@ Every service above has a ready-to-run Podman command in the wiki at [docs.shani
 
 | Category | Services |
 |---|---|
-| [Media](https://docs.shani.dev/doc/servers/media) | Jellyfin, Plex, Navidrome, Immich, *Arr stack, qBittorrent, Pinchflat, Kavita, Audiobookshelf, PhotoPrism |
+| [Media](https://docs.shani.dev/doc/servers/media) | Jellyfin, Plex, Navidrome, Immich, \*Arr stack, qBittorrent, Pinchflat, Kavita, Audiobookshelf, PhotoPrism |
 | [Productivity](https://docs.shani.dev/doc/servers/productivity) | Nextcloud, Syncthing, Paperless-ngx, Planka, Vikunja, Outline, Mealie, Miniflux, Stirling PDF, Actual Budget, n8n |
 | [AI & LLMs](https://docs.shani.dev/doc/servers/ai-llms) | Ollama, Open WebUI, LocalAI, ComfyUI, Automatic1111, Whisper, Kokoro TTS, Tabby, SearXNG |
 | [Security](https://docs.shani.dev/doc/servers/security) | Vaultwarden, Authelia, Authentik, Keycloak, Zitadel, CrowdSec, Step-CA, Infisical |
@@ -391,7 +446,7 @@ Every service above has a ready-to-run Podman command in the wiki at [docs.shani
 | [Business Intelligence](https://docs.shani.dev/doc/servers/business-intelligence) | Metabase, Apache Superset, Redash, Evidence.dev, Lightdash, ClickHouse, Plausible, Umami |
 | [IoT & Monitoring](https://docs.shani.dev/doc/servers/iot) | Telegraf, EMQX, MQTT Exporter, Prometheus, Alertmanager, InfluxDB, Modbus, OPC-UA |
 | [VPN & Tunnels](https://docs.shani.dev/doc/servers/vpn-tunnels) | WG-Easy, Headscale, Headplane, Cloudflared, Pangolin, Pritunl, Firezone, Nebula, ZeroTier, NetBird, Hysteria 2, OpenVPN |
-| [Network & DNS](https://docs.shani.dev/doc/servers/networking) | Pi-hole, AdGuard Home, Unbound, Nginx Proxy Manager, Traefik, SearXNG, Homepage |
+| [Network & DNS](https://docs.shani.dev/doc/servers/networking) | Pi-hole, AdGuard Home, Unbound, Nginx Proxy Manager, Traefik, Caddy, SearXNG, Homepage |
 | [Backups & Sync](https://docs.shani.dev/doc/servers/backups-sync) | Restic, Rclone, MinIO, Garage, Duplicati, Borgmatic, Kopia |
 | [Monitoring](https://docs.shani.dev/doc/servers/monitoring) | Prometheus, Grafana, Loki, Alloy, Netdata, Uptime Kuma, Gatus, Beszel, Dozzle, Healthchecks, Speedtest Tracker |
 | [Management](https://docs.shani.dev/doc/servers/management) | Portainer, Dockge, Yacht, Homepage, auto-update, systemd integration, cleanup timers |

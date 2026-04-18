@@ -35,7 +35,7 @@ Every Shani OS system ships with:
 - **firewalld** — active from first boot with a default-deny inbound policy
 - **fail2ban** — automated banning of repeated authentication failures, integrates with firewalld
 - **OpenSSH** — pre-installed, not enabled by default
-- **Caddy** — modern reverse proxy with automatic HTTPS via Let's Encrypt
+- **Caddy** — modern reverse proxy with automatic HTTPS via Let's Encrypt and a built-in CA for private addresses
 - **Samba / NFS** — SMB file sharing for Windows and macOS; NFS for Linux-to-Linux
 - **rsyncd** — rsync daemon for efficient network file synchronisation
 - **SSHFS** — mount remote directories over SSH as local filesystems
@@ -277,10 +277,10 @@ sudo firewall-cmd --reload
 ### Tunnels
 
 ```bash
-ssh -L 8096:localhost:8096 shanios   # local forward: remote Jellyfin at localhost:8096
-ssh -R 3000:localhost:3000 shanios   # remote forward: expose local port on server
-ssh -D 1080 shanios                  # dynamic SOCKS proxy
-ssh -N -f -L 5432:localhost:5432 shanios   # background tunnel to remote Postgres
+ssh -L 8096:localhost:8096 user@shani-server   # local forward: remote Jellyfin at localhost:8096
+ssh -R 3000:localhost:3000 user@shani-server   # remote forward: expose local port on server
+ssh -D 1080 user@shani-server                  # dynamic SOCKS proxy
+ssh -N -f -L 5432:localhost:5432 user@shani-server   # background tunnel to remote Postgres
 ```
 
 Full guide: [docs.shani.dev — OpenSSH](https://docs.shani.dev/doc/networking/openssh).
@@ -291,7 +291,7 @@ SSHFS mounts any SSH-accessible directory as a local folder using FUSE. No serve
 
 ```bash
 mkdir -p ~/remote
-sshfs user@server:/path/to/data ~/remote \
+sshfs user@shani-server:/path/to/data ~/remote \
   -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=3
 fusermount -u ~/remote    # unmount
 ```
@@ -302,14 +302,14 @@ Full guide: [docs.shani.dev — SSHFS](https://docs.shani.dev/doc/networking/ssh
 
 ## Caddy — Automatic HTTPS Reverse Proxy
 
-Caddy provisions and renews TLS certificates automatically. Always bind container ports to `127.0.0.1` and proxy through Caddy so services are never directly exposed to the network.
+Caddy provisions and renews TLS certificates automatically — via Let's Encrypt for public domains, and via its built-in CA for private `.home.local` addresses. Always bind container ports to `127.0.0.1` and proxy through Caddy so services are never directly exposed to the network.
 
 Config file: `/etc/caddy/Caddyfile`. Changes persist across OS updates.
 
 ```bash
 sudo systemctl enable --now caddy
-sudo systemctl reload caddy                          # zero-downtime reload
-caddy validate --config /etc/caddy/Caddyfile         # validate before reloading
+caddy validate --config /etc/caddy/Caddyfile    # validate before reloading
+sudo systemctl reload caddy                      # zero-downtime reload
 ```
 
 ```caddyfile
@@ -330,7 +330,7 @@ service.example.com {
         uri /api/verify?rd=https://auth.example.com
         copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
     }
-    reverse_proxy localhost:SERVICE_PORT
+    reverse_proxy localhost:8080
 }
 ```
 
@@ -576,10 +576,10 @@ Features: shared clipboard, file transfer, notification mirroring, remote input 
 Install the app ([Android](https://play.google.com/store/apps/details?id=org.kde.kdeconnect_tp) / [iOS](https://apps.apple.com/app/kde-connect/id1580245991)), ensure both devices are on the same Wi-Fi, and accept the pairing request.
 
 ```bash
-systemctl --user status kdeconnectd          # confirm daemon is running
-kdeconnect-cli --list-devices                # list discovered devices
-kdeconnect-cli --share /path/to/file --device <id>   # send a file to phone
-kdeconnect-cli --ring --device <id>          # ring your phone to find it
+systemctl --user status kdeconnectd                          # confirm daemon is running
+kdeconnect-cli --list-devices                                # list discovered devices
+kdeconnect-cli --share /path/to/file --device <id>          # send a file to phone
+kdeconnect-cli --ring --device <id>                         # ring your phone to find it
 ```
 
 Full guide: [docs.shani.dev — KDE Connect](https://docs.shani.dev/doc/networking/kdeconnect).
@@ -591,10 +591,10 @@ Full guide: [docs.shani.dev — KDE Connect](https://docs.shani.dev/doc/networki
 Avahi is **active by default**. Your machine is reachable as `hostname.local` on the LAN without any DNS server. CUPS printers, Samba shares, and KDE Connect all advertise via Avahi.
 
 ```bash
-avahi-browse -at                         # discover all services on the LAN
-avahi-browse _ssh._tcp                   # find SSH servers
-avahi-browse _ipp._tcp                   # find printers
-avahi-resolve --name myhostname.local    # resolve a .local hostname to IP
+avahi-browse -at                          # discover all services on the LAN
+avahi-browse _ssh._tcp                    # find SSH servers
+avahi-browse _ipp._tcp                    # find printers
+avahi-resolve --name myhostname.local     # resolve a .local hostname to IP
 ```
 
 Full guide: [docs.shani.dev — Avahi (mDNS)](https://docs.shani.dev/doc/networking/avahi).
@@ -671,7 +671,7 @@ kinit -R                        # renew before expiry
 kdestroy                        # destroy all tickets
 
 sudo firewall-cmd --permanent --add-port=88/tcp --add-port=88/udp   # KDC
-sudo firewall-cmd --permanent --add-port=749/tcp                      # kadmin
+sudo firewall-cmd --permanent --add-port=749/tcp                     # kadmin
 sudo firewall-cmd --reload
 ```
 
@@ -707,7 +707,7 @@ Full guide: [docs.shani.dev — Backup & Recovery](https://docs.shani.dev/doc/ne
 Any network service also runs as a rootless Podman container on Shani OS, surviving every OS update untouched. The self-hosting wiki covers ready-to-run commands for:
 
 - **[VPN & Tunnels](https://docs.shani.dev/doc/servers/vpn-tunnels)** — WG-Easy, Headscale + Headplane, Cloudflared, Pangolin, Pritunl, Firezone, Nebula, ZeroTier, NetBird
-- **[Network & DNS](https://docs.shani.dev/doc/servers/networking)** — Pi-hole, AdGuard Home, Nginx Proxy Manager, Traefik, Unbound, SearXNG, Homepage dashboard
+- **[Network & DNS](https://docs.shani.dev/doc/servers/networking)** — Pi-hole, AdGuard Home, Nginx Proxy Manager, Traefik, Caddy, Unbound, SearXNG, Homepage dashboard
 - **[Mail Servers](https://docs.shani.dev/doc/servers/mail)** — Mailcow, Mailu, Stalwart, Roundcube, SnappyMail
 - **[Monitoring](https://docs.shani.dev/doc/servers/monitoring)** — Prometheus, Grafana, Loki, Netdata, Uptime Kuma, Gatus, Dozzle
 
