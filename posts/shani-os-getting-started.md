@@ -228,7 +228,7 @@ If an app cannot access a file you expect it to, open Flatseal, find the app, an
 
 ## Daily Use
 
-Once set up, a Shani OS system in daily use is quiet. Updates arrive as desktop notifications (via `shani-update`, which runs at login). You apply them when ready with `sudo shani-deploy`, then reboot when convenient. Your apps, containers, and home directory are never affected by OS updates.
+Once set up, a Shani OS system in daily use is quiet. Updates arrive as desktop notifications (via `shani-update`, which runs automatically via a systemd timer and at login). You apply them when ready with `sudo shani-deploy`, then reboot when convenient. Your apps, containers, and home directory are never affected by OS updates.
 
 The shell environment is set up out of the box: Zsh with syntax highlighting and autosuggestions, Starship prompt, McFly for smart command history, FZF for fuzzy search.
 

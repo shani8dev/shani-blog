@@ -65,6 +65,8 @@ The boot entries in systemd-boot are labelled clearly:
 
 After each deployment, `shani-deploy` rewrites both entries. The newly updated slot is labelled Active with `+3-0` boot-count tries set. If it fails to reach multi-user.target within three attempts, systemd-boot automatically falls back to the Candidate slot.
 
+`shani-update` runs automatically via a systemd user timer — 15 minutes after boot and every 2 hours — checking for new versions and surfacing the appropriate dialog for fallback boots, pending reboots, or available updates.
+
 ---
 
 ## How /etc Stays Writable
@@ -115,11 +117,11 @@ Here is every step `shani-deploy update` runs, in order.
 ### 1. Fetch and Verify
 
 ```bash
-# Download metadata from CDN
-curl -fsSL https://cdn.shani.dev/stable/latest.json
+# Download version manifest from R2 CDN (with SourceForge fallback)
+# e.g. https://downloads.shani.dev/<profile>/stable.txt
 
-# Download image — streamed with resume support via aria2c
-# SHA256 verified inline during download
+# Download image — streamed with resume support via aria2c, wget, or curl
+# SHA256 verified after download
 # GPG signature verified against known public key
 ```
 
@@ -133,35 +135,39 @@ btrfs subvolume snapshot @green @green.$(date +%Y%m%d-%H%M%S)
 
 This snapshot is created before any changes to the inactive slot. If the update partially writes and something goes wrong, this snapshot is your recovery point.
 
-### 3. Receive the New Image
+### 3. Extract the New Image
 
 ```bash
-btrfs receive --stream @green < verified_image.btrfs
+# Decompress and receive the btrfs send stream into a temp workspace
+zstd -d --long=31 -T0 shanios-<version>-<profile>.zst -c | btrfs receive /mnt/temp_update
+
+# Extraction succeeded — now swap the candidate slot
+btrfs subvolume delete @green
+btrfs subvolume snapshot /mnt/temp_update/shanios_base @green
+btrfs property set -f -ts @green ro true
 ```
 
 `btrfs receive` reconstructs the subvolume from the send stream. The result is byte-for-byte identical to the subvolume that was snapshotted, signed, and shipped. This is not package application or a diff — it is a complete, verified reconstitution of exactly what passed build QA.
 
 ### 4. Generate the UKI
 
-A Unified Kernel Image bundles the kernel, initramfs, and kernel command line into a single signed EFI binary. `gen-efi` generates and signs a new UKI for the updated slot:
+A Unified Kernel Image bundles the kernel, initramfs, and kernel command line into a single signed EFI binary. `gen-efi` generates and signs a new UKI for the updated slot. `shani-deploy` runs this inside a chroot of the candidate slot:
 
 ```bash
-gen-efi generate --slot green --sign-key /etc/shani/signing.key
+gen-efi configure green
 ```
 
-The cmdline embedded in the UKI is regenerated from the live disk state — current LUKS UUID, swap offset, keyboard layout. The UKI is placed in the ESP and the bootloader is updated to set it as the next-boot default.
+The kernel cmdline embedded in the UKI is regenerated from the live disk state — current LUKS UUID, swap offset, keyboard layout — and written to `/etc/kernel/install_cmdline_green` before `dracut` assembles the UKI. Signing uses the MOK keypair at `/etc/secureboot/keys/MOK.key` and `MOK.crt`. The signed UKI is placed in the ESP and the bootloader is updated to set it as the next-boot default.
 
 ### 5. Boot Counting
 
-The new entry is registered with systemd-boot's boot counting. On the first boot of the new slot, the boot count starts at 3. Each failed boot attempt decrements it. If it reaches zero, systemd-boot automatically falls back to the previous slot's UKI.
+The new entry is registered with systemd-boot's boot counting. The entry filename gets a `+3-0` suffix: 3 tries allowed, 0 done. Each failed boot attempt decrements the tries-left counter. If it reaches zero, systemd-boot automatically falls back to the previous slot's UKI.
 
-If the new slot boots successfully and a 15-second startup check passes, the boot count is marked successful and the slot becomes the permanent default.
+If the new slot boots successfully, `bless-boot` calls `bootctl set-good`, which renames the entry from `+3-0` to `+3-3` (done equals left), stopping the countdown. The slot becomes the permanent default.
 
 ---
 
 ## Application Isolation
-
-**`passim`** is pre-installed and enabled. It broadcasts available firmware payloads and OS update metadata via mDNS — machines on the same LAN can fetch from each other rather than the public CDN, eliminating repeated downloads of the same image across a subnet. This is particularly useful for fleet deployments.
 
 The `@flatpak`, `@nix`, and `@containers` subvolumes exist entirely outside the OS slots.
 

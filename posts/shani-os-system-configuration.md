@@ -94,12 +94,21 @@ sudo rm -rf /data/overlay/etc/upper/some/directory/
 
 ### Resetting All /etc Customisations
 
+Do not use raw `rm -rf` to wipe the overlay — this leaves the work directory in an inconsistent state and does not reset the other persistent state directories (`/data/varlib`, `/data/varspool`) that services depend on. Use `shani-reset` instead:
+
 ```bash
-# Nuclear option — removes ALL your /etc customisations
-# Use with extreme caution — you will lose custom SSH config, hostname, etc.
-sudo rm -rf /data/overlay/etc/upper/*
-sudo reboot
+# Factory reset all persistent system state in /data
+# (keeps /home and OS slots intact, reboots automatically)
+sudo shani-reset
+
+# Preview what would be wiped without making changes
+sudo shani-reset --dry-run
+
+# Keep previously downloaded OS images to avoid re-downloading
+sudo shani-reset --keep-downloads
 ```
+
+`shani-reset` wipes the `/etc` overlay upper layer, the `/var` overlay, all service state in `/data/varlib` and `/data/varspool`, and all boot markers — then reboots. User accounts are part of the `/etc` overlay and will be gone after reset; the desktop setup wizard runs on next login to create a new account. Your files in `/home` are untouched unless you pass `--home`.
 
 ---
 

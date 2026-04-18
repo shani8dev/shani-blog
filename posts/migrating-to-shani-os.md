@@ -102,13 +102,13 @@ This is a short list. Most software that experienced Linux users install falls i
 
 | Traditional | Shani OS |
 |---|---|
-| `sudo apt upgrade` | `sudo shani-deploy update` |
-| `sudo pacman -Syu` | `sudo shani-deploy update` |
-| `sudo dnf upgrade` | `sudo shani-deploy update` |
+| `sudo apt upgrade` | `sudo shani-deploy` |
+| `sudo pacman -Syu` | `sudo shani-deploy` |
+| `sudo dnf upgrade` | `sudo shani-deploy` |
 | Reboot to apply kernel | Reboot after `shani-deploy` |
-| Roll back to previous packages | `sudo shani-deploy --rollback` (entire OS, instant) |
+| Roll back to previous packages | `sudo shani-deploy -r` (entire OS, instant) |
 
-The critical difference: `shani-deploy update` replaces the entire OS image, not individual packages. There is no "partial update" state. Either the update applies fully and cleanly, or it does not apply at all. And if the new image causes problems, rollback takes you back to the previous complete OS state — not a partial undo.
+The critical difference: `shani-deploy` replaces the entire OS image, not individual packages. There is no "partial update" state. Either the update applies fully and cleanly, or it does not apply at all. And if the new image causes problems, rollback takes you back to the previous complete OS state — not a partial undo.
 
 ### Service Management
 

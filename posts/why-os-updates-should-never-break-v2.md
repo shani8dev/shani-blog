@@ -43,7 +43,7 @@ Here is what happens when you run `sudo shani-deploy`:
 2. The latest OS image is downloaded, verifying both SHA256 checksum and GPG signature before a single byte is written anywhere.
 3. A timestamped Btrfs snapshot of the standby copy is taken — it exists before any changes begin.
 4. The new, verified image is extracted into the standby copy via `btrfs receive`.
-5. A new Unified Kernel Image (UKI) is generated and signed for the updated slot by running `gen-efi configure <slot>` inside a chroot of the candidate.
+5. A new Unified Kernel Image (UKI) is generated and signed for the updated slot via `gen-efi configure` inside a chroot.
 6. Only after successful extraction and UKI generation does the bootloader update to point to the new slot.
 7. Your running system continues unchanged. The pending update waits until you reboot.
 
@@ -51,7 +51,7 @@ If power is cut mid-update, your running system is intact. If the new copy boots
 
 If the new copy cannot boot at all: systemd-boot's boot-counting mechanism detects the failure after three attempts and reverts automatically. You may not even notice.
 
-The active slot is tracked in `/data/current-slot`. `shani-update` runs automatically via a systemd user timer — 15 minutes after boot and every 2 hours thereafter — and detects whether the last boot was a fallback, whether a staged update is waiting for a reboot, or whether a new version is available — prompting appropriately for each case. For full details on the update pipeline: [The Architecture Behind Shani OS](/post/shani-os-architecture-deep-dive#the-update-pipeline-in-full).
+The active slot is tracked in `/data/current-slot`. `shani-update` runs automatically via a systemd timer — 15 minutes after boot and every 2 hours thereafter — and detects whether the last boot was a fallback, whether a staged update is waiting for a reboot, or whether a new version is available — prompting appropriately for each case. For full details on the update pipeline: [The Architecture Behind Shani OS](/post/shani-os-architecture-deep-dive#the-update-pipeline-in-full).
 
 ---
 

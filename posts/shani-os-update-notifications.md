@@ -3,7 +3,7 @@ slug: shani-os-update-notifications
 title: 'shani-update — The Shani OS Update Manager'
 date: '2026-05-11'
 tag: 'Guide'
-excerpt: 'shani-update is the user-facing update manager for Shani OS. It runs at login, detects boot failures, checks for staged updates awaiting a reboot, identifies newly deployed slots, and checks for new OS images — all with GUI dialogs, automatic terminal detection, and a deferred-reminder system.'
+excerpt: 'shani-update is the user-facing update manager for Shani OS. It runs automatically via a systemd user timer and at login, detects boot failures, checks for staged updates awaiting a reboot, identifies newly deployed slots, and checks for new OS images — all with GUI dialogs, automatic terminal detection, and a deferred-reminder system.'
 cover: ''
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
@@ -16,15 +16,15 @@ readTime: '6 min'
 series: 'Shani OS Guides'
 ---
 
-`shani-update` is the user-facing update manager for Shani OS. It runs automatically at login via a desktop autostart entry (`shani-update --startup`) and can also be invoked manually. It handles the full update lifecycle on behalf of the user: detecting whether the last boot was a fallback, prompting to reboot into a staged update, noticing when you're on a freshly deployed slot and letting you roll back if needed, and checking for new OS images when everything is healthy.
+`shani-update` is the user-facing update manager for Shani OS. It runs automatically in two ways: via a desktop autostart entry (`shani-update --startup`) that fires at login after a 15-second delay, and via a systemd user timer that runs 15 minutes after boot and then every 2 hours thereafter. It can also be invoked manually at any time. It handles the full update lifecycle on behalf of the user: detecting whether the last boot was a fallback, prompting to reboot into a staged update, noticing when you're on a freshly deployed slot and letting you roll back if needed, and checking for new OS images when everything is healthy.
 
 `shani-deploy` is the lower-level tool that actually downloads, verifies, and stages OS images. `shani-update` is the front-end that decides when and whether to call it. Full reference: [docs.shani.dev — System Updates](https://docs.shani.dev/doc/updates/system).
 
 ---
 
-## What shani-update Does at Login
+## What shani-update Does on Each Run
 
-When run with `--startup`, `shani-update` works through a fixed priority sequence. Each step can short-circuit the rest:
+When run with `--startup`, `shani-update` waits 15 seconds (to let the polkit agent and desktop shell initialise), then works through a fixed priority sequence. Each step can short-circuit the rest. The same sequence runs for every invocation — at login via the autostart entry, on the 2-hour timer, or when called manually.
 
 ### 1. Fallback boot detection
 
@@ -103,9 +103,15 @@ shani-update -d
 
 ---
 
-## Service Management
+## How shani-update Runs
 
-`shani-update --startup` is triggered by a desktop autostart entry, not a systemd user timer. It runs once at login after a 15-second delay (to let the polkit agent and desktop shell initialize), then exits. There is no background polling loop.
+`shani-update` is triggered by two mechanisms:
+
+**Desktop autostart entry** — `shani-update --startup` is called when you log in. The script waits 15 seconds to let the polkit agent and desktop shell initialise before acquiring its lock and running the check sequence.
+
+**Systemd user timer** — `shani-update.timer` fires 15 minutes after boot, then every 2 hours. This ensures checks happen even during long sessions and even if the autostart entry was missed.
+
+Both paths run the identical check sequence (fallback boot → reboot needed → candidate boot → update check). The lock file prevents two instances running simultaneously.
 
 ```bash
 # View recent shani-update logs
@@ -113,6 +119,9 @@ cat ~/.cache/shani-update.log
 
 # Or via journalctl (shani-update also writes to the system journal via systemd-cat)
 journalctl -t shani-update -n 50
+
+# Check the timer status
+systemctl --user status shani-update.timer
 
 # Run an immediate interactive check
 shani-update
@@ -179,12 +188,15 @@ For the full update workflow, see [shani-deploy Reference](https://blog.shani.de
 
 ## Fleet and OEM Deployments
 
-For fleet deployments using automated update scheduling, the autostart entry for `shani-update --startup` should typically be disabled in favour of a central update management approach:
+For fleet deployments using automated update scheduling, both the autostart entry and the user timer should be disabled in favour of a central update management approach:
 
 ```bash
 # Disable the autostart entry system-wide
-# (remove or mask the autostart .desktop file in /etc/xdg/autostart/)
 sudo rm /etc/xdg/autostart/shani-update.desktop
+
+# Disable the user timer system-wide (mask the unit)
+sudo systemctl --global disable shani-update.timer
+sudo systemctl --global mask shani-update.timer
 ```
 
 Updates can then be triggered on schedule via a systemd timer calling `shani-deploy` directly. See [Shani OS for OEMs and IT Fleets](https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment) for the fleet deployment guide.

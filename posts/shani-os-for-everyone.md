@@ -43,7 +43,7 @@ What you lose: Final Cut Pro, Logic Pro, iCloud native integration, Apple Silico
 
 ### The update experience
 
-`shani-update` runs at login and shows a desktop notification when a new OS image is ready. When you are ready, run `sudo shani-deploy`, wait a few minutes, reboot when convenient. The previous OS copy stays on disk until the next update cycle, always ready for instant rollback with `sudo shani-deploy -r`.
+`shani-update` runs automatically via a systemd timer and at login, showing a desktop notification when a new OS image is ready. When you are ready, run `sudo shani-deploy`, wait a few minutes, reboot when convenient. The previous OS copy stays on disk until the next update cycle, always ready for instant rollback with `sudo shani-deploy -r`.
 
 ---
 
@@ -138,8 +138,6 @@ An OS update never costs you a gaming session. The update runs in the background
 Every machine in a fleet pulls from the same GPG-signed, SHA256-verified image. There is no per-device package drift. Every machine running the same release runs the identical, cryptographically verified OS.
 
 The OEM Initial Setup wizard handles first-boot configuration of language, timezone, and accounts. Plymouth BGRT displays your organisation's logo automatically via UEFI firmware.
-
-`passim`, the local content sharing daemon, broadcasts available firmware payloads via mDNS — machines on the same LAN avoid downloading the same firmware repeatedly.
 
 ### Rollback without a dispatch
 

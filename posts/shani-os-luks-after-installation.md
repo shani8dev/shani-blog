@@ -171,7 +171,7 @@ sudo btrfs receive /mnt/root < /media/external/home-backup
 sudo btrfs receive /mnt/root < /media/external/data-backup
 ```
 
-For `@blue` and `@green` (the OS images), you can either restore from backup or simply re-run a fresh `shani-deploy update` after rebooting into the new encrypted system — the update will download a fresh verified image.
+For `@blue` and `@green` (the OS images), you can either restore from backup or simply re-run `sudo shani-deploy` after rebooting into the new encrypted system — it will download a fresh verified image into the inactive slot.
 
 The simplest approach for the OS slots is to install Shani OS fresh into the new LUKS partition using the installer (which handles all of this), and then just restore your home and data subvolumes.
 
@@ -201,14 +201,17 @@ sudo nano /mnt/data/overlay/etc/upper/fstab
 
 ## Step 8: Regenerate UKIs with New LUKS UUID
 
-After restoring and rebooting into the encrypted system, the UKIs need to be regenerated with the new LUKS UUID embedded in the kernel command line:
+After rebooting into the encrypted system, the UKI for the booted slot needs to be regenerated so the new LUKS UUID is embedded in the kernel command line. You can only regenerate the UKI for the slot you are currently booted into from the live system:
 
 ```bash
-# Regenerate both UKIs
-sudo gen-efi generate --slot blue
-sudo gen-efi generate --slot green
+# Regenerate the UKI for the booted slot (e.g. blue)
+sudo gen-efi configure blue
 
-# Verify the LUKS UUID is embedded
+# Then run shani-deploy to deploy an update, which will regenerate
+# the inactive slot's UKI automatically via chroot
+sudo shani-deploy
+
+# Verify the LUKS UUID is embedded in the active slot's UKI
 sudo objcopy -O binary --only-section=.cmdline \
     /boot/efi/EFI/shanios/shanios-blue.efi /dev/stdout | strings | grep luks
 ```

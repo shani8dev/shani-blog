@@ -70,9 +70,9 @@ The real-world setup that Shani OS makes easy is TPM2 auto-unlock. After enablin
 sudo gen-efi enroll-tpm2
 ```
 
-This seals the LUKS key into the TPM2 chip, bound to PCRs 0 and 7 — the firmware state and the Secure Boot policy. The disk now unlocks automatically when booted on your own hardware with an unmodified, verified firmware and kernel. If the hardware is physically moved to another machine, the TPM won't release the key. If the firmware is tampered with, the PCR values change and the key is not released. If the kernel signature changes (an unsigned kernel is loaded), PCR 7 changes and the key is not released.
+This seals the LUKS key into the TPM2 chip, with the PCR policy chosen automatically based on Secure Boot state: **PCR 0+7** when Secure Boot is enabled (firmware measurements + Secure Boot certificate state), or **PCR 0 only** when Secure Boot is disabled (with a warning that physical-access protection is weaker without it). The disk now unlocks automatically when booted on your own hardware with a matching firmware and Secure Boot state. If the hardware is physically moved to another machine, the TPM won't release the key. If the firmware is tampered with, PCR 0 changes and the key is not released. With Secure Boot enabled, if the kernel signature changes, PCR 7 changes and the key is not released.
 
-The result: full-disk encryption that unlocks silently on your own machine while remaining genuinely protected against physical theft and firmware tampering. Setup instructions: [docs.shani.dev — TPM2 Enrollment](https://docs.shani.dev/doc/security/tpm2).
+The result: full-disk encryption that unlocks silently on your own machine while remaining genuinely protected against physical theft and firmware tampering. Re-enrollment is required after firmware updates or any change to the Secure Boot state. Setup instructions: [docs.shani.dev — TPM2 Enrollment](https://docs.shani.dev/doc/security/tpm2).
 
 ---
 
