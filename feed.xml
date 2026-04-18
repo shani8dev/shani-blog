@@ -5,7 +5,7 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Sat, 18 Apr 2026 11:00:34 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 18 Apr 2026 11:23:04 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>shani-update — The Shani OS Update Manager</title>
@@ -32,6 +32,15 @@
       <description>An honest technical comparison of immutable Linux distributions. Where Shani OS wins, where others genuinely win, and how to pick the right one for your situation. Btrfs send/receive vs OSTree vs OCI images, gaming focus, enterprise needs, and declarative vs imperative philosophy.</description>
       <pubDate>Fri, 08 May 2026 00:00:00 GMT</pubDate>
       <category>Engineering</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+    <item>
+      <title>Running Windows Apps on Shani OS — Wine, Bottles, and When to Use a VM</title>
+      <link>https://blog.shani.dev/post/windows-apps-on-shani-os</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/windows-apps-on-shani-os</guid>
+      <description>You do not need Windows to run Windows software on Shani OS. Bottles (pre-installed on the KDE Plasma edition) manages Wine environments for productivity tools, creative software, and legacy apps. Here is how to get any Windows app running, and when a VM is the better answer.</description>
+      <pubDate>Fri, 08 May 2026 00:00:00 GMT</pubDate>
+      <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
     <item>
