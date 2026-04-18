@@ -3,7 +3,7 @@ slug: gpu-compute-on-shani-os
 title: 'GPU Compute on Shani OS — NVIDIA CUDA, AMD ROCm, and Intel oneAPI'
 date: '2026-05-07'
 tag: 'Guide'
-excerpt: 'How to run GPU compute workloads on Shani OS — AMD ROCm with PyTorch and TensorFlow, NVIDIA CUDA via Distrobox, Intel oneAPI, HIP for cross-vendor portability, and Nix for pure ML environments. Works for ML, simulation, data science, and scientific computing.'
+excerpt: 'How to run GPU compute workloads on Shani OS — setting up AMD ROCm with PyTorch and TensorFlow via Distrobox, NVIDIA CUDA via Distrobox, Intel oneAPI, HIP for cross-vendor portability, and Nix for pure ML environments. Works for ML, simulation, data science, and scientific computing.'
 cover: ''
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
@@ -16,7 +16,9 @@ readTime: '8 min'
 series: 'Shani OS Guides'
 ---
 
-GPU compute on Shani OS works at first boot. AMD GPUs have the open-source AMDGPU kernel driver and full ROCm compute stack pre-configured. NVIDIA drivers are set up during installation. Intel GPUs use Mesa's open-source Vulkan and compute drivers. This post covers how to actually use them — from verifying hardware, to running PyTorch or TensorFlow, to writing portable GPU code that runs on any vendor.
+Shani OS ships with GPU drivers pre-installed — Mesa's open-source stack for AMD and Intel, and the proprietary `nvidia-open` stack for NVIDIA. The GPU compute toolchains (ROCm, CUDA development libraries, oneAPI) are **not** pre-installed on the host; the recommended approach is to run them inside Distrobox containers using the vendor's official images. This keeps the host OS clean and immutable while giving you fully-configured compute environments that survive every OS update.
+
+This post covers how to set up and use GPU compute — from verifying hardware, to running PyTorch or TensorFlow, to writing portable GPU code that runs on any vendor.
 
 For GPU passthrough to VMs (dedicating a GPU to a Windows VM for gaming or isolated ML), see [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines). For using GPU compute inside Apptainer containers for HPC clusters, see [Apptainer on Shani OS](https://blog.shani.dev/post/apptainer-on-shani-os).
 
@@ -24,45 +26,68 @@ Full reference: [docs.shani.dev — Containers](https://docs.shani.dev/doc/softw
 
 ---
 
-## Choosing Your GPU Compute Stack
+## What Ships on the Host
 
-| GPU | Driver | Compute API | Recommended path |
-|---|---|---|---|
-| NVIDIA (RTX / Tesla / H-series) | proprietary nvidia-open | CUDA | Distrobox with `nvidia/cuda` image |
-| AMD (RX 6000 / RX 7000 / Instinct) | open AMDGPU | ROCm / HIP | Host ROCm stack or Distrobox |
-| Intel (Arc, Xe, integrated) | open i915 / Xe | oneAPI / SYCL | Distrobox with `intel/oneapi-basekit` |
-| Any (portability) | any above | OpenCL | Available in all three stacks |
+Shani OS includes GPU drivers, not compute toolchains. Here is what is pre-installed:
+
+| Vendor | What's included on the host |
+|---|---|
+| AMD | `vulkan-radeon` (Mesa RADV), `AMDGPU` kernel driver |
+| NVIDIA | `nvidia-open`, `nvidia-utils`, `nvidia-prime`, `libva-nvidia-driver` |
+| Intel | `vulkan-intel`, `libva-intel-driver`, `intel-media-driver`, `vpl-gpu-rt` |
+| All | `mesa`, `vulkan-mesa-layers`, `libvdpau-va-gl` |
+
+For compute workloads (ML training, GPGPU, scientific simulation), you need the vendor compute stack — ROCm for AMD, CUDA libraries for NVIDIA, oneAPI for Intel. These live inside Distrobox containers, not on the host.
 
 ---
 
-## AMD ROCm
+## Choosing Your GPU Compute Stack
 
-ROCm is AMD's open-source GPU compute stack — the equivalent of CUDA for AMD hardware. Shani OS ships with the AMDGPU kernel driver and ROCm userspace pre-configured. Most Radeon RX 6000, RX 7000, and Instinct series cards are supported.
+| GPU | Driver (host) | Compute API | Recommended path |
+|---|---|---|---|
+| NVIDIA (RTX / Tesla / H-series) | `nvidia-open` | CUDA | Distrobox with `nvidia/cuda` image |
+| AMD (RX 6000 / RX 7000 / Instinct) | `vulkan-radeon` / AMDGPU | ROCm / HIP | Distrobox with `rocm/dev-ubuntu` image |
+| Intel (Arc, Xe, integrated) | `vulkan-intel` | oneAPI / SYCL | Distrobox with `intel/oneapi-basekit` |
+| Any (portability) | any above | OpenCL | Available in all three vendor images |
 
-### Verify ROCm
+---
+
+## Verify Your GPU
+
+Before setting up a compute container, confirm your GPU is visible to the host.
 
 ```bash
-# Verify ROCm installation and GPU visibility
-rocminfo
+# All vendors — check kernel-detected GPUs
+lspci | grep -E "VGA|3D|Display"
 
-# List detected GPUs and utilisation
-rocm-smi
+# NVIDIA — check driver and GPU visibility
+nvidia-smi
 
-# Check ROCm runtime version
-/opt/rocm/bin/rocminfo | grep -i "ROCm Runtime"
+# AMD — check kernel driver is loaded
+lsmod | grep amdgpu
+ls /dev/dri/
+
+# Intel — check device nodes
+ls /dev/dri/
 ```
 
-### PyTorch and TensorFlow via Distrobox
+---
 
-The cleanest way to run ROCm ML workloads is inside a Distrobox container using AMD's official image. The container has the correct ROCm libraries pre-installed and device access configured:
+## AMD ROCm via Distrobox
+
+ROCm is AMD's open-source GPU compute stack — the equivalent of CUDA for AMD hardware. The host has the AMDGPU kernel driver and Vulkan driver installed; the ROCm userspace compute libraries live inside a Distrobox container.
 
 ```bash
-# Create a ROCm-capable container
+# Create a ROCm-capable container using AMD's official image
 distrobox create --name rocm-dev \
   --image rocm/dev-ubuntu-22.04:latest \
   --additional-flags "--device=/dev/kfd --device=/dev/dri --group-add video --group-add render"
 
 distrobox enter rocm-dev
+
+# Verify ROCm can see your GPU
+rocminfo
+rocm-smi
 
 # Install PyTorch for ROCm
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.0
@@ -73,6 +98,8 @@ python3 -c "import torch; print(torch.cuda.is_available()); print(torch.cuda.get
 # Install TensorFlow for ROCm
 pip install tensorflow-rocm
 ```
+
+The `--device=/dev/kfd --device=/dev/dri` flags give the container access to the GPU compute and render devices from the host. The `--group-add video --group-add render` flags ensure the container user has the right group permissions.
 
 The container lives in the `@containers` Btrfs subvolume and survives every OS update. Your entire ROCm ML environment is independent of the host OS.
 
@@ -104,25 +131,14 @@ See [Apptainer on Shani OS](https://blog.shani.dev/post/apptainer-on-shani-os) f
 
 ---
 
-## NVIDIA CUDA
+## NVIDIA CUDA via Distrobox
 
-NVIDIA drivers are configured at installation time on the KDE Plasma edition. The proprietary `nvidia-open` kernel module is in the initramfs.
-
-### Verify NVIDIA
+The host has `nvidia-open` and `nvidia-utils` installed. The CUDA development toolchain (nvcc, cuDNN, etc.) lives inside a Distrobox container using NVIDIA's official CUDA base images.
 
 ```bash
-# Check driver and GPU visibility
+# Verify the host driver is working
 nvidia-smi
 
-# Check CUDA version available
-nvidia-smi | grep "CUDA Version"
-```
-
-### PyTorch and TensorFlow via Distrobox
-
-CUDA libraries live in the NVIDIA driver stack, but the development toolchain (nvcc, cuDNN, etc.) is most cleanly managed inside a container using NVIDIA's official CUDA base images:
-
-```bash
 # Create a CUDA-capable container
 distrobox create --name cuda-dev --image nvidia/cuda:12.3.0-devel-ubuntu22.04
 distrobox enter cuda-dev
@@ -147,13 +163,16 @@ With `--nv`, Apptainer injects the host NVIDIA runtime into the container — no
 
 ---
 
-## Intel oneAPI
+## Intel oneAPI via Distrobox
 
-Intel Arc discrete GPUs and Intel integrated graphics (Xe architecture) support GPU compute via Intel's oneAPI toolkit.
+Intel Arc discrete GPUs and Intel integrated graphics (Xe architecture) support GPU compute via Intel's oneAPI toolkit. The host has `vulkan-intel` and the Intel media drivers; oneAPI itself runs in a container.
 
 ```bash
 # Create an Intel compute container
-distrobox create --name intel-dev --image intel/oneapi-basekit:latest
+distrobox create --name intel-dev \
+  --image intel/oneapi-basekit:latest \
+  --additional-flags "--device=/dev/dri"
+
 distrobox enter intel-dev
 
 # Verify Intel GPU visibility
@@ -170,13 +189,12 @@ cd /opt/intel/oneapi/samples && icpx -fsycl vector_add.cpp -o vector_add && ./ve
 ROCm's HIP layer provides a CUDA-compatible programming model that compiles for both AMD and NVIDIA hardware. If you are writing new GPU code or porting existing CUDA code, HIP gives you cross-vendor portability.
 
 ```bash
-# Install hipify tool via Nix
-nix-env -iA nixpkgs.rocmPackages.hipify
+# Inside your ROCm Distrobox container:
 
 # Convert a CUDA source file to HIP
 hipify-perl my_kernel.cu > my_kernel.hip.cpp
 
-# Compile for AMD GPU (inside ROCm Distrobox container or with ROCm installed)
+# Compile for AMD GPU
 hipcc my_kernel.hip.cpp -o my_kernel
 
 # The same source compiles for NVIDIA with nvcc after hipify
@@ -188,25 +206,22 @@ HIP code uses `hip::` namespaces and `hipMalloc`/`hipMemcpy` APIs which map dire
 
 ## PyTorch / JAX / TensorFlow via Nix
 
-For pure-Nix ML workflows without containers — useful for quick experimentation or when you want everything managed declaratively:
+For pure-Nix ML workflows without containers — useful for quick CPU-based experimentation or when you want everything managed declaratively. Note that GPU-accelerated Nix ML paths require matching the Nix-packaged ROCm or CUDA version against your hardware and host driver, which is more involved than the Distrobox approach. For most GPU work, Distrobox containers are more reliable.
 
 ```bash
-# NVIDIA path — uses pre-built binaries
-nix-shell -p python311 python311Packages.torch-bin python311Packages.jaxlib-bin
-
-# AMD ROCm path — uses ROCm-enabled builds from nixpkgs
-nix-shell -p python311 python311Packages.torchWithRocm
+# NVIDIA path — uses pre-built CPU binaries (GPU requires matching CUDA version)
+nix-shell -p python311 python311Packages.torch-bin
 
 # Project-specific environment — create a shell.nix
 ```
 
 ```nix
-# shell.nix for a PyTorch project (ROCm)
+# shell.nix for a CPU-based PyTorch project
 { pkgs ? import <nixpkgs> {} }:
 pkgs.mkShell {
   buildInputs = with pkgs; [
     python311
-    python311Packages.torchWithRocm
+    python311Packages.torch-bin
     python311Packages.numpy
     python311Packages.pandas
     python311Packages.matplotlib
@@ -220,7 +235,7 @@ nix-shell  # enter the environment
 jupyter lab
 ```
 
-The Nix approach is lighter than a full Distrobox container but gives you less control over the exact CUDA/ROCm library versions. For production ML training, the Distrobox container approach is more reliable.
+For GPU-accelerated Nix environments, the Distrobox container approach using vendor images is recommended — it handles library versioning against the installed driver automatically.
 
 ---
 
@@ -241,10 +256,9 @@ pip install jupyter
 jupyter lab --ip=0.0.0.0 --no-browser
 ```
 
-**Via Nix:**
+**Via Nix (CPU / no GPU acceleration without additional setup):**
 
 ```bash
-nix-env -iA nixpkgs.jupyter nixpkgs.python311 nixpkgs.python311Packages.ipykernel
 nix-shell -p jupyter python311 python311Packages.numpy python311Packages.matplotlib
 jupyter lab
 ```
@@ -260,16 +274,16 @@ flatpak install flathub org.jupyter.JupyterLab
 ## Monitoring GPU Utilisation
 
 ```bash
-# AMD
-rocm-smi                    # ROCm's GPU monitor
-radeontop                   # real-time AMD GPU stats
+# AMD — requires entering the ROCm container, or using host kernel tools
+radeontop                   # real-time AMD GPU stats (host)
+# rocm-smi is available inside the rocm-dev Distrobox container
 
 # NVIDIA
-nvidia-smi                  # NVIDIA GPU monitor
+nvidia-smi                  # NVIDIA GPU monitor (host)
 nvidia-smi dmon             # continuous monitoring
 
 # Intel
-sudo intel_gpu_top          # Intel GPU utilisation
+sudo intel_gpu_top          # Intel GPU utilisation (host)
 
 # MangoHud (gaming + compute) — overlays GPU stats on screen
 MANGOHUD=1 python3 train.py

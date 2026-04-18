@@ -3,7 +3,7 @@ slug: shani-os-for-researchers-and-hpc
 title: 'Shani OS for Researchers and HPC — Reproducible Environments from Desktop to Cluster'
 date: '2026-04-16'
 tag: 'Guide'
-excerpt: 'How Shani OS makes scientific computing reproducible from the ground up — Apptainer for cluster workloads, Nix for pinned environments, AMD ROCm and NVIDIA CUDA for GPU compute, DVC for data versioning, and a GPG-signed host OS that is itself a verifiable artefact.'
+excerpt: 'How Shani OS makes scientific computing reproducible from the ground up — Apptainer for cluster workloads, Nix for pinned environments, AMD ROCm and NVIDIA CUDA via Distrobox containers, DVC for data versioning, and a GPG-signed host OS that is itself a verifiable artefact.'
 cover: ''
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
@@ -18,7 +18,7 @@ series: 'Shani OS Deep Dives'
 
 Reproducibility is the central challenge of modern scientific computing. You produce a result on your workstation. A collaborator cannot replicate it. A cluster job produces different output six months later because the software environment drifted. A reviewer asks for the exact environment used — and it no longer exists.
 
-Shani OS approaches this problem at every layer. The host OS is a cryptographically signed, immutable artefact — it is itself reproducible and verifiable. Apptainer, the HPC standard for container portability, is pre-installed and configured. Nix provides declarative, pinned environments for local work. GPU workloads run with full hardware acceleration across NVIDIA CUDA, AMD ROCm, and Intel compute stacks. The full stack — from kernel to container to workload — can be described, versioned, and reproduced.
+Shani OS approaches this problem at every layer. The host OS is a cryptographically signed, immutable artefact — it is itself reproducible and verifiable. Apptainer, the HPC standard for container portability, is pre-installed and configured. Nix provides declarative, pinned environments for local work. GPU drivers for NVIDIA, AMD, and Intel ship on the host; the compute toolchains (ROCm, CUDA, oneAPI) run cleanly inside Distrobox containers or Apptainer images, keeping the immutable host clean while giving you full hardware acceleration. The full stack — from kernel to container to workload — can be described, versioned, and reproduced.
 
 This post covers the tools and workflows that make Shani OS well-suited for research computing. Full reference documentation lives at [docs.shani.dev](https://docs.shani.dev).
 
@@ -126,13 +126,29 @@ Full Nix guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os).
 
 ## GPU Workloads — NVIDIA CUDA and AMD ROCm
 
-GPU support on Shani OS works at first boot. NVIDIA drivers are configured during installation. AMD GPUs use the open-source AMDGPU kernel driver with full ROCm compute support. Intel GPUs use Mesa's open-source drivers with Vulkan and compute.
+Shani OS ships GPU drivers pre-installed: `nvidia-open` and `nvidia-utils` for NVIDIA, and the open AMDGPU kernel driver with `vulkan-radeon` for AMD, and `vulkan-intel` with Intel media drivers for Intel hardware. The compute toolchains — ROCm, CUDA development libraries, oneAPI — are not on the host. They run inside Distrobox containers using the vendor's official images.
 
-The typical research pattern: create a Distrobox container using the vendor's official base image (AMD's `rocm/dev-ubuntu-22.04`, NVIDIA's `nvidia/cuda:12.x-devel-ubuntu22.04`, or Intel's `oneapi-basekit`), install PyTorch or TensorFlow inside it, and run your workload. The container lives in `@containers` and survives every OS update. For cluster jobs, Apptainer's `--nv` and `--rocm` flags inject the host GPU runtime into your SIF image automatically — no driver bundling needed.
+This is the cleanest pattern for an immutable OS: the host provides verified, stable drivers; the compute environment is isolated in a container that you control entirely. The container lives in `@containers` and survives every OS update and rollback.
 
-For pure-Nix ML environments without containers, `python311Packages.torchWithRocm` (AMD) and `python311Packages.torch-bin` (NVIDIA) are available in nixpkgs.
+**AMD ROCm:**
+```bash
+distrobox create --name rocm-dev \
+  --image rocm/dev-ubuntu-22.04:latest \
+  --additional-flags "--device=/dev/kfd --device=/dev/dri --group-add video --group-add render"
+distrobox enter rocm-dev
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.0
+```
 
-Full GPU compute guide — ROCm setup, CUDA via Distrobox, HIP cross-vendor portability, Jupyter with GPU access, and monitoring: [GPU Compute on Shani OS →](https://blog.shani.dev/post/gpu-compute-on-shani-os)
+**NVIDIA CUDA:**
+```bash
+distrobox create --name cuda-dev --image nvidia/cuda:12.3.0-devel-ubuntu22.04
+distrobox enter cuda-dev
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
+
+For cluster jobs, Apptainer's `--nv` and `--rocm` flags inject the host GPU driver into your SIF image automatically — no driver bundling needed in the image itself.
+
+Full GPU compute guide — ROCm and CUDA container setup, HIP cross-vendor portability, Jupyter with GPU access, and monitoring: [GPU Compute on Shani OS →](https://blog.shani.dev/post/gpu-compute-on-shani-os)
 
 ---
 
@@ -218,7 +234,7 @@ Tailscale state persists across OS updates at `/data/varlib/tailscale`. Full gui
 | Host OS | Shani OS release + GPG key | Kernel, drivers, system libraries |
 | Local environment | `shell.nix` with commit hash | Exact package versions + dependencies |
 | Container | Apptainer `.sif` + `.def` | Full userspace environment |
-| GPU compute | ROCm version / CUDA version in SIF | Driver-independent runtime — see [GPU Compute on Shani OS](https://blog.shani.dev/post/gpu-compute-on-shani-os) |
+| GPU compute | ROCm / CUDA version inside Distrobox or SIF | Compute toolchain, independent of immutable host — see [GPU Compute on Shani OS](https://blog.shani.dev/post/gpu-compute-on-shani-os) |
 | Data | DVC + restic | Dataset versions + encrypted backups |
 | Code | Git | Source history |
 
@@ -232,7 +248,7 @@ Each layer is independently verifiable. The combination gives you a research sta
 - [docs.shani.dev — Nix Package Manager](https://docs.shani.dev/doc/software/nix) — Nix setup and usage on Shani OS
 - [docs.shani.dev — Virtual Machines](https://docs.shani.dev/doc/software/vms) — GPU passthrough via VFIO for ML workloads
 - [docs.shani.dev — Backup](https://docs.shani.dev/doc/networking/backup) — rclone and restic configuration
-- [GPU Compute on Shani OS](https://blog.shani.dev/post/gpu-compute-on-shani-os) — ROCm, CUDA, HIP, Intel oneAPI, Nix ML paths
+- [GPU Compute on Shani OS](https://blog.shani.dev/post/gpu-compute-on-shani-os) — ROCm, CUDA, HIP, Intel oneAPI via Distrobox
 - [Apptainer on Shani OS](https://blog.shani.dev/post/apptainer-on-shani-os) — full guide: definition files, SLURM/PBS scripts, MPI, overlays, GPU detail
 - [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — detailed Nix guide
 - [The Architecture Behind Shani OS](https://blog.shani.dev/post/shani-os-architecture-deep-dive) — how subvolumes and slots work
