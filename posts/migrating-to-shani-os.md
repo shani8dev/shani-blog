@@ -36,8 +36,9 @@ Instead, three persistent layers sit alongside the OS:
 1. **`@flatpak`** — for GUI desktop applications (browsers, office, media, etc.)
 2. **`@nix`** — for CLI tools, development runtimes, and language toolchains
 3. **`@containers`** — for full mutable Linux environments when you need them
+4. **`@snapd`** — for Snap packages when an app is only available on the Snap Store
 
-All three survive every OS update and rollback. They are never touched by `shani-deploy`. They have their own update paths. They do not conflict with each other.
+All four survive every OS update and rollback. They are never touched by `shani-deploy`. They have their own update paths. They do not conflict with each other.
 
 ---
 
@@ -53,7 +54,7 @@ All three survive every OS update and rollback. They are never touched by `shani
 | `yay -S spotify` | `flatpak install flathub com.spotify.Client` |
 | `sudo apt install code` | `flatpak install flathub com.visualstudio.code` |
 
-Search for the Flatpak app ID at [flathub.org](https://flathub.org) or via `flatpak search <name>`. Most major GUI applications are on Flathub.
+Search for the Flatpak app ID at [flathub.org](https://flathub.org) or via `flatpak search <n>`. Most major GUI applications are on Flathub. If an app is only available on the Snap Store, `snap install <n>` works as a fallback — Snap is pre-configured on Shani OS and the `@snapd` subvolume persists across updates just like `@flatpak`.
 
 ### CLI Tools and Development Runtimes
 
@@ -224,8 +225,9 @@ The parts of the filesystem you regularly interact with are the same. The OS roo
 | `/var` | tmpfs — cleared on reboot; persistent state bind-mounted from `@data` |
 | `/nix` | Writable by Nix — your Nix packages live here |
 | `/var/lib/flatpak` | Flatpak apps — writable via `@flatpak` |
+| `/var/lib/snapd` | Snap packages — writable via `@snapd` |
 
-The read-only nature of `/usr` is the main thing to internalise. Anything that tries to write to `/usr/local/bin` or install files into `/usr/share` will fail. Use Nix, Flatpak, or Distrobox instead.
+The read-only nature of `/usr` is the main thing to internalise. Anything that tries to write to `/usr/local/bin` or install files into `/usr/share` will fail. Use Nix, Flatpak, Snap, or Distrobox instead.
 
 ---
 
@@ -290,6 +292,8 @@ These do not require any migration thought — they work on Shani OS exactly as 
 - [docs.shani.dev — Distrobox](https://docs.shani.dev/doc/software/distrobox) — mutable containers guide
 - [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — detailed Nix workflow guide
 - [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — full Flatpak guide
+- [docs.shani.dev — Snaps](https://docs.shani.dev/doc/software/snaps) — Snap setup and usage
+- [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os) — when to use Snap vs Flatpak
 - [Telegram community](https://t.me/shani8dev) — ask migration questions
 
 [Download Shani OS at shani.dev →](https://shani.dev)

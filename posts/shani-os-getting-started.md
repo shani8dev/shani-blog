@@ -181,7 +181,13 @@ Apps install to `@flatpak` and auto-update every 12 hours. You can also manage p
 Waydroid is pre-installed. Run the setup helper:
 
 ```bash
-sudo waydroid-helper init
+sudo waydroid init
+
+# Start the Waydroid session
+waydroid session start
+
+# Launch the Android UI
+waydroid show-full-ui
 ```
 
 Firewall rules are already configured. Hardware acceleration works on Intel and AMD. ARM app compatibility via translation is included. Guide: [docs.shani.dev — Android (Waydroid)](https://docs.shani.dev/doc/software/waydroid).
@@ -244,16 +250,16 @@ sudo shani-deploy -r
 ## Common Questions
 
 **Can I install packages with pacman?**
-No — and you do not need to. The immutable root means `pacman -S` to the base system would be overwritten on the next update anyway. Use Flatpak for GUI apps, Nix for CLI tools, and Distrobox for anything that needs a full mutable package manager. The migration table at [docs.shani.dev](https://docs.shani.dev/doc/concepts) maps every traditional workflow to its Shani OS equivalent.
+No — and you do not need to. The immutable root means `pacman -S` to the base system would be overwritten on the next update anyway. Use Flatpak for GUI apps, Snap when an app is only on the Snap Store, Nix for CLI tools, and Distrobox for anything that needs a full mutable package manager. The migration table at [docs.shani.dev](https://docs.shani.dev/doc/concepts) maps every traditional workflow to its Shani OS equivalent.
 
 **What happens to my files if I roll back?**
-Nothing. Your home directory is in `@home`, completely independent of the OS slots. Flatpak apps are in `@flatpak`. Nix packages are in `@nix`. An OS rollback does not touch any of them.
+Nothing. Your home directory is in `@home`, completely independent of the OS slots. Flatpak apps are in `@flatpak`. Snap packages are in `@snapd`. Nix packages are in `@nix`. An OS rollback does not touch any of them.
 
 **Can I dual boot?**
 It is possible but not recommended — other operating systems may overwrite the bootloader. If you need Windows alongside Shani OS, a virtual machine via KDE's virt-manager or GNOME Boxes is the more reliable setup.
 
 **How do I find more apps?**
-[Flathub.org](https://flathub.org) has the full catalogue. GNOME Software and KDE Discover let you browse from the desktop. Warehouse (pre-installed) gives you a unified view of all your installed Flatpaks with one-click updates and removal. For CLI tools, [search.nixos.org](https://search.nixos.org/packages) covers the Nix package set.
+[Flathub.org](https://flathub.org) has the full catalogue. GNOME Software and KDE Discover let you browse from the desktop. Warehouse (pre-installed) gives you a unified view of all your installed Flatpaks with one-click updates and removal. For CLI tools, [search.nixos.org](https://search.nixos.org/packages) covers the Nix package set. If an app is only on the Snap Store, [snapcraft.io](https://snapcraft.io) has the catalogue — `snap install <n>` installs it directly.
 
 ---
 

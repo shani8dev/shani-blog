@@ -46,7 +46,7 @@ Shani OS's entire persistence model is built on Btrfs subvolumes. There are two 
 
 Image integrity is underpinned by `ostree` and `composefs`, which verify the OS subvolume contents. `squashfuse` enables read-only squashfs mounts where needed during the boot and recovery sequence.
 
-Only `@blue` and `@green` are OS images. Every other subvolume holds data that is independent of which OS slot is running. This is the core guarantee: **an OS update or rollback touches exactly two subvolumes and nothing else**. Your home directory, your Flatpak apps, your Nix packages, your containers, and your configuration all survive every update unchanged.
+Only `@blue` and `@green` are OS images. Every other subvolume holds data that is independent of which OS slot is running. This is the core guarantee: **an OS update or rollback touches exactly two subvolumes and nothing else**. Your home directory, your Flatpak apps, your Snap packages, your Nix packages, your containers, and your configuration all survive every update unchanged.
 
 ---
 
@@ -210,7 +210,7 @@ For the full security model: [docs.shani.dev — Security](https://docs.shani.de
 - Run Android apps via Waydroid — state in `@waydroid`
 
 **You cannot:**
-- Install packages directly to the OS root (the root is read-only; use Flatpak, Nix, or Distrobox instead)
+- Install packages directly to the OS root (the root is read-only; use Flatpak, Snap, Nix, or Distrobox instead)
 - Modify files in `/usr` at runtime
 - Build a custom OS image without going through the `shani-deploy` pipeline
 

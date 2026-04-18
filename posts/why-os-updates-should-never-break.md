@@ -119,6 +119,8 @@ Distrobox runs a full mutable container of any Linux distro — Arch, Ubuntu, Fe
 
 AppImages are portable self-contained executables — download and run. Gear Lever (pre-installed) integrates them into your app launcher. Homebrew can also be installed and works exactly as it does on macOS. Guide: [docs.shani.dev — AppImage](https://docs.shani.dev/doc/software/appimage).
 
+**Snap** is available as a complement when an app is on the Snap Store but not Flathub. Snap is pre-configured — `snapd.socket` is enabled and the `@snapd` subvolume persists across every OS update and rollback. `snap install <n>` and it is there. Guide: [docs.shani.dev — Snaps](https://docs.shani.dev/doc/software/snaps).
+
 The design principle: the OS is infrastructure, not your workspace. An `apt install` to the base system would be overwritten the next time `shani-deploy` runs anyway — the right place for software is always outside the OS.
 
 ---
@@ -127,7 +129,7 @@ The design principle: the OS is infrastructure, not your workspace. An `apt inst
 
 A Shani OS system in daily use is quiet. `shani-update` runs automatically via a systemd timer — 15 minutes after boot and every 2 hours thereafter — and shows a notification when a new OS image is ready. When you are ready, you run `sudo shani-deploy`, which takes a few minutes. You reboot when convenient. If anything feels off, `sudo shani-deploy -r` rolls back with one command and one reboot.
 
-Your apps — Flatpaks, Nix packages, containers — live in their own subvolumes, completely independent of the OS. They update on their own schedules. `flatpak update` updates your apps. `shani-deploy` updates the OS. Neither affects the other.
+Your apps — Flatpaks, Snaps, Nix packages, containers — live in their own subvolumes, completely independent of the OS. They update on their own schedules. `flatpak update` updates your apps. `shani-deploy` updates the OS. Neither affects the other.
 
 The worst case is: reboot to undo it. That is a level of reliability that, until recently, was only available to server infrastructure. It runs on your laptop now.
 

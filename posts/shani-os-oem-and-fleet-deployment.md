@@ -70,16 +70,6 @@ Shani OS update images are served via HTTPS from a CDN. For fleet deployments, y
 
 **Mirror the update CDN internally.** Point machines at your internal mirror by configuring the update URL in `shani-deploy`'s configuration. Updates are downloaded from your network, not the public CDN. This controls bandwidth and allows offline or air-gapped deployments.
 
-**Use `passim` for LAN-local update sharing.** `passim` is pre-installed and enabled. It broadcasts available firmware and update payloads via mDNS — machines on the same LAN can fetch from each other rather than the CDN, eliminating repeated downloads of the same image across a subnet.
-
-```bash
-# Check passim status
-systemctl status passim
-
-# See what passim is sharing
-passim-client list
-```
-
 ### Staged Rollouts
 
 `shani-deploy` supports two release channels: `stable` (default, monthly) and `latest` (more frequent). For staged rollouts, run a canary group on `latest` before pushing to the full fleet on `stable`:

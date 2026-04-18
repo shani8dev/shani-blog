@@ -44,10 +44,10 @@ ARM app compatibility is handled by `libhoudini` (Intel's ARM-to-x86 binary tran
 Waydroid is pre-installed but needs one-time initialisation to download the Android image:
 
 ```bash
-sudo waydroid-helper init
+sudo waydroid init
 ```
 
-This downloads the Android 11 image (around 800 MB), configures the container, and sets up the `@waydroid` subvolume. The helper also handles the `binder` kernel module and firewall rules — both are already configured in Shani OS, so the process is fully automated.
+This downloads the Android 11 image (around 800 MB), configures the container, and sets up the `@waydroid` subvolume. The `binder` kernel module and firewall rules are already configured in Shani OS, so the process is fully automated.
 
 After initialisation completes:
 
@@ -115,7 +115,7 @@ After GApps installation, open the Waydroid full UI, open the Play Store, and si
 
 ## ARM App Compatibility
 
-Most Android apps in the Play Store are compiled for ARM processors, not x86. Waydroid handles this transparently via `libhoudini`, Intel's ARM-to-x86 binary translation layer, which is included in the `waydroid-helper init` setup.
+Most Android apps in the Play Store are compiled for ARM processors, not x86. Waydroid handles this transparently via `libhoudini`, Intel's ARM-to-x86 binary translation layer, which is included in the `waydroid init` setup.
 
 Apps that work without issues under translation: most social media apps, streaming apps, productivity tools, casual games, and the vast majority of the Play Store catalogue.
 
@@ -206,7 +206,7 @@ The Android environment persists in the `@waydroid` Btrfs subvolume. Even after 
 To fully reset Waydroid (wipes all Android apps and data):
 
 ```bash
-sudo waydroid-helper init --reinstall
+sudo waydroid init -f
 ```
 
 ---
@@ -235,7 +235,7 @@ journalctl -u waydroid-container.service -n 50
 lsmod | grep binder
 
 # Re-initialise if needed
-sudo waydroid-helper init
+sudo waydroid init
 ```
 
 **Play Store says device is not certified:**

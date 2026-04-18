@@ -131,7 +131,7 @@ Waydroid runs a full Android stack in a lightweight container — hardware-accel
 
 ```bash
 # First-time setup
-sudo waydroid-helper init
+sudo waydroid init
 
 # Launch Android environment
 waydroid session start

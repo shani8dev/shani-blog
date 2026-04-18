@@ -98,7 +98,6 @@ Among the options above, only Shani OS is designed with OEM and enterprise deplo
 - GPG-signed images with public key on keyservers (independently auditable)
 - Plymouth BGRT brand logo from UEFI firmware
 - OEM first-boot wizard
-- `passim` for LAN-local firmware distribution
 - Private update channel (in development)
 - Zero telemetry (verifiable by reading the source)
 - Indian language support as a first-class feature — critical for government, public sector, and educational deployments in India

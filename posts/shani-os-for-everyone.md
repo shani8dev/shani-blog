@@ -91,7 +91,7 @@ Your containers live in the `@containers` subvolume and survive OS updates. Home
 
 VS Code via Flatpak, your runtimes in Nix, your project containers in Distrobox, your databases in Podman — each layer independent, each surviving updates. If a bad OS update disrupts something, `sudo shani-deploy -r` restores the exact previous OS state while leaving your containers, Nix packages, and home directory completely untouched.
 
-Waydroid is pre-configured for Android development — hardware-accelerated on Intel and AMD, with ARM translation included. Guide: [docs.shani.dev — Android (Waydroid)](https://docs.shani.dev/doc/software/waydroid).
+Waydroid is pre-installed for Android development — run `sudo waydroid init` once to download the Android image, then `waydroid session start` and `waydroid show-full-ui`. Hardware-accelerated on Intel and AMD, with ARM translation included. Guide: [docs.shani.dev — Android (Waydroid)](https://docs.shani.dev/doc/software/waydroid).
 
 For HPC and research workflows, Apptainer (formerly Singularity) is pre-installed. Submit reproducible environments to clusters, share exact setups with collaborators, run isolated GPU workloads — all against an immutable, GPG-signed host OS that is itself a verifiable artefact.
 
