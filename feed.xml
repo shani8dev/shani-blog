@@ -5,13 +5,13 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Fri, 17 Apr 2026 17:14:17 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 18 Apr 2026 08:35:44 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
-      <title>Update Notifications on Shani OS — How shani-update Works</title>
+      <title>shani-update — The Shani OS Update Manager</title>
       <link>https://blog.shani.dev/post/shani-os-update-notifications</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-update-notifications</guid>
-      <description>shani-update is a lightweight background service that watches for new Shani OS images and sends a desktop notification when one is ready — no polling every boot, no forced updates, just a quiet tap on the shoulder when something new is available.</description>
+      <description>shani-update is the user-facing update manager for Shani OS. It runs at login, detects boot failures, checks for staged updates awaiting a reboot, identifies newly deployed slots, and checks for new OS images — all with GUI dialogs, automatic terminal detection, and a deferred-reminder system.</description>
       <pubDate>Mon, 11 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
@@ -137,7 +137,7 @@
       <title>shani-deploy Reference — Every Flag, Every Workflow</title>
       <link>https://blog.shani.dev/post/shani-deploy-reference</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-deploy-reference</guid>
-      <description>The complete reference for shani-deploy — the atomic update and rollback tool at the heart of Shani OS. Every flag, every use case, every edge case covered: update, rollback, dry-run, storage-info, cleanup, optimize, and more.</description>
+      <description>The complete reference for shani-deploy — the atomic update and rollback tool at the heart of Shani OS. Every flag, every use case, every edge case covered: update, rollback, dry-run, cleanup, optimize, channel management, and more.</description>
       <pubDate>Sun, 26 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>

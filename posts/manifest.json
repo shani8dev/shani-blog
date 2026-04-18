@@ -1,12 +1,12 @@
 [
   {
     "slug": "shani-os-update-notifications",
-    "title": "Update Notifications on Shani OS — How shani-update Works",
-    "excerpt": "shani-update is a lightweight background service that watches for new Shani OS images and sends a desktop notification when one is ready — no polling every boot, no forced updates, just a quiet tap on the shoulder when something new is available.",
+    "title": "shani-update — The Shani OS Update Manager",
+    "excerpt": "shani-update is the user-facing update manager for Shani OS. It runs at login, detects boot failures, checks for staged updates awaiting a reboot, identifies newly deployed slots, and checks for new OS images — all with GUI dialogs, automatic terminal detection, and a deferred-reminder system.",
     "date": "2026-05-11",
     "updated": "",
     "tag": "Guide",
-    "readTime": "4 min",
+    "readTime": "6 min",
     "paywalled": false,
     "cover": "",
     "series": "Shani OS Guides",
@@ -394,7 +394,7 @@
   {
     "slug": "shani-deploy-reference",
     "title": "shani-deploy Reference — Every Flag, Every Workflow",
-    "excerpt": "The complete reference for shani-deploy — the atomic update and rollback tool at the heart of Shani OS. Every flag, every use case, every edge case covered: update, rollback, dry-run, storage-info, cleanup, optimize, and more.",
+    "excerpt": "The complete reference for shani-deploy — the atomic update and rollback tool at the heart of Shani OS. Every flag, every use case, every edge case covered: update, rollback, dry-run, cleanup, optimize, channel management, and more.",
     "date": "2026-04-26",
     "updated": "",
     "tag": "Guide",
