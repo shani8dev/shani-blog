@@ -32,6 +32,30 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://blog.shani.dev/post/shani-os-for-designers-and-visual-creators</loc>
+    <lastmod>2026-05-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://blog.shani.dev/post/shani-os-for-general-desktop-users</loc>
+    <lastmod>2026-05-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://blog.shani.dev/post/shani-os-for-video-creators</loc>
+    <lastmod>2026-05-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://blog.shani.dev/post/shani-os-multimedia</loc>
+    <lastmod>2026-05-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://blog.shani.dev/post/shani-os-luks-after-installation</loc>
     <lastmod>2026-05-09</lastmod>
     <changefreq>monthly</changefreq>
