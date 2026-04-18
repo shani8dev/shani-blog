@@ -24,9 +24,9 @@ Full reference: [docs.shani.dev — Containers](https://docs.shani.dev/doc/softw
 
 ---
 
-## LXC vs LXD vs Distrobox vs Podman vs nspawn
+## LXC vs LXD vs Distrobox vs Podman vs nspawn vs VMs
 
-Choosing the right container type:
+Choosing the right container or isolation type:
 
 | | Distrobox | Podman | systemd-nspawn | LXD | QEMU/KVM |
 |---|---|---|---|---|---|
@@ -37,6 +37,8 @@ Choosing the right container type:
 | Startup time | ~1s | ~0.1s | ~1s | ~3s | ~30s |
 | Daemon required | No | No | No | Yes (socket) | Yes |
 | Isolation | Low–medium | Medium | High | High | Full |
+
+For GUI apps and portable tools, see: **Flatpak** ([guide](https://blog.shani.dev/post/flatpak-on-shani-os)), **Snap** ([guide](https://blog.shani.dev/post/snap-on-shani-os)), **AppImage** ([guide](https://blog.shani.dev/post/appimage-on-shani-os)). For CLI tools and runtimes, see **Nix** ([guide](https://blog.shani.dev/post/nix-on-shani-os)).
 
 **Use LXD when:**
 - You need a complete isolated server environment (web server, database, multiple services)
@@ -226,7 +228,10 @@ lxc exec pg16 -- apt install -y postgresql-16
 - [LXD documentation](https://documentation.ubuntu.com/lxd/)
 - [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os) — lighter system containers with no daemon or setup
 - [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — dev containers with home directory sharing
+- [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os) — OCI containers and services
 - [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full VMs for hardware-level isolation
+- [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — GUI applications
+- [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — CLI tools and dev runtimes
 - [Telegram community](https://t.me/shani8dev)
 
 ---

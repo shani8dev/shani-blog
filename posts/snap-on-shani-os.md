@@ -91,22 +91,24 @@ snap install node --classic
 
 ---
 
-## Snap vs Flatpak: When to Use Each
+## Snap vs the Full Ecosystem
 
-On Shani OS, Flatpak is the primary recommendation. Here is when to reach for Snap instead:
+On Shani OS, Flatpak is the primary recommendation for GUI apps, and Snap is the complement for apps only on the Snap Store. Here is the full picture:
 
 **Use Snap when:**
 - An app is available on the Snap Store but not on Flathub (this is increasingly rare)
 - You need a tool that only ships as a snap (some enterprise software, Canonical products)
 - You are already managing a Snap-heavy workflow and prefer consistency
 
-**Use Flatpak for everything else:**
-- Flathub has a larger catalogue than the Snap Store for desktop GUI apps
-- Flatpak's permission model is more granular and manageable via Flatseal
-- Flatpak is fully open-source end-to-end; the Snap Store backend is operated by Canonical and is not open-source
-- Flatpak auto-updates on a 12-hour timer; snaps auto-refresh on their own schedule
+**Use Flatpak for most GUI apps** — Flathub has a larger catalogue, Flatpak's permission model is more granular and manageable via Flatseal, and Flatpak is fully open-source end-to-end. Guide: [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os).
 
-Both coexist without conflict — you can have apps from both ecosystems installed simultaneously.
+**Use AppImage** for portable self-contained apps, beta builds, or tools available only as AppImages. Gear Lever (pre-installed) integrates them into your launcher. Guide: [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os).
+
+**Use Nix** for CLI tools, runtimes, and language toolchains. Over 100,000 packages with multiple-version support and reproducible environments. Guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os).
+
+**Use Distrobox** when you need a full mutable Linux environment with `apt`, `pacman`, or `yay`. Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
+
+All ecosystems coexist without conflict — you can have apps from Flatpak, Snap, AppImage, Nix, and Distrobox running simultaneously.
 
 ---
 
@@ -136,6 +138,8 @@ snap set system refresh.retain=2
 - [docs.shani.dev — Snaps](https://docs.shani.dev/doc/software/snaps) — full reference
 - [snapcraft.io](https://snapcraft.io) — Snap Store catalogue
 - [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — the primary app ecosystem
+- [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os) — portable apps with Gear Lever
+- [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — CLI tools and dev environments
 
 ---
 

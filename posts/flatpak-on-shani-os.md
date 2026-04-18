@@ -233,15 +233,23 @@ For organisations deploying Shani OS at scale, a private Flatpak repository is t
 
 ---
 
-## Flatpak vs Nix vs Distrobox
+## The Full Software Ecosystem on Shani OS
 
-Flatpak, Nix, and Distrobox serve different purposes on Shani OS and are not in competition:
+Flatpak is one of several complementary app ecosystems. None of them conflict — you can use all of them simultaneously:
 
-**Use Flatpak for** GUI desktop applications — browsers, office suites, creative tools, media players, communication apps. Flatpak apps are self-contained, update automatically, and integrate with your desktop environment via portals.
+**Flatpak** (this guide) — GUI desktop applications. Self-contained, sandboxed, auto-updating. Primary recommendation for any app available on Flathub.
 
-**Use Nix for** CLI tools, development runtimes, and language toolchains — Node, Python, Rust, Go, kubectl, terraform. Nix handles multiple versions of the same tool without conflict and provides reproducible per-project environments. Full guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os).
+**Snap** — a secondary app store for cases where an app is on the Snap Store but not Flathub. Pre-configured with its own `@snapd` subvolume. Guide: [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os).
 
-**Use Distrobox for** workflows that need a full mutable Linux environment — building AUR packages, tools that expect a traditional `/usr/bin` layout, or anything that simply is not available in Flatpak or Nix. Guide: [docs.shani.dev — Distrobox](https://docs.shani.dev/doc/software/distrobox).
+**AppImage** — portable self-contained executables. Download, make executable, run — no installation. Gear Lever (pre-installed) integrates them into your launcher. Guide: [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os).
+
+**Nix** — CLI tools, development runtimes, and language toolchains. Handles multiple versions of the same tool without conflict and provides reproducible per-project environments. Guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os).
+
+**Distrobox** — full mutable Linux environment (any distro's `apt`, `pacman`, `yay`, etc.) inside a container with your home directory shared. For anything not available in Flatpak or Nix, or workflows requiring a traditional package manager. Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
+
+**Podman** — OCI containers for services, databases, and development workflows. Docker-compatible, rootless, no daemon. Guide: [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os).
+
+**Homebrew** — works identically to macOS if that's your muscle memory. Installs to `/home/linuxbrew/.linuxbrew`, completely outside the read-only root. Guide: [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os).
 
 ---
 
@@ -249,7 +257,10 @@ Flatpak, Nix, and Distrobox serve different purposes on Shani OS and are not in 
 
 - [flathub.org](https://flathub.org) — browse the full app catalogue
 - [docs.shani.dev — Flatpak](https://docs.shani.dev/doc/software/flatpak) — full reference including advanced configuration
+- [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os) — when to use Snap vs Flatpak
+- [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os) — portable apps with Gear Lever
 - [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — CLI tools and development environments
+- [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — full mutable Linux environments
 - [Telegram community](https://t.me/shani8dev) — questions and app recommendations
 
 ---

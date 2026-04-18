@@ -347,11 +347,29 @@ podman system prune -af --volumes
 
 ---
 
+## Podman vs the Full Container and App Ecosystem
+
+Podman is one of several container and app options on Shani OS. Here is where each one fits:
+
+**Podman** (this guide) — OCI containers for services, databases, and development workflows. Rootless, Docker-compatible, daemon-free. Persistent data lives in `@containers`.
+
+**Distrobox** — a layer on top of Podman that provides a mutable Linux environment with home directory sharing. For `apt install`, `pacman -S`, AUR access, and tools that need a traditional filesystem layout. Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
+
+**LXC/LXD** — full Linux system containers with their own init system and network stack. For isolated server environments and multi-service setups lighter than a full VM. Guide: [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os).
+
+**systemd-nspawn** — the lightest full-system containers. No daemon, no setup — pull a tarball and boot it. Best for isolated builds and quick system environment tests. Guide: [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os).
+
+**Flatpak / Snap / AppImage** — for GUI desktop applications and portable tools. Not containers in the traditional sense, but each lives in its own persistent Btrfs subvolume. Guides: [Flatpak](https://blog.shani.dev/post/flatpak-on-shani-os) · [Snap](https://blog.shani.dev/post/snap-on-shani-os) · [AppImage](https://blog.shani.dev/post/appimage-on-shani-os).
+
+---
+
 ## Resources
 
 - [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — full Podman and container reference
 - [docs.shani.dev — Distrobox](https://docs.shani.dev/doc/software/distrobox) — mutable dev containers with full distro package managers
 - [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — using apt, pacman, yay inside Shani OS
+- [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os) — full system containers
+- [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os) — lightweight system containers
 - [Telegram community](https://t.me/shani8dev)
 
 ---

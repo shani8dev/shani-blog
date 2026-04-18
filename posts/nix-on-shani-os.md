@@ -237,9 +237,11 @@ nix-env -iA nixpkgs.kubectl nixpkgs.helm nixpkgs.terraform \
     nixpkgs.awscli2 nixpkgs.google-cloud-sdk
 ```
 
-### When Nix is not enough: Distrobox
+### The Full Ecosystem
 
-For packages not in Nixpkgs, or for workflows that require a full mutable Linux environment (building AUR packages, running tools that expect a traditional `/usr` layout, legacy software), Distrobox is the right tool:
+For packages not in Nixpkgs, or for specific workflows, the other layers on Shani OS fill the gaps:
+
+**Distrobox** — for anything requiring a full mutable Linux environment (building AUR packages, running tools that expect a traditional `/usr` layout, legacy software with complex system deps):
 
 ```bash
 distrobox create --name dev --image archlinux:latest
@@ -247,9 +249,17 @@ distrobox enter dev
 # Full pacman, yay, anything
 ```
 
-Distrobox containers live in `@containers` and also survive OS updates. Guide: [docs.shani.dev — Distrobox](https://docs.shani.dev/doc/software/distrobox).
+Distrobox containers live in `@containers` and survive OS updates. Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
 
-If you are coming from macOS and `brew install` is muscle memory, Homebrew also works on Shani OS — it installs to `/home/linuxbrew/.linuxbrew`, completely outside the read-only root. See [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os).
+**Flatpak** — for GUI desktop applications. Flathub has thousands of apps, auto-updates, and sandbox permission management via Flatseal. Guide: [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os).
+
+**Snap** — when an app is only on the Snap Store and not Flathub or Nixpkgs. Pre-configured with its own `@snapd` subvolume. Guide: [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os).
+
+**AppImage** — portable self-contained executables for one-off tools or latest beta versions. Gear Lever (pre-installed) integrates them into your launcher. Guide: [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os).
+
+**Podman** — OCI containers for services and databases. Docker-compatible, rootless. Guide: [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os).
+
+**Homebrew** — if you are coming from macOS and `brew install` is muscle memory, it works identically on Shani OS, installing to `/home/linuxbrew/.linuxbrew` outside the read-only root. See [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os).
 
 ---
 
@@ -258,6 +268,11 @@ If you are coming from macOS and `brew install` is muscle memory, Homebrew also 
 - [Nixpkgs search](https://search.nixos.org/packages) — search all 100,000+ packages
 - [Nix Pills](https://nixos.org/guides/nix-pills/) — the canonical learning resource for Nix fundamentals
 - [docs.shani.dev — Nix Package Manager](https://docs.shani.dev/doc/software/nix) — Shani OS-specific setup and configuration
+- [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — when you need a full distro package manager
+- [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — GUI applications
+- [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os) — Snap Store apps
+- [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os) — portable apps
+- [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os) — brew for macOS switchers
 
 ---
 

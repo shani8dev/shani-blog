@@ -279,29 +279,49 @@ distrobox enter arch-dev -- yay -Qs some-package
 
 ---
 
-## Distrobox vs Nix vs Flatpak
+## Distrobox vs the Full Ecosystem
 
-All three are available on Shani OS and serve different roles:
+All of these are available on Shani OS simultaneously and serve distinct roles:
 
 **Use Distrobox when:**
 - You need `apt`, `pacman`, `dnf`, or `yay` — the full package manager of a specific distro
 - A tool requires `make install` or `./configure` into system paths
 - You need a specific distro environment for compatibility testing
 - You want to use PPAs, COPR repos, or the AUR
-- A tool is not in Flathub or Nixpkgs
-
-**Use Nix when:**
-- You want CLI tools or development runtimes installed persistently
-- You need multiple versions of the same tool without conflict
-- You want reproducible per-project environments via `shell.nix`
-- The tool is in Nixpkgs (over 100,000 packages)
+- A tool is not in Flathub, the Snap Store, or Nixpkgs
 
 **Use Flatpak when:**
-- You want a GUI desktop application
-- The app is available on Flathub
+- You want a GUI desktop application available on Flathub
 - You want sandboxed permissions management via Flatseal
+- Guide: [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os)
 
-The three layers do not conflict. You can have an app exported from Distrobox, CLI tools from Nix, and GUI apps from Flatpak all running simultaneously — each in its own layer, each surviving OS updates.
+**Use Snap when:**
+- An app is only on the Snap Store and not Flathub
+- Guide: [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os)
+
+**Use AppImage when:**
+- An app ships only as an AppImage or you want a specific portable version
+- Guide: [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os)
+
+**Use Nix when:**
+- You want CLI tools or development runtimes installed persistently without a full container
+- You need multiple versions of the same tool without conflict
+- You want reproducible per-project environments via `shell.nix`
+- Guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os)
+
+**Use Podman when:**
+- You want OCI containers for services, databases, or development — rootless and Docker-compatible
+- Guide: [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os)
+
+**Use LXC/LXD or systemd-nspawn when:**
+- You need a full isolated Linux system with its own init, services, and network stack — lighter than a VM but more complete than Distrobox
+- Guide: [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os) · [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os)
+
+**Use Homebrew when:**
+- You are coming from macOS and `brew install` is muscle memory
+- Guide: [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os)
+
+The layers do not conflict. You can have apps from all ecosystems running simultaneously — each in its own Btrfs subvolume, each surviving OS updates.
 
 ---
 
@@ -370,8 +390,14 @@ Full troubleshooting reference: [docs.shani.dev — Distrobox](https://docs.shan
 
 - [docs.shani.dev — Distrobox](https://docs.shani.dev/doc/software/distrobox) — full reference
 - [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — Podman and all container runtimes
-- [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — CLI tools and dev environments
 - [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — GUI applications
+- [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os) — Snap Store apps
+- [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os) — portable apps with Gear Lever
+- [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — CLI tools and dev environments
+- [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os) — OCI containers and services
+- [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os) — full system containers
+- [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os) — lightweight system containers
+- [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os) — brew for macOS switchers
 - [Telegram community](https://t.me/shani8dev) — questions and support
 
 ---

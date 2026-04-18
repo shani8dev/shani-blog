@@ -38,6 +38,39 @@ The KDE Plasma edition ships the following gaming tools as Flatpaks, all pre-ins
 
 ---
 
+## Windows Compatibility — Wine, Proton, and Bottles
+
+Running Windows games and software on Linux is handled through Wine — a compatibility layer that translates Windows API calls to Linux equivalents. You do not need Windows. You do not need a VM. Wine runs Windows `.exe` files directly on your Linux desktop.
+
+**Proton** is Valve's distribution of Wine, bundled with Steam and tuned specifically for gaming. It includes DXVK (DirectX 9/10/11 → Vulkan translation), VKD3D-Proton (DirectX 12 → Vulkan), and Steam Input. Proton is what makes the majority of Steam's Windows-only catalogue run on Linux. It is managed entirely within Steam — no separate installation.
+
+```bash
+# Enable Proton for a Steam game:
+# Steam → Library → right-click game → Properties → Compatibility
+# → "Force the use of a specific Steam Play compatibility tool"
+# → Select Proton version
+
+# Useful Steam launch options for Wine/Proton:
+# PROTON_LOG=1 %command%            — enable detailed Wine/Proton logging
+# DXVK_ASYNC=1 %command%            — async shader compilation (reduces stutter)
+# PROTON_USE_WINED3D=1 %command%    — use OpenGL-based wined3d instead of DXVK
+# PROTON_NO_ESYNC=1 %command%       — disable esync (try if a game crashes)
+```
+
+**Bottles** (`com.usebottles.bottles`) is pre-installed on the KDE Plasma edition. It provides a clean interface for creating isolated Wine environments ("bottles") for non-Steam Windows software — games from GOG installers, Windows tools, legacy software. Each bottle has its own Wine prefix and can be configured independently.
+
+```bash
+# Install winetricks dependencies for a specific game inside a Bottles bottle:
+# Bottles → select bottle → Dependencies → search and install
+# (Bottles manages winetricks automatically — no terminal needed)
+```
+
+**Heroic Games Launcher** also handles Wine/Proton for Epic and GOG games — it uses its own Wine runners and can download specific Proton-GE or Wine-GE versions for compatibility.
+
+**[ProtonDB](https://www.protondb.com)** is the community-maintained database of game compatibility. Before trying a game, check its ProtonDB rating and user reports for any launch flags needed.
+
+---
+
 ## Performance Overlay and Post-Processing
 
 **GOverlay** (`io.github.benjamimgois.goverlay`) is the graphical configuration tool for MangoHud, pre-installed on the KDE Plasma edition. It provides an easy interface for setting up your performance overlay without editing config files manually.
@@ -195,7 +228,8 @@ Full gaming troubleshooting: [docs.shani.dev — Gaming Issues](https://docs.sha
 - [docs.shani.dev — Gaming Hardware & Performance](https://docs.shani.dev/doc/intro/whats-included) — full hardware compatibility list
 - [docs.shani.dev — Gaming Issues](https://docs.shani.dev/doc/troubleshooting) — troubleshooting
 - [docs.shani.dev — Android (Waydroid)](https://docs.shani.dev/doc/software/waydroid) — Android gaming setup
-- [ProtonDB](https://www.protondb.com) — community compatibility database
+- [ProtonDB](https://www.protondb.com) — community Wine/Proton compatibility database
+- [WineHQ AppDB](https://appdb.winehq.org) — compatibility reports for non-game Windows software
 - [Telegram community](https://t.me/shani8dev) — gaming discussions and support
 
 [Download Shani OS KDE Plasma Edition at shani.dev →](https://shani.dev)

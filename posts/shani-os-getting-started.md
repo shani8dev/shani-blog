@@ -176,6 +176,16 @@ flatpak install flathub org.telegram.desktop
 
 Apps install to `@flatpak` and auto-update every 12 hours. You can also manage permissions graphically with Flatseal. Full guide: [docs.shani.dev — Flatpak](https://docs.shani.dev/doc/software/flatpak).
 
+If an app is only available on the Snap Store and not Flathub, Snap is pre-configured as a fallback. The `@snapd` Btrfs subvolume persists across every OS update and rollback:
+
+```bash
+# Install a snap when the app isn't on Flathub
+snap install some-app
+snap install some-tool --classic
+```
+
+Full guide: [docs.shani.dev — Snaps](https://docs.shani.dev/doc/software/snaps).
+
 ### 5. Set up Waydroid for Android apps (optional)
 
 Waydroid is pre-installed. Run the setup helper:
@@ -222,6 +232,25 @@ For containerised databases and services, Podman works with standard Docker comm
 podman run -d -p 5432:5432 -e POSTGRES_PASSWORD=secret postgres
 ```
 
+For full Linux system containers — complete with an init system and services — LXC/LXD is pre-installed with dedicated `@lxc` and `@lxd` Btrfs subvolumes. For even lighter full-system containers with no setup, systemd-nspawn is available immediately:
+
+```bash
+# systemd-nspawn: pull a tarball and boot it — no daemon, no config
+sudo machinectl pull-tar --verify=no \
+  https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-basic.tar.zst archlinux
+sudo machinectl start archlinux
+```
+
+For portable one-off tools, AppImages run directly and Gear Lever (pre-installed) integrates them into your launcher. For Android development and testing, Waydroid is pre-installed — run Android apps natively with full GPU acceleration:
+
+```bash
+sudo waydroid init
+waydroid session start
+waydroid show-full-ui
+# Install and test your APK
+waydroid app install myapp.apk
+```
+
 ---
 
 ## Managing Flatpak Permissions
@@ -250,7 +279,19 @@ sudo shani-deploy -r
 ## Common Questions
 
 **Can I install packages with pacman?**
-No — and you do not need to. The immutable root means `pacman -S` to the base system would be overwritten on the next update anyway. Use Flatpak for GUI apps, Snap when an app is only on the Snap Store, Nix for CLI tools, and Distrobox for anything that needs a full mutable package manager. The migration table at [docs.shani.dev](https://docs.shani.dev/doc/concepts) maps every traditional workflow to its Shani OS equivalent.
+No — and you do not need to. The immutable root means `pacman -S` to the base system would be overwritten on the next update anyway. The full set of options:
+
+- **Flatpak** — GUI desktop apps (browsers, office, creative tools, media). Primary recommendation.
+- **Snap** — fallback when an app is only on the Snap Store. Pre-configured.
+- **Nix** — CLI tools, runtimes, language toolchains. Handles multiple versions without conflict.
+- **Distrobox** — full mutable Linux environment with any distro's package manager (pacman, apt, yay).
+- **Podman** — OCI containers for services, databases, and development workflows.
+- **AppImage** — portable self-contained executables. Download and run; Gear Lever integrates them.
+- **LXC/LXD** — full system containers with init systems and services.
+- **systemd-nspawn** — lightweight system containers, no daemon required.
+- **Homebrew** — works identically to macOS if that's your preference.
+
+The migration table at [docs.shani.dev](https://docs.shani.dev/doc/concepts) maps every traditional workflow to its Shani OS equivalent.
 
 **What happens to my files if I roll back?**
 Nothing. Your home directory is in `@home`, completely independent of the OS slots. Flatpak apps are in `@flatpak`. Snap packages are in `@snapd`. Nix packages are in `@nix`. An OS rollback does not touch any of them.

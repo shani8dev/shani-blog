@@ -113,13 +113,17 @@ You install software into the right layer for it — outside the OS, in persiste
 
 **GUI applications** go through Flatpak. Flathub has thousands of apps. `flatpak install flathub app.name` and it lives in the `@flatpak` subvolume. The Warehouse app (pre-installed on both editions) gives you a graphical front-end for browsing and managing all your Flatpaks. Full Flatpak guidance: [docs.shani.dev — Flatpak](https://docs.shani.dev/doc/software/flatpak).
 
+**Snap** is pre-configured as a complement when an app exists only on the Snap Store. Snap packages live in `@snapd` and survive every OS update and rollback. `snap install <n>` and it is there. Guide: [docs.shani.dev — Snaps](https://docs.shani.dev/doc/software/snaps).
+
+**AppImages** are portable self-contained executables — download, `chmod +x`, run. Gear Lever (pre-installed on both editions) integrates them into your launcher and tracks updates. No installation, no system writes. Guide: [docs.shani.dev — AppImage](https://docs.shani.dev/doc/software/appimage).
+
 **CLI tools and dev environments** have several good options. Nix comes pre-installed, with the daemon running and the `@nix` subvolume shared across both slots. Add a channel once, then install anything: `nix-env -i ripgrep`, `nix-env -i nodejs`, `nix-env -i python312`. Nix handles multiple versions without conflict. Full guide: [docs.shani.dev — Nix Package Manager](https://docs.shani.dev/doc/software/nix).
 
 Distrobox runs a full mutable container of any Linux distro — Arch, Ubuntu, Fedora — with `pacman`, `apt`, or `dnf` fully intact. Your home directory is shared by default, and containers live in `@containers`, surviving OS updates. BoxBuddy (pre-installed) provides a GUI for managing your containers. Full guide: [docs.shani.dev — Distrobox](https://docs.shani.dev/doc/software/distrobox).
 
-AppImages are portable self-contained executables — download and run. Gear Lever (pre-installed) integrates them into your app launcher. Homebrew can also be installed and works exactly as it does on macOS. Guide: [docs.shani.dev — AppImage](https://docs.shani.dev/doc/software/appimage).
+Podman handles OCI containers for services, databases, and development workflows. The Pods app (pre-installed) gives you a graphical interface. Rootless, Docker-compatible, daemon-free. Guide: [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers).
 
-**Snap** is available as a complement when an app is on the Snap Store but not Flathub. Snap is pre-configured — `snapd.socket` is enabled and the `@snapd` subvolume persists across every OS update and rollback. `snap install <n>` and it is there. Guide: [docs.shani.dev — Snaps](https://docs.shani.dev/doc/software/snaps).
+For full Linux system containers (with their own init and services), LXC/LXD and systemd-nspawn are pre-installed. systemd-nspawn needs no setup — pull a tarball and boot it. LXD adds a richer feature set for more complex needs. Homebrew also works on Shani OS if that is your preference — it installs to `/home/linuxbrew/.linuxbrew`, completely outside the read-only root. Guide: [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os).
 
 The design principle: the OS is infrastructure, not your workspace. An `apt install` to the base system would be overwritten the next time `shani-deploy` runs anyway — the right place for software is always outside the OS.
 

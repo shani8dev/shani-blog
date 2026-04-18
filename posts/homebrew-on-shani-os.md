@@ -88,30 +88,23 @@ brew doctor
 
 ---
 
-## Homebrew vs Nix: Which Should You Use?
+## Homebrew vs the Full Ecosystem
 
-Both Homebrew and Nix install tools to user-space locations outside the OS root. Both survive OS updates. They coexist without conflict — you can use both simultaneously.
+Homebrew coexists with everything else on Shani OS without conflict. Here is how they all fit together:
 
-The right choice depends on your workflow:
+**Homebrew** (this guide) — familiar `brew install` for macOS switchers. Installs to `/home/linuxbrew/.linuxbrew`, completely outside the read-only root. Great for users who know the Homebrew catalogue and want continuity.
 
-**Choose Homebrew if:**
-- You are coming from macOS and already know Homebrew
-- You want simple `brew install` and `brew upgrade` commands
-- You do not need multiple versions of the same tool
-- Your workflow is straightforward and reproducibility per-project is not a priority
+**Nix** — the recommended alternative for complex dev environments. Handles multiple versions of the same tool, per-project `shell.nix` environments, and cryptographic package pinning. More powerful than Homebrew for serious development workflows. Guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os).
 
-**Choose Nix if:**
-- You need multiple versions of the same tool (e.g. Node 18 and Node 22 simultaneously)
-- You want per-project environments via `shell.nix` that are reproducible across machines
-- You want environments that are isolated — entering a `nix-shell` does not affect your global PATH
-- You care about reproducibility: `shell.nix` with a pinned Nixpkgs commit gives you byte-identical packages six months later
-- You manage complex dependency chains (Nix handles these better than Homebrew)
+**Flatpak** — GUI desktop applications. Primary recommendation for any app available on Flathub. Guide: [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os).
 
-**Summary:**
-- Homebrew: familiar, simple, great for macOS switchers
-- Nix: more powerful, declarative, better for complex dev environments
+**Snap** — fallback for apps only on the Snap Store. Guide: [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os).
 
-You can use both. Many macOS switchers start with Homebrew because it is familiar, then migrate specific workflows to Nix as they discover its advantages.
+**AppImage** — portable self-contained executables. Download and run; Gear Lever integrates them into your launcher. Guide: [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os).
+
+**Distrobox** — when you need a full mutable Linux environment with `apt`, `pacman`, or `yay`. Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
+
+Many macOS switchers start with Homebrew because it is familiar, then migrate specific workflows to Nix as they discover its advantages. Both can coexist indefinitely.
 
 ---
 
@@ -170,6 +163,10 @@ alias brewup='brew update && brew upgrade && brew cleanup'
 
 - [docs.shani.dev — Homebrew](https://docs.shani.dev/doc/software/homebrew) — full reference
 - [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — the recommended alternative for complex dev environments
+- [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — GUI applications
+- [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os) — Snap Store apps
+- [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os) — portable apps
+- [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — full mutable Linux environments
 - [Migrating to Shani OS](https://blog.shani.dev/post/migrating-to-shani-os) — full workflow translation guide
 - [Telegram community](https://t.me/shani8dev)
 

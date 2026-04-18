@@ -29,7 +29,7 @@ Once you understand that `flatpak install flathub org.mozilla.firefox` is equiva
 
 Both GNOME and KDE editions ship with Vivaldi Browser and OnlyOffice Desktop Editors pre-installed. OnlyOffice opens `.docx`, `.xlsx`, and `.pptx` natively — your existing documents work on day one. VLC, image viewers, calendar, notes, media players — all included.
 
-Windows applications run through Bottles (pre-installed on KDE Plasma, available on Flathub for GNOME). Many Windows applications work via Wine-based compatibility without needing Windows at all.
+Windows applications run through Wine — a compatibility layer that translates Windows API calls so Windows `.exe` files run directly on Linux without needing Windows or a VM. Bottles (pre-installed on KDE Plasma, available on Flathub for GNOME) provides a clean interface for managing Wine environments. For games specifically, Proton (Valve's gaming-tuned distribution of Wine, bundled with Steam) handles the vast majority of Steam's Windows-only catalogue automatically.
 
 Indian-language support — Devanagari, Tamil, Telugu, and more — is first-class, not an afterthought. IBus multi-language input is pre-configured. Indian scripts render correctly from first boot without installing additional packages.
 
@@ -86,6 +86,14 @@ Your containers live in the `@containers` subvolume and survive OS updates. Home
 **Podman** for container-based workflows — rootless, Docker-compatible, daemon running at boot. The Pods app (pre-installed on both editions) gives you a graphical interface for managing containers and images. The usual `docker run` commands work via the `podman-docker` drop-in. Guide: [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers).
 
 **AppImages** for portable one-off tools — download, run, managed by Gear Lever (pre-installed on both editions), which integrates them into your app launcher. Guide: [docs.shani.dev — AppImage](https://docs.shani.dev/doc/software/appimage).
+
+**Snap** is available as a complement when an app exists only on the Snap Store. `snapd.socket` is pre-configured and Snap packages live in the `@snapd` Btrfs subvolume, surviving every OS update and rollback. Guide: [docs.shani.dev — Snaps](https://docs.shani.dev/doc/software/snaps).
+
+**LXC/LXD** for full Linux system containers — a complete OS environment (init system, services, network stack) without the overhead of a full VM. Pre-installed with dedicated `@lxc` and `@lxd` Btrfs subvolumes. Useful for isolated server environments, testing system services, or running multiple distro instances simultaneously. Guide: [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os).
+
+**systemd-nspawn** for the lightest full-system containers — pull a Linux root tarball, start the container in under a second, no daemon required. Containers live in `@machines`. The fastest way to spin up an isolated Linux environment for builds or testing. Guide: [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os).
+
+**Waydroid** for Android app development — run a full hardware-accelerated Android stack on your Linux desktop. Test APKs directly with `adb`, iterate without a physical device. Pre-installed on both editions. Guide: [docs.shani.dev — Android (Waydroid)](https://docs.shani.dev/doc/software/waydroid).
 
 ### The dev experience in practice
 

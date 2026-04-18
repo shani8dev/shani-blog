@@ -31,14 +31,18 @@ On a traditional Linux distribution, software installation means writing files i
 
 On Shani OS, the OS root is frozen. It is a verified, signed image. You do not write into it because doing so would undermine the entire reliability guarantee: if you can add arbitrary packages to the OS, the OS is no longer the reproducible artefact that the update pipeline verified.
 
-Instead, three persistent layers sit alongside the OS:
+Instead, persistent layers sit alongside the OS, each in its own Btrfs subvolume:
 
-1. **`@flatpak`** — for GUI desktop applications (browsers, office, media, etc.)
-2. **`@nix`** — for CLI tools, development runtimes, and language toolchains
-3. **`@containers`** — for full mutable Linux environments when you need them
-4. **`@snapd`** — for Snap packages when an app is only available on the Snap Store
+1. **`@flatpak`** — GUI desktop applications (browsers, office, media, etc.)
+2. **`@snapd`** — Snap packages when an app is only available on the Snap Store
+3. **`@nix`** — CLI tools, development runtimes, and language toolchains
+4. **`@containers`** — Distrobox and Podman OCI containers
+5. **`@machines`** — systemd-nspawn system containers
+6. **`@lxc`** / **`@lxd`** — LXC/LXD full system containers
+7. **`@libvirt`** / **`@qemu`** — Virtual machine disk images
+8. **`@waydroid`** — Android environment
 
-All four survive every OS update and rollback. They are never touched by `shani-deploy`. They have their own update paths. They do not conflict with each other.
+All survive every OS update and rollback. They are never touched by `shani-deploy`. They have their own update paths. They do not conflict with each other.
 
 ---
 
@@ -55,6 +59,8 @@ All four survive every OS update and rollback. They are never touched by `shani-
 | `sudo apt install code` | `flatpak install flathub com.visualstudio.code` |
 
 Search for the Flatpak app ID at [flathub.org](https://flathub.org) or via `flatpak search <n>`. Most major GUI applications are on Flathub. If an app is only available on the Snap Store, `snap install <n>` works as a fallback — Snap is pre-configured on Shani OS and the `@snapd` subvolume persists across updates just like `@flatpak`.
+
+For portable self-contained tools distributed as AppImages, download the `.AppImage`, make it executable, and run — or open with Gear Lever (pre-installed) to add it permanently to your launcher with automatic update checking.
 
 ### CLI Tools and Development Runtimes
 
@@ -177,7 +183,38 @@ nix-shell -p nodejs_22  # separate shell with Node 22
 
 Full Nix guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os).
 
-### AUR Packages (Arch Users)
+### Full System Containers (LXC/LXD and systemd-nspawn)
+
+For workflows that need a complete isolated Linux system — with its own init, services, and network stack, lighter than a full VM — two options are pre-installed:
+
+**LXC/LXD** is the more full-featured option, with a built-in image catalog, port forwarding, and snapshot management. Container storage lives in `@lxc`/`@lxd`:
+
+```bash
+lxc launch ubuntu:24.04 myserver
+lxc exec myserver -- bash
+```
+
+**systemd-nspawn** is the lightest option — no daemon, no image format, just point it at a Linux root directory and it boots. Container filesystems live in `@machines`:
+
+```bash
+sudo machinectl pull-tar --verify=no \
+  https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-basic.tar.zst archlinux
+sudo machinectl start archlinux
+sudo machinectl login archlinux
+```
+
+### Android Apps and Development
+
+Waydroid runs a full hardware-accelerated Android stack in a container. Indian apps (BHIM, DigiLocker, IRCTC), streaming apps, and Android development testing all work without a separate device. The `@waydroid` subvolume persists across every OS update:
+
+```bash
+sudo waydroid init    # one-time setup
+waydroid session start
+waydroid show-full-ui
+waydroid app install myapp.apk    # test your APK with adb
+```
+
+Guide: [Waydroid on Shani OS](https://blog.shani.dev/post/waydroid-android-on-shani-os).
 
 The AUR is not directly available on Shani OS — but the full Arch Linux experience, including `yay` and the AUR, is one command away via Distrobox:
 
@@ -223,9 +260,14 @@ The parts of the filesystem you regularly interact with are the same. The OS roo
 | `/usr` | **Read-only** — OS files live here, you cannot modify them |
 | `/bin`, `/lib`, `/sbin` | Symlinks into `/usr` — effectively read-only |
 | `/var` | tmpfs — cleared on reboot; persistent state bind-mounted from `@data` |
-| `/nix` | Writable by Nix — your Nix packages live here |
+| `/nix` | Writable by Nix — your Nix packages live here (`@nix`) |
 | `/var/lib/flatpak` | Flatpak apps — writable via `@flatpak` |
 | `/var/lib/snapd` | Snap packages — writable via `@snapd` |
+| `/var/lib/containers` | Distrobox and Podman containers — writable via `@containers` |
+| `/var/lib/machines` | systemd-nspawn system containers — writable via `@machines` |
+| `/var/lib/lxd` | LXD containers — writable via `@lxd` |
+| `/var/lib/libvirt` | VM disk images — writable via `@libvirt` |
+| `/var/lib/waydroid` | Android environment — writable via `@waydroid` |
 
 The read-only nature of `/usr` is the main thing to internalise. Anything that tries to write to `/usr/local/bin` or install files into `/usr/share` will fail. Use Nix, Flatpak, Snap, or Distrobox instead.
 
@@ -290,10 +332,18 @@ These do not require any migration thought — they work on Shani OS exactly as 
 - [docs.shani.dev — Nix Package Manager](https://docs.shani.dev/doc/software/nix) — complete Nix setup guide
 - [docs.shani.dev — Flatpak](https://docs.shani.dev/doc/software/flatpak) — Flatpak configuration
 - [docs.shani.dev — Distrobox](https://docs.shani.dev/doc/software/distrobox) — mutable containers guide
+- [docs.shani.dev — Snaps](https://docs.shani.dev/doc/software/snaps) — Snap setup and usage
+- [docs.shani.dev — AppImage](https://docs.shani.dev/doc/software/appimage) — AppImage and Gear Lever
+- [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — Podman, LXC/LXD, systemd-nspawn
+- [docs.shani.dev — Android (Waydroid)](https://docs.shani.dev/doc/software/waydroid) — Android app setup
 - [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — detailed Nix workflow guide
 - [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — full Flatpak guide
-- [docs.shani.dev — Snaps](https://docs.shani.dev/doc/software/snaps) — Snap setup and usage
 - [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os) — when to use Snap vs Flatpak
+- [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — full Distrobox guide
+- [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os) — AppImage guide
+- [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os) — full system containers
+- [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os) — lightweight system containers
+- [Waydroid on Shani OS](https://blog.shani.dev/post/waydroid-android-on-shani-os) — Android apps
 - [Telegram community](https://t.me/shani8dev) — ask migration questions
 
 [Download Shani OS at shani.dev →](https://shani.dev)
