@@ -5,7 +5,7 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Sat, 18 Apr 2026 09:52:02 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 18 Apr 2026 10:27:23 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>shani-update — The Shani OS Update Manager</title>
@@ -35,10 +35,37 @@
       <author>Shrinivas Kumbhar</author>
     </item>
     <item>
+      <title>Apptainer (Singularity) on Shani OS — HPC Containers for Workstation and Cluster</title>
+      <link>https://blog.shani.dev/post/apptainer-on-shani-os</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/apptainer-on-shani-os</guid>
+      <description>Apptainer is the HPC standard for portable, reproducible containers — pre-installed on Shani OS, no root required, runs the same SIF image on your workstation and on any SLURM/PBS cluster. Build once, run anywhere, with full NVIDIA and AMD ROCm GPU support.</description>
+      <pubDate>Thu, 07 May 2026 00:00:00 GMT</pubDate>
+      <category>Guide</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+    <item>
+      <title>GPU Compute on Shani OS — NVIDIA CUDA, AMD ROCm, and Intel oneAPI</title>
+      <link>https://blog.shani.dev/post/gpu-compute-on-shani-os</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/gpu-compute-on-shani-os</guid>
+      <description>How to run GPU compute workloads on Shani OS — AMD ROCm with PyTorch and TensorFlow, NVIDIA CUDA via Distrobox, Intel oneAPI, HIP for cross-vendor portability, and Nix for pure ML environments. Works for ML, simulation, data science, and scientific computing.</description>
+      <pubDate>Thu, 07 May 2026 00:00:00 GMT</pubDate>
+      <category>Guide</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+    <item>
       <title>LXC and LXD on Shani OS — Full System Containers</title>
       <link>https://blog.shani.dev/post/lxc-lxd-on-shani-os</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/lxc-lxd-on-shani-os</guid>
       <description>LXC and LXD run full Linux system containers on Shani OS — complete OS environments sharing the host kernel, stored in dedicated @lxc and @lxd Btrfs subvolumes that survive every OS update. Lighter than VMs, more complete than Distrobox.</description>
+      <pubDate>Thu, 07 May 2026 00:00:00 GMT</pubDate>
+      <category>Guide</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+    <item>
+      <title>systemd-nspawn and machinectl on Shani OS — Lightweight System Containers</title>
+      <link>https://blog.shani.dev/post/systemd-nspawn-on-shani-os</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/systemd-nspawn-on-shani-os</guid>
+      <description>systemd-nspawn is the lightest way to run a full Linux system environment on Shani OS — no image management, no daemon, no setup. Containers boot in under a second, live in the @machines Btrfs subvolume, and survive every OS update untouched.</description>
       <pubDate>Thu, 07 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
@@ -227,7 +254,7 @@
       <title>Shani OS for Researchers and HPC — Reproducible Environments from Desktop to Cluster</title>
       <link>https://blog.shani.dev/post/shani-os-for-researchers-and-hpc</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-for-researchers-and-hpc</guid>
-      <description>How Shani OS makes scientific computing reproducible from the ground up — Apptainer for cluster workloads, Nix for pinned environments, GPU passthrough for ML, AMD ROCm for open-source GPU compute, and a GPG-signed host OS that is itself a verifiable artefact.</description>
+      <description>How Shani OS makes scientific computing reproducible from the ground up — Apptainer for cluster workloads, Nix for pinned environments, AMD ROCm and NVIDIA CUDA for GPU compute, DVC for data versioning, and a GPG-signed host OS that is itself a verifiable artefact.</description>
       <pubDate>Thu, 16 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>

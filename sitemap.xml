@@ -44,7 +44,25 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://blog.shani.dev/post/apptainer-on-shani-os</loc>
+    <lastmod>2026-05-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://blog.shani.dev/post/gpu-compute-on-shani-os</loc>
+    <lastmod>2026-05-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://blog.shani.dev/post/lxc-lxd-on-shani-os</loc>
+    <lastmod>2026-05-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://blog.shani.dev/post/systemd-nspawn-on-shani-os</loc>
     <lastmod>2026-05-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
