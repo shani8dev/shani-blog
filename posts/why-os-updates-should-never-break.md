@@ -37,20 +37,21 @@ The result is a class of problems with no good solution in the traditional model
 
 Shani OS keeps two complete, bootable copies of the operating system on disk at all times. They live in Btrfs subvolumes called `@blue` and `@green`. You boot from one. Updates are prepared on the other. The running copy is never touched.
 
-Here is what happens when you run `sudo shani-deploy update`:
+Here is what happens when you run `sudo shani-deploy`:
 
-1. The updater downloads the latest OS image, verifying both SHA256 checksum and GPG signature before a single byte is written anywhere.
-2. A timestamped Btrfs snapshot of the standby copy is taken — it exists before any changes begin.
-3. The new, verified image is extracted into the standby copy via `btrfs receive`.
-4. A new Unified Kernel Image (UKI) is generated and signed for the updated slot via `gen-efi`.
-5. Only after successful extraction and UKI generation does the bootloader update to point to the new slot.
-6. Your running system continues unchanged. The pending update waits until you reboot.
+1. The updater checks for a newer version of itself and re-executes if one is found, preserving all state.
+2. The latest OS image is downloaded, verifying both SHA256 checksum and GPG signature before a single byte is written anywhere.
+3. A timestamped Btrfs snapshot of the standby copy is taken — it exists before any changes begin.
+4. The new, verified image is extracted into the standby copy via `btrfs receive`.
+5. A new Unified Kernel Image (UKI) is generated and signed for the updated slot via `gen-efi configure` inside a chroot.
+6. Only after successful extraction and UKI generation does the bootloader update to point to the new slot.
+7. Your running system continues unchanged. The pending update waits until you reboot.
 
-If power is cut mid-update, your running system is intact. If the new copy boots but does not work for you: `sudo shani-deploy --rollback`. One command. One reboot. You are back.
+If power is cut mid-update, your running system is intact. If the new copy boots but does not work for you: `sudo shani-deploy -r`. One command. One reboot. You are back.
 
-If the new copy cannot boot at all: systemd-boot's boot-counting mechanism detects the failure and reverts automatically. You may not even notice.
+If the new copy cannot boot at all: systemd-boot's boot-counting mechanism detects the failure after three attempts and reverts automatically. You may not even notice.
 
-The active slot is tracked in `/data/current-slot`. A startup check runs 15 seconds after login to confirm a successful boot. For full details on the update pipeline: [The Architecture Behind Shani OS](/post/shani-os-architecture-deep-dive#the-update-pipeline-in-full).
+The active slot is tracked in `/data/current-slot`. `shani-update` runs at login and detects whether the last boot was a fallback, whether a staged update is waiting for a reboot, or whether the system is running a freshly deployed slot — prompting appropriately for each case. For full details on the update pipeline: [The Architecture Behind Shani OS](/post/shani-os-architecture-deep-dive#the-update-pipeline-in-full).
 
 ---
 
@@ -84,13 +85,13 @@ Security in most operating systems is a layer applied on top of the system. You 
 
 Six Linux Security Modules run simultaneously from first boot: AppArmor, Landlock, Lockdown, Yama, Integrity (IMA/EVM), and BPF LSM. Most Linux distributions enable one or two. The combination means an attacker who escapes one layer faces restrictions from the remaining five.
 
-Full-disk encryption with LUKS2 and argon2id key derivation is available at install time. TPM2 auto-unlock seals the LUKS key to the hardware state — the disk unlocks automatically on your own machine and is locked against physical removal. Secure Boot verifies the bootloader and kernel before the system starts. Intel ME kernel modules are blacklisted by default.
+Full-disk encryption with LUKS2 and argon2id key derivation is available at install time. TPM2 auto-unlock seals the LUKS key to the hardware state — the PCR policy is chosen automatically based on Secure Boot state (PCR 0+7 with Secure Boot enabled, PCR 0 only without). The disk unlocks automatically on your own machine and is locked against physical removal. Secure Boot verifies the bootloader and kernel before the system starts. Intel ME kernel modules are blacklisted by default.
 
 None of this requires post-install configuration. It is on by default, or available with a single step at install.
 
 > If you install Shani OS on a laptop, enable LUKS2 encryption during setup and run `sudo gen-efi enroll-tpm2` on first boot. You get full-disk encryption that unlocks automatically on your own hardware — no passphrase at every boot.
 
-For setup instructions: [wiki.shani.dev — TPM2 Enrollment](https://wiki.shani.dev#tpm-encryption). For the full security model: [Security Without Configuration](/post/shani-os-security-deep-dive).
+For setup instructions: [docs.shani.dev — TPM2 Enrollment](https://docs.shani.dev/doc/security/tpm2). For the full security model: [Security Without Configuration](/post/shani-os-security-deep-dive).
 
 ---
 
@@ -110,13 +111,13 @@ The most common question when encountering an immutable OS: if the root filesyst
 
 You install software into the right layer for it — outside the OS, in persistent Btrfs subvolumes that survive every update and rollback untouched.
 
-**GUI applications** go through Flatpak. Flathub has thousands of apps. `flatpak install flathub app.name` and it lives in the `@flatpak` subvolume. The Warehouse app (pre-installed on both editions) gives you a graphical front-end for browsing and managing all your Flatpaks. Full Flatpak guidance: [wiki.shani.dev — Flatpak](https://wiki.shani.dev#flatpak).
+**GUI applications** go through Flatpak. Flathub has thousands of apps. `flatpak install flathub app.name` and it lives in the `@flatpak` subvolume. The Warehouse app (pre-installed on both editions) gives you a graphical front-end for browsing and managing all your Flatpaks. Full Flatpak guidance: [docs.shani.dev — Flatpak](https://docs.shani.dev/doc/software/flatpak).
 
-**CLI tools and dev environments** have several good options. Nix comes pre-installed, with the daemon running and the `@nix` subvolume shared across both slots. Add a channel once, then install anything: `nix-env -i ripgrep`, `nix-env -i nodejs`, `nix-env -i python312`. Nix handles multiple versions without conflict. Full guide: [wiki.shani.dev — Nix Package Manager](https://wiki.shani.dev#nix).
+**CLI tools and dev environments** have several good options. Nix comes pre-installed, with the daemon running and the `@nix` subvolume shared across both slots. Add a channel once, then install anything: `nix-env -i ripgrep`, `nix-env -i nodejs`, `nix-env -i python312`. Nix handles multiple versions without conflict. Full guide: [docs.shani.dev — Nix Package Manager](https://docs.shani.dev/doc/software/nix).
 
-Distrobox runs a full mutable container of any Linux distro — Arch, Ubuntu, Fedora — with `pacman`, `apt`, or `dnf` fully intact. Your home directory is shared by default, and containers live in `@containers`, surviving OS updates. BoxBuddy (pre-installed) provides a GUI for managing your containers. Full guide: [wiki.shani.dev — Distrobox](https://wiki.shani.dev#distrobox).
+Distrobox runs a full mutable container of any Linux distro — Arch, Ubuntu, Fedora — with `pacman`, `apt`, or `dnf` fully intact. Your home directory is shared by default, and containers live in `@containers`, surviving OS updates. BoxBuddy (pre-installed) provides a GUI for managing your containers. Full guide: [docs.shani.dev — Distrobox](https://docs.shani.dev/doc/software/distrobox).
 
-AppImages are portable self-contained executables — download and run. Gear Lever (pre-installed) integrates them into your app launcher. Homebrew can also be installed and works exactly as it does on macOS. Guide: [wiki.shani.dev — AppImage](https://wiki.shani.dev#appimage).
+AppImages are portable self-contained executables — download and run. Gear Lever (pre-installed) integrates them into your app launcher. Homebrew can also be installed and works exactly as it does on macOS. Guide: [docs.shani.dev — AppImage](https://docs.shani.dev/doc/software/appimage).
 
 The design principle: the OS is infrastructure, not your workspace. An `apt install` to the base system would be overwritten the next time `shani-deploy` runs anyway — the right place for software is always outside the OS.
 
@@ -124,7 +125,7 @@ The design principle: the OS is infrastructure, not your workspace. An `apt inst
 
 ## The Practical Shape of a Day
 
-A Shani OS system in daily use is quiet. You get a desktop notification when a new OS image is ready. When you are ready, you run `sudo shani-deploy update`, which takes a few minutes. You reboot when convenient. If anything feels off, you roll back with one command and one reboot.
+A Shani OS system in daily use is quiet. `shani-update` runs at login and shows a notification when a new OS image is ready. When you are ready, you run `sudo shani-deploy`, which takes a few minutes. You reboot when convenient. If anything feels off, `sudo shani-deploy -r` rolls back with one command and one reboot.
 
 Your apps — Flatpaks, Nix packages, containers — live in their own subvolumes, completely independent of the OS. They update on their own schedules. `flatpak update` updates your apps. `shani-deploy` updates the OS. Neither affects the other.
 
@@ -140,7 +141,7 @@ Both are free. Both are open source. Both require no account.
 
 **System requirements:** UEFI firmware, 64-bit x86 CPU, 4 GB RAM (8 GB recommended), 32 GB storage. NVIDIA, AMD, and Intel graphics all work at first boot.
 
-Full documentation at [wiki.shani.dev](https://wiki.shani.dev). For a deeper look at every subvolume and the boot sequence: [The Architecture Behind Shani OS](/post/shani-os-architecture-deep-dive). For use-case specific guidance: [Shani OS for Everyone](/post/shani-os-for-everyone).
+Full documentation at [docs.shani.dev](https://docs.shani.dev). For a deeper look at every subvolume and the boot sequence: [The Architecture Behind Shani OS](/post/shani-os-architecture-deep-dive). For use-case specific guidance: [Shani OS for Everyone](/post/shani-os-for-everyone).
 
 [Download Shani OS at shani.dev →](https://shani.dev)
 

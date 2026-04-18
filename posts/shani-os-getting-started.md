@@ -152,13 +152,13 @@ Full instructions: [docs.shani.dev — TPM2 Enrollment](https://docs.shani.dev/d
 ### 3. Update the system
 
 ```bash
-sudo shani-deploy update
+sudo shani-deploy
 ```
 
-This downloads the latest OS image to the inactive slot, verifies it, builds a new UKI, and sets it as the next-boot default. Reboot when ready. If anything goes wrong:
+This downloads the latest OS image to the inactive slot, verifies it, builds a new UKI, and sets it as the next-boot default. Reboot when ready. If anything goes wrong after the reboot:
 
 ```bash
-sudo shani-deploy --rollback
+sudo shani-deploy -r
 # Then reboot
 ```
 
@@ -228,14 +228,14 @@ If an app cannot access a file you expect it to, open Flatseal, find the app, an
 
 ## Daily Use
 
-Once set up, a Shani OS system in daily use is quiet. Updates arrive as desktop notifications. You apply them when ready with `sudo shani-deploy`, then reboot when convenient. Your apps, containers, and home directory are never affected by OS updates.
+Once set up, a Shani OS system in daily use is quiet. Updates arrive as desktop notifications (via `shani-update`, which runs at login). You apply them when ready with `sudo shani-deploy`, then reboot when convenient. Your apps, containers, and home directory are never affected by OS updates.
 
 The shell environment is set up out of the box: Zsh with syntax highlighting and autosuggestions, Starship prompt, McFly for smart command history, FZF for fuzzy search.
 
 If something goes wrong after an update:
 
 ```bash
-sudo shani-deploy --rollback
+sudo shani-deploy -r
 # Then reboot
 ```
 

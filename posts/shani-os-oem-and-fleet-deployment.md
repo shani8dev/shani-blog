@@ -82,20 +82,23 @@ passim-client list
 
 ### Staged Rollouts
 
-`shani-deploy` supports deploying to specific release channels. For staged rollouts, run a canary group on a `next` or `testing` channel before pushing to the full fleet:
+`shani-deploy` supports two release channels: `stable` (default, monthly) and `latest` (more frequent). For staged rollouts, run a canary group on `latest` before pushing to the full fleet on `stable`:
 
 ```bash
 # Check current channel
-cat /etc/shani-deploy/channel
+cat /etc/shani-channel
 
-# Switch to a specific release channel
-sudo shani-deploy --channel stable update
-sudo shani-deploy --channel next update
+# Switch to a specific release channel (persisted to /etc/shani-channel)
+sudo shani-deploy --set-channel stable
+sudo shani-deploy --set-channel latest
+
+# Or use a channel for a single run without changing the default
+sudo shani-deploy -t latest
 ```
 
 ### Automated Updates
 
-For unattended fleet updates, a systemd timer can trigger `shani-deploy` on a schedule:
+For unattended fleet updates, a systemd timer can trigger `shani-deploy` on a schedule. The update stages the new image and writes `/run/shanios/reboot-needed`; the reboot can be scheduled separately in a maintenance window:
 
 ```bash
 # /etc/systemd/system/shani-autoupdate.timer
@@ -117,14 +120,20 @@ Description=Automatic Shani OS update
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/shani-deploy update --no-reboot
+ExecStart=/usr/local/bin/shani-deploy
 ```
 
 ```bash
 sudo systemctl enable shani-autoupdate.timer
 ```
 
-The `--no-reboot` flag downloads and prepares the update without rebooting. Reboot can be scheduled separately during a maintenance window.
+After `shani-deploy` stages an update, check `/run/shanios/reboot-needed` in your maintenance window logic to trigger the reboot at the right time.
+
+For managed fleets you should also disable the `shani-update` autostart entry so it does not prompt users interactively:
+
+```bash
+sudo rm /etc/xdg/autostart/shani-update.desktop
+```
 
 ---
 
@@ -137,7 +146,7 @@ The most operationally significant property of Shani OS for fleet management is 
 **Manual rollback (one command):** If a machine boots but has a problem, one command reverts it:
 
 ```bash
-sudo shani-deploy --rollback
+sudo shani-deploy -r
 # Then reboot — via SSH, MDM, or remote management console
 ```
 
@@ -205,7 +214,7 @@ Pre-installed and working at first boot without driver installation:
 
 ### Encryption Key Management
 
-LUKS2 keys never leave the device. TPM2 sealing binds to PCRs 0 and 7 — the firmware state and the Secure Boot policy. For government and institutional deployments that require no foreign key escrow: the encryption key is on the device, sealed in the TPM2 chip, verifiable via the public `gen-efi` source code.
+LUKS2 keys never leave the device. TPM2 sealing binds to PCRs 0 and 7 — the firmware state and the Secure Boot policy (or PCR 0 only when Secure Boot is disabled). For government and institutional deployments that require no foreign key escrow: the encryption key is on the device, sealed in the TPM2 chip, verifiable via the public `gen-efi` source code.
 
 For the complete security architecture: [Security Without Configuration](https://blog.shani.dev/post/shani-os-security-deep-dive).
 
@@ -225,7 +234,20 @@ Shani OS is particularly well-suited to environments where users cannot be trust
 rsync -a --delete /etc/skel/ /home/labuser/
 ```
 
-**OS reset between terms:** No reimaging cycle needed between semesters. The OS is already in the same state it was on the first day of term — it's the same image. Only `/home` and `@data` (configuration) accumulate changes, and both can be reset independently.
+**OS reset between terms:** `shani-reset` is pre-installed and wipes all persistent system state stored in `/data` (the `/etc` overlay, service state, enabled units, etc.) without touching the OS image or user home directories. At the end of a term:
+
+```bash
+# Preview what would be wiped (dry run)
+sudo shani-reset --dry-run
+
+# Wipe all /data state and reboot (system starts fresh from the same OS image)
+sudo shani-reset
+
+# Wipe /data AND /home if you want to reset user files too
+sudo shani-reset --home
+```
+
+No reimaging cycle needed between semesters. The OS image is untouched.
 
 **Indian language support:** Devanagari, Tamil, Telugu, and other Indian scripts are configured from first boot. IBus multi-language input is pre-configured. For government schools and institutions: the software is free, the codebase is auditable, and there is no subscription, licence fee, or vendor lock-in.
 
@@ -235,18 +257,29 @@ rsync -a --delete /etc/skel/ /home/labuser/
 
 ### System Health
 
+`shani-health` is the diagnostic tool for fleet monitoring. It covers boot state, security configuration, storage, hardware, and package status:
+
 ```bash
-# Slot status and update availability
-shani-deploy --status
-shani-deploy --storage-info
+# Full system status report
+shani-health
 
-# Btrfs filesystem health
-sudo btrfs scrub status /
-sudo btrfs filesystem df /
+# Boot report: slots, UKI state, deployment status
+shani-health --boot
 
-# systemd service failures
-systemctl --failed
-journalctl -p err -b 0 -n 50
+# Security report: boot chain, encryption, LSM, users
+shani-health --security
+
+# Btrfs storage analysis
+shani-health --storage-info
+
+# Deep integrity check: UKI signatures + Btrfs scrub
+shani-health --verify
+
+# Last 50 deploy/rollback events
+shani-health --history
+
+# systemd journal entries at error level and above
+shani-health --journal err
 ```
 
 ### Remote Monitoring via Tailscale or SSH
@@ -254,11 +287,11 @@ journalctl -p err -b 0 -n 50
 For fleet-wide health monitoring, each machine is accessible via SSH over Tailscale without requiring a VPN server or port forwarding:
 
 ```bash
-# Check a remote machine's slot and update status
-ssh admin@machine-name.tailnet.ts.net 'cat /data/current-slot && shani-deploy --status'
+# Check a remote machine's active slot and boot state
+ssh admin@machine-name.tailnet.ts.net 'cat /data/current-slot && shani-health --boot'
 
 # Remote rollback
-ssh admin@machine-name.tailnet.ts.net 'sudo shani-deploy --rollback && sudo reboot'
+ssh admin@machine-name.tailnet.ts.net 'sudo shani-deploy -r && sudo reboot'
 ```
 
 Tailscale state persists across OS updates at `/data/varlib/tailscale`. Tailscale SSH does not require a separate SSH daemon — it uses Tailscale's identity system for authentication.
@@ -270,7 +303,7 @@ Tailscale state persists across OS updates at `/data/varlib/tailscale`. Tailscal
 | Concern | Traditional Mutable Linux | Shani OS |
 |---|---|---|
 | Fleet uniformity | Drifts over time; requires reconciliation tools | Every machine on same channel runs identical verified image |
-| Bad update recovery | Reimage or manual rollback; often on-site | One SSH command, automatic if unattended |
+| Bad update recovery | Reimage or manual rollback; often on-site | One SSH command (`shani-deploy -r`); automatic if unattended |
 | Security audit | Hardening guide + configuration management | Secure by default; auditable public codebase |
 | Software inventory | `dpkg -l`, `rpm -qa` varies per machine | OS image version + Flatpak list — identical across fleet |
 | Remote management | MDM + SSH + configuration management stack | SSH or Tailscale; no drift to manage |

@@ -39,11 +39,11 @@ The terminal is familiar. Bash and Zsh work exactly as expected. Homebrew can be
 
 Nix is also pre-installed. For macOS developers, it is worth understanding: Nix is a declarative package manager that keeps environments isolated and reproducible. It is a different mental model from Homebrew — not a replacement, but something many developers eventually prefer for managing complex dependency chains. Guide: [docs.shani.dev — Nix Package Manager](https://docs.shani.dev/doc/software/nix).
 
-What you lose: Final Cut Pro, Logic Pro, iCloud native integration, Apple Silicon battery life, and some professional creative apps. Check beforehand if these are essential to your workflow. What you gain: no Apple ID requirement, no iCloud push, no subscription for basic features, full root access, hardware freedom, and a bad update that is always reversible in one command. macOS has no equivalent to `sudo shani-deploy --rollback`.
+What you lose: Final Cut Pro, Logic Pro, iCloud native integration, Apple Silicon battery life, and some professional creative apps. Check beforehand if these are essential to your workflow. What you gain: no Apple ID requirement, no iCloud push, no subscription for basic features, full root access, hardware freedom, and a bad update that is always reversible in one command. macOS has no equivalent to `sudo shani-deploy -r`.
 
 ### The update experience
 
-You get a desktop notification when a new OS image is ready. Run `sudo shani-deploy update`, wait a few minutes, reboot when convenient. The previous OS copy stays on disk until the next update cycle, always ready for instant rollback.
+`shani-update` runs at login and shows a desktop notification when a new OS image is ready. When you are ready, run `sudo shani-deploy`, wait a few minutes, reboot when convenient. The previous OS copy stays on disk until the next update cycle, always ready for instant rollback with `sudo shani-deploy -r`.
 
 ---
 
@@ -89,7 +89,7 @@ Your containers live in the `@containers` subvolume and survive OS updates. Home
 
 ### The dev experience in practice
 
-VS Code via Flatpak, your runtimes in Nix, your project containers in Distrobox, your databases in Podman — each layer independent, each surviving updates. If a bad OS update disrupts something, rollback restores the exact previous OS state while leaving your containers, Nix packages, and home directory completely untouched.
+VS Code via Flatpak, your runtimes in Nix, your project containers in Distrobox, your databases in Podman — each layer independent, each surviving updates. If a bad OS update disrupts something, `sudo shani-deploy -r` restores the exact previous OS state while leaving your containers, Nix packages, and home directory completely untouched.
 
 Waydroid is pre-configured for Android development — hardware-accelerated on Intel and AMD, with ARM translation included. Guide: [docs.shani.dev — Android (Waydroid)](https://docs.shani.dev/doc/software/waydroid).
 
@@ -127,7 +127,7 @@ The kernel is tuned for gaming: HPET and RTC timers at 3072 Hz (versus the defau
 
 ### The gaming advantage of immutability
 
-An OS update never costs you a gaming session. The update runs in the background on the inactive OS slot — your running system and your game library are never touched. If an update introduces a regression, roll back with one command and one reboot. Your Steam library, Heroic cache, and save files live in your home directory and the `@flatpak` subvolume — completely independent of the OS rollback.
+An OS update never costs you a gaming session. The update runs in the background on the inactive OS slot — your running system and your game library are never touched. If an update introduces a regression, `sudo shani-deploy -r` rolls back with one command and one reboot. Your Steam library, Heroic cache, and save files live in your home directory and the `@flatpak` subvolume — completely independent of the OS rollback.
 
 ---
 
@@ -143,7 +143,7 @@ The OEM Initial Setup wizard handles first-boot configuration of language, timez
 
 ### Rollback without a dispatch
 
-A bad update on a remote machine does not require reimaging or an on-site visit. Boot-counting detects a failing OS slot and reverts automatically before a user sees an error. For machines that reach the desktop with a problem, `sudo shani-deploy --rollback` restores the previous verified state in under a minute.
+A bad update on a remote machine does not require reimaging or an on-site visit. Boot-counting detects a failing OS slot and reverts automatically before a user sees an error. For machines that reach the desktop with a problem, `sudo shani-deploy -r` restores the previous verified state in under a minute.
 
 ### Security posture that passes audits
 

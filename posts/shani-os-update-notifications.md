@@ -1,9 +1,9 @@
 ---
 slug: shani-os-update-notifications
-title: 'Update Notifications on Shani OS — How shani-update Works'
+title: 'shani-update — The Shani OS Update Manager'
 date: '2026-05-11'
 tag: 'Guide'
-excerpt: 'shani-update is a lightweight background service that watches for new Shani OS images and sends a desktop notification when one is ready — no polling every boot, no forced updates, just a quiet tap on the shoulder when something new is available.'
+excerpt: 'shani-update is the user-facing update manager for Shani OS. It runs at login, detects boot failures, checks for staged updates awaiting a reboot, identifies newly deployed slots, and checks for new OS images — all with GUI dialogs, automatic terminal detection, and a deferred-reminder system.'
 cover: ''
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
@@ -12,82 +12,135 @@ author_initials: 'SK'
 author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
-readTime: '4 min'
+readTime: '6 min'
 series: 'Shani OS Guides'
 ---
 
-`shani-update` is a user-level background service that monitors for new Shani OS images on your configured update channel and sends a desktop notification when one is available. It does not apply the update — you always decide when to run `sudo shani-deploy`. It just makes sure you know when something new is waiting.
+`shani-update` is the user-facing update manager for Shani OS. It runs automatically at login via a desktop autostart entry (`shani-update --startup`) and can also be invoked manually. It handles the full update lifecycle on behalf of the user: detecting whether the last boot was a fallback, prompting to reboot into a staged update, noticing when you're on a freshly deployed slot and letting you roll back if needed, and checking for new OS images when everything is healthy.
 
-The service is enabled by default at first boot. It runs as a systemd user service, not as root, and makes a lightweight metadata check against the CDN rather than downloading the full image.
-
-Full reference: [docs.shani.dev — System Updates](https://docs.shani.dev/doc/updates/system).
+`shani-deploy` is the lower-level tool that actually downloads, verifies, and stages OS images. `shani-update` is the front-end that decides when and whether to call it. Full reference: [docs.shani.dev — System Updates](https://docs.shani.dev/doc/updates/system).
 
 ---
 
-## How It Works
+## What shani-update Does at Login
 
-`shani-update` runs on a systemd user timer. On each trigger:
+When run with `--startup`, `shani-update` works through a fixed priority sequence. Each step can short-circuit the rest:
 
-1. Fetches the latest release metadata from the CDN (a small JSON file — no image download)
-2. Compares the available version against the currently running slot's version
-3. If a newer version exists on your channel: sends a desktop notification via `notify-send`
-4. Does nothing if already current
+### 1. Fallback boot detection
 
-The notification appears as a standard desktop notification:
+`shani-update` compares the booted subvolume (read from `/proc/cmdline`) against `/data/current-slot`. If they differ and a `/data/boot_failure` or `/data/boot_hard_failure` marker is present, it knows the newly deployed slot failed to boot and the system fell back to the previous one.
 
-> **Shani OS update available**
-> Version 2026.05.01 is ready. Run `sudo shani-deploy` when convenient.
+In that case it shows a GUI dialog:
 
-Clicking the notification (on GNOME) opens a terminal. On KDE, the notification action can be configured to open Konsole.
+> **Boot Failure Detected**
+> Slot @green failed to boot. The system fell back to @blue.
+> Roll back @green now so it boots correctly next time?
+
+If confirmed, it opens a terminal window and runs `shani-deploy --rollback` with `pkexec` for privilege escalation, then shows a follow-up dialog offering to reboot immediately. If the failure was a hard failure (the slot failed to mount entirely), the dialog text makes this explicit.
+
+### 2. Reboot-needed check
+
+If `/run/shanios/reboot-needed` exists, a staged update is waiting. `shani-update` shows:
+
+> **Restart Required**
+> Shani OS has been updated to v2026.05.01.
+> Restart now to boot into the updated system.
+
+The user can restart immediately or dismiss and be reminded later. This file lives on a tmpfs and is cleared automatically on reboot, so the reminder never resurfaces after the reboot happens.
+
+### 3. Candidate boot check
+
+If the booted slot differs from `current-slot` but there's no failure marker, you're running the newly deployed slot for the first time. `shani-update` shows:
+
+> **Running Updated System**
+> You're running the newly updated system (@green).
+> If everything looks good, no action needed. If something is broken, roll back to @blue now.
+
+### 4. Update check
+
+If none of the above apply, `shani-update` checks network connectivity, fetches the latest release metadata from the CDN (a small text file — no image download), and compares it to `/etc/shani-version` and `/etc/shani-profile`. If a newer version is available, it shows:
+
+> **Update Available**
+> Current: v2026.04.15-default
+> Available: v2026.05.01-default
+> The update will download and install in a terminal window.
+
+If confirmed, `shani-update` detects the available terminal emulator (checking for `alacritty`, `kitty`, `wezterm`, `foot`, `gnome-terminal`, `kgx`, `konsole`, `xterm`, and others), constructs the right command-line arguments for that specific terminal, and launches `shani-deploy` inside it via `pkexec`.
+
+If the user dismisses the dialog, a reminder is scheduled using `systemd-run --user --on-active=86400s` — the update check runs again in 24 hours without any user action.
+
+---
+
+## Usage
+
+```bash
+# Run at login (used by the autostart entry)
+shani-update --startup
+
+# Run interactively — same checks but no 15-second startup delay
+shani-update
+
+# Roll back the inactive slot immediately
+shani-update --rollback
+shani-update -r
+
+# Force deploy even if version matches
+shani-update --force
+shani-update -f
+
+# Use a specific update channel for this run
+shani-update --channel latest
+shani-update -t latest
+
+# Verbose output from shani-deploy
+shani-update --verbose
+shani-update -v
+
+# Dry-run — simulate without changes
+shani-update --dry-run
+shani-update -d
+```
 
 ---
 
 ## Service Management
 
+`shani-update --startup` is triggered by a desktop autostart entry, not a systemd user timer. It runs once at login after a 15-second delay (to let the polkit agent and desktop shell initialize), then exits. There is no background polling loop.
+
 ```bash
-# Check status
-systemctl --user status shani-update.service
-systemctl --user status shani-update.timer
+# View recent shani-update logs
+cat ~/.cache/shani-update.log
 
-# See when the next check is scheduled
-systemctl --user list-timers shani-update.timer
+# Or via journalctl (shani-update also writes to the system journal via systemd-cat)
+journalctl -t shani-update -n 50
 
-# Run an immediate check (without waiting for the timer)
-systemctl --user start shani-update.service
-
-# View recent check logs
-journalctl --user -u shani-update.service -n 30
-
-# Disable the notification service (if you prefer to check manually)
-systemctl --user disable --now shani-update.timer
-
-# Re-enable it
-systemctl --user enable --now shani-update.timer
+# Run an immediate interactive check
+shani-update
 ```
+
+The log file at `~/.cache/shani-update.log` rotates automatically at 1 MB.
 
 ---
 
-## Check Frequency
+## GUI Support
 
-By default, `shani-update.timer` triggers once per day. The exact time is randomised within a 30-minute window to avoid all machines on a network hitting the CDN simultaneously.
+`shani-update` supports three GUI backends, tried in order: `yad` (preferred — supports timeouts and button labels), `zenity`, and `kdialog`. All dialogs have a configurable timeout — if no response is given within the timeout, the dialog dismisses as if cancelled.
 
-To change the frequency, override the timer:
+For fallback boot and reboot dialogs, the timeout is 5 minutes. For the update available dialog, it is 2 minutes before it auto-dismisses and defers.
 
-```bash
-# Create a user override directory
-mkdir -p ~/.config/systemd/user/shani-update.timer.d/
+When no GUI is available (headless or SSH session), `shani-update` falls back to `notify-send` for non-interactive contexts, or an interactive console prompt if running in a terminal (`stdin` and `stdout` are both TTYs).
 
-# Set a custom interval (e.g. every 6 hours)
-cat > ~/.config/systemd/user/shani-update.timer.d/override.conf << 'EOF'
-[Timer]
-OnCalendar=
-OnCalendar=*-*-* 00/6:00:00
-RandomizedDelaySec=600
-EOF
+---
 
-systemctl --user daemon-reload
-systemctl --user restart shani-update.timer
-```
+## Terminal Detection
+
+When `shani-update` needs to open a terminal to run `shani-deploy`, it detects the right terminal emulator using a layered strategy:
+
+1. **Session-native hint:** checks `KONSOLE_VERSION` (set inside any Konsole window), `VTE_VERSION` (set inside any VTE-based terminal like `kgx`, `gnome-terminal`, `tilix`), and `XDG_CURRENT_DESKTOP` to prefer the terminal that matches the running desktop
+2. **Environment variables:** checks `$TERMINAL`, `$TERMINAL_EMULATOR`, `$COLORTERM`, `$TERM_PROGRAM` against an allowlist
+3. **PATH scan:** tries `alacritty`, `kitty`, `wezterm`, `foot`, `gnome-terminal`, `kgx`, `tilix`, `xfce4-terminal`, `konsole`, `lxterminal`, `mate-terminal`, `deepin-terminal`, `terminator`, `xterm`, `urxvt`, `st` in order
+
+Each terminal gets its own command construction — for example, `konsole` is launched with `--noclose` so the window stays open after `shani-deploy` finishes; `kgx` does not support `--title` so the title argument is omitted.
 
 ---
 
@@ -97,59 +150,44 @@ systemctl --user restart shani-update.timer
 
 ```bash
 # Check current channel
-cat /etc/shani-deploy/channel
+cat /etc/shani-channel
 
 # Switch channel (affects both shani-deploy and shani-update)
-echo "latest" | sudo tee /etc/shani-deploy/channel
-echo "stable" | sudo tee /etc/shani-deploy/channel
+sudo shani-deploy --set-channel latest
+sudo shani-deploy --set-channel stable
 ```
 
 On the `stable` channel (default), new images arrive approximately monthly. On `latest`, checks may find something new more frequently.
 
 ---
 
-## Applying the Update
+## Applying the Update Manually
 
-When you are ready to apply an available update:
+When you are ready to apply an available update without waiting for the dialog:
 
 ```bash
-# Download, verify, and stage the update (reboot required to activate)
+# Download, verify, and stage the update
 sudo shani-deploy
 
 # Simulate without changing anything
-sudo shani-deploy --dry-run
-
-``
+sudo shani-deploy -d
+```
 
 For the full update workflow, see [shani-deploy Reference](https://blog.shani.dev/post/shani-deploy-reference).
 
 ---
 
-## Disabling Auto-Check
-
-If you manage updates on a schedule and do not want background checks:
-
-```bash
-systemctl --user disable --now shani-update.timer
-```
-
-You can still check manually at any time:
-
-```bash
-sudo shani-deploy --dry-run
-```
-
----
-
 ## Fleet and OEM Deployments
 
-For fleet deployments using automated update scheduling, `shani-update.timer` should typically be disabled on managed machines in favour of the central update management approach described in [Shani OS for OEMs and IT Fleets](https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment):
+For fleet deployments using automated update scheduling, the autostart entry for `shani-update --startup` should typically be disabled in favour of a central update management approach:
 
 ```bash
-sudo systemctl disable --global shani-update.timer
+# Disable the autostart entry system-wide
+# (remove or mask the autostart .desktop file in /etc/xdg/autostart/)
+sudo rm /etc/xdg/autostart/shani-update.desktop
 ```
 
-The `--global` flag disables the timer for all users on the system.
+Updates can then be triggered on schedule via a systemd timer calling `shani-deploy` directly. See [Shani OS for OEMs and IT Fleets](https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment) for the fleet deployment guide.
 
 ---
 

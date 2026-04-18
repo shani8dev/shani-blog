@@ -37,7 +37,7 @@ Shani OS maintains two UKIs, one per slot:
 - `/boot/efi/EFI/shanios/shanios-blue.efi`
 - `/boot/efi/EFI/shanios/shanios-green.efi`
 
-Both are signed with the same MOK key. `gen-efi` regenerates them during every `shani-deploy` update and on manual request.
+Both are signed with the same MOK key. `gen-efi configure` regenerates them during every `shani-deploy` update and on manual request.
 
 ---
 
@@ -54,21 +54,20 @@ UEFI Firmware
 The MOK (Machine Owner Key) is a keypair generated on your machine during installation:
 - Private key: `/etc/secureboot/keys/MOK.key` (never leaves the device)
 - Certificate: `/etc/secureboot/keys/MOK.crt`
-- DER-encoded public key: `/boot/efi/EFI/BOOT/MOK.der` (enrolled into UEFI firmware)
+- DER-encoded public key: `/etc/secureboot/keys/MOK.der` (also copied to `/boot/efi/EFI/BOOT/MOK.der` for MokManager enrollment)
+
+If the MOK keypair is missing when `gen-efi` runs, it automatically generates a fresh 2048-bit RSA keypair, re-signs all existing EFI binaries on the ESP, and stages MOK enrollment. If `MOK.key` and `MOK.crt` exist but are a mismatched keypair, `gen-efi` detects this before attempting to sign and regenerates the full pair rather than failing with an opaque OpenSSL error deep inside dracut.
 
 ---
 
 ## gen-efi Quick Reference
 
 ```bash
-# Generate UKI for the current active slot
-sudo gen-efi generate
+# Generate UKI for a specific slot (must match the currently booted slot when run directly)
+sudo gen-efi configure blue
+sudo gen-efi configure green
 
-# Generate UKI for a specific slot
-sudo gen-efi generate --slot blue
-sudo gen-efi generate --slot green
-
-# Enroll MOK key into UEFI firmware (for Secure Boot)
+# Enroll MOK key into UEFI firmware (re-signs EFI binaries, stages mokutil enrollment)
 sudo gen-efi enroll-mok
 
 # Clean up stale MOK keys from previous installations
@@ -77,49 +76,45 @@ sudo gen-efi cleanup-mok
 # Enroll LUKS key into TPM2 (for passwordless disk unlock)
 sudo gen-efi enroll-tpm2
 
-# Remove TPM2 enrollment (before firmware updates, etc.)
+# Remove stale TPM2 LUKS keyslots after re-enrollment
 sudo gen-efi cleanup-tpm2
-
-# Configure key generation and UKI build (run on custom images)
-sudo gen-efi configure <slot>
-
-# List both UKI entries and their versions
-sudo gen-efi list
-
-# Verify MOK enrollment status
-sudo gen-efi verify
 ```
+
+> **Important:** `gen-efi configure` enforces that the target slot matches the currently booted slot when run directly on the live system. Running it for the inactive slot is only permitted inside a chroot, which `shani-deploy` does automatically. This prevents a common mistake: generating a UKI for `@green` while booted into `@blue` would embed `@blue`'s kernel in `@green`'s boot entry.
 
 ---
 
 ## Generating UKIs
 
-`gen-efi generate` rebuilds the UKI for a slot by:
+`gen-efi configure <slot>` rebuilds the UKI for a slot by:
 
-1. Reading the current kernel from the slot's `/usr/lib/modules/` directory
-2. Regenerating the initramfs via `dracut`
-3. Reading the kernel command line from `/etc/kernel/install_cmdline_<slot>`, updating it with the live LUKS UUID, swap offset, and keyboard layout
-4. Bundling kernel + initramfs + cmdline into a single EFI binary via `dracut --force --uefi`
-5. Signing the resulting binary with the MOK private key
+1. Validating that `<slot>` matches the currently booted subvolume (unless running inside a chroot)
+2. Ensuring the MOK keypair exists — generating a new one if missing, and validating that `MOK.key` and `MOK.crt` are a matching keypair before attempting to sign anything
+3. Mounting the ESP at `/boot/efi` temporarily if not already mounted
+4. Updating shim (`BOOTX64.EFI`) and systemd-boot (`grubx64.efi`) on the ESP if the source binaries in `/usr` are newer than what's on the ESP
+5. Reading the current kernel version from `/usr/lib/modules/`
+6. Detecting the LUKS UUID from the live mapper device, with a fallback to the existing `/etc/crypttab` entry for chroot environments where the device path is not accessible
+7. Updating `/etc/crypttab` and the dracut crypt config (`/etc/dracut.conf.d/99-crypt-key.conf`) to keep them consistent
+8. Generating the complete kernel command line — including `rootflags=subvol=@<slot>`, `rd.luks.*` parameters, `rd.vconsole.keymap=` from `/etc/vconsole.conf`, and `resume=`/`resume_offset=` from the Btrfs swapfile if present — and writing it atomically to `/etc/kernel/install_cmdline_<slot>`
+9. Running `dracut --force --uefi` to build the UKI
+10. Signing the binary with `sbsign` and verifying it with `sbverify`
+11. Staging MOK enrollment automatically if the current key is not yet enrolled in firmware (silent when already enrolled)
 
 ```bash
-# Rebuild the UKI for the active slot
-sudo gen-efi generate
+# Rebuild the UKI for the currently booted slot
+sudo gen-efi configure blue   # if booted into @blue
+sudo gen-efi configure green  # if booted into @green
 
-# Rebuild the UKI for a specific slot
-sudo gen-efi generate --slot green
-
-# List the resulting UKIs and verify signatures
-sudo gen-efi list
-sbctl verify /boot/efi/EFI/shanios/shanios-blue.efi
-sbctl verify /boot/efi/EFI/shanios/shanios-green.efi
+# Verify signatures
+sbverify --cert /etc/secureboot/keys/MOK.crt /boot/efi/EFI/shanios/shanios-blue.efi
+sbverify --cert /etc/secureboot/keys/MOK.crt /boot/efi/EFI/shanios/shanios-green.efi
 ```
 
-When would you manually run `gen-efi generate`?
-- After editing a kernel parameter in `/etc/kernel/install_cmdline_<slot>`
+When would you manually run `gen-efi configure`?
 - After enabling or changing full-disk encryption
-- When troubleshooting a boot issue caused by a stale UKI
-- When `shani-deploy --repair-boot` calls it automatically
+- When troubleshooting a boot issue caused by a stale or corrupt UKI
+- After a LUKS UUID change (e.g. re-encryption)
+- When `shani-deploy` calls it automatically via chroot during a normal update
 
 ---
 
@@ -132,10 +127,9 @@ After installation, Secure Boot is disabled (you disabled it before installing p
 On the first boot from the Shani OS USB, MokManager (`mmx64.efi`) launches automatically and offers to enroll a key from disk:
 
 1. Select "Enroll key from disk"
-2. Navigate to the EFI partition root
-3. Select `MOK.der`
-4. Confirm enrollment
-5. Reboot and enable Secure Boot in BIOS
+2. Navigate to the EFI partition and select `EFI/BOOT/MOK.der`
+3. Confirm enrollment
+4. Reboot and enable Secure Boot in BIOS
 
 ### Method 2: From the Installed System
 
@@ -150,66 +144,88 @@ sudo gen-efi enroll-mok
 sudo reboot
 ```
 
-After MokManager completes, go into BIOS and enable Secure Boot.
+`enroll-mok` must run on the live booted system — it talks to real UEFI firmware via `mokutil` and cannot run inside a chroot. After MokManager completes, enable Secure Boot in BIOS.
 
 ```bash
-# Remove any stale keys from the ISO (after installation is complete)
+# After confirming the new key is enrolled, remove stale keys from previous installations
 sudo gen-efi cleanup-mok
 
 # Verify the key is enrolled
 mokutil --list-enrolled | grep -i shani
-sbctl status
+mokutil --sb-state
 ```
+
+`cleanup-mok` compares the fingerprint of each enrolled key against the current `MOK.der`. Keys that do not match are staged for deletion via `mokutil --delete`, confirmed in MokManager on the next reboot. Run it only after confirming the new key is enrolled.
 
 ---
 
 ## TPM2 Auto-Unlock
 
-TPM2 auto-unlock seals your LUKS decryption key into the TPM2 chip, bound to PCR values 0 (firmware state) and 7 (Secure Boot policy). The disk unlocks silently on trusted hardware and remains locked on any other hardware or with tampered firmware.
+TPM2 auto-unlock seals your LUKS decryption key into the TPM2 chip. The PCR policy is chosen automatically:
+
+- **Secure Boot enabled:** PCR 0 + PCR 7 — firmware measurements and Secure Boot state (UEFI db/dbx/pk)
+- **Secure Boot disabled:** PCR 0 only — firmware measurements only (weaker: an attacker with physical access could replace the bootloader)
+
+The disk unlocks silently on boot when PCR values match. Your LUKS passphrase always remains valid as a fallback.
+
+During enrollment, `gen-efi enroll-tpm2` also checks the LUKS KDF and warns if it is `pbkdf2` instead of `argon2id` — `pbkdf2` is orders of magnitude weaker against GPU brute-force attacks. You can convert with `cryptsetup luksConvertKey --pbkdf argon2id <device>`.
 
 ### Setup
 
 ```bash
 # Enroll LUKS key into TPM2 (one-time setup after fresh install)
+# You will be prompted for your LUKS passphrase
+# You can also opt in to a TPM2 PIN for a second factor
 sudo gen-efi enroll-tpm2
 
-# Test — reboot and confirm silent unlock
+# Reboot and confirm silent unlock
 sudo reboot
 ```
 
 ### After Firmware Updates
 
-If `fwupdmgr update` updated your BIOS or platform firmware, PCR 0 changes. The TPM will not release the key with the old PCR binding. You will be prompted for your LUKS passphrase on the next boot — this is correct security behaviour.
+If `fwupdmgr update` updated your BIOS or platform firmware, PCR 0 changes. The TPM will not release the key with the old binding, so you will be prompted for your LUKS passphrase on the next boot. This is expected.
 
 ```bash
-# After booting with passphrase, remove stale TPM2 enrollment
+# After booting with passphrase, clean up the stale TPM2 slot
 sudo gen-efi cleanup-tpm2
 
-# Re-enroll with current PCR values
+# Re-enroll with the current PCR values
+sudo gen-efi enroll-tpm2
+```
+
+`cleanup-tpm2` collects all TPM2-type keyslots from the LUKS header, keeps the highest-numbered (most recently written), and wipes the rest using `systemd-cryptenroll --wipe-slot`. It prompts for your LUKS passphrase to authorise each removal.
+
+### After Secure Boot Changes
+
+When you change Secure Boot settings (enable, disable, or change enrolled keys), PCR 7 changes. Re-enroll:
+
+```bash
+sudo gen-efi cleanup-tpm2
 sudo gen-efi enroll-tpm2
 ```
 
 ### Verifying TPM2 State
 
 ```bash
-# List current TPM2 LUKS keyslots
+# List LUKS keyslots and tokens including TPM2 entries
 sudo cryptsetup luksDump /dev/nvme0n1p2 | grep -A 5 "Token"
 
-# Check PCR values
-sudo systemd-cryptenroll --tpm2-device=auto --print-pcrs
+# Confirm TPM2 enrollment
+sudo cryptsetup luksDump /dev/nvme0n1p2 | grep systemd-tpm2
 
-# Check which PCRs the key is bound to
-sudo tpm2_nvread ...  # or use systemd-cryptenroll output
+# List available TPM2 devices
+sudo systemd-cryptenroll --tpm2-device=list
 ```
 
 ---
 
 ## Inspecting the Kernel Command Line
 
-The kernel command line is embedded in the UKI at build time. To read it from an existing UKI:
+The kernel command line is embedded in the UKI at build time. `gen-efi` always regenerates it from live system state — it never reuses a cached file. The generated line is stored at `/etc/kernel/install_cmdline_<slot>` (overwritten on every run). To read the cmdline embedded in an existing UKI:
 
 ```bash
-# Extract and display the command line from the active slot's UKI
+# Extract and display the command line from a UKI
 sudo objcopy -O binary --only-section=.cmdline \
     /boot/efi/EFI/shanios/shanios-blue.efi /dev/stdout | strings
 
@@ -217,70 +233,55 @@ sudo objcopy -O binary --only-section=.cmdline \
 sudo ukify inspect /boot/efi/EFI/shanios/shanios-blue.efi
 ```
 
-The command line includes: `quiet splash systemd.volatile=state ro lsm=landlock,lockdown,yama,integrity,apparmor,bpf rootfstype=btrfs rootflags=subvol=@blue,ro,...` plus LUKS UUID parameters (if encrypted) and `resume=` (if hibernation is configured).
+The generated command line looks like:
 
----
-
-## Editing Kernel Parameters
-
-To add or change a kernel parameter:
-
-```bash
-# The stored cmdline template (gen-efi reads this and adds live values)
-sudo nano /etc/kernel/install_cmdline_blue
-sudo nano /etc/kernel/install_cmdline_green
-
-# After editing, regenerate the UKI
-sudo gen-efi generate --slot blue
-sudo gen-efi generate --slot green
+```
+quiet splash systemd.volatile=state ro lsm=landlock,lockdown,yama,integrity,apparmor,bpf
+rootfstype=btrfs rootflags=subvol=@blue,ro,noatime,compress=zstd,space_cache=v2,autodefrag
+rd.luks.uuid=<uuid> rd.luks.name=<uuid>=shani_root rd.luks.options=<uuid>=tpm2-device=auto
+root=/dev/mapper/shani_root rd.vconsole.keymap=us
+resume=UUID=<uuid> resume_offset=<offset>
 ```
 
-Common parameters users add:
-```
-# Disable the NMI watchdog (slightly faster boot)
-nmi_watchdog=0
-
-# Force a specific GPU driver
-amdgpu.ppfeaturemask=0xffffffff
-
-# Verbose boot (remove 'quiet splash')
-# Remove 'quiet splash' from the cmdline file
-```
+Parameters are added or omitted based on system state: `rd.luks.*` only on encrypted systems, `rd.vconsole.keymap=` only if `/etc/vconsole.conf` defines a keymap, `resume=` only if `/swap/swapfile` exists.
 
 ---
 
 ## Troubleshooting
 
+### MOK.key and MOK.crt Do Not Match
+
+`gen-efi` detects keypair mismatches before attempting to sign anything and regenerates the full pair automatically. After regeneration, run `enroll-mok` to stage enrollment of the new key, then reboot to confirm in MokManager.
+
 ### UKI Signature Verification Fails
 
 ```bash
-# Check MOK enrollment
-mokutil --list-enrolled
+# Verify the UKI against the local MOK cert
+sbverify --cert /etc/secureboot/keys/MOK.crt /boot/efi/EFI/shanios/shanios-blue.efi
 
-# Re-sign the UKIs
-sudo gen-efi generate --slot blue
-sudo gen-efi generate --slot green
+# If it fails, rebuild the UKI for the current slot
+sudo gen-efi configure blue
 
-# Verify
-sbctl verify /boot/efi/EFI/shanios/shanios-blue.efi
+# If the MOK key changed, re-enroll it
+sudo gen-efi enroll-mok
 ```
 
 ### Secure Boot Rejects the Kernel After Update
 
 ```bash
-# Check if the new UKI was signed
-sbctl verify /boot/efi/EFI/shanios/shanios-green.efi
+# Check signature on the new slot's UKI
+sbverify --cert /etc/secureboot/keys/MOK.crt /boot/efi/EFI/shanios/shanios-green.efi
 
-# Regenerate if needed
-sudo gen-efi generate --slot green
+# Regenerate if needed (run from the currently booted slot)
+sudo gen-efi configure blue
 
-# Verify the MOK key is still enrolled
+# Confirm the MOK key is enrolled
 mokutil --list-enrolled | grep -i shani
 ```
 
 ### TPM2 Fails After Secure Boot Change
 
-When you change Secure Boot settings (enable, disable, modify enrolled keys), PCR 7 changes. Re-enroll:
+When you change Secure Boot settings, PCR 7 changes. Re-enroll:
 
 ```bash
 sudo gen-efi cleanup-tpm2
