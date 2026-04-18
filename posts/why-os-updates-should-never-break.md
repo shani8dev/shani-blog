@@ -125,6 +125,8 @@ Podman handles OCI containers for services, databases, and development workflows
 
 For full Linux system containers (with their own init and services), LXC/LXD and systemd-nspawn are pre-installed. systemd-nspawn needs no setup — pull a tarball and boot it. LXD adds a richer feature set for more complex needs. Homebrew also works on Shani OS if that is your preference — it installs to `/home/linuxbrew/.linuxbrew`, completely outside the read-only root. Guide: [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os).
 
+**Windows applications** run through Wine via Bottles (`com.usebottles.bottles`, pre-installed on the KDE Plasma edition). Bottles manages isolated Wine environments for productivity tools, creative software, and legacy apps — no Windows licence or VM required for most applications. For applications that need a real Windows kernel, virt-manager (pre-installed on KDE Plasma) runs a full Windows VM with near-native performance. Guides: [Windows Apps on Shani OS](https://blog.shani.dev/post/windows-apps-on-shani-os) · [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
+
 The design principle: the OS is infrastructure, not your workspace. An `apt install` to the base system would be overwritten the next time `shani-deploy` runs anyway — the right place for software is always outside the OS.
 
 ---

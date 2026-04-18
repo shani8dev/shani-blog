@@ -155,7 +155,7 @@ prime-run game-binary
 
 If NVIDIA drivers do not load on first boot, check Secure Boot configuration: [docs.shani.dev — NVIDIA Setup](https://docs.shani.dev/doc/troubleshooting).
 
-For GPU passthrough — dedicating a discrete GPU entirely to a Windows VM for native gaming performance — see the full VFIO setup in [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
+For GPU passthrough — dedicating a discrete GPU entirely to a Windows VM for native gaming performance — `virt-manager` is pre-installed on the KDE Plasma edition (`org.virt_manager.virt-manager` Flatpak). See the full VFIO setup in [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
 
 ---
 

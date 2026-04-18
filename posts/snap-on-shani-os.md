@@ -108,6 +108,8 @@ On Shani OS, Flatpak is the primary recommendation for GUI apps, and Snap is the
 
 **Use Distrobox** when you need a full mutable Linux environment with `apt`, `pacman`, or `yay`. Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
 
+**Use Virtual Machines** when you need full hardware-level isolation — a separate kernel, a Windows VM, or GPU passthrough. virt-manager is pre-installed on the KDE Plasma edition. Guide: [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
+
 All ecosystems coexist without conflict — you can have apps from Flatpak, Snap, AppImage, Nix, and Distrobox running simultaneously.
 
 ---
@@ -140,6 +142,7 @@ snap set system refresh.retain=2
 - [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — the primary app ecosystem
 - [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os) — portable apps with Gear Lever
 - [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — CLI tools and dev environments
+- [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full VMs with hardware isolation
 
 ---
 

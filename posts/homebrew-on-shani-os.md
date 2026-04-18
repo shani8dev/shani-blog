@@ -104,6 +104,8 @@ Homebrew coexists with everything else on Shani OS without conflict. Here is how
 
 **Distrobox** — when you need a full mutable Linux environment with `apt`, `pacman`, or `yay`. Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
 
+**Virtual Machines** — when you need full hardware-level isolation: a separate kernel, a Windows VM, or GPU passthrough. virt-manager is pre-installed on the KDE Plasma edition. Guide: [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
+
 Many macOS switchers start with Homebrew because it is familiar, then migrate specific workflows to Nix as they discover its advantages. Both can coexist indefinitely.
 
 ---
@@ -167,6 +169,7 @@ alias brewup='brew update && brew upgrade && brew cleanup'
 - [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os) — Snap Store apps
 - [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os) — portable apps
 - [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — full mutable Linux environments
+- [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full VMs with hardware isolation
 - [Migrating to Shani OS](https://blog.shani.dev/post/migrating-to-shani-os) — full workflow translation guide
 - [Telegram community](https://t.me/shani8dev)
 

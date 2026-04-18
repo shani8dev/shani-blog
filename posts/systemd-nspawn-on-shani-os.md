@@ -26,17 +26,19 @@ Full reference: [docs.shani.dev — Containers](https://docs.shani.dev/doc/softw
 
 ---
 
-## nspawn vs LXD vs Distrobox vs Podman
+## nspawn vs LXD vs Distrobox vs Podman vs VMs
 
-| | systemd-nspawn | LXD | Distrobox | Podman |
-|---|---|---|---|---|
-| Purpose | Lightweight system containers | Full system containers | Dev/app containers | OCI app containers |
-| Daemon required | No | Yes (lxd.socket) | No | No (socket-activated) |
-| Image management | Manual / machinectl pull | Built-in | Automatic | Built-in |
-| Full init system | Yes | Yes | No | No |
-| Startup time | ~1s | ~3s | ~1s | ~0.1s |
-| Networking | Basic (host network or private) | Full bridge + NAT | Host network | Full (netavark) |
-| Isolation | High | High | Low–medium | Medium |
+Choosing the right container or isolation type:
+
+| | systemd-nspawn | LXD | Distrobox | Podman | QEMU/KVM |
+|---|---|---|---|---|---|
+| Purpose | Lightweight system containers | Full system containers | Dev/app containers | OCI app containers | Full VMs |
+| Daemon required | No | Yes (lxd.socket) | No | No (socket-activated) | Yes |
+| Image management | Manual / machinectl pull | Built-in | Automatic | Built-in | Manual |
+| Full init system | Yes | Yes | No | No | Yes |
+| Startup time | ~1s | ~3s | ~1s | ~0.1s | ~30s |
+| Networking | Basic (host network or private) | Full bridge + NAT | Host network | Full (netavark) | Full (bridged/NAT) |
+| Isolation | High | High | Low–medium | Medium | Full |
 
 **Use systemd-nspawn when:**
 - You want a full Linux system environment with minimal overhead
@@ -284,15 +286,35 @@ sudo machinectl remove arch-test
 
 ---
 
-## nspawn vs LXD: When to Choose Which
+## nspawn vs the Full Ecosystem
 
-Both run full system containers with an init system and full process tree. The practical differences:
+All of these are available on Shani OS simultaneously and serve distinct roles:
 
-**Choose nspawn when** you want zero overhead — no LXD daemon, no image format, no configuration wizard. Pull a tar, start the container. Works immediately on any Shani OS install.
+**Use systemd-nspawn when** you want a full Linux system container with zero setup — no daemon, no image format, no wizard. Pull a tarball, boot it. Best for isolated builds, service sandboxing, and quick system environment tests.
 
-**Choose LXD when** you need its richer feature set: a GUI-friendly image catalog (`lxc image list images:`), built-in port forwarding devices, per-container resource limits via the LXD CLI, or the ability to manage containers on remote machines. LXD is more operational tooling; nspawn is simpler machinery.
+**Use LXC/LXD when** you need the same full-system isolation but want a richer operational layer: a built-in image catalog, per-container resource limits via the LXD CLI, built-in port forwarding devices, or remote container management. LXD adds tooling on top of what nspawn provides.
+Guide: [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os).
 
-For most development and testing use cases, nspawn is sufficient and faster.
+**Use Distrobox when** you need `apt`, `pacman`, `dnf`, or `yay` — the full package manager of a specific distro — with your home directory shared into the container. Not a full system container; more like a mutable dev shell layered over Podman.
+Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
+
+**Use Podman when** you want OCI containers for services, databases, and development workflows. Rootless, Docker-compatible, daemon-free. The right tool for running PostgreSQL, Redis, self-hosted apps, and Compose stacks.
+Guide: [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os).
+
+**Use Apptainer when** you need portable, reproducible containers for HPC and cluster workflows — single `.sif` files that run identically on your workstation and any SLURM/PBS cluster.
+Guide: [Apptainer on Shani OS](https://blog.shani.dev/post/apptainer-on-shani-os).
+
+**Use Flatpak when** you want a GUI desktop application available on Flathub. Guide: [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os).
+
+**Use Snap when** an app is only on the Snap Store and not Flathub. Guide: [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os).
+
+**Use Nix when** you want CLI tools or development runtimes installed persistently without a full container — multiple versions without conflict, reproducible per-project environments via `shell.nix`.
+Guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os).
+
+**Use QEMU/KVM when** you need full hardware-level isolation — a separate kernel, hardware passthrough, or a Windows VM for gaming.
+Guide: [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
+
+The layers do not conflict. Containers in `@machines`, `@containers`, `@lxc`, and `@lxd`, apps in `@flatpak` and `@snapd`, and packages in `@nix` are all fully independent — each survives OS updates and rollbacks untouched.
 
 ---
 
@@ -301,6 +323,11 @@ For most development and testing use cases, nspawn is sufficient and faster.
 - [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — full container runtime reference
 - [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os) — full system containers with more features
 - [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — dev containers with home directory sharing
+- [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os) — OCI containers and services
+- [Apptainer on Shani OS](https://blog.shani.dev/post/apptainer-on-shani-os) — HPC and cluster containers
+- [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — GUI applications
+- [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os) — Snap Store apps
+- [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — CLI tools and dev environments
 - [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full VMs with hardware isolation
 - [Telegram community](https://t.me/shani8dev)
 

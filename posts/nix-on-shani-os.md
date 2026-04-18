@@ -261,6 +261,8 @@ Distrobox containers live in `@containers` and survive OS updates. Guide: [Distr
 
 **Homebrew** — if you are coming from macOS and `brew install` is muscle memory, it works identically on Shani OS, installing to `/home/linuxbrew/.linuxbrew` outside the read-only root. See [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os).
 
+**Virtual Machines** — when you need full hardware-level isolation: a separate kernel, a Windows VM, or GPU passthrough. virt-manager is pre-installed on the KDE Plasma edition. Guide: [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
+
 ---
 
 ## Resources
@@ -273,6 +275,7 @@ Distrobox containers live in `@containers` and survive OS updates. Guide: [Distr
 - [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os) — Snap Store apps
 - [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os) — portable apps
 - [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os) — brew for macOS switchers
+- [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full VMs with hardware isolation
 
 ---
 

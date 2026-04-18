@@ -361,6 +361,8 @@ Podman is one of several container and app options on Shani OS. Here is where ea
 
 **Flatpak / Snap / AppImage** — for GUI desktop applications and portable tools. Not containers in the traditional sense, but each lives in its own persistent Btrfs subvolume. Guides: [Flatpak](https://blog.shani.dev/post/flatpak-on-shani-os) · [Snap](https://blog.shani.dev/post/snap-on-shani-os) · [AppImage](https://blog.shani.dev/post/appimage-on-shani-os).
 
+**Virtual Machines** — when you need full hardware-level isolation: a separate kernel, a Windows VM, or GPU passthrough. Heavier than any container option but provides complete isolation. virt-manager is pre-installed on the KDE Plasma edition. Guide: [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
+
 ---
 
 ## Resources
@@ -370,6 +372,7 @@ Podman is one of several container and app options on Shani OS. Here is where ea
 - [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — using apt, pacman, yay inside Shani OS
 - [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os) — full system containers
 - [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os) — lightweight system containers
+- [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full VMs with hardware isolation
 - [Telegram community](https://t.me/shani8dev)
 
 ---

@@ -321,6 +321,10 @@ All of these are available on Shani OS simultaneously and serve distinct roles:
 - You are coming from macOS and `brew install` is muscle memory
 - Guide: [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os)
 
+**Use Virtual Machines when:**
+- You need full hardware-level isolation — a separate kernel, a Windows VM, or GPU passthrough for gaming or ML
+- Guide: [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines)
+
 The layers do not conflict. You can have apps from all ecosystems running simultaneously — each in its own Btrfs subvolume, each surviving OS updates.
 
 ---
@@ -398,6 +402,7 @@ Full troubleshooting reference: [docs.shani.dev — Distrobox](https://docs.shan
 - [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os) — full system containers
 - [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os) — lightweight system containers
 - [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os) — brew for macOS switchers
+- [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full VMs with hardware isolation
 - [Telegram community](https://t.me/shani8dev) — questions and support
 
 ---

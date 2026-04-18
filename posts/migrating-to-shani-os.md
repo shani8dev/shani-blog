@@ -60,6 +60,21 @@ All survive every OS update and rollback. They are never touched by `shani-deplo
 
 Search for the Flatpak app ID at [flathub.org](https://flathub.org) or via `flatpak search <n>`. Most major GUI applications are on Flathub. If an app is only available on the Snap Store, `snap install <n>` works as a fallback — Snap is pre-configured on Shani OS and the `@snapd` subvolume persists across updates just like `@flatpak`.
 
+### Windows Applications
+
+Windows `.exe` software runs through Wine — a compatibility layer that translates Windows API calls to Linux equivalents. No Windows licence required, no VM overhead for most apps.
+
+| Traditional | Shani OS |
+|---|---|
+| Run a Windows `.exe` installer | Open with Bottles — creates an isolated Wine environment |
+| Install a Windows productivity tool | Bottles → Create bottle → Run Executable |
+| Run legacy Windows software | Bottles with Wine Staging or Wine-GE runner |
+| Windows game (non-Steam) | Bottles with Wine-GE, or Heroic Games Launcher |
+
+**Bottles** (`com.usebottles.bottles`) is pre-installed on the KDE Plasma edition and available on Flathub for the GNOME edition. It manages isolated Wine prefixes per application, handles runtime dependencies (Visual C++, .NET, DirectX) via its built-in dependency installer, and supports multiple Wine runners including Wine-GE and Proton-GE.
+
+For applications that require a real Windows kernel — hardware drivers, anti-cheat systems, enterprise software with kernel-level components — a Windows VM via virt-manager (pre-installed on KDE Plasma) or GNOME Boxes is the reliable path. VM disk images live in `@libvirt`, completely independent of the OS. Guide: [Windows Apps on Shani OS](https://blog.shani.dev/post/windows-apps-on-shani-os) · [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
+
 For portable self-contained tools distributed as AppImages, download the `.AppImage`, make it executable, and run — or open with Gear Lever (pre-installed) to add it permanently to your launcher with automatic update checking.
 
 ### CLI Tools and Development Runtimes
@@ -344,6 +359,8 @@ These do not require any migration thought — they work on Shani OS exactly as 
 - [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os) — full system containers
 - [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os) — lightweight system containers
 - [Waydroid on Shani OS](https://blog.shani.dev/post/waydroid-android-on-shani-os) — Android apps
+- [Windows Apps on Shani OS](https://blog.shani.dev/post/windows-apps-on-shani-os) — Wine, Bottles, and when to use a VM
+- [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full VMs with hardware isolation
 - [Telegram community](https://t.me/shani8dev) — ask migration questions
 
 [Download Shani OS at shani.dev →](https://shani.dev)

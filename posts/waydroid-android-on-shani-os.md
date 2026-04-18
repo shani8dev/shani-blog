@@ -16,7 +16,7 @@ readTime: '7 min'
 series: 'Shani OS Guides'
 ---
 
-Waydroid runs a complete Android operating system in a lightweight Linux container, giving you access to the full Android app ecosystem on your Shani OS desktop. Unlike emulators that virtualise the entire hardware stack, Waydroid runs Android using your actual Linux kernel — specifically via the `binder` and `ashmem` kernel modules. The result is near-native performance, not the sluggishness of QEMU-based Android emulation.
+Waydroid runs a complete Android operating system in a lightweight Linux container, giving you access to the full Android app ecosystem on your Shani OS desktop. Unlike emulators that virtualise the entire hardware stack, Waydroid runs Android using your actual Linux kernel — specifically via the `binder` and `ashmem` kernel modules. The result is near-native performance, not the sluggishness of QEMU-based Android emulation. For running a full Windows or Linux VM with hardware-level isolation, see [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
 
 On Shani OS, Waydroid is pre-installed and pre-configured. The `@waydroid` Btrfs subvolume stores your Android environment independently of the OS — an OS update or rollback never touches your installed Android apps, their data, or your Google account login.
 
@@ -255,6 +255,7 @@ Full troubleshooting guide: [docs.shani.dev — Android (Waydroid)](https://docs
 
 - [docs.shani.dev — Android (Waydroid)](https://docs.shani.dev/doc/software/waydroid) — full setup and configuration reference
 - [Waydroid documentation](https://docs.waydro.id) — upstream project documentation
+- [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full VMs for Windows, Linux, and GPU passthrough
 - [Telegram community](https://t.me/shani8dev) — Waydroid questions and support
 
 ---

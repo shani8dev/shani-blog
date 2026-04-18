@@ -290,6 +290,8 @@ No — and you do not need to. The immutable root means `pacman -S` to the base 
 - **LXC/LXD** — full system containers with init systems and services.
 - **systemd-nspawn** — lightweight system containers, no daemon required.
 - **Homebrew** — works identically to macOS if that's your preference.
+- **Bottles + Wine** — run Windows `.exe` applications directly via Wine. Bottles (pre-installed on KDE Plasma) manages isolated Wine environments. Guide: [Windows Apps on Shani OS](https://blog.shani.dev/post/windows-apps-on-shani-os).
+- **Virtual Machines** — for software requiring a real Windows kernel. virt-manager (pre-installed on KDE Plasma) or GNOME Boxes. Guide: [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
 
 The migration table at [docs.shani.dev](https://docs.shani.dev/doc/concepts) maps every traditional workflow to its Shani OS equivalent.
 
@@ -309,6 +311,13 @@ It is possible but not recommended — other operating systems may overwrite the
 - [docs.shani.dev](https://docs.shani.dev) — full technical documentation
 - [shani.dev](https://shani.dev) — downloads and overview
 - [github.com/shani8dev](https://github.com/shani8dev) — source code
+- [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — complete Flatpak guide
+- [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — CLI tools and dev environments
+- [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — mutable Linux environments
+- [Windows Apps on Shani OS](https://blog.shani.dev/post/windows-apps-on-shani-os) — Wine, Bottles, and when to use a VM
+- [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full VMs with hardware isolation
+- [Gaming on Shani OS](https://blog.shani.dev/post/shani-os-gaming-deep-dive) — Steam, Proton, and the full gaming stack
+- [Waydroid on Shani OS](https://blog.shani.dev/post/waydroid-android-on-shani-os) — Android apps on the desktop
 - [Telegram community](https://t.me/shani8dev) — questions and support
 
 ---
