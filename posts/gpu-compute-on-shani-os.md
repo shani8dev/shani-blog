@@ -139,6 +139,12 @@ The host has `nvidia-open` and `nvidia-utils` installed. The CUDA development to
 # Verify the host driver is working
 nvidia-smi
 
+# If using raw Podman (not Distrobox) for NVIDIA, you must first generate the CDI spec:
+# sudo pacman -S nvidia-container-toolkit
+# sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+# Then use: podman run --device nvidia.com/gpu=all --security-opt=label=disable ...
+# Distrobox handles this automatically — no CDI setup required.
+
 # Create a CUDA-capable container
 distrobox create --name cuda-dev --image nvidia/cuda:12.3.0-devel-ubuntu22.04
 distrobox enter cuda-dev
