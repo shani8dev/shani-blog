@@ -5,8 +5,71 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Sat, 18 Apr 2026 18:48:34 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 19 Apr 2026 09:26:38 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>shani-health — System Health Monitoring for Shani OS</title>
+      <link>https://blog.shani.dev/post/shani-health-reference</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/shani-health-reference</guid>
+      <description>shani-health is the CLI tool for checking the health of a running Shani OS system — filesystem integrity, slot state, subvolume sizes, service status, and more. Introduced in the 2026.04.15 release.</description>
+      <pubDate>Tue, 12 May 2026 00:00:00 GMT</pubDate>
+      <category>Guide</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+    <item>
+      <title>Android App Compatibility on Shani OS — What Works, What Doesn't, and Workarounds</title>
+      <link>https://blog.shani.dev/post/shani-os-android-app-compatibility</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-android-app-compatibility</guid>
+      <description>Which Android apps work in Waydroid on Shani OS — Indian banking and government apps, streaming services, DRM status, and practical workarounds for apps that are blocked. Includes a tested compatibility list for common Indian apps.</description>
+      <pubDate>Tue, 12 May 2026 00:00:00 GMT</pubDate>
+      <category>Guide</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+    <item>
+      <title>Shani OS FAQ — Frequently Asked Questions</title>
+      <link>https://blog.shani.dev/post/shani-os-faq</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-faq</guid>
+      <description>Answers to the most common questions about Shani OS: software installation, what happens to your files after rollback, hardware compatibility, dual boot, gaming, security, and the immutable model in plain terms.</description>
+      <pubDate>Tue, 12 May 2026 00:00:00 GMT</pubDate>
+      <category>Guide</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+    <item>
+      <title>Your First Week with Shani OS — From Install to Fully Set Up</title>
+      <link>https://blog.shani.dev/post/shani-os-first-week</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-first-week</guid>
+      <description>A day-by-day walkthrough for new Shani OS users: getting encryption and updates sorted on day one, then systematically setting up email, cloud sync, printing, dev tools, backups, and daily habits through the first week.</description>
+      <pubDate>Tue, 12 May 2026 00:00:00 GMT</pubDate>
+      <category>Guide</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+    <item>
+      <title>The Shani OS Software Ecosystem — What to Use, When, and Why</title>
+      <link>https://blog.shani.dev/post/shani-os-software-ecosystem</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-software-ecosystem</guid>
+      <description>One canonical reference for every software installation option on Shani OS: Flatpak, Snap, AppImage, Nix, Distrobox, Podman, LXC/LXD, systemd-nspawn, Apptainer, Homebrew, and VMs. Includes a decision flowchart, full comparison table, and the subvolume each ecosystem lives in.</description>
+      <pubDate>Tue, 12 May 2026 00:00:00 GMT</pubDate>
+      <category>Guide</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+    <item>
+      <title>Shani OS Troubleshooting Guide — Boot, Updates, Audio, GPU, and More</title>
+      <link>https://blog.shani.dev/post/shani-os-troubleshooting-guide</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-troubleshooting-guide</guid>
+      <description>The consolidated troubleshooting reference for Shani OS — boot failures and slot recovery, update issues, audio problems, Bluetooth, Flatpak sandbox, NVIDIA detection, TPM2 unlock, Waydroid, and common journalctl commands for diagnosing anything else.</description>
+      <pubDate>Tue, 12 May 2026 00:00:00 GMT</pubDate>
+      <category>Guide</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+    <item>
+      <title>Updates on Shani OS — shani-update, shani-deploy, and the Full Reference</title>
+      <link>https://blog.shani.dev/post/shani-os-updates</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-updates</guid>
+      <description>The complete guide to Shani OS updates: how shani-update detects and surfaces updates automatically, and the full shani-deploy flag reference for every scenario — update, rollback, dry-run, cleanup, channel management, and automated fleet deployments.</description>
+      <pubDate>Tue, 12 May 2026 00:00:00 GMT</pubDate>
+      <category>Guide</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
     <item>
       <title>shani-update — The Shani OS Update Manager</title>
       <link>https://blog.shani.dev/post/shani-os-update-notifications</link>
@@ -369,11 +432,12 @@
       <author>Shrinivas Kumbhar</author>
     </item>
     <item>
-      <title>Shani OS for Everyone — Gamers, Developers, Switchers, and IT Teams</title>
+      <title>Shani OS for Everyone — Find Your Guide</title>
       <link>https://blog.shani.dev/post/shani-os-for-everyone</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-for-everyone</guid>
-      <description>A practical guide to who Shani OS is for and what it looks like in daily use — whether you are coming from Windows, running a game library, managing a fleet, or doing serious dev work.</description>
+      <description>Shani OS works for Windows and macOS switchers, developers, gamers, and IT administrators. This page points you to the right guide for your situation.</description>
       <pubDate>Mon, 13 Apr 2026 00:00:00 GMT</pubDate>
+      <lastBuildDate>Tue, 12 May 2026 00:00:00 GMT</lastBuildDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -392,24 +456,6 @@
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-getting-started</guid>
       <description>A complete walkthrough: download, verify, install, and configure Shani OS from scratch — including Flatpak apps, Nix packages, Distrobox containers, and TPM2 encryption setup.</description>
       <pubDate>Sat, 11 Apr 2026 00:00:00 GMT</pubDate>
-      <category>Guide</category>
-      <author>Shrinivas Kumbhar</author>
-    </item>
-    <item>
-      <title>Why Your OS Update Should Never Break Your Computer — And How Shani OS Fixes This</title>
-      <link>https://blog.shani.dev/post/why-os-updates-should-never-break</link>
-      <guid isPermaLink="true">https://blog.shani.dev/post/why-os-updates-should-never-break</guid>
-      <description>Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.</description>
-      <pubDate>Fri, 10 Apr 2026 00:00:00 GMT</pubDate>
-      <category>Engineering</category>
-      <author>Shrinivas Kumbhar</author>
-    </item>
-    <item>
-      <title>Nix on Shani OS — The Best Package Manager for an Immutable System</title>
-      <link>https://blog.shani.dev/post/nix-on-shani-os</link>
-      <guid isPermaLink="true">https://blog.shani.dev/post/nix-on-shani-os</guid>
-      <description>Why Nix and immutable Linux are a natural match, how to set it up on Shani OS in five minutes, and practical workflows for developers, researchers, and power users.</description>
-      <pubDate>Thu, 09 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
