@@ -167,6 +167,7 @@ Full Tailscale guide: [Networking on Shani OS](https://blog.shani.dev/post/shani
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [docs.shani.dev — KDE Connect](https://docs.shani.dev/doc/networking/kdeconnect) — full reference
 - [kdeconnect.kde.org](https://kdeconnect.kde.org) — official documentation
 - [Networking on Shani OS](https://blog.shani.dev/post/shani-os-networking-guide) — Tailscale for remote access

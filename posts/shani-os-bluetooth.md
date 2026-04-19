@@ -219,6 +219,7 @@ Full Bluetooth troubleshooting: [docs.shani.dev — Bluetooth](https://docs.shan
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [docs.shani.dev — Bluetooth](https://docs.shani.dev/doc/troubleshooting) — troubleshooting reference
 - [Gaming on Shani OS](https://blog.shani.dev/post/shani-os-gaming-deep-dive) — gaming controller configuration
 - [Telegram community](https://t.me/shani8dev)

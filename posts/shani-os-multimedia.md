@@ -394,6 +394,7 @@ All of the following play without any additional installation on Shani OS:
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [Audio on Shani OS](https://blog.shani.dev/post/shani-os-audio-pipewire) — PipeWire, audio hardware, Bluetooth audio
 - [Bluetooth on Shani OS](https://blog.shani.dev/post/shani-os-bluetooth) — wireless headphones and speakers
 - [Waydroid on Shani OS](https://blog.shani.dev/post/waydroid-android-on-shani-os) — Netflix 4K, Android streaming apps

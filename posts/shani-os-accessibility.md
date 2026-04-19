@@ -268,6 +268,8 @@ GDM (GNOME's login manager) and SDDM (KDE's login manager) both support Orca at 
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
 - GNOME Accessibility: [Settings → Accessibility]
 - KDE Accessibility: [System Settings → Accessibility]
 - Orca documentation: [gnome.org/orca](https://help.gnome.org/users/orca/stable/)

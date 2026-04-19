@@ -149,4 +149,14 @@ For setup instructions, configuration details, and troubleshooting: [docs.shani.
 
 ---
 
+## Resources
+
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common security questions
+- [gen-efi and Secure Boot on Shani OS](https://blog.shani.dev/post/gen-efi-and-secure-boot) — UKI generation, MOK keys, TPM2 commands
+- [LUKS2 Encryption on Shani OS](https://blog.shani.dev/post/shani-os-luks-after-installation) — keyslot management and recovery
+- [docs.shani.dev — Security](https://docs.shani.dev/doc/security) — full security reference
+- [Telegram community](https://t.me/shani8dev)
+---
+
 > **Built in India** 🇮🇳 · **Immutable** · **Atomic** · **Zero Telemetry**

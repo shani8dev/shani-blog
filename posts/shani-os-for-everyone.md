@@ -75,4 +75,15 @@ Both editions include: the full immutable architecture, all security features, a
 
 ---
 
+## Resources
+
+- [Getting Started with Shani OS](https://blog.shani.dev/post/shani-os-getting-started) — installation and first boot
+- [Your First Week with Shani OS](https://blog.shani.dev/post/shani-os-first-week) — day-by-day setup guide
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) — what to use for each type of software
+- [docs.shani.dev](https://docs.shani.dev) — full documentation
+- [Telegram community](https://t.me/shani8dev)
+---
+
 > **Built in India** 🇮🇳 · **Immutable** · **Atomic** · **Zero Telemetry**

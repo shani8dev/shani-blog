@@ -313,5 +313,11 @@ Tailscale state persists across OS updates at `/data/varlib/tailscale`. Tailscal
 
 ---
 
+## Resources
+
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
+- [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates) — update and rollback reference
+
 > **Built in India** 🇮🇳 · **Immutable** · **Atomic** · **Zero Telemetry**  
 > *Enterprise-grade update reliability. No per-device licence. No vendor lock-in.*

@@ -244,6 +244,8 @@ Each layer is independently verifiable. The combination gives you a research sta
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) — what to use for each type of software
 - [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — Apptainer, Podman, Distrobox full reference
 - [docs.shani.dev — Nix Package Manager](https://docs.shani.dev/doc/software/nix) — Nix setup and usage on Shani OS
 - [docs.shani.dev — Virtual Machines](https://docs.shani.dev/doc/software/vms) — GPU passthrough via VFIO for ML workloads

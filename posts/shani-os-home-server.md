@@ -316,10 +316,10 @@ Run updates when you choose — Shani OS does not update automatically. `shani-d
 sudo shani-deploy
 
 # Roll back if anything is wrong after rebooting
-sudo shani-deploy --rollback
+sudo shani-deploy -r
 ```
 
-No rescue mode, no package manager archaeology, no manual state reconstruction.
+No rescue mode, no package manager archaeology, no manual state reconstruction. Full update reference: [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates).
 
 ### Monitoring — [wiki](https://docs.shani.dev/doc/servers/monitoring)
 
@@ -375,6 +375,9 @@ Shani OS is built with that in mind — an operating system that gets out of the
 - [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os) — rootless containers, Docker Compose compatibility, volumes, auto-start
 - [Networking on Shani OS](https://blog.shani.dev/post/shani-os-networking-guide) — VPNs, Tailscale, SSH hardening, Caddy, firewall rules
 - [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — full mutable Linux inside the immutable OS
+- [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates) — update and rollback reference
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Btrfs Snapshots and Backup on Shani OS](https://blog.shani.dev/post/shani-os-btrfs-snapshots-and-backup) — off-device backup strategy
 - [Telegram community](https://t.me/shani8dev) — questions, setups, and community support
 
 ---

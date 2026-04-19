@@ -304,6 +304,8 @@ sudo gen-efi enroll-tpm2
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
 - [docs.shani.dev — LUKS](https://docs.shani.dev/doc/security/luks) — full reference
 - [docs.shani.dev — TPM2 Enrollment](https://docs.shani.dev/doc/security/tpm2) — passwordless unlock setup
 - [gen-efi and Secure Boot on Shani OS](https://blog.shani.dev/post/gen-efi-and-secure-boot) — UKI generation and TPM2

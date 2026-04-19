@@ -406,6 +406,8 @@ Shani OS's earlyoom out-of-memory manager prevents system freezes during memory-
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) — what to use for each type of software
 - [Audio on Shani OS](https://blog.shani.dev/post/shani-os-audio-pipewire) — PipeWire, JACK, audio interfaces
 - [GPU Compute on Shani OS](https://blog.shani.dev/post/gpu-compute-on-shani-os) — GPU-accelerated rendering
 - [Shani OS for Designers](https://blog.shani.dev/post/shani-os-for-designers-and-visual-creators) — photo editing, illustration

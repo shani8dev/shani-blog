@@ -324,6 +324,9 @@ These activate automatically when the relevant hypervisor is detected. No manual
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
+- [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) — what to use for each type of software
 - [docs.shani.dev — Virtual Machines](https://docs.shani.dev/doc/software/vms) — full KVM/libvirt reference
 - [docs.shani.dev — VM Issues](https://docs.shani.dev/doc/troubleshooting) — troubleshooting
 - [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os) — lightweight system containers without a daemon

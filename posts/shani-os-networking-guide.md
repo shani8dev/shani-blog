@@ -713,4 +713,19 @@ Any network service also runs as a rootless Podman container on Shani OS, surviv
 
 ---
 
+## Resources
+
+- [docs.shani.dev — Networking](https://docs.shani.dev/doc/networking) — full networking documentation
+- [docs.shani.dev/servers](https://docs.shani.dev/doc/servers) — self-hosting wiki with ready-to-run Podman commands
+- [Shani OS as a Home Server](https://blog.shani.dev/post/shani-os-home-server) — self-hosting guide with service catalogue
+- [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os) — rootless containers reference
+- [KDE Connect on Shani OS](https://blog.shani.dev/post/shani-os-kde-connect) — phone + desktop integration
+- [Btrfs Snapshots and Backup on Shani OS](https://blog.shani.dev/post/shani-os-btrfs-snapshots-and-backup) — restic and rclone backup guide
+- [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates) — update and rollback reference
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — network troubleshooting and general diagnostics
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions
+- [Telegram community](https://t.me/shani8dev)
+
+---
+
 > **Built in India** 🇮🇳 · **Immutable** · **Atomic** · **Zero Telemetry**

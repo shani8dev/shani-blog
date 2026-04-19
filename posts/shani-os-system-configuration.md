@@ -329,6 +329,9 @@ This is useful for auditing your configuration before a major update and for doc
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates) — update and rollback reference
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
 - [docs.shani.dev — System Configuration](https://docs.shani.dev/doc/updates/config) — full reference
 - [docs.shani.dev — Overlay Filesystem](https://docs.shani.dev/doc/arch/overlay) — OverlayFS technical details
 - [The Architecture Behind Shani OS](https://blog.shani.dev/post/shani-os-architecture-deep-dive) — how /etc stays writable

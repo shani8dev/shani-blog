@@ -284,6 +284,7 @@ You configure your printer once. OS updates and rollbacks leave your printer con
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [docs.shani.dev — Printing & Scanning](https://docs.shani.dev/doc/troubleshooting) — troubleshooting reference
 - [CUPS documentation](https://www.cups.org/documentation.html)
 - [Telegram community](https://t.me/shani8dev)

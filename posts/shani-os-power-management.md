@@ -256,6 +256,7 @@ After installing Shani OS on a laptop:
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [docs.shani.dev — Power & Suspend](https://docs.shani.dev/doc/troubleshooting) — troubleshooting reference
 - [docs.shani.dev — TPM2 Enrollment](https://docs.shani.dev/doc/security/tpm2) — full TPM2 setup guide
 - [Security Without Configuration](https://blog.shani.dev/post/shani-os-security-deep-dive) — LUKS2 and security deep dive

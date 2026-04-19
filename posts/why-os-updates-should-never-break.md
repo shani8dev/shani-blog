@@ -139,4 +139,19 @@ Full documentation at [docs.shani.dev](https://docs.shani.dev). For a deeper loo
 
 ---
 
+
+---
+
+## Resources
+
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
+- [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) — what to use for each type of software
+- [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates) — full update and rollback reference
+- [The Architecture Behind Shani OS](https://blog.shani.dev/post/shani-os-architecture-deep-dive) — technical deep dive
+- [Getting Started with Shani OS](https://blog.shani.dev/post/shani-os-getting-started) — installation and first boot
+- [docs.shani.dev](https://docs.shani.dev) — full documentation
+
+---
+
 > Your OS update should never break your computer. On Shani OS, it structurally cannot.

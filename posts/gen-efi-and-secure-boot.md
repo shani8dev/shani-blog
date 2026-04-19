@@ -294,6 +294,8 @@ Full boot and security troubleshooting: [docs.shani.dev — Boot Issues](https:/
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
 - [docs.shani.dev — Secure Boot](https://docs.shani.dev/doc/security/secure-boot) — full Secure Boot reference
 - [docs.shani.dev — gen-efi Reference](https://docs.shani.dev/doc/security/gen-efi) — complete gen-efi documentation
 - [docs.shani.dev — TPM2 Enrollment](https://docs.shani.dev/doc/security/tpm2) — TPM2 setup guide

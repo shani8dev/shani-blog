@@ -139,7 +139,7 @@ nix-env --switch-generation 12
 nix-env -e <package>  # just uninstall it
 ```
 
-This rollback is independent of Shani OS's `shani-deploy --rollback`. OS rollback and Nix rollback are separate concerns: OS rollback switches the entire system image; Nix rollback changes which packages are in your profile. Neither affects the other.
+This rollback is independent of Shani OS's `shani-deploy -r`. OS rollback and Nix rollback are separate concerns: OS rollback switches the entire system image; Nix rollback changes which packages are in your profile. Neither affects the other.
 
 ---
 
@@ -149,7 +149,7 @@ On Shani OS, `/nix` is mounted from the `@nix` Btrfs subvolume, which is shared 
 
 When you perform an OS update with `shani-deploy`, the active slot changes. The `@nix` subvolume does not change. Your installed packages are immediately available in the new slot without reinstalling anything.
 
-When you perform an OS rollback with `shani-deploy --rollback`, same thing — `@nix` is untouched.
+When you perform an OS rollback with `shani-deploy -r`, same thing — `@nix` is untouched.
 
 Btrfs deduplication via `bees` also benefits the Nix store. The Nix store intentionally shares build outputs across packages via hardlinks; `bees` additionally deduplicates at the block level. The result is an efficient store even with many packages and versions installed.
 
@@ -267,6 +267,8 @@ Distrobox containers live in `@containers` and survive OS updates. Guide: [Distr
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) — what to use for each type of software
 - [Nixpkgs search](https://search.nixos.org/packages) — search all 100,000+ packages
 - [Nix Pills](https://nixos.org/guides/nix-pills/) — the canonical learning resource for Nix fundamentals
 - [docs.shani.dev — Nix Package Manager](https://docs.shani.dev/doc/software/nix) — Shani OS-specific setup and configuration

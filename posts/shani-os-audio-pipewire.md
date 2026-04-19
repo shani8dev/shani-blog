@@ -20,7 +20,7 @@ PipeWire is the audio and video routing daemon on Shani OS. It replaces PulseAud
 
 WirePlumber is the session manager that sits on top of PipeWire — it makes routing decisions: which microphone goes to which app, which speaker gets output from which process, how Bluetooth devices connect, and how JACK clients are managed.
 
-Full reference: [docs.shani.dev — Audio Issues](https://docs.shani.dev/doc/troubleshooting).
+Full reference: [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide).
 
 ---
 
@@ -300,7 +300,8 @@ pavucontrol &              # install via flatpak if needed
 
 ## Resources
 
-- [docs.shani.dev — Audio Issues](https://docs.shani.dev/doc/troubleshooting) — troubleshooting reference
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — audio troubleshooting
 - [PipeWire documentation](https://pipewire.pages.freedesktop.org/pipewire/)
 - [Bluetooth on Shani OS](https://blog.shani.dev/post/shani-os-bluetooth) — Bluetooth audio codec guide
 - [Telegram community](https://t.me/shani8dev)

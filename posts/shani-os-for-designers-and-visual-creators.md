@@ -400,6 +400,8 @@ Guide: [Printing and Scanning on Shani OS](https://blog.shani.dev/post/shani-os-
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) — what to use for each type of software
 - [GPU Compute on Shani OS](https://blog.shani.dev/post/gpu-compute-on-shani-os) — GPU acceleration for Blender cycles
 - [Windows Apps on Shani OS](https://blog.shani.dev/post/windows-apps-on-shani-os) — Affinity, Adobe via Wine or VM
 - [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full Windows VM for Adobe CC

@@ -157,6 +157,9 @@ Many users end up with a hybrid: Shani OS as the host (imperative, familiar) wit
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
+- [Your First Week with Shani OS](https://blog.shani.dev/post/shani-os-first-week) — day-by-day setup guide
 - [shani.dev — Compare section](https://shani.dev#compare) — full comparison table
 - [Why Your OS Update Should Never Break Your Computer](https://blog.shani.dev/post/why-os-updates-should-never-break) — the philosophy behind Shani OS's design
 - [The Architecture Behind Shani OS](https://blog.shani.dev/post/shani-os-architecture-deep-dive) — Btrfs send/receive deep dive

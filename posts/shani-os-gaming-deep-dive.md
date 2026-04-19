@@ -18,7 +18,7 @@ series: 'Shani OS Deep Dives'
 
 The KDE Plasma edition of Shani OS ships a complete, pre-configured gaming stack. Not a collection of packages you need to configure — a stack that works at first boot, tuned for low-latency gaming, with every major launcher ready, NVIDIA drivers configured, and peripherals detected automatically.
 
-This post explains what is included, what each component does, and why an immutable OS is actually an advantage for gaming. Gaming troubleshooting: [docs.shani.dev — Gaming Issues](https://docs.shani.dev/doc/troubleshooting). Full hardware list: [docs.shani.dev — Gaming Hardware & Performance](https://docs.shani.dev/doc/intro/whats-included).
+This post explains what is included, what each component does, and why an immutable OS is actually an advantage for gaming. Gaming troubleshooting: [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide). Full hardware list: [docs.shani.dev — Gaming Hardware & Performance](https://docs.shani.dev/doc/intro/whats-included).
 
 ---
 
@@ -153,7 +153,7 @@ prime-run game-binary
 # __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia %command%
 ```
 
-If NVIDIA drivers do not load on first boot, check Secure Boot configuration: [docs.shani.dev — NVIDIA Setup](https://docs.shani.dev/doc/troubleshooting).
+If NVIDIA drivers do not load on first boot, check Secure Boot configuration: [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide).
 
 For GPU passthrough — dedicating a discrete GPU entirely to a Windows VM for native gaming performance — `virt-manager` is pre-installed on the KDE Plasma edition (`org.virt_manager.virt-manager` Flatpak). See the full VFIO setup in [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
 
@@ -195,7 +195,7 @@ The common objection to immutable Linux for gaming is: "I can't install packages
 
 **No dependency conflicts.** Gaming tools (Steam, MangoHud, GameScope, Proton) run as Flatpaks or are part of the verified OS image. They do not conflict with dev tools, system tools, or anything you install via Nix or Distrobox — because those live in separate Btrfs subvolumes.
 
-**Regression recovery.** If a Proton update breaks a specific game, use Steam's own Proton version selector to pin a specific Proton version per game. If an OS update breaks something at the kernel or driver level, `sudo shani-deploy --rollback` takes you back to the verified previous state in under a minute.
+**Regression recovery.** If a Proton update breaks a specific game, use Steam's own Proton version selector to pin a specific Proton version per game. If an OS update breaks something at the kernel or driver level, `sudo shani-deploy -r` takes you back to the verified previous state in under a minute.
 
 ---
 
@@ -219,14 +219,16 @@ vulkaninfo --summary
 gamemoded -s
 ```
 
-Full gaming troubleshooting: [docs.shani.dev — Gaming Issues](https://docs.shani.dev/doc/troubleshooting).
+Full gaming troubleshooting: [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide).
 
 ---
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
 - [docs.shani.dev — Gaming Hardware & Performance](https://docs.shani.dev/doc/intro/whats-included) — full hardware compatibility list
-- [docs.shani.dev — Gaming Issues](https://docs.shani.dev/doc/troubleshooting) — troubleshooting
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — troubleshooting
 - [docs.shani.dev — Android (Waydroid)](https://docs.shani.dev/doc/software/waydroid) — Android gaming setup
 - [ProtonDB](https://www.protondb.com) — community Wine/Proton compatibility database
 - [WineHQ AppDB](https://appdb.winehq.org) — compatibility reports for non-game Windows software

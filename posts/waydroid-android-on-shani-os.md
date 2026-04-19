@@ -253,6 +253,8 @@ Full troubleshooting guide: [docs.shani.dev — Android (Waydroid)](https://docs
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
 - [docs.shani.dev — Android (Waydroid)](https://docs.shani.dev/doc/software/waydroid) — full setup and configuration reference
 - [Waydroid documentation](https://docs.waydro.id) — upstream project documentation
 - [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full VMs for Windows, Linux, and GPU passthrough

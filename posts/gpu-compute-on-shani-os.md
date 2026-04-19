@@ -299,6 +299,8 @@ MANGOHUD=1 python3 train.py
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) — what to use for each type of software
 - [Shani OS for Researchers and HPC](https://blog.shani.dev/post/shani-os-for-researchers-and-hpc) — reproducibility stack: Apptainer, Nix, DVC, cluster workflows
 - [Apptainer on Shani OS](https://blog.shani.dev/post/apptainer-on-shani-os) — HPC containers with `--nv` and `--rocm` GPU passthrough
 - [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — GPU passthrough via VFIO for dedicated VM compute

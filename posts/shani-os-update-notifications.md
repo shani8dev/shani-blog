@@ -38,7 +38,7 @@ In that case it shows a GUI dialog:
 > Slot @green failed to boot. The system fell back to @blue.
 > Roll back @green now so it boots correctly next time?
 
-If confirmed, it opens a terminal window and runs `shani-deploy --rollback` with `pkexec` for privilege escalation, then shows a follow-up dialog offering to reboot immediately. If the failure was a hard failure (the slot failed to mount entirely), the dialog text makes this explicit.
+If confirmed, it opens a terminal window and runs `shani-deploy -r` with `pkexec` for privilege escalation, then shows a follow-up dialog offering to reboot immediately. If the failure was a hard failure (the slot failed to mount entirely), the dialog text makes this explicit.
 
 ### 2. Reboot-needed check
 
@@ -207,6 +207,7 @@ Updates can then be triggered on schedule via a systemd timer calling `shani-dep
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [docs.shani.dev — System Updates](https://docs.shani.dev/doc/updates/system) — full update reference
 - [shani-deploy Reference](https://blog.shani.dev/post/shani-deploy-reference) — every flag and workflow
 - [Shani OS for OEMs and IT Fleets](https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment) — fleet update management

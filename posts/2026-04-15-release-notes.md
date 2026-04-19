@@ -252,5 +252,15 @@ cat /data/current-slot
 
 ---
 
+## Resources
+
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — troubleshooting after update
+- [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates) — shani-deploy and shani-update reference
+- [shani-health Reference](https://blog.shani.dev/post/shani-health-reference) — system health monitoring CLI
+- [Getting Started with Shani OS](https://blog.shani.dev/post/shani-os-getting-started) — installation guide
+- [wiki.shani.dev](https://docs.shani.dev) — full technical documentation
+- [Telegram community](https://t.me/shani8dev)
+---
+
 > **Built in India** 🇮🇳 · **Immutable** · **Atomic** · **Zero Telemetry**
 > *Shani OS 2026.04.15 — Reliable by design, consistent by default.*

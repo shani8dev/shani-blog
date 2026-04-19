@@ -53,7 +53,7 @@ Every invocation works through a fixed priority sequence. Each step can short-ci
 
 `shani-update` compares the booted subvolume (from `/proc/cmdline`) against `/data/current-slot`. If they differ and a `/data/boot_failure` marker is present, the newly deployed slot failed to boot and the system fell back automatically.
 
-A dialog appears offering to run `shani-deploy --rollback` to clean the failed slot. If confirmed, `shani-deploy --rollback` runs in a terminal via `pkexec`, then a follow-up dialog offers an immediate reboot.
+A dialog appears offering to run `shani-deploy -r` to clean the failed slot. If confirmed, `shani-deploy -r` runs in a terminal via `pkexec`, then a follow-up dialog offers an immediate reboot.
 
 **2. Reboot-needed check**
 

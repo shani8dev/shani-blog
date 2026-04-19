@@ -432,6 +432,7 @@ For the full update workflow, channels, and rollback reference: [Updates on Shan
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [Getting Started with Shani OS](https://blog.shani.dev/post/shani-os-getting-started) — installation and first boot
 - [Your First Week with Shani OS](https://blog.shani.dev/post/shani-os-first-week) — day-by-day setup guide
 - [Migrating to Shani OS](https://blog.shani.dev/post/migrating-to-shani-os) — coming from Ubuntu, Fedora, or Arch

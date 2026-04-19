@@ -311,6 +311,8 @@ The OS itself does not need to be backed up — `shani-deploy` downloads a fresh
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates) — update and rollback reference
 - [docs.shani.dev — Backup (rclone/restic)](https://docs.shani.dev/doc/networking/backup) — full reference
 - [restic documentation](https://restic.readthedocs.io)
 - [rclone documentation](https://rclone.org/docs/)

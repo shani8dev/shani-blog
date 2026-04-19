@@ -314,6 +314,9 @@ All Nix-installed tools survive OS updates and rollbacks, are immediately on you
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) — what to use for each type of software
+- [Your First Week with Shani OS](https://blog.shani.dev/post/shani-os-first-week) — day-by-day setup guide
 - [docs.shani.dev — Shell & Environment](https://docs.shani.dev/doc/updates/shell) — full shell configuration reference
 - [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — installing additional CLI tools
 - [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — tools that need a full distro environment

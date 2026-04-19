@@ -238,4 +238,16 @@ The [2026.04.15 release](https://blog.shani.dev/post/shani-os-2026-04-15-release
 
 ---
 
+## Resources
+
+- [Why Your OS Update Should Never Break Your Computer](https://blog.shani.dev/post/why-os-updates-should-never-break) — the philosophy behind the architecture
+- [Security Without Configuration](https://blog.shani.dev/post/shani-os-security-deep-dive) — the security model in detail
+- [gen-efi and Secure Boot on Shani OS](https://blog.shani.dev/post/gen-efi-and-secure-boot) — UKI generation and Secure Boot chain
+- [docs.shani.dev](https://docs.shani.dev) — full technical documentation
+- [Telegram community](https://t.me/shani8dev)
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
+- [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) — what to use for each type of software
+- [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates) — update and rollback reference
+
 > **Built in India** 🇮🇳 · **Immutable** · **Atomic** · **Zero Telemetry**

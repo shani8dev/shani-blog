@@ -206,6 +206,8 @@ For OEM and fleet deployments with Indian language requirements, contact [shani.
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
 - [docs.shani.dev — Shell & Environment](https://docs.shani.dev/doc/updates/shell) — locale configuration reference
 - [IBus documentation](https://github.com/ibus/ibus/wiki)
 - [Noto Fonts](https://fonts.google.com/noto) — the font family covering all Indian scripts
