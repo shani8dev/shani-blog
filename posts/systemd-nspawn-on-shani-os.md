@@ -288,38 +288,15 @@ sudo machinectl remove arch-test
 
 ## nspawn vs the Full Ecosystem
 
-All of these are available on Shani OS simultaneously and serve distinct roles:
+systemd-nspawn is the lightest path to a full Linux system container — no daemon, no setup, no image format beyond a plain directory. Use it for isolated builds, service sandboxing, and quick system environment tests. For richer operational tooling (image catalog, port forwarding devices, snapshots via GUI), LXD adds a feature layer. For GUI apps, Flatpak. For CLI tools, Nix. For mutable dev environments with home directory sharing, Distrobox. For full hardware isolation, VMs.
 
-**Use systemd-nspawn when** you want a full Linux system container with zero setup — no daemon, no image format, no wizard. Pull a tarball, boot it. Best for isolated builds, service sandboxing, and quick system environment tests.
-
-**Use LXC/LXD when** you need the same full-system isolation but want a richer operational layer: a built-in image catalog, per-container resource limits via the LXD CLI, built-in port forwarding devices, or remote container management. LXD adds tooling on top of what nspawn provides.
-Guide: [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os).
-
-**Use Distrobox when** you need `apt`, `pacman`, `dnf`, or `yay` — the full package manager of a specific distro — with your home directory shared into the container. Not a full system container; more like a mutable dev shell layered over Podman.
-Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
-
-**Use Podman when** you want OCI containers for services, databases, and development workflows. Rootless, Docker-compatible, daemon-free. The right tool for running PostgreSQL, Redis, self-hosted apps, and Compose stacks.
-Guide: [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os).
-
-**Use Apptainer when** you need portable, reproducible containers for HPC and cluster workflows — single `.sif` files that run identically on your workstation and any SLURM/PBS cluster.
-Guide: [Apptainer on Shani OS](https://blog.shani.dev/post/apptainer-on-shani-os).
-
-**Use Flatpak when** you want a GUI desktop application available on Flathub. Guide: [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os).
-
-**Use Snap when** an app is only on the Snap Store and not Flathub. Guide: [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os).
-
-**Use Nix when** you want CLI tools or development runtimes installed persistently without a full container — multiple versions without conflict, reproducible per-project environments via `shell.nix`.
-Guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os).
-
-**Use QEMU/KVM when** you need full hardware-level isolation — a separate kernel, hardware passthrough, or a Windows VM for gaming.
-Guide: [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
-
-The layers do not conflict. Containers in `@machines`, `@containers`, `@lxc`, and `@lxd`, apps in `@flatpak` and `@snapd`, and packages in `@nix` are all fully independent — each survives OS updates and rollbacks untouched.
+[The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) has the complete decision guide with a flowchart and comparison table.
 
 ---
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — full container runtime reference
 - [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os) — full system containers with more features
 - [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — dev containers with home directory sharing

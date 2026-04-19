@@ -193,35 +193,7 @@ For Netflix 4K, the most reliable path is the Android app in Waydroid (see [Wayd
 
 ## Music Playback
 
-### Local Music Library
-
-```bash
-# Amberol — clean, simple player for local music
-flatpak install flathub io.bassi.Amberol
-
-# Rhythmbox — full-featured library manager with Last.fm scrobbling
-flatpak install flathub org.gnome.Rhythmbox3
-
-# Elisa — KDE music player
-flatpak install flathub org.kde.elisa
-
-# Lollypop — GNOME music player with album art focus
-flatpak install flathub org.gnome.Lollypop
-```
-
-### Streaming Music
-
-```bash
-# Spotify
-flatpak install flathub com.spotify.Client
-
-# Spotube — open-source Spotify client (no Premium required for most features)
-flatpak install flathub com.github.KRTirtho.Spotube
-
-# YouTube Music
-# Use music.youtube.com in Vivaldi, or:
-flatpak install flathub dev.aunetx.deezer   # Deezer
-```
+For music players (Amberol, Rhythmbox, Elisa, Lollypop) and streaming clients (Spotify, Spotube, JioSaavn), see [Shani OS for General Desktop Users](https://blog.shani.dev/post/shani-os-for-general-desktop-users#media-playback) for the full list. This section covers audio format conversion, which is specific to multimedia workflows.
 
 ### Audio Format Conversion
 

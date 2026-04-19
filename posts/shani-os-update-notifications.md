@@ -16,6 +16,8 @@ readTime: '6 min'
 series: 'Shani OS Guides'
 ---
 
+> **Note:** This post has been superseded by [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates), which merges `shani-update` and `shani-deploy` into a single reference. The content below remains accurate.
+
 `shani-update` is the user-facing update manager for Shani OS. It runs automatically in two ways: via a desktop autostart entry (`shani-update --startup`) that fires at login after a 15-second delay, and via a systemd user timer that runs 15 minutes after boot and then every 2 hours thereafter. It can also be invoked manually at any time. It handles the full update lifecycle on behalf of the user: detecting whether the last boot was a fallback, prompting to reboot into a staged update, noticing when you're on a freshly deployed slot and letting you roll back if needed, and checking for new OS images when everything is healthy.
 
 `shani-deploy` is the lower-level tool that actually downloads, verifies, and stages OS images. `shani-update` is the front-end that decides when and whether to call it. Full reference: [docs.shani.dev — System Updates](https://docs.shani.dev/doc/updates/system).

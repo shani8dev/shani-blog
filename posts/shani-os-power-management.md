@@ -129,38 +129,21 @@ powerprofilesctl set performance
 
 ## LUKS2 Encryption and TPM2 Auto-Unlock on Laptops
 
-If you enabled LUKS2 encryption during installation (recommended for all laptops), you are prompted for a passphrase at every boot by default. TPM2 auto-unlock eliminates this prompt while maintaining full encryption security.
+If you enabled LUKS2 encryption during installation (recommended for all laptops), you are prompted for a passphrase at every boot by default. TPM2 auto-unlock eliminates this prompt — the LUKS key is sealed into your laptop's TPM2 chip, bound to PCR values 0 (firmware state) and 7 (Secure Boot policy). The disk unlocks silently on your own hardware. Move the disk to another machine or modify the firmware and it won't unlock.
 
-### How It Works
-
-TPM2 auto-unlock seals the LUKS key into the TPM2 chip, bound to PCR (Platform Configuration Register) values 0 and 7:
-- **PCR 0**: Firmware state — changes if the BIOS firmware is modified
-- **PCR 7**: Secure Boot policy — changes if Secure Boot settings change or an unsigned bootloader is loaded
-
-When you boot your own laptop with unmodified firmware and the correct Secure Boot state, the TPM releases the key and the disk unlocks silently. If the laptop is physically stolen and the disk moved to another machine, or if the firmware is tampered with, the TPM does not release the key.
-
-### Setting Up TPM2 Auto-Unlock
+**One-time setup on first boot:**
 
 ```bash
-# One-time setup (run after fresh install)
 sudo gen-efi enroll-tpm2
-
-# Verify enrollment
-sudo systemd-cryptenroll --tpm2-device=auto --print-pcrs
-
-# Test — reboot and confirm the disk unlocks without a passphrase prompt
-sudo reboot
 ```
 
-### Re-enrolling After Firmware Updates
-
-If you update your laptop's firmware (via `fwupdmgr update`), the PCR 0 value changes and the TPM will no longer release the key — you will be prompted for your passphrase on the next boot. This is correct security behaviour. After a successful boot with the passphrase:
+**After any firmware update** (`fwupdmgr update`), PCR 0 changes and the passphrase will be required on the next boot — expected behaviour. After booting with the passphrase, re-enroll:
 
 ```bash
-# Remove old TPM2 enrollment and re-enroll with new PCR values
-sudo gen-efi cleanup-tpm2
-sudo gen-efi enroll-tpm2
+sudo gen-efi cleanup-tpm2 && sudo gen-efi enroll-tpm2
 ```
+
+Full TPM2 reference including PCR policy selection, optional PIN, and keyslot management: [gen-efi and Secure Boot on Shani OS](https://blog.shani.dev/post/gen-efi-and-secure-boot) · [LUKS2 Encryption on Shani OS](https://blog.shani.dev/post/shani-os-luks-after-installation).
 
 ---
 
@@ -252,13 +235,7 @@ sudo gen-efi generate --slot $(cat /data/current-slot)
 
 ### TPM2 Unlock Fails After OS Update
 
-The OS update regenerates both UKIs via `gen-efi`. This does not change PCR values for the running slot. However, if something changed in the Secure Boot chain:
-
-```bash
-# Manually unlock with passphrase, then re-enroll
-sudo gen-efi cleanup-tpm2
-sudo gen-efi enroll-tpm2
-```
+The OS update regenerates both UKIs but does not change PCR values for the running slot. If something changed in the Secure Boot chain, boot with your passphrase then run `sudo gen-efi cleanup-tpm2 && sudo gen-efi enroll-tpm2`. Full recovery steps: [gen-efi and Secure Boot on Shani OS](https://blog.shani.dev/post/gen-efi-and-secure-boot).
 
 Full power troubleshooting: [docs.shani.dev — Power & Suspend](https://docs.shani.dev/doc/troubleshooting).
 
@@ -269,11 +246,11 @@ Full power troubleshooting: [docs.shani.dev — Power & Suspend](https://docs.sh
 After installing Shani OS on a laptop:
 
 1. **Enable LUKS2 encryption** during the installer (strongly recommended)
-2. **Enroll TPM2** on first boot: `sudo gen-efi enroll-tpm2` — eliminates passphrase at every boot
+2. **Enroll TPM2** on first boot: `sudo gen-efi enroll-tpm2` — eliminates passphrase at every boot (see [gen-efi and Secure Boot](https://blog.shani.dev/post/gen-efi-and-secure-boot))
 3. **Hibernate works immediately** — swapfile is already sized and configured
 4. **Power profiles** are available in the system menu — no setup required
 5. **Firmware updates** via `fwupdmgr update` keep your BIOS and hardware secure
-6. After any firmware update, **re-enroll TPM2**: `sudo gen-efi cleanup-tpm2 && sudo gen-efi enroll-tpm2`
+6. After any firmware update, **re-enroll TPM2**: `sudo gen-efi cleanup-tpm2 && sudo gen-efi enroll-tpm2` (PCR 0 changes with each firmware update)
 
 ---
 

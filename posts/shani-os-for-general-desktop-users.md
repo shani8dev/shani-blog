@@ -404,23 +404,11 @@ For detailed printer setup, including HP, Epson, Brother, and Canon drivers: [Pr
 
 ## Keeping Your System Updated
 
-`shani-update` checks for OS updates automatically (15 minutes after boot and every 2 hours) and shows a desktop notification when one is ready. Apply it when convenient:
+`shani-update` checks for OS updates automatically and shows a desktop notification when one is ready. When you're ready, run `sudo shani-deploy` and reboot. If anything feels wrong after the reboot, `sudo shani-deploy -r` instantly restores the previous OS version — your personal files are never affected either way.
 
-```bash
-sudo shani-deploy
-# Reboot when prompted
-```
+Flatpak apps update automatically every 12 hours. Warehouse (pre-installed) lets you manage updates manually.
 
-Your documents, browser profiles, email, and all apps are completely unaffected by the OS update. If anything feels wrong after an update:
-
-```bash
-sudo shani-deploy -r
-# Then reboot
-```
-
-This instantly restores the previous OS version. Your personal data is never affected by rollback.
-
-Flatpak apps update automatically every 12 hours. You can also trigger an update manually from Warehouse (the Flatpak manager, pre-installed).
+For the full update workflow, channels, and rollback reference: [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates).
 
 ---
 
@@ -444,8 +432,11 @@ Flatpak apps update automatically every 12 hours. You can also trigger an update
 
 ## Resources
 
-- [Getting Started with Shani OS](https://blog.shani.dev/post/shani-os-getting-started) — installation and first steps
-- [Migrating to Shani OS](https://blog.shani.dev/post/migrating-to-shani-os) — coming from Windows or macOS
+- [Getting Started with Shani OS](https://blog.shani.dev/post/shani-os-getting-started) — installation and first boot
+- [Your First Week with Shani OS](https://blog.shani.dev/post/shani-os-first-week) — day-by-day setup guide
+- [Migrating to Shani OS](https://blog.shani.dev/post/migrating-to-shani-os) — coming from Ubuntu, Fedora, or Arch
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
+- [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates) — update and rollback reference
 - [KDE Connect on Shani OS](https://blog.shani.dev/post/shani-os-kde-connect) — phone + desktop integration
 - [Printing and Scanning on Shani OS](https://blog.shani.dev/post/shani-os-printing-and-scanning) — printer setup
 - [Audio on Shani OS](https://blog.shani.dev/post/shani-os-audio-pipewire) — speakers, headphones, Bluetooth audio

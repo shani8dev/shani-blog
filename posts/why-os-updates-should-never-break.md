@@ -105,32 +105,16 @@ The entire codebase is public on [github.com/shani8dev](https://github.com/shani
 
 ---
 
+
 ## Installing Software on an Immutable OS
 
-The most common question when encountering an immutable OS: if the root filesystem is read-only, how do I install anything?
+The most common question when first encountering an immutable OS: if the root filesystem is read-only, how do I install anything?
 
-You install software into the right layer for it — outside the OS, in persistent Btrfs subvolumes that survive every update and rollback untouched.
+Software belongs in one of several persistent layers outside the OS — each in its own Btrfs subvolume, surviving every update and rollback. GUI apps go through Flatpak (Flathub has thousands; the Warehouse app manages them graphically). CLI tools and dev runtimes go through Nix (pre-installed, 100,000+ packages). Anything requiring `apt`, `pacman`, or `yay` runs in Distrobox. Services and databases run in Podman. Windows apps run through Bottles/Wine or a VM.
 
-**GUI applications** go through Flatpak. Flathub has thousands of apps. `flatpak install flathub app.name` and it lives in the `@flatpak` subvolume. The Warehouse app (pre-installed on both editions) gives you a graphical front-end for browsing and managing all your Flatpaks. Full Flatpak guidance: [docs.shani.dev — Flatpak](https://docs.shani.dev/doc/software/flatpak).
-
-**Snap** is pre-configured as a complement when an app exists only on the Snap Store. Snap packages live in `@snapd` and survive every OS update and rollback. `snap install <n>` and it is there. Guide: [docs.shani.dev — Snaps](https://docs.shani.dev/doc/software/snaps).
-
-**AppImages** are portable self-contained executables — download, `chmod +x`, run. Gear Lever (pre-installed on both editions) integrates them into your launcher and tracks updates. No installation, no system writes. Guide: [docs.shani.dev — AppImage](https://docs.shani.dev/doc/software/appimage).
-
-**CLI tools and dev environments** have several good options. Nix comes pre-installed, with the daemon running and the `@nix` subvolume shared across both slots. Add a channel once, then install anything: `nix-env -i ripgrep`, `nix-env -i nodejs`, `nix-env -i python312`. Nix handles multiple versions without conflict. Full guide: [docs.shani.dev — Nix Package Manager](https://docs.shani.dev/doc/software/nix).
-
-Distrobox runs a full mutable container of any Linux distro — Arch, Ubuntu, Fedora — with `pacman`, `apt`, or `dnf` fully intact. Your home directory is shared by default, and containers live in `@containers`, surviving OS updates. BoxBuddy (pre-installed) provides a GUI for managing your containers. Full guide: [docs.shani.dev — Distrobox](https://docs.shani.dev/doc/software/distrobox).
-
-Podman handles OCI containers for services, databases, and development workflows. The Pods app (pre-installed) gives you a graphical interface. Rootless, Docker-compatible, daemon-free. Guide: [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers).
-
-For full Linux system containers (with their own init and services), LXC/LXD and systemd-nspawn are pre-installed. systemd-nspawn needs no setup — pull a tarball and boot it. LXD adds a richer feature set for more complex needs. Homebrew also works on Shani OS if that is your preference — it installs to `/home/linuxbrew/.linuxbrew`, completely outside the read-only root. Guide: [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os).
-
-**Windows applications** run through Wine via Bottles (`com.usebottles.bottles`, pre-installed on the KDE Plasma edition). Bottles manages isolated Wine environments for productivity tools, creative software, and legacy apps — no Windows licence or VM required for most applications. For applications that need a real Windows kernel, virt-manager (pre-installed on KDE Plasma) runs a full Windows VM with near-native performance. Guides: [Windows Apps on Shani OS](https://blog.shani.dev/post/windows-apps-on-shani-os) · [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
-
-The design principle: the OS is infrastructure, not your workspace. An `apt install` to the base system would be overwritten the next time `shani-deploy` runs anyway — the right place for software is always outside the OS.
+For the full decision guide — what to use for each category, with the comparison table and decision flowchart — see [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem).
 
 ---
-
 ## The Practical Shape of a Day
 
 A Shani OS system in daily use is quiet. `shani-update` runs automatically via a systemd timer — 15 minutes after boot and every 2 hours thereafter — and shows a notification when a new OS image is ready. When you are ready, you run `sudo shani-deploy`, which takes a few minutes. You reboot when convenient. If anything feels off, `sudo shani-deploy -r` rolls back with one command and one reboot.

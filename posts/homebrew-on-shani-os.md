@@ -90,26 +90,9 @@ brew doctor
 
 ## Homebrew vs the Full Ecosystem
 
-Homebrew coexists with everything else on Shani OS without conflict. Here is how they all fit together:
+Homebrew is a solid choice for macOS switchers who want continuity — it installs to `/home/linuxbrew/.linuxbrew` outside the read-only root and works identically to macOS. For new Shani OS users without a Homebrew habit, Nix is more powerful: it handles multiple versions without conflict and provides reproducible per-project environments via `shell.nix`. Both coexist fine — many macOS switchers run Homebrew initially and migrate specific workflows to Nix over time.
 
-**Homebrew** (this guide) — familiar `brew install` for macOS switchers. Installs to `/home/linuxbrew/.linuxbrew`, completely outside the read-only root. Great for users who know the Homebrew catalogue and want continuity.
-
-**Nix** — the recommended alternative for complex dev environments. Handles multiple versions of the same tool, per-project `shell.nix` environments, and cryptographic package pinning. More powerful than Homebrew for serious development workflows. Guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os).
-
-**Flatpak** — GUI desktop applications. Primary recommendation for any app available on Flathub. Guide: [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os).
-
-**Snap** — fallback for apps only on the Snap Store. Guide: [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os).
-
-**AppImage** — portable self-contained executables. Download and run; Gear Lever integrates them into your launcher. Guide: [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os).
-
-**Distrobox** — when you need a full mutable Linux environment with `apt`, `pacman`, or `yay`. Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
-
-**Virtual Machines** — when you need full hardware-level isolation: a separate kernel, a Windows VM, or GPU passthrough. virt-manager is pre-installed on the KDE Plasma edition. Guide: [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
-
-Many macOS switchers start with Homebrew because it is familiar, then migrate specific workflows to Nix as they discover its advantages. Both can coexist indefinitely.
-
----
-
+[The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) covers all ecosystems including Flatpak, Distrobox, Podman, and VMs.
 ## Package Overlap with Nix
 
 Many tools are available in both Homebrew and Nixpkgs. If you have installed the same tool in both, the one earlier in your `$PATH` takes precedence. This is usually fine, but check if you ever see unexpected behaviour:
@@ -163,6 +146,7 @@ alias brewup='brew update && brew upgrade && brew cleanup'
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [docs.shani.dev — Homebrew](https://docs.shani.dev/doc/software/homebrew) — full reference
 - [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — the recommended alternative for complex dev environments
 - [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — GUI applications

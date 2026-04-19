@@ -235,26 +235,12 @@ For organisations deploying Shani OS at scale, a private Flatpak repository is t
 
 ## The Full Software Ecosystem on Shani OS
 
-Flatpak is one of several complementary app ecosystems. None of them conflict — you can use all of them simultaneously:
+Flatpak is the primary recommendation for GUI desktop applications — it has the largest catalogue (Flathub), the best sandboxing, and auto-updates. For CLI tools, Nix is the right layer. For apps not on Flathub, Snap is the pre-configured fallback. For Windows apps, Bottles/Wine. For anything requiring a full distro environment, Distrobox. None of these conflict — each lives in its own Btrfs subvolume.
 
-**Flatpak** (this guide) — GUI desktop applications. Self-contained, sandboxed, auto-updating. Primary recommendation for any app available on Flathub.
-
-**Snap** — a secondary app store for cases where an app is on the Snap Store but not Flathub. Pre-configured with its own `@snapd` subvolume. Guide: [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os).
-
-**AppImage** — portable self-contained executables. Download, make executable, run — no installation. Gear Lever (pre-installed) integrates them into your launcher. Guide: [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os).
-
-**Nix** — CLI tools, development runtimes, and language toolchains. Handles multiple versions of the same tool without conflict and provides reproducible per-project environments. Guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os).
-
-**Distrobox** — full mutable Linux environment (any distro's `apt`, `pacman`, `yay`, etc.) inside a container with your home directory shared. For anything not available in Flatpak or Nix, or workflows requiring a traditional package manager. Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
-
-**Podman** — OCI containers for services, databases, and development workflows. Docker-compatible, rootless, no daemon. Guide: [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os).
-
-**Homebrew** — works identically to macOS if that's your muscle memory. Installs to `/home/linuxbrew/.linuxbrew`, completely outside the read-only root. Guide: [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os).
-
----
-
+[The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) has the complete decision flowchart and comparison table for every ecosystem on Shani OS.
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [flathub.org](https://flathub.org) — browse the full app catalogue
 - [docs.shani.dev — Flatpak](https://docs.shani.dev/doc/software/flatpak) — full reference including advanced configuration
 - [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os) — when to use Snap vs Flatpak

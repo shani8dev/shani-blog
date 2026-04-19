@@ -93,27 +93,9 @@ snap install node --classic
 
 ## Snap vs the Full Ecosystem
 
-On Shani OS, Flatpak is the primary recommendation for GUI apps, and Snap is the complement for apps only on the Snap Store. Here is the full picture:
+Flatpak is the primary recommendation for GUI apps — larger catalogue, more granular sandbox permissions via Flatseal, fully open-source end-to-end. Snap is the configured fallback when an app exists only on the Snap Store. Both coexist without conflict, each in its own Btrfs subvolume.
 
-**Use Snap when:**
-- An app is available on the Snap Store but not on Flathub (this is increasingly rare)
-- You need a tool that only ships as a snap (some enterprise software, Canonical products)
-- You are already managing a Snap-heavy workflow and prefer consistency
-
-**Use Flatpak for most GUI apps** — Flathub has a larger catalogue, Flatpak's permission model is more granular and manageable via Flatseal, and Flatpak is fully open-source end-to-end. Guide: [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os).
-
-**Use AppImage** for portable self-contained apps, beta builds, or tools available only as AppImages. Gear Lever (pre-installed) integrates them into your launcher. Guide: [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os).
-
-**Use Nix** for CLI tools, runtimes, and language toolchains. Over 100,000 packages with multiple-version support and reproducible environments. Guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os).
-
-**Use Distrobox** when you need a full mutable Linux environment with `apt`, `pacman`, or `yay`. Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
-
-**Use Virtual Machines** when you need full hardware-level isolation — a separate kernel, a Windows VM, or GPU passthrough. virt-manager is pre-installed on the KDE Plasma edition. Guide: [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
-
-All ecosystems coexist without conflict — you can have apps from Flatpak, Snap, AppImage, Nix, and Distrobox running simultaneously.
-
----
-
+[The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) covers the complete decision guide including Nix, Distrobox, AppImage, Podman, and VMs.
 ## Storage Efficiency
 
 Snap packages are stored in `/var/lib/snapd/snaps/` as squashfs images — each version of each snap is a separate file. This means upgrading a snap adds a new version file alongside the old one, which is only removed after a few revisions.
@@ -137,6 +119,7 @@ snap set system refresh.retain=2
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [docs.shani.dev — Snaps](https://docs.shani.dev/doc/software/snaps) — full reference
 - [snapcraft.io](https://snapcraft.io) — Snap Store catalogue
 - [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — the primary app ecosystem

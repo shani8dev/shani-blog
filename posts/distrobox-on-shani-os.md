@@ -281,51 +281,9 @@ distrobox enter arch-dev -- yay -Qs some-package
 
 ## Distrobox vs the Full Ecosystem
 
-All of these are available on Shani OS simultaneously and serve distinct roles:
+Distrobox fills the gap that Flatpak, Nix, and AppImage can't: when you need a full mutable Linux environment with `apt`, `pacman`, `yay`, or any distro's native package manager. It coexists with every other ecosystem on Shani OS — containers in `@containers`, apps in `@flatpak`, packages in `@nix`, all independent and all surviving OS updates.
 
-**Use Distrobox when:**
-- You need `apt`, `pacman`, `dnf`, or `yay` — the full package manager of a specific distro
-- A tool requires `make install` or `./configure` into system paths
-- You need a specific distro environment for compatibility testing
-- You want to use PPAs, COPR repos, or the AUR
-- A tool is not in Flathub, the Snap Store, or Nixpkgs
-
-**Use Flatpak when:**
-- You want a GUI desktop application available on Flathub
-- You want sandboxed permissions management via Flatseal
-- Guide: [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os)
-
-**Use Snap when:**
-- An app is only on the Snap Store and not Flathub
-- Guide: [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os)
-
-**Use AppImage when:**
-- An app ships only as an AppImage or you want a specific portable version
-- Guide: [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os)
-
-**Use Nix when:**
-- You want CLI tools or development runtimes installed persistently without a full container
-- You need multiple versions of the same tool without conflict
-- You want reproducible per-project environments via `shell.nix`
-- Guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os)
-
-**Use Podman when:**
-- You want OCI containers for services, databases, or development — rootless and Docker-compatible
-- Guide: [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os) · What to run: [Shani OS as a Home Server](https://blog.shani.dev/post/shani-os-home-server)
-
-**Use LXC/LXD or systemd-nspawn when:**
-- You need a full isolated Linux system with its own init, services, and network stack — lighter than a VM but more complete than Distrobox
-- Guide: [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os) · [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os)
-
-**Use Homebrew when:**
-- You are coming from macOS and `brew install` is muscle memory
-- Guide: [Homebrew on Shani OS](https://blog.shani.dev/post/homebrew-on-shani-os)
-
-**Use Virtual Machines when:**
-- You need full hardware-level isolation — a separate kernel, a Windows VM, or GPU passthrough for gaming or ML
-- Guide: [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines)
-
-The layers do not conflict. You can have apps from all ecosystems running simultaneously — each in its own Btrfs subvolume, each surviving OS updates.
+[The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) has the full decision flowchart and comparison table.
 
 ---
 
@@ -392,6 +350,7 @@ Full troubleshooting reference: [docs.shani.dev — Distrobox](https://docs.shan
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [docs.shani.dev — Distrobox](https://docs.shani.dev/doc/software/distrobox) — full reference
 - [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — Podman and all container runtimes
 - [Shani OS as a Home Server](https://blog.shani.dev/post/shani-os-home-server) — what to self-host with Podman

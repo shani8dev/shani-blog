@@ -349,24 +349,15 @@ podman system prune -af --volumes
 
 ## Podman vs the Full Container and App Ecosystem
 
-Podman is one of several container and app options on Shani OS. Here is where each one fits:
+Podman is the right tool for OCI containers — services, databases, and development workflows that need an isolated runtime rather than a full distro environment. For GUI apps use Flatpak; for CLI tools use Nix; for a full mutable distro shell use Distrobox (which runs on top of Podman); for full system containers use LXD or systemd-nspawn; for full hardware isolation use a VM.
 
-**Podman** (this guide) — OCI containers for services, databases, and development workflows. Rootless, Docker-compatible, daemon-free. Persistent data lives in `@containers`. For what you can self-host with it, see [Shani OS as a Home Server](https://blog.shani.dev/post/shani-os-home-server).
-
-**Distrobox** — a layer on top of Podman that provides a mutable Linux environment with home directory sharing. For `apt install`, `pacman -S`, AUR access, and tools that need a traditional filesystem layout. Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
-
-**LXC/LXD** — full Linux system containers with their own init system and network stack. For isolated server environments and multi-service setups lighter than a full VM. Guide: [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os).
-
-**systemd-nspawn** — the lightest full-system containers. No daemon, no setup — pull a tarball and boot it. Best for isolated builds and quick system environment tests. Guide: [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os).
-
-**Flatpak / Snap / AppImage** — for GUI desktop applications and portable tools. Not containers in the traditional sense, but each lives in its own persistent Btrfs subvolume. Guides: [Flatpak](https://blog.shani.dev/post/flatpak-on-shani-os) · [Snap](https://blog.shani.dev/post/snap-on-shani-os) · [AppImage](https://blog.shani.dev/post/appimage-on-shani-os).
-
-**Virtual Machines** — when you need full hardware-level isolation: a separate kernel, a Windows VM, or GPU passthrough. Heavier than any container option but provides complete isolation. virt-manager is pre-installed on the KDE Plasma edition. Guide: [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
+[The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) has the complete decision guide with a flowchart and comparison table.
 
 ---
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — full Podman and container reference
 - [Shani OS as a Home Server](https://blog.shani.dev/post/shani-os-home-server) — what to self-host and how to access it remotely
 - [docs.shani.dev/servers](https://docs.shani.dev/servers) — self-hosting wiki with ready-to-run commands for every service

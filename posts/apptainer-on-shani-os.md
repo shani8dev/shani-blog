@@ -371,26 +371,15 @@ Pulled and built `.sif` files are standalone files — store them wherever makes
 
 ## Apptainer vs the Full Ecosystem
 
-All of these are available on Shani OS simultaneously and serve distinct roles:
+Apptainer is the right tool when cluster portability and long-term reproducibility are the primary requirements — a single `.sif` file that runs identically on your Shani OS workstation and any SLURM/PBS/LSF cluster. For OCI services and local development, Podman is the right tool. For a full mutable distro environment, Distrobox. For GUI apps, Flatpak. For CLI tools, Nix. For full hardware isolation, VMs.
 
-**Use Apptainer when** you need portable, reproducible containers for HPC and cluster workflows — a single `.sif` file that runs identically on your workstation and on any SLURM/PBS/LSF cluster. The right tool when cluster compatibility and long-term reproducibility are the primary requirements.
-
-**Use Podman when** you want OCI containers for services, databases, and development workflows. Rootless, Docker-compatible, daemon-free. Not cluster-compatible, but the right tool for running PostgreSQL, Redis, self-hosted apps, and Compose stacks locally. Guide: [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os).
-
-**Use Distrobox when** you need `apt`, `pacman`, `dnf`, or `yay` — the full package manager of a specific distro — with your home directory shared into the container. Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
-
-**Use LXC/LXD or systemd-nspawn when** you need a complete isolated Linux system with its own init system and network stack — lighter than a VM but more complete than a Distrobox container. Guides: [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os) · [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os).
-
-**Use Nix when** you want CLI tools or development runtimes installed persistently without a container — multiple versions without conflict, reproducible per-project environments via `shell.nix`. Guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os).
-
-**Use Flatpak when** you want GUI desktop applications from Flathub. Guide: [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os).
-
-**Use Virtual Machines when** you need full hardware-level isolation — a separate kernel, a Windows VM, or GPU passthrough. virt-manager is pre-installed on the KDE Plasma edition. Guide: [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
+[The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) has the complete decision guide with a flowchart and comparison table.
 
 ---
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — full Apptainer reference
 - [Shani OS for Researchers and HPC](https://blog.shani.dev/post/shani-os-for-researchers-and-hpc) — full research computing stack: Nix, GPU compute, DVC, remote access
 - [Apptainer documentation](https://apptainer.org/docs/user/latest/) — official upstream docs

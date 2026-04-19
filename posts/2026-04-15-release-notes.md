@@ -61,7 +61,7 @@ Several reliability issues in the update and rollback pipeline have been resolve
 - `shani-update` background notification service (user-level systemd service) now more reliably detects new images and sends desktop notifications
 
 ### shani-health
-- `shani-health` new cli for the check the health of shanios
+- `shani-health` new CLI for checking the health of a running Shani OS system — slot state, subvolume storage, service status, and filesystem integrity. Full reference: [shani-health Reference](https://blog.shani.dev/post/shani-health-reference).
 
 ### Hardware Support
 

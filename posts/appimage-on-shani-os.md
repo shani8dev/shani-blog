@@ -73,33 +73,9 @@ Gear Lever is pre-installed on both GNOME and KDE editions. Open it from your ap
 
 ## Where AppImages Fit in the Ecosystem
 
-AppImages fill a specific niche. Here is how they relate to everything else available on Shani OS:
+AppImages are best for apps released only in that format, for getting the absolute latest version before it reaches Flathub, or for portable tools you want to run from a USB drive. For most GUI apps, Flatpak (Flathub) is the better choice — sandboxed, auto-updating, and larger catalogue. For CLI tools, Nix. For anything needing a full distro environment, Distrobox.
 
-**Use AppImage when:**
-- An app releases only as an AppImage (common for newer or indie tools, creative software in beta, tools from smaller developers)
-- You want the absolute latest version of an app before it reaches Flathub
-- You need a portable version of a tool you can carry on a USB drive
-- You want to test a specific version of an app without installing it permanently
-
-**Use Flatpak for most GUI apps** — Flathub is larger, Flatpak's sandbox is more granular, and Flatpak auto-updates in the background. Guide: [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os).
-
-**Use Snap** when an app is on the Snap Store but not Flathub and not available as an AppImage. Guide: [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os).
-
-**Use Nix for CLI tools** — AppImages are almost exclusively GUI applications. Nix covers the CLI and dev runtime space. Guide: [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os).
-
-**Use Distrobox** when an app has complex system dependencies or requires a full `apt`/`pacman` environment that AppImage, Flatpak, and Nix can't satisfy. Guide: [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os).
-
-### Popular Apps Available as AppImages
-
-- Obsidian (note-taking)
-- Joplin (notes and to-dos)
-- Logseq (knowledge base)
-- Zettlr (Markdown editor)
-- Kdenlive portable build
-- Many game-related tools
-- Various beta and nightly builds of major apps
-
-Check [appimagehub.com](https://www.appimagehub.com) and individual project GitHub releases pages.
+[The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) has the full decision flowchart and comparison table.
 
 ---
 
@@ -142,6 +118,7 @@ cd squashfs-root
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [docs.shani.dev — AppImage](https://docs.shani.dev/doc/software/appimage) — full reference
 - [appimagehub.com](https://www.appimagehub.com) — AppImage catalogue
 - [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — the primary GUI app ecosystem

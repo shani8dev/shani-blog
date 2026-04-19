@@ -90,27 +90,9 @@ bluetoothctl remove XX:XX:XX:XX:XX:XX
 
 ## Audio Codecs
 
-PipeWire handles Bluetooth audio on Shani OS. The following codecs are supported and negotiated automatically based on what your headphones support:
+PipeWire handles Bluetooth audio. Supported codecs (SBC, AAC, aptX, aptX HD, LDAC up to 990 kbps, LC3 for Bluetooth LE Audio) are negotiated automatically — if your headphones support LDAC, PipeWire uses it with no configuration needed.
 
-- **SBC** — universal baseline codec
-- **AAC** — better quality than SBC; supported by most headphones
-- **aptX / aptX HD** — Qualcomm codec; wide support on mid-range headphones
-- **LDAC** — Sony's high-resolution codec for Bluetooth audio up to 990 kbps
-- **LC3** — Bluetooth LE Audio codec; used by the newest headphones
-
-Codec negotiation is automatic. If your headphones support LDAC, PipeWire will use it. No configuration required.
-
-To check which codec is in use:
-
-```bash
-# Check the active audio codec for a Bluetooth device
-pactl list cards | grep -A 20 "Name: bluez"
-# Look for 'Active Profile' — e.g. 'a2dp-sink-ldac'
-
-# Switch profiles if needed
-pactl set-card-profile bluez_card.XX_XX_XX_XX_XX_XX a2dp-sink-ldac
-pactl set-card-profile bluez_card.XX_XX_XX_XX_XX_XX headset-head-unit
-```
+To check the active codec or switch profiles manually, see the [Audio on Shani OS](https://blog.shani.dev/post/shani-os-audio-pipewire) guide which covers codec selection, profile switching, and EasyEffects for audio processing.
 
 ---
 

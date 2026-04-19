@@ -16,6 +16,8 @@ readTime: '8 min'
 series: 'Shani OS Guides'
 ---
 
+> **Note:** This post has been superseded by [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates), which merges `shani-deploy` and `shani-update` into a single reference. The content below remains accurate.
+
 `shani-deploy` is the tool that makes Shani OS's atomic update and rollback model work. It downloads, verifies, and deploys OS images to the inactive Btrfs slot — never touching the running system — and handles rollback, storage cleanup, and deduplication.
 
 This post is the complete reference. For the conceptual explanation of why the blue-green model exists, start with [Why Your OS Update Should Never Break Your Computer](https://blog.shani.dev/post/why-os-updates-should-never-break). For the full architectural detail, see [The Architecture Behind Shani OS](https://blog.shani.dev/post/shani-os-architecture-deep-dive). Full reference: [docs.shani.dev — System Updates](https://docs.shani.dev/doc/updates/system).

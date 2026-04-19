@@ -49,6 +49,8 @@ For GUI apps and portable tools, see: **Flatpak** ([guide](https://blog.shani.de
 
 **Use systemd-nspawn when** you want the same full-system isolation as LXD with less setup — no init wizard, no daemon, no image format. Pull a tar and start. See [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os).
 
+For the complete picture of all app and container ecosystems on Shani OS — Flatpak, Nix, Distrobox, Podman, Apptainer, VMs, and more — see [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem).
+
 ---
 
 ## LXD Setup
@@ -224,6 +226,7 @@ lxc exec pg16 -- apt install -y postgresql-16
 
 ## Resources
 
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — LXC/LXD and all container runtimes reference
 - [LXD documentation](https://documentation.ubuntu.com/lxd/)
 - [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os) — lighter system containers with no daemon or setup

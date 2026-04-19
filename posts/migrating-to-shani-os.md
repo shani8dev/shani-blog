@@ -343,24 +343,15 @@ These do not require any migration thought — they work on Shani OS exactly as 
 
 ## Resources
 
+- [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) — canonical "what to use when" guide with decision flowchart and comparison table
 - [docs.shani.dev](https://docs.shani.dev/doc/concepts) — migration reference and key concepts
-- [docs.shani.dev — Nix Package Manager](https://docs.shani.dev/doc/software/nix) — complete Nix setup guide
-- [docs.shani.dev — Flatpak](https://docs.shani.dev/doc/software/flatpak) — Flatpak configuration
-- [docs.shani.dev — Distrobox](https://docs.shani.dev/doc/software/distrobox) — mutable containers guide
-- [docs.shani.dev — Snaps](https://docs.shani.dev/doc/software/snaps) — Snap setup and usage
-- [docs.shani.dev — AppImage](https://docs.shani.dev/doc/software/appimage) — AppImage and Gear Lever
-- [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — Podman, LXC/LXD, systemd-nspawn
-- [docs.shani.dev — Android (Waydroid)](https://docs.shani.dev/doc/software/waydroid) — Android app setup
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions including rollback, file safety, and dual boot
 - [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — detailed Nix workflow guide
 - [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — full Flatpak guide
-- [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os) — when to use Snap vs Flatpak
-- [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — full Distrobox guide
-- [AppImage on Shani OS](https://blog.shani.dev/post/appimage-on-shani-os) — AppImage guide
-- [LXC and LXD on Shani OS](https://blog.shani.dev/post/lxc-lxd-on-shani-os) — full system containers
-- [systemd-nspawn on Shani OS](https://blog.shani.dev/post/systemd-nspawn-on-shani-os) — lightweight system containers
-- [Waydroid on Shani OS](https://blog.shani.dev/post/waydroid-android-on-shani-os) — Android apps
+- [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — full Distrobox guide (AUR, apt, PPAs)
 - [Windows Apps on Shani OS](https://blog.shani.dev/post/windows-apps-on-shani-os) — Wine, Bottles, and when to use a VM
-- [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full VMs with hardware isolation
+- [Waydroid on Shani OS](https://blog.shani.dev/post/waydroid-android-on-shani-os) — Android apps
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [Telegram community](https://t.me/shani8dev) — ask migration questions
 
 [Download Shani OS at shani.dev →](https://shani.dev)

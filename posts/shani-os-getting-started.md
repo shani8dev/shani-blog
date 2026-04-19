@@ -279,21 +279,7 @@ sudo shani-deploy -r
 ## Common Questions
 
 **Can I install packages with pacman?**
-No — and you do not need to. The immutable root means `pacman -S` to the base system would be overwritten on the next update anyway. The full set of options:
-
-- **Flatpak** — GUI desktop apps (browsers, office, creative tools, media). Primary recommendation.
-- **Snap** — fallback when an app is only on the Snap Store. Pre-configured.
-- **Nix** — CLI tools, runtimes, language toolchains. Handles multiple versions without conflict.
-- **Distrobox** — full mutable Linux environment with any distro's package manager (pacman, apt, yay).
-- **Podman** — OCI containers for services, databases, and development workflows.
-- **AppImage** — portable self-contained executables. Download and run; Gear Lever integrates them.
-- **LXC/LXD** — full system containers with init systems and services.
-- **systemd-nspawn** — lightweight system containers, no daemon required.
-- **Homebrew** — works identically to macOS if that's your preference.
-- **Bottles + Wine** — run Windows `.exe` applications directly via Wine. Bottles (pre-installed on KDE Plasma) manages isolated Wine environments. Guide: [Windows Apps on Shani OS](https://blog.shani.dev/post/windows-apps-on-shani-os).
-- **Virtual Machines** — for software requiring a real Windows kernel. virt-manager (pre-installed on KDE Plasma) or GNOME Boxes. Guide: [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).
-
-The migration table at [docs.shani.dev](https://docs.shani.dev/doc/concepts) maps every traditional workflow to its Shani OS equivalent.
+No — and you don't need to. The immutable root means `pacman -S` to the base system would be overwritten by the next OS update anyway. Software belongs in the layers designed for it: Flatpak for GUI apps, Nix for CLI tools, Distrobox for anything that needs `apt`/`pacman`/`yay`, Podman for services. For the complete decision guide with a flowchart and comparison table, see [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem).
 
 **What happens to my files if I roll back?**
 Nothing. Your home directory is in `@home`, completely independent of the OS slots. Flatpak apps are in `@flatpak`. Snap packages are in `@snapd`. Nix packages are in `@nix`. An OS rollback does not touch any of them.
@@ -311,6 +297,10 @@ It is possible but not recommended — other operating systems may overwrite the
 - [docs.shani.dev](https://docs.shani.dev) — full technical documentation
 - [shani.dev](https://shani.dev) — downloads and overview
 - [github.com/shani8dev](https://github.com/shani8dev) — source code
+- [Your First Week with Shani OS](https://blog.shani.dev/post/shani-os-first-week) — day-by-day setup after first boot
+- [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
+- [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) — what to use for each type of software
+- [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates) — full update and rollback reference
 - [Flatpak on Shani OS](https://blog.shani.dev/post/flatpak-on-shani-os) — complete Flatpak guide
 - [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — CLI tools and dev environments
 - [Distrobox on Shani OS](https://blog.shani.dev/post/distrobox-on-shani-os) — mutable Linux environments
@@ -318,6 +308,7 @@ It is possible but not recommended — other operating systems may overwrite the
 - [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines) — full VMs with hardware isolation
 - [Gaming on Shani OS](https://blog.shani.dev/post/shani-os-gaming-deep-dive) — Steam, Proton, and the full gaming stack
 - [Waydroid on Shani OS](https://blog.shani.dev/post/waydroid-android-on-shani-os) — Android apps on the desktop
+- [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [Telegram community](https://t.me/shani8dev) — questions and support
 
 ---
