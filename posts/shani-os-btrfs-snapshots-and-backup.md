@@ -20,7 +20,7 @@ Shani OS handles OS updates with atomic snapshots that let you roll back the ent
 
 This guide covers two complementary layers: Btrfs snapshots for fast, on-disk point-in-time copies, and encrypted off-device backups via `restic` and `rclone` (both pre-installed). The combination gives you fast local recovery and durable off-site protection.
 
-Full reference: [docs.shani.dev — Backup](https://docs.shani.dev/doc/networking/backup).
+Full reference: [docs.shani.dev — Backup](https://docs.shani.dev/doc/system/backup).
 
 ---
 
@@ -313,7 +313,7 @@ The OS itself does not need to be backed up — `shani-deploy` downloads a fresh
 
 - [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates) — update and rollback reference
-- [docs.shani.dev — Backup (rclone/restic)](https://docs.shani.dev/doc/networking/backup) — full reference
+- [docs.shani.dev — Backup (rclone/restic)](https://docs.shani.dev/doc/system/backup) — full reference
 - [restic documentation](https://restic.readthedocs.io)
 - [rclone documentation](https://rclone.org/docs/)
 - [Shani OS for Researchers and HPC](https://blog.shani.dev/post/shani-os-for-researchers-and-hpc) — DVC for research data

@@ -194,7 +194,7 @@ restic -r s3:s3.amazonaws.com/my-research-bucket check
 restic -r s3:s3.amazonaws.com/my-research-bucket restore latest --target ~/restored
 ```
 
-`restic`'s configuration lives in `/data/varlib/restic` and survives OS updates. Full guide: [docs.shani.dev — Backup](https://docs.shani.dev/doc/networking/backup).
+`restic`'s configuration lives in `/data/varlib/restic` and survives OS updates. Full guide: [docs.shani.dev — Backup](https://docs.shani.dev/doc/system/backup).
 
 ---
 
@@ -249,7 +249,7 @@ Each layer is independently verifiable. The combination gives you a research sta
 - [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers) — Apptainer, Podman, Distrobox full reference
 - [docs.shani.dev — Nix Package Manager](https://docs.shani.dev/doc/software/nix) — Nix setup and usage on Shani OS
 - [docs.shani.dev — Virtual Machines](https://docs.shani.dev/doc/software/vms) — GPU passthrough via VFIO for ML workloads
-- [docs.shani.dev — Backup](https://docs.shani.dev/doc/networking/backup) — rclone and restic configuration
+- [docs.shani.dev — Backup](https://docs.shani.dev/doc/system/backup) — rclone and restic configuration
 - [GPU Compute on Shani OS](https://blog.shani.dev/post/gpu-compute-on-shani-os) — ROCm, CUDA, HIP, Intel oneAPI via Distrobox
 - [Apptainer on Shani OS](https://blog.shani.dev/post/apptainer-on-shani-os) — full guide: definition files, SLURM/PBS scripts, MPI, overlays, GPU detail
 - [Nix on Shani OS](https://blog.shani.dev/post/nix-on-shani-os) — detailed Nix guide

@@ -698,7 +698,7 @@ restic check
 
 Automate with a systemd user timer and a dead man's switch (Healthchecks) so you're alerted if a backup silently fails.
 
-Full guide: [docs.shani.dev — Backup & Recovery](https://docs.shani.dev/doc/networking/backup).
+Full guide: [docs.shani.dev — Backup & Recovery](https://docs.shani.dev/doc/system/backup).
 
 ---
 
