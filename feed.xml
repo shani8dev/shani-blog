@@ -5,7 +5,7 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Mon, 20 Apr 2026 18:57:05 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 26 Apr 2026 18:25:49 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>shani-health — System Health Monitoring for Shani OS</title>
@@ -184,6 +184,15 @@
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-system-configuration</guid>
       <description>The /etc OverlayFS on Shani OS means all your configuration changes persist normally across every OS update and rollback. This guide covers editing config files, managing systemd services, enabling services, kernel parameters, and inspecting what you have customised.</description>
       <pubDate>Wed, 06 May 2026 00:00:00 GMT</pubDate>
+      <category>Guide</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
+    <item>
+      <title>Kubernetes on Shani OS — k3s, k0s, MicroK8s, and the Full Orchestration Stack</title>
+      <link>https://blog.shani.dev/post/kubernetes-on-shani-os</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/kubernetes-on-shani-os</guid>
+      <description>How to run Kubernetes on Shani OS — from a single-node k3s cluster in two minutes, to multi-node production setups with ArgoCD, cert-manager, Longhorn, and full GitOps. Covers k3s, k0s, MicroK8s, minikube, kind, RKE2, and Talos Linux.</description>
+      <pubDate>Tue, 05 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
@@ -448,15 +457,6 @@
       <description>A detailed walkthrough of how Shani OS is structured on disk — every Btrfs subvolume, every mount, every step from image signing to your running desktop.</description>
       <pubDate>Sun, 12 Apr 2026 00:00:00 GMT</pubDate>
       <category>Engineering</category>
-      <author>Shrinivas Kumbhar</author>
-    </item>
-    <item>
-      <title>Getting Started with Shani OS — From Download to Daily Use</title>
-      <link>https://blog.shani.dev/post/shani-os-getting-started</link>
-      <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-getting-started</guid>
-      <description>A complete walkthrough: download, verify, install, and configure Shani OS from scratch — including Flatpak apps, Nix packages, Distrobox containers, and TPM2 encryption setup.</description>
-      <pubDate>Sat, 11 Apr 2026 00:00:00 GMT</pubDate>
-      <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
   </channel>
