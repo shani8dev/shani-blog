@@ -267,6 +267,22 @@ Your databases already live on the server — your analytics stack runs next to 
 
 Self-hosting email requires a static IP, correct DNS (MX, SPF, DKIM, DMARC), and an ISP or VPS that allows port 25. **Mailcow** bundles the full stack (Postfix, Dovecot, Rspamd, SOGo, ClamAV). **Stalwart** is a modern single-binary alternative with native JMAP. Beyond servers: **listmonk** for newsletters, **SimpleLogin** and **addy.io** for email aliasing, **Postal** for transactional sending with delivery analytics and bounce handling.
 
+### Kubernetes & Container Orchestration — [wiki](https://docs.shani.dev/doc/servers/kubernetes)
+
+When a single Podman host is not enough, Shani OS supports every major Kubernetes distribution. **k3s** is the fastest path to a working cluster — a single binary, a single command, and you have a fully conformant CNCF Kubernetes node running on your hardware. **k0s** is even more minimal. **MicroK8s** installs via Snap and adds capabilities (Istio, Knative, GPU support) with a one-line addon command. **minikube** and **kind** are the right tools for local development and CI testing. **RKE2** targets hardened production deployments. The wiki covers Helm, ArgoCD, Flux CD, cert-manager, Longhorn storage, Rancher, k9s, and the full in-cluster CI/CD stack (Tekton, Argo Workflows, Kaniko).
+
+### Clusters & High Availability — [wiki](https://docs.shani.dev/doc/servers/clusters)
+
+For multi-node setups running on old hardware or a small homelab rack. The wiki covers production-grade HA for every major data store: **Patroni + etcd + HAProxy** for PostgreSQL, **Redis Sentinel** and **Valkey Cluster**, **Elasticsearch** and **OpenSearch** 3-node clusters, **Kafka** with KRaft (no ZooKeeper), **Cassandra** and **ScyllaDB**, **MongoDB Replica Set**, **RabbitMQ Cluster**, **VictoriaMetrics Cluster**, and a standalone **etcd** cluster for Kubernetes backing stores. Each entry includes a working compose file, quorum and split-brain explanations, and a troubleshooting section.
+
+### DevOps & Infrastructure — [wiki](https://docs.shani.dev/doc/servers/devops)
+
+Your home server is also a local platform engineering environment. Beyond Gitea and Woodpecker CI (covered under Developer Tools), the DevOps wiki adds **Atlantis** for Terraform pull-request automation, **Skaffold** and **Tilt** for fast local Kubernetes development loops, **Ansible AWX** for playbook execution at scale, **Consul** and **Nomad** for service discovery and workload orchestration, **Nexus Repository** and **Verdaccio** for artifact and npm package management, **Backstage** as an internal developer portal, and a full selection of Infrastructure as Code tools (Terraform, Pulumi, OpenTofu).
+
+### OpenStack & Private Cloud — [wiki](https://docs.shani.dev/doc/servers/openstack)
+
+For anyone who wants a full private cloud — tenant isolation, a Nova compute API, Cinder block volumes, Neutron networking, and a Horizon dashboard — on their own hardware. **MicroStack** (via Snap) installs a working all-in-one OpenStack in minutes. **DevStack** is the reference development environment. **Kolla-Ansible** is the production path, deploying each OpenStack service in a container with full HA support. The wiki covers the CLI tools, core service reference, Heat IaC templates, and integration with an existing k3s or Kubernetes cluster via Kuryr and Magnum.
+
 ### Backups — [wiki](https://docs.shani.dev/doc/servers/backups-sync)
 
 A server without offsite backups is one drive failure from total loss. **Restic** handles encrypted, deduplicated snapshots to any destination — local, SFTP, S3, or **MinIO** on a second machine. **Rclone** mirrors to 70+ cloud providers. **Borgmatic** wraps Borg with a single YAML config and automatic pruning. **Litestream** gives SQLite-backed apps continuous offsite replication with sub-second RPO.
@@ -355,6 +371,10 @@ Every service has a ready-to-run Podman command in the wiki at [docs.shani.dev/d
 | [VPN & Tunnels](https://docs.shani.dev/doc/servers/vpn-tunnels) | WireGuard, WG-Easy, Tailscale, Headscale, Headplane, Cloudflared, Pangolin, NetBird, Pritunl, Firezone, Nebula, ZeroTier, OpenVPN, Hysteria 2, Gluetun |
 | [Network & DNS](https://docs.shani.dev/doc/servers/networking) | Pi-hole, AdGuard Home, Blocky, Unbound, Technitium, Nginx Proxy Manager, Traefik, HAProxy, SearXNG, LibreNMS, NetBox, Ntopng, OwnTracks |
 | [Monitoring](https://docs.shani.dev/doc/servers/monitoring) | Prometheus, Alertmanager, Grafana, Grafana Alloy, Loki, Netdata, Uptime Kuma, Gatus, Beszel, Dozzle, Healthchecks, Speedtest Tracker, SmokePing, VictoriaMetrics, Grafana Tempo, Zabbix, SigNoz, OpenTelemetry Collector, Checkmk, Karma, Graylog, Changedetection.io |
+| [Kubernetes](https://docs.shani.dev/doc/servers/kubernetes) | k3s, k0s, MicroK8s, minikube, kind, RKE2, kubeadm, Talos Linux, Helm, ArgoCD, Flux CD, Kustomize, cert-manager, Longhorn, Rancher, Lens/OpenLens, k9s, Kubernetes Dashboard, kube-prometheus-stack, Velero, Tekton, Argo Workflows, Kaniko, Argo Rollouts, ingress-nginx, NGINX Gateway Fabric, Sealed Secrets, External Secrets Operator, Goldilocks |
+| [Clusters & HA](https://docs.shani.dev/doc/servers/clusters) | Patroni, etcd, HAProxy, Redis Sentinel, Valkey Cluster, Elasticsearch Cluster, OpenSearch Cluster, Kafka (KRaft), Cassandra, ScyllaDB, MongoDB Replica Set, RabbitMQ Cluster, VictoriaMetrics Cluster |
+| [DevOps & Infrastructure](https://docs.shani.dev/doc/servers/devops) | Atlantis, Skaffold, Tilt, Ansible AWX, Consul, Nomad, Nexus Repository, Verdaccio, Backstage, Terraform, Pulumi, OpenTofu, Vault, Boundary, Packer |
+| [OpenStack & Private Cloud](https://docs.shani.dev/doc/servers/openstack) | MicroStack, DevStack, Kolla-Ansible, OpenStack CLI, Nova, Neutron, Cinder, Glance, Keystone, Horizon, Heat, Octavia, Magnum, Kuryr |
 | [Backups & Sync](https://docs.shani.dev/doc/servers/backups-sync) | Restic, Borgmatic, Duplicati, Rclone, MinIO, Kopia, Garage, Litestream |
 | [Management](https://docs.shani.dev/doc/servers/management) | Portainer, Dockge, Yacht, Komodo, Homepage, Diun, auto-update, systemd integration, cleanup timers |
 
