@@ -5,7 +5,7 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Sun, 26 Apr 2026 18:25:49 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 27 Apr 2026 04:22:20 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>shani-health — System Health Monitoring for Shani OS</title>
@@ -188,10 +188,10 @@
       <author>Shrinivas Kumbhar</author>
     </item>
     <item>
-      <title>Kubernetes on Shani OS — k3s, k0s, MicroK8s, and the Full Orchestration Stack</title>
+      <title>Kubernetes on Shani OS — From a Single Node to a Production-Grade Cluster</title>
       <link>https://blog.shani.dev/post/kubernetes-on-shani-os</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/kubernetes-on-shani-os</guid>
-      <description>How to run Kubernetes on Shani OS — from a single-node k3s cluster in two minutes, to multi-node production setups with ArgoCD, cert-manager, Longhorn, and full GitOps. Covers k3s, k0s, MicroK8s, minikube, kind, RKE2, and Talos Linux.</description>
+      <description>Shani OS and Kubernetes are built for each other. Immutable OS root, Btrfs subvolumes, and fully decoupled lifecycles make it the ideal base for running k3s, RKE2, and the full modern stack — Cilium, ArgoCD, Longhorn, cert-manager, and beyond.</description>
       <pubDate>Tue, 05 May 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>

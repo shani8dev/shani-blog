@@ -561,8 +561,8 @@
   },
   {
     "slug": "kubernetes-on-shani-os",
-    "title": "Kubernetes on Shani OS — k3s, k0s, MicroK8s, and the Full Orchestration Stack",
-    "excerpt": "How to run Kubernetes on Shani OS — from a single-node k3s cluster in two minutes, to multi-node production setups with ArgoCD, cert-manager, Longhorn, and full GitOps. Covers k3s, k0s, MicroK8s, minikube, kind, RKE2, and Talos Linux.",
+    "title": "Kubernetes on Shani OS — From a Single Node to a Production-Grade Cluster",
+    "excerpt": "Shani OS and Kubernetes are built for each other. Immutable OS root, Btrfs subvolumes, and fully decoupled lifecycles make it the ideal base for running k3s, RKE2, and the full modern stack — Cilium, ArgoCD, Longhorn, cert-manager, and beyond.",
     "date": "2026-05-05",
     "updated": "",
     "tag": "Guide",
