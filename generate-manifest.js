@@ -192,9 +192,11 @@ function buildStub(post) {
   <meta property="og:image"     id="og-image"     content="${image}">
   <meta property="og:image:alt" id="og-image-alt" content="${title}">
   <meta property="og:locale"    content="en_US">
-  <meta property="article:published_time" content="${datePublished}">
-  <meta property="article:modified_time"  content="${dateModified}">
-  <meta property="article:author"         content="${authorName}">
+  <meta property="article:published_time" id="og-article-pubtime" content="${datePublished}">
+  <meta property="article:modified_time"  id="og-article-modtime" content="${dateModified}">
+  <meta property="article:author"         id="og-article-author"  content="${authorName}">
+  <meta property="article:section"        id="og-article-section" content="${escHtml(post.tag || '')}">
+  ${post.keywords ? `<meta name="keywords" content="${escHtml(post.keywords)}">` : ''}
 
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:site"        id="tw-site"  content="${escHtml(TWITTER_HANDLE)}">
@@ -203,18 +205,45 @@ function buildStub(post) {
   <meta name="twitter:image"       id="tw-image" content="${image}">
 
   <script type="application/ld+json" id="ld-blogs">${ldJson}<\/script>
-  <script type="application/ld+json" id="ld-org">{}<\/script>`;
+  <script type="application/ld+json" id="ld-org">{}<\/script>
+  <link rel="alternate" type="application/rss+xml" title="${escHtml(SITE_TITLE)} RSS Feed" href="/feed.xml">`;
 
   // Replace the entire existing <head> SEO block (from <title> to the last
-  // ld+json script) with our pre-filled version.  The regex targets the
-  // placeholder block that index.html ships with.
+  // ld+json script) with our pre-filled version.
+  //
+  // SENTINEL DESIGN: index.html must contain the exact comment line:
+  //   <!-- ═══ PRIMARY SEO — values overwritten by Renderer.applyBranding() ══════ -->
+  // followed by the placeholder <title>Blog</title>.
+  // The replacement ends at (and excludes) the PERFORMANCE comment sentinel.
+  // This avoids brittle regex spanning the full head block.
   let html = buildStub._indexHtml;
 
-  // Replace placeholder <title>Blog</title> line with full SEO injection
-  html = html.replace(
-    /[ \t]*<title>Blog<\/title>[\s\S]*?<\/script>\s*\n(\s*<!-- ═══ PERFORMANCE)/,
-    SEO_INJECTION + '\n\n  $1'
-  );
+  const START_SENTINEL = '<!-- ═══ PRIMARY SEO — values overwritten by Renderer.applyBranding() ══════ -->';
+  const END_SENTINEL   = '<!-- ═══ PERFORMANCE';
+
+  const startIdx = html.indexOf(START_SENTINEL);
+  const endIdx   = html.indexOf(END_SENTINEL, startIdx);
+
+  if (startIdx === -1 || endIdx === -1) {
+    // Fallback: try the original title-based regex for backward compatibility
+    const patched = html.replace(
+      /[ \t]*<title>Blog<\/title>[\s\S]*?<\/script>\s*\n(\s*<!-- ═══ PERFORMANCE)/,
+      SEO_INJECTION + '\n\n  $1'
+    );
+    if (patched === html) {
+      throw new Error(
+        'buildStub: Could not find SEO injection sentinels in index.html.\n' +
+        'Ensure index.html contains the PRIMARY SEO comment block and PERFORMANCE comment.'
+      );
+    }
+    return patched;
+  }
+
+  // Splice: keep everything before START_SENTINEL, inject SEO block, then
+  // keep everything from END_SENTINEL onward (preserving the PERFORMANCE section).
+  html = html.slice(0, startIdx) +
+         SEO_INJECTION.trimStart() + '\n\n  ' +
+         html.slice(endIdx);
 
   return html;
 }

@@ -21,6 +21,11 @@
   <meta property="og:image"     id="og-image"     content="">
   <meta property="og:image:alt" id="og-image-alt" content="Blog logo">
   <meta property="og:locale"    content="en_US">
+  <!-- article:* — populated by applyBranding() / renderPost() for post views -->
+  <meta property="article:author"         id="og-article-author"  content="">
+  <meta property="article:published_time" id="og-article-pubtime" content="">
+  <meta property="article:modified_time"  id="og-article-modtime" content="">
+  <meta property="article:section"        id="og-article-section" content="">
 
   <!-- ═══ TWITTER / X CARD ════════════════════════════════════════════════ -->
   <meta name="twitter:card"        content="summary_large_image">
@@ -32,6 +37,9 @@
   <!-- ═══ STRUCTURED DATA — rewritten by applyBranding() / renderPost() ══ -->
   <script type="application/ld+json" id="ld-blogs">{}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
+
+  <!-- RSS feed discovery — Googlebot uses this to find the feed -->
+  <link rel="alternate" type="application/rss+xml" title="Blog RSS Feed" href="/feed.xml">
 
   <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
