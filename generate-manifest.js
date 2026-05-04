@@ -364,24 +364,31 @@ function build() {
     console.log(`  ${isPaywalled ? '[members]' : '[free]   '} ${slug}`);
   }
 
+  // ── Filter out drafts — never publish to manifest, sitemap, feed, or stubs ──
+  const draftSlugs = posts.filter(p => p.draft).map(p => p.slug);
+  if (draftSlugs.length) {
+    console.log(`\n  ✎ Skipping ${draftSlugs.length} draft(s): ${draftSlugs.join(', ')}`);
+  }
+  const publishedPosts = posts.filter(p => !p.draft);
+
   // ── Warn on duplicate titles (common sign of copy-paste front-matter errors) ──
   const titleCount = {};
-  posts.forEach(p => { titleCount[p.title] = (titleCount[p.title] || 0) + 1; });
+  publishedPosts.forEach(p => { titleCount[p.title] = (titleCount[p.title] || 0) + 1; });
   const dupes = Object.entries(titleCount).filter(([, n]) => n > 1);
   if (dupes.length) {
     console.warn('\n  ⚠  Duplicate titles detected (likely wrong title: in front-matter):');
     dupes.forEach(([title, n]) => {
-      const slugs = posts.filter(p => p.title === title).map(p => p.slug).join(', ');
+      const slugs = publishedPosts.filter(p => p.title === title).map(p => p.slug).join(', ');
       console.warn(`     "${title}" appears ${n}×  →  ${slugs}`);
     });
     console.warn('');
   }
 
   // Sort newest first (same as GitHub Actions output)
-  posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+  publishedPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  fs.writeFileSync(OUT_PATH, JSON.stringify(posts, null, 2));
-  console.log(`\n  ✓ Written ${posts.length} post(s) to posts/manifest.json`);
+  fs.writeFileSync(OUT_PATH, JSON.stringify(publishedPosts, null, 2));
+  console.log(`\n  ✓ Written ${publishedPosts.length} post(s) to posts/manifest.json`);
 
   // ── Generate sitemap.xml ────────────────────────────────────────
   const staticUrls = SITEMAP_STATIC_URLS.map(u => ({
@@ -389,7 +396,7 @@ function build() {
     priority: u.priority,
     changefreq: u.changefreq,
   }));
-  const postUrls = posts.map(p => ({
+  const postUrls = publishedPosts.filter(p => !p.noindex).map(p => ({
     loc:        `${BLOG_URL}/post/${p.slug}`,
     lastmod:    p.updated || p.date,
     priority:   '0.8',
@@ -413,7 +420,7 @@ function build() {
   console.log(`  ✓ Written sitemap.xml with ${allUrls.length} URL(s)`);
 
   // ── Generate feed.xml (RSS) ─────────────────────────────────────
-  const rssItems = posts.slice(0, 50).map(p => [
+  const rssItems = publishedPosts.filter(p => !p.noindex).slice(0, 50).map(p => [
     '    <item>',
     `      <title>${escXml(p.title)}</title>`,
     `      <link>${BLOG_URL}/post/${p.slug}</link>`,
@@ -440,7 +447,8 @@ function build() {
     '</rss>',
   ].join('\n');
   fs.writeFileSync(FEED_PATH, feed);
-  console.log(`  ✓ Written feed.xml with ${Math.min(50, posts.length)} item(s)`);
+  const indexableCount = publishedPosts.filter(p => !p.noindex).length;
+  console.log(`  ✓ Written feed.xml with ${Math.min(50, indexableCount)} item(s)`);
 
   // ── Generate manifest.json (PWA) ────────────────────────────────
   const pwa = {
@@ -467,7 +475,7 @@ function build() {
   const liveSlugs = new Set();
   let stubsWritten = 0;
 
-  for (const post of posts) {
+  for (const post of publishedPosts) {
     if (!post.slug) continue;
     liveSlugs.add(post.slug);
     const dir  = path.join(POST_DIR, post.slug);
@@ -476,12 +484,13 @@ function build() {
     stubsWritten++;
   }
 
-  // Remove stubs for posts that no longer exist
+  // Remove stubs for posts that no longer exist — directories only, never files
   let stubsRemoved = 0;
-  for (const entry of fs.readdirSync(POST_DIR)) {
-    if (!liveSlugs.has(entry)) {
-      fs.rmSync(path.join(POST_DIR, entry), { recursive: true, force: true });
-      console.log(`  ✗ Removed stale stub: post/${entry}/`);
+  for (const entry of fs.readdirSync(POST_DIR, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;  // skip .nojekyll, README.md, etc.
+    if (!liveSlugs.has(entry.name)) {
+      fs.rmSync(path.join(POST_DIR, entry.name), { recursive: true, force: true });
+      console.log(`  ✗ Removed stale stub: post/${entry.name}/`);
       stubsRemoved++;
     }
   }

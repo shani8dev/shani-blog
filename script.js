@@ -1579,12 +1579,12 @@ const Router = {
     // Handle /posts/slug (raw GitHub Pages path) → silently rewrite to /post/slug
     const rawMd = location.pathname.match(/^\/posts\/(.+?)(?:\.md)?$/);
     if (rawMd) {
-      const slug = decodeURIComponent(rawMd[1]);
+      const slug = decodeURIComponent(rawMd[1]).replace(/\/+$/, '');
       history.replaceState({}, '', `/post/${encodeURIComponent(slug)}`);
       return slug;
     }
     const m = location.pathname.match(/^\/post\/(.+)$/);
-    return m ? decodeURIComponent(m[1]) : null;
+    return m ? decodeURIComponent(m[1]).replace(/\/+$/, '') : null;
   },
   getParams() {
     const qs = new URLSearchParams(location.search);
