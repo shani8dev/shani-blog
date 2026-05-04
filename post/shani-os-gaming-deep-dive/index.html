@@ -59,8 +59,8 @@
       var q = qs.get('q') || ''; qs.delete('q');
       var h = qs.get('h') || ''; qs.delete('h');
       var url = decodeURIComponent(p);
-      // Rewrite /posts/slug or /posts/slug.md → /post/slug
-      var postsMatch = url.match(/^\/posts\/(.+?)(?:\.md)?(\?.*)?$/);
+      // Rewrite /posts/slug or /posts/slug.md or /posts/slug/ → /post/slug
+      var postsMatch = url.match(/^\/posts\/(.+?)(?:\.md)?\/?(\?.*)?$/);
       if (postsMatch) url = '/post/' + postsMatch[1];
       if (q) url += '?' + decodeURIComponent(q);
       if (h) url += '#' + decodeURIComponent(h);
