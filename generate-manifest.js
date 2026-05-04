@@ -128,8 +128,16 @@ const escHtml = escXml;
 
 // ── Post stub builder ─────────────────────────────────────────────
 // Generates a real HTML file at post/<slug>/index.html so GitHub Pages
-// returns HTTP 200 for every post URL. Googlebot sees full meta tags +
-// JSON-LD. Real users get the full SPA experience via script.js.
+// returns HTTP 200 for every post URL.
+//
+// KEY DESIGN: The <body> is a FULL COPY of index.html so script.js has
+// all the DOM elements it needs (#view-index, #view-post, #posts-grid,
+// etc.). Only the <head> SEO tags are pre-filled for Googlebot / social
+// crawlers. The SPA reads location.pathname on boot and renders the post.
+//
+// A minimal stub body (just a loader + scripts) breaks script.js because
+// it tries to querySelector elements that don't exist and silently fails,
+// resulting in a blank page for real users.
 function buildStub(post) {
   const url           = `${BLOG_URL}/post/${post.slug}`;
   const title         = escHtml(post.title);
@@ -157,69 +165,58 @@ function buildStub(post) {
     ...(image ? { image } : {}),
   });
 
-  return `<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  // Read the root index.html once and cache it
+  if (!buildStub._indexHtml) {
+    const indexPath = path.join(__dirname, 'index.html');
+    if (!fs.existsSync(indexPath)) {
+      throw new Error(`buildStub: index.html not found at ${indexPath}`);
+    }
+    buildStub._indexHtml = fs.readFileSync(indexPath, 'utf8');
+  }
 
+  // Replace only the <head> SEO block in index.html.
+  // We inject pre-filled tags right after <meta charset> so crawlers see
+  // them immediately. The rest of index.html (body, scripts) is untouched.
+  const SEO_INJECTION = `
   <title>${title} — ${escHtml(SITE_TITLE)}</title>
-  <meta name="description" content="${desc}">
+  <meta name="description" id="meta-desc" content="${desc}">
   <meta name="author"      content="${authorName}">
   <meta name="robots"      content="${robots}">
-  <link rel="canonical"    href="${escHtml(url)}">
+  <link rel="canonical"    id="canonical-url" href="${escHtml(url)}">
 
-  <meta property="og:type"        content="article">
-  <meta property="og:site_name"   content="${escHtml(SITE_TITLE)}">
-  <meta property="og:title"       content="${title}">
-  <meta property="og:description" content="${desc}">
-  <meta property="og:url"         content="${escHtml(url)}">
-  <meta property="og:image"       content="${image}">
+  <meta property="og:site_name" id="og-site-name" content="${escHtml(SITE_TITLE)}">
+  <meta property="og:type"      id="og-type"      content="article">
+  <meta property="og:title"     id="og-title"     content="${title}">
+  <meta property="og:description" id="og-desc"    content="${desc}">
+  <meta property="og:url"       id="og-url"       content="${escHtml(url)}">
+  <meta property="og:image"     id="og-image"     content="${image}">
+  <meta property="og:image:alt" id="og-image-alt" content="${title}">
+  <meta property="og:locale"    content="en_US">
   <meta property="article:published_time" content="${datePublished}">
   <meta property="article:modified_time"  content="${dateModified}">
   <meta property="article:author"         content="${authorName}">
 
   <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:site"        content="${escHtml(TWITTER_HANDLE)}">
-  <meta name="twitter:title"       content="${title}">
-  <meta name="twitter:description" content="${desc}">
-  <meta name="twitter:image"       content="${image}">
+  <meta name="twitter:site"        id="tw-site"  content="${escHtml(TWITTER_HANDLE)}">
+  <meta name="twitter:title"       id="tw-title" content="${title}">
+  <meta name="twitter:description" id="tw-desc"  content="${desc}">
+  <meta name="twitter:image"       id="tw-image" content="${image}">
 
-  <script type="application/ld+json">${ldJson}</script>
+  <script type="application/ld+json" id="ld-blogs">${ldJson}<\/script>
+  <script type="application/ld+json" id="ld-org">{}<\/script>`;
 
-  <link rel="icon" type="image/svg+xml" href="${escHtml(FAVICON_URL)}">
-  <link rel="manifest" href="/manifest.json">
+  // Replace the entire existing <head> SEO block (from <title> to the last
+  // ld+json script) with our pre-filled version.  The regex targets the
+  // placeholder block that index.html ships with.
+  let html = buildStub._indexHtml;
 
-  <!-- Theme flash prevention — mirrors index.html inline script -->
-  <script>
-    (function () {
-      var pfx = '${STORAGE_PREFIX}';
-      var t = localStorage.getItem(pfx + '_theme') ||
-              (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', t);
-    })();
-  </script>
+  // Replace placeholder <title>Blog</title> line with full SEO injection
+  html = html.replace(
+    /[ \t]*<title>Blog<\/title>[\s\S]*?<\/script>\s*\n(\s*<!-- ═══ PERFORMANCE)/,
+    SEO_INJECTION + '\n\n  $1'
+  );
 
-  <link rel="stylesheet" href="/brand-shani.css">
-  <link rel="stylesheet" href="/style.css">
-</head>
-<body>
-  <!-- Loading overlay — identical to index.html so the SPA's hideLoader() works -->
-  <div id="page-loader" aria-hidden="true">
-    <div class="loader__logo">
-      <img id="loader-logo-img" src="${escHtml(FAVICON_URL)}" alt="${escHtml(SITE_TITLE)}" height="40">
-      <span class="logo__sub"></span>
-    </div>
-    <div class="loader__track"><div class="loader__bar"></div></div>
-    <p class="loader__text">Loading…</p>
-  </div>
-
-  <!-- SPA takes over: reads the current URL path, fetches the .md, renders the post -->
-  <script src="/config-shani.js"></script>
-  <script src="/utils.js"></script>
-  <script src="/script.js"></script>
-</body>
-</html>`;
+  return html;
 }
 
 // ── Build ─────────────────────────────────────────────────────────
