@@ -24,6 +24,7 @@
  *   sitemap.xml          — all post URLs + static pages
  *   feed.xml             — RSS feed (latest 50 posts)
  *   manifest.json        — PWA web app manifest
+ *   post/<slug>/index.html — static HTML stubs (200 OK for Googlebot)
  *
  * The SPA fetches each post's .md on-demand when a reader opens it.
  * This keeps the manifest tiny (~100 KB for hundreds of posts).
@@ -39,6 +40,7 @@ const OUT_PATH     = path.join(POSTS_DIR, 'manifest.json');
 const SITEMAP_PATH = path.join(__dirname, 'sitemap.xml');
 const FEED_PATH    = path.join(__dirname, 'feed.xml');
 const PWA_PATH     = path.join(__dirname, 'manifest.json');
+const POST_DIR     = path.join(__dirname, 'post');          // ← stub output dir
 const CONFIG_PATH  = path.join(__dirname, 'config-shani.js');
 const WATCH_MODE   = process.argv.includes('--watch');
 
@@ -56,17 +58,23 @@ function getConfig(key, fallback) {
 }
 
 // ── Config values (all sourced from config-shani.js) ─────────────
-const BLOG_URL       = getConfig('BLOG_URL',        'https://blog.shani.dev');
-const SITE_TITLE     = getConfig('SITE_TITLE',      'Blog');
-const SITE_DESC      = getConfig('SITE_DESCRIPTION','');
-const AUTHOR         = getConfig('AUTHOR_NAME',     '');
-const LANG           = getConfig('LANG', getConfig('DATE_LOCALE', 'en-US'));
-const PWA_NAME       = getConfig('PWA_NAME',        SITE_TITLE);
-const PWA_SHORT_NAME = getConfig('PWA_SHORT_NAME',  'Blog');
-const PWA_DESCRIPTION= getConfig('PWA_DESCRIPTION', SITE_DESC);
-const PWA_THEME_COLOR= getConfig('PWA_THEME_COLOR', '#000000');
-const PWA_BG_COLOR   = getConfig('PWA_BG_COLOR',    '#000000');
-const PWA_ICON_URL   = getConfig('FAVICON_URL',     '/favicon.svg');
+const BLOG_URL        = getConfig('BLOG_URL',        'https://blog.shani.dev');
+const SITE_TITLE      = getConfig('SITE_TITLE',      'Blog');
+const SITE_DESC       = getConfig('SITE_DESCRIPTION','');
+const AUTHOR          = getConfig('AUTHOR_NAME',     '');
+const LANG            = getConfig('LANG', getConfig('DATE_LOCALE', 'en-US'));
+const PWA_NAME        = getConfig('PWA_NAME',        SITE_TITLE);
+const PWA_SHORT_NAME  = getConfig('PWA_SHORT_NAME',  'Blog');
+const PWA_DESCRIPTION = getConfig('PWA_DESCRIPTION', SITE_DESC);
+const PWA_THEME_COLOR = getConfig('PWA_THEME_COLOR', '#000000');
+const PWA_BG_COLOR    = getConfig('PWA_BG_COLOR',    '#000000');
+const PWA_ICON_URL    = getConfig('FAVICON_URL',     '/favicon.svg');
+const FAVICON_URL     = getConfig('FAVICON_URL',     '');
+const OG_IMAGE        = getConfig('OG_IMAGE',        '');
+const TWITTER_HANDLE  = getConfig('TWITTER_HANDLE',  '');
+const PUBLISHER_NAME  = getConfig('PUBLISHER_NAME',  SITE_TITLE);
+const PUBLISHER_LOGO  = getConfig('PUBLISHER_LOGO',  FAVICON_URL);
+const STORAGE_PREFIX  = getConfig('STORAGE_PREFIX',  'shani');
 
 // ── SITEMAP_STATIC_URLS — parsed from the CONFIG array literal ───
 // Falls back to a sensible default if parsing fails.
@@ -113,6 +121,105 @@ function autoExcerpt(body, paywalled) {
 
 function escXml(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// escXml doubles as HTML attribute escaper for the stubs
+const escHtml = escXml;
+
+// ── Post stub builder ─────────────────────────────────────────────
+// Generates a real HTML file at post/<slug>/index.html so GitHub Pages
+// returns HTTP 200 for every post URL. Googlebot sees full meta tags +
+// JSON-LD. Real users get the full SPA experience via script.js.
+function buildStub(post) {
+  const url           = `${BLOG_URL}/post/${post.slug}`;
+  const title         = escHtml(post.title);
+  const desc          = escHtml(post.excerpt || SITE_DESC);
+  const image         = escHtml(post.og_image || post.cover || OG_IMAGE);
+  const authorName    = escHtml(post.author || AUTHOR);
+  const datePublished = post.date    ? new Date(post.date    + 'T00:00:00').toISOString() : '';
+  const dateModified  = post.updated ? new Date(post.updated + 'T00:00:00').toISOString() : datePublished;
+  const robots        = post.noindex ? 'noindex' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+
+  const ldJson = JSON.stringify({
+    '@context':     'https://schema.org',
+    '@type':        'BlogPosting',
+    headline:       post.title,
+    description:    post.excerpt || SITE_DESC,
+    url,
+    datePublished,
+    dateModified,
+    author:    { '@type': 'Person', name: post.author || AUTHOR },
+    publisher: {
+      '@type': 'Organization',
+      name:    PUBLISHER_NAME,
+      logo:    { '@type': 'ImageObject', url: PUBLISHER_LOGO },
+    },
+    ...(image ? { image } : {}),
+  });
+
+  return `<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>${title} — ${escHtml(SITE_TITLE)}</title>
+  <meta name="description" content="${desc}">
+  <meta name="author"      content="${authorName}">
+  <meta name="robots"      content="${robots}">
+  <link rel="canonical"    href="${escHtml(url)}">
+
+  <meta property="og:type"        content="article">
+  <meta property="og:site_name"   content="${escHtml(SITE_TITLE)}">
+  <meta property="og:title"       content="${title}">
+  <meta property="og:description" content="${desc}">
+  <meta property="og:url"         content="${escHtml(url)}">
+  <meta property="og:image"       content="${image}">
+  <meta property="article:published_time" content="${datePublished}">
+  <meta property="article:modified_time"  content="${dateModified}">
+  <meta property="article:author"         content="${authorName}">
+
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:site"        content="${escHtml(TWITTER_HANDLE)}">
+  <meta name="twitter:title"       content="${title}">
+  <meta name="twitter:description" content="${desc}">
+  <meta name="twitter:image"       content="${image}">
+
+  <script type="application/ld+json">${ldJson}</script>
+
+  <link rel="icon" type="image/svg+xml" href="${escHtml(FAVICON_URL)}">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Theme flash prevention — mirrors index.html inline script -->
+  <script>
+    (function () {
+      var pfx = '${STORAGE_PREFIX}';
+      var t = localStorage.getItem(pfx + '_theme') ||
+              (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/brand-shani.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Loading overlay — identical to index.html so the SPA's hideLoader() works -->
+  <div id="page-loader" aria-hidden="true">
+    <div class="loader__logo">
+      <img id="loader-logo-img" src="${escHtml(FAVICON_URL)}" alt="${escHtml(SITE_TITLE)}" height="40">
+      <span class="logo__sub"></span>
+    </div>
+    <div class="loader__track"><div class="loader__bar"></div></div>
+    <p class="loader__text">Loading…</p>
+  </div>
+
+  <!-- SPA takes over: reads the current URL path, fetches the .md, renders the post -->
+  <script src="/config-shani.js"></script>
+  <script src="/utils.js"></script>
+  <script src="/script.js"></script>
+</body>
+</html>`;
 }
 
 // ── Build ─────────────────────────────────────────────────────────
@@ -352,7 +459,37 @@ function build() {
     categories: ['technology', 'news'],
   };
   fs.writeFileSync(PWA_PATH, JSON.stringify(pwa, null, 2));
-  console.log(`  ✓ Written manifest.json (PWA)\n`);
+  console.log(`  ✓ Written manifest.json (PWA)`);
+
+  // ── Generate post/<slug>/index.html stubs ────────────────────────
+  // Each stub is a real file → GitHub Pages returns HTTP 200 for every
+  // post URL. Googlebot indexes the meta tags + JSON-LD immediately.
+  // The SPA (script.js) still hydrates the page for real users.
+  fs.mkdirSync(POST_DIR, { recursive: true });
+
+  const liveSlugs = new Set();
+  let stubsWritten = 0;
+
+  for (const post of posts) {
+    if (!post.slug) continue;
+    liveSlugs.add(post.slug);
+    const dir  = path.join(POST_DIR, post.slug);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'index.html'), buildStub(post));
+    stubsWritten++;
+  }
+
+  // Remove stubs for posts that no longer exist
+  let stubsRemoved = 0;
+  for (const entry of fs.readdirSync(POST_DIR)) {
+    if (!liveSlugs.has(entry)) {
+      fs.rmSync(path.join(POST_DIR, entry), { recursive: true, force: true });
+      console.log(`  ✗ Removed stale stub: post/${entry}/`);
+      stubsRemoved++;
+    }
+  }
+
+  console.log(`  ✓ Written ${stubsWritten} post stub(s) to post/${stubsRemoved ? ` (${stubsRemoved} stale removed)` : ''}\n`);
 }
 
 // ── Run ───────────────────────────────────────────────────────────
@@ -366,7 +503,7 @@ if (WATCH_MODE) {
     if (!filename?.endsWith('.md')) return;
     clearTimeout(debounce);
     debounce = setTimeout(() => {
-      console.log(`  → ${filename} changed, rebuilding…`);
+      console.log(`  → ${filename} changed, rebuilding…\n`);
       build();
     }, 150);
   });
