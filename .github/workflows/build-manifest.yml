@@ -36,6 +36,7 @@ on:
     branches: [main]
     paths:
       - 'posts/**.md'
+      - 'generate-manifest.js'
       - '.github/workflows/build-manifest.yml'
   workflow_dispatch: # allow manual trigger from the Actions tab
 
@@ -73,15 +74,15 @@ jobs:
       #     token: ${{ secrets.POSTS_PAT }}
       #     path: posts-repo
 
-      - name: Generate posts/manifest.json
+      - name: Generate posts/manifest.json + post stubs
         run: node generate-manifest.js
 
-      - name: Commit manifest + sitemap + feed + PWA manifest
+      - name: Commit manifest + sitemap + feed + PWA manifest + post stubs
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add posts/manifest.json sitemap.xml feed.xml manifest.json
+          git add posts/manifest.json sitemap.xml feed.xml manifest.json post/
           git diff --staged --quiet && echo "nothing changed" || {
-            git commit -m "chore: rebuild manifest, sitemap, feed & PWA [skip ci]"
+            git commit -m "chore: rebuild manifest, sitemap, feed, PWA & post stubs [skip ci]"
             git push
           }
