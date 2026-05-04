@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>Kubernetes on Shani OS — From a Single Node to a Production-Grade Cluster — Shanios Blog</title>
+  <meta name="description" content="Shani OS and Kubernetes are built for each other. Immutable OS root, Btrfs subvolumes, and fully decoupled lifecycles make it the ideal base for running k3s, RKE2, and the full modern stack — Cilium, ArgoCD, Longhorn, cert-manager, and beyond.">
+  <meta name="author"      content="Shrinivas Vishnu Kumbhar">
+  <meta name="robots"      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical"    href="https://blog.shani.dev/post/kubernetes-on-shani-os">
+
+  <meta property="og:type"        content="article">
+  <meta property="og:site_name"   content="Shanios Blog">
+  <meta property="og:title"       content="Kubernetes on Shani OS — From a Single Node to a Production-Grade Cluster">
+  <meta property="og:description" content="Shani OS and Kubernetes are built for each other. Immutable OS root, Btrfs subvolumes, and fully decoupled lifecycles make it the ideal base for running k3s, RKE2, and the full modern stack — Cilium, ArgoCD, Longhorn, cert-manager, and beyond.">
+  <meta property="og:url"         content="https://blog.shani.dev/post/kubernetes-on-shani-os">
+  <meta property="og:image"       content="https://shani.dev/assets/images/logo.svg">
+  <meta property="article:published_time" content="2026-05-05T00:00:00.000Z">
+  <meta property="article:modified_time"  content="2026-05-05T00:00:00.000Z">
+  <meta property="article:author"         content="Shrinivas Vishnu Kumbhar">
+
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:site"        content="@shani8dev">
+  <meta name="twitter:title"       content="Kubernetes on Shani OS — From a Single Node to a Production-Grade Cluster">
+  <meta name="twitter:description" content="Shani OS and Kubernetes are built for each other. Immutable OS root, Btrfs subvolumes, and fully decoupled lifecycles make it the ideal base for running k3s, RKE2, and the full modern stack — Cilium, ArgoCD, Longhorn, cert-manager, and beyond.">
+  <meta name="twitter:image"       content="https://shani.dev/assets/images/logo.svg">
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Kubernetes on Shani OS — From a Single Node to a Production-Grade Cluster","description":"Shani OS and Kubernetes are built for each other. Immutable OS root, Btrfs subvolumes, and fully decoupled lifecycles make it the ideal base for running k3s, RKE2, and the full modern stack — Cilium, ArgoCD, Longhorn, cert-manager, and beyond.","url":"https://blog.shani.dev/post/kubernetes-on-shani-os","datePublished":"2026-05-05T00:00:00.000Z","dateModified":"2026-05-05T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+
+  <link rel="icon" type="image/svg+xml" href="https://shani.dev/assets/images/logo.svg">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Theme flash prevention — mirrors index.html inline script -->
+  <script>
+    (function () {
+      var pfx = 'shani';
+      var t = localStorage.getItem(pfx + '_theme') ||
+              (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/brand-shani.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Loading overlay — identical to index.html so the SPA's hideLoader() works -->
+  <div id="page-loader" aria-hidden="true">
+    <div class="loader__logo">
+      <img id="loader-logo-img" src="https://shani.dev/assets/images/logo.svg" alt="Shanios Blog" height="40">
+      <span class="logo__sub"></span>
+    </div>
+    <div class="loader__track"><div class="loader__bar"></div></div>
+    <p class="loader__text">Loading…</p>
+  </div>
+
+  <!-- SPA takes over: reads the current URL path, fetches the .md, renders the post -->
+  <script src="/config-shani.js"></script>
+  <script src="/utils.js"></script>
+  <script src="/script.js"></script>
+</body>
+</html>
