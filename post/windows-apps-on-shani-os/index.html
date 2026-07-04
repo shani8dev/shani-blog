@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="You do not need Windows to run Windows software on Shani OS. Bottles (pre-installed on the KDE Plasma edition) manages Wine environments for productivity tools, creative software, and legacy apps. Here is how to get any Windows app running, and when a VM is the better answer.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Running Windows Apps on Shani OS — Wine, Bottles, and When to Use a VM","description":"You do not need Windows to run Windows software on Shani OS. Bottles (pre-installed on the KDE Plasma edition) manages Wine environments for productivity tools, creative software, and legacy apps. Here is how to get any Windows app running, and when a VM is the better answer.","url":"https://blog.shani.dev/post/windows-apps-on-shani-os","datePublished":"2026-05-08T00:00:00.000Z","dateModified":"2026-05-08T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Running Windows Apps on Shani OS — Wine, Bottles, and When to Use a VM","description":"You do not need Windows to run Windows software on Shani OS. Bottles (pre-installed on the KDE Plasma edition) manages Wine environments for productivity tools, creative software, and legacy apps. Here is how to get any Windows app running, and when a VM is the better answer.","url":"https://blog.shani.dev/post/windows-apps-on-shani-os","datePublished":"2026-05-08T00:00:00.000Z","dateModified":"2026-05-08T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,180 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Running Windows Apps on Shani OS — Wine, Bottles, and When to Use a VM</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-08 · 8 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>You do not need Windows to run Windows software on Shani OS. Wine — a compatibility layer that translates Windows API calls to Linux equivalents — lets you run Windows <code>.exe</code> files directly on your Linux desktop. No virtual machine, no Windows licence, no second OS to maintain.</p>
+<p>For gaming, Proton (Valve's Wine distribution, built into Steam) handles this automatically — see <a href="https://blog.shani.dev/post/shani-os-gaming-deep-dive">Gaming on Shani OS</a>. This post covers everything else: productivity tools, creative software, business applications, utilities, and legacy software that has no Linux or Flatpak equivalent.</p>
+<p><strong>Bottles</strong> (<code>com.usebottles.bottles</code>) is pre-installed on the KDE Plasma edition and available on Flathub for the GNOME edition. It is the recommended tool for running non-gaming Windows software on Shani OS — it manages Wine environments, runtime dependencies, and application isolation without any terminal work.</p>
+<p>For games specifically, use Steam + Proton or Heroic Games Launcher. Bottles is for everything else.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/software/containers">docs.shani.dev — Containers</a>.</p>
+<p>---</p>
+<h2>How Wine Works</h2>
+<p>Wine is not an emulator. It does not simulate x86 hardware or run a virtualised CPU. It reimplements the Windows API — the set of functions Windows applications call to draw windows, open files, make network connections, play audio, and so on — as native Linux calls. When a Windows <code>.exe</code> calls <code>CreateFile()</code>, Wine translates that to <code>open()</code>. When it calls <code>DirectX</code>, Wine routes it through DXVK (DirectX 9/10/11) or VKD3D (DirectX 12) to Vulkan.</p>
+<p>The result: most Windows applications run at near-native speed, because they are running natively — just with their Windows API calls answered by Wine instead of the Windows kernel.</p>
+<p>What Wine cannot do: applications that rely on Windows kernel drivers, hardware dongles tied to Windows, or anti-cheat systems that inspect the kernel will not work. For those cases, a Windows VM is the correct answer — see <a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a>.</p>
+<p>---</p>
+<h2>Bottles — Wine Without the Complexity</h2>
+<p>Bottles provides a clean graphical interface for creating and managing Wine environments. Each "bottle" is an isolated Wine prefix — it has its own Windows registry, its own <code>C:\</code> drive equivalent, its own installed applications and runtime libraries. Bottles from different applications cannot interfere with each other.</p>
+<h3>Installing Bottles on the GNOME Edition</h3>
+<p>Bottles is pre-installed on the KDE Plasma edition. On the GNOME edition:</p>
+<pre><code class="language-bash">flatpak install flathub com.usebottles.bottles</code></pre>
+<h3>Creating a Bottle</h3>
+<p>Open Bottles from your application launcher. Click <strong>Create a new bottle</strong> and choose a template:</p>
+<ul>
+<li><strong>Application</strong> — for productivity tools, utilities, and most Windows software. Uses a standard Wine environment.</li>
+<li><strong>Gaming</strong> — pre-configured with DXVK and VKD3D for DirectX games. Use this for games not managed by Steam or Heroic.</li>
+<li><strong>Custom</strong> — full manual control over runner version, DXVK version, and all settings.</li>
+</ul>
+<p>Give the bottle a name, select the template, and click <strong>Create</strong>. Bottles downloads the Wine runner and sets up the prefix automatically.</p>
+<h3>Installing a Windows Application</h3>
+<ol>
+<li>Open your bottle in Bottles</li>
+<li>Click <strong>Run Executable</strong></li>
+<li>Select the <code>.exe</code> installer</li>
+<li>The installer runs inside the bottle — click through it as you would on Windows</li>
+<li>The installed application appears in Bottles under <strong>Programs</strong></li>
+<li>Click the program to launch it, or click the three-dot menu → <strong>Add Desktop Entry</strong> to add it to your Linux app launcher</li>
+</ol>
+<p>The application runs inside the bottle's isolated Wine prefix. Your Linux home directory is accessible from inside Wine at <code>Z:\home\username</code>.</p>
+<p>---</p>
+<h2>Runtime Dependencies — Winetricks and the Bottles Dependency Manager</h2>
+<p>Many Windows applications require additional runtime libraries that are not included in a base Wine installation: Visual C++ redistributables, .NET Framework, DirectX components, media codecs. These are managed through <strong>winetricks</strong> — a script that downloads and installs Windows runtime components into a Wine prefix.</p>
+<p>Bottles handles winetricks automatically through its Dependencies panel. You do not need to run winetricks from the terminal.</p>
+<h3>Common Dependencies</h3>
+<p>In Bottles → select your bottle → <strong>Dependencies</strong> → search and install:</p>
+<p>| Dependency | Required by | |---|---| | <code>vcredist2019</code> | Most modern Windows apps (Visual C++ 2019) | | <code>vcredist2015</code> | Older apps (Visual C++ 2015) | | <code>dotnet48</code> | .NET Framework 4.8 — business software, installers | | <code>dotnet6</code> | .NET 6 — newer cross-platform apps | | <code>d3dx9</code> | DirectX 9 components | | <code>d3dcompiler_47</code> | DirectX shader compiler — many modern apps | | <code>mfc140</code> | MFC runtime — some legacy Windows tools | | <code>corefonts</code> | Microsoft Core Fonts — improves text rendering | | <code>liberation</code> | Liberation fonts — metrically compatible with Times, Arial |</p>
+<p>Install only what the application actually needs. Each dependency is downloaded and installed inside the bottle, not the host system.</p>
+<p>---</p>
+<h2>Choosing a Wine Runner</h2>
+<p>Bottles supports multiple Wine runners, each with different compatibility trade-offs:</p>
+<p><strong>Wine-GE</strong> — Valve's Wine, backported for non-Steam use. The same Proton patches (DXVK, VKD3D-Proton, esync, fsync) but usable outside Steam. Best general-purpose choice for most Windows software including games outside Steam.</p>
+<p><strong>Wine Staging</strong> — Wine with the Staging patchset. Good compatibility and stability for productivity apps and non-gaming software.</p>
+<p><strong>Caffe</strong> — Bottles' default curated runner. Well-tested, stable, good for most applications.</p>
+<p><strong>Vaniglia</strong> — upstream Wine with minimal patches. Use when an app behaves unexpectedly with patched runners.</p>
+<p>To change the runner for a bottle: Bottles → select bottle → <strong>Settings</strong> → <strong>Runner</strong> → select from the dropdown. Bottles downloads the runner automatically.</p>
+<p>For most productivity and business software, <strong>Caffe</strong> or <strong>Wine Staging</strong> works well. For games or media software using DirectX, use <strong>Wine-GE</strong>.</p>
+<p>---</p>
+<h2>Common Windows Software on Shani OS</h2>
+<h3>Microsoft Office</h3>
+<p>Microsoft Office itself is not supported well under Wine due to its deep system integration. The recommended alternatives:</p>
+<ul>
+<li><strong>OnlyOffice Desktop Editors</strong> — pre-installed as a Flatpak on both editions. Opens <code>.docx</code>, <code>.xlsx</code>, <code>.pptx</code> with high compatibility. For most Office workflows, this is the right answer.</li>
+<li><strong>LibreOffice</strong> — available on Flathub. Full office suite with strong <code>.docx</code>/<code>.xlsx</code> compatibility.</li>
+<li><strong>Microsoft 365 in a browser</strong> — the web version of Word, Excel, and PowerPoint works fully in any browser on Shani OS.</li>
+<li><strong>Office in a Windows VM</strong> — if you need the full desktop Office experience with macros and COM add-ins, a Windows VM via virt-manager is the most reliable path. See <a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a>.</li>
+</ul>
+<h3>Creative and Design Tools</h3>
+<p><strong>Adobe Photoshop</strong> — older versions (CS6 and earlier) run well in Bottles with <code>vcredist2019</code> and <code>d3dcompiler_47</code>. Recent Creative Cloud versions have mixed compatibility; check <a href="https://appdb.winehq.org">WineHQ AppDB</a> for your specific version. For vector work, Inkscape (Flatpak) and Affinity Suite (available natively on Linux) cover most use cases.</p>
+<p><strong>Adobe Illustrator</strong> — CS6 runs in Bottles. CC versions have lower compatibility. Check WineHQ AppDB.</p>
+<p><strong>Clip Studio Paint</strong> — runs well in Bottles with Wine-GE. Add <code>vcredist2019</code>. A native Linux version is also available directly from Celsys.</p>
+<p><strong>Krita</strong> — native Linux app available on Flathub. No Wine needed.</p>
+<p><strong>Affinity Photo, Designer, Publisher</strong> — native Linux versions are available. No Wine needed.</p>
+<h3>Engineering and CAD</h3>
+<p><strong>AutoCAD</strong> — older versions (2018 and earlier) have good Wine compatibility. Newer versions are inconsistent. Check WineHQ AppDB for your version. For reliable AutoCAD access, a Windows VM is the most predictable approach.</p>
+<p><strong>SolidWorks, CATIA, Siemens NX</strong> — these have kernel-level drivers and hardware dongle dependencies that Wine cannot satisfy. Use a Windows VM.</p>
+<p><strong>FreeCAD</strong> — native Linux app available on Flathub.</p>
+<p><strong>LibreCAD</strong> — native Linux app, available on Flathub.</p>
+<h3>Business and Productivity Tools</h3>
+<p><strong>Notepad++</strong> — runs perfectly in Bottles. A lightweight alternative is any of the native Linux text editors (Kate, gedit, Zed).</p>
+<p><strong>7-Zip</strong> — runs well in Bottles, though native Linux equivalents (<code>p7zip</code>, Ark on KDE, File Roller on GNOME) handle the same formats natively.</p>
+<p><strong>WinRAR</strong> — runs in Bottles. Native tools handle <code>.rar</code> extraction on Linux without Wine.</p>
+<p><strong>Total Commander</strong> — runs well in Bottles with good compatibility.</p>
+<p><strong>PDF tools (Adobe Acrobat Reader)</strong> — runs in Bottles with <code>vcredist2019</code>. For most PDF work, Papers (GNOME, pre-installed) or Okular (KDE, pre-installed) cover reading, annotation, and form filling natively.</p>
+<h3>Audio and Music Production</h3>
+<p><strong>FL Studio</strong> — runs well in Bottles with Wine-GE. Add <code>vcredist2019</code>. Widely reported as working well for production workflows.</p>
+<p><strong>Ableton Live</strong> — mixed results depending on version. Check WineHQ AppDB. For reliable Ableton use, a Windows VM or dual boot may be more stable for professional production.</p>
+<p><strong>REAPER</strong> — has a native Linux version. No Wine needed.</p>
+<p><strong>Plugins (VST/VST3)</strong> — Windows VST plugins can run inside Wine-based DAWs via <a href="https://github.com/robbert-vdh/yabridge">yabridge</a>, which bridges Windows VST plugins into Linux DAWs. Advanced setup but widely used in production.</p>
+<p>---</p>
+<h2>Advanced Bottle Configuration</h2>
+<h3>DXVK and VKD3D</h3>
+<p>For applications that use DirectX (not just games — some creative tools and 3D software use DirectX too):</p>
+<p>In Bottles → select bottle → <strong>Settings</strong>:</p>
+<ul>
+<li>Enable <strong>DXVK</strong> for DirectX 9/10/11 → Vulkan translation</li>
+<li>Enable <strong>VKD3D</strong> for DirectX 12 → Vulkan translation</li>
+</ul>
+<p>These are enabled by default in the Gaming template and can be manually toggled in Application and Custom bottles.</p>
+<h3>Environment Variables</h3>
+<p>Some applications need specific Wine environment variables. In Bottles → bottle <strong>Settings</strong> → <strong>Environment Variables</strong>:</p>
+<pre><code>WINE_LARGE_ADDRESS_AWARE=1    # allows 32-bit apps to use more than 2 GB RAM
+WINEDEBUG=-all                # suppress debug output (speeds up some apps)
+STAGING_SHARED_MEMORY=1       # improves performance with Wine Staging</code></pre>
+<h3>Virtual Desktop Mode</h3>
+<p>If an application does not render correctly in full-screen or has window management issues, try running it in a virtual desktop — Wine creates a fake Windows desktop at a fixed resolution inside a single Linux window:</p>
+<p>In Bottles → bottle <strong>Settings</strong> → enable <strong>Virtual Desktop</strong> and set the resolution.</p>
+<h3>DLL Overrides</h3>
+<p>Sometimes a specific Windows DLL needs to be overridden with a native version (downloaded via winetricks) or forced to use Wine's built-in implementation:</p>
+<p>In Bottles → bottle <strong>Settings</strong> → <strong>DLL Overrides</strong>:</p>
+<ul>
+<li><code>native,builtin</code> — try the native (winetricks-installed) DLL first</li>
+<li><code>builtin,native</code> — try Wine's built-in implementation first</li>
+<li><code>disabled</code> — disable the DLL entirely</li>
+</ul>
+<p>Common override: if an app uses <code>d3d9</code> and has rendering issues, set <code>d3d9</code> to <code>native</code> after installing <code>d3dx9</code> via Dependencies.</p>
+<p>---</p>
+<h2>Proton-GE for Non-Steam Windows Apps</h2>
+<p>Proton-GE is a community-maintained fork of Proton with additional patches, codecs, and compatibility fixes that Valve has not yet merged upstream. It can be used outside Steam via Bottles:</p>
+<p>In Bottles → <strong>Preferences</strong> → <strong>Runners</strong> → download a <code>GE-Proton</code> version. Then set the runner for a specific bottle to that version.</p>
+<p>Proton-GE is particularly useful for:</p>
+<ul>
+<li>Applications that use media codecs (video players, apps with embedded video)</li>
+<li>Software that needs the additional WINE patches included in GE builds</li>
+<li>Games from GOG or itch.io that need Proton-level compatibility</li>
+</ul>
+<p>---</p>
+<h2>Checking Compatibility Before You Try</h2>
+<p>Before spending time configuring a bottle, check these resources:</p>
+<p><strong><a href="https://appdb.winehq.org">WineHQ AppDB</a></strong> — the primary compatibility database for non-game Windows software. Each application entry includes user reports, ratings (Platinum/Gold/Silver/Bronze/Garbage), and configuration notes specific to the version you are running.</p>
+<p><strong><a href="https://www.protondb.com">ProtonDB</a></strong> — for games. Community-maintained, with per-game launch flag recommendations.</p>
+<p><strong>Bottles community</strong> — the Bottles GitHub issues and community forum have compatibility reports for many applications.</p>
+<p>A Platinum or Gold rating on WineHQ AppDB means the application runs well with little or no configuration. Bronze means it runs with workarounds. Garbage means expect significant issues — at that point, a Windows VM is worth considering.</p>
+<p>---</p>
+<h2>When to Use a Windows VM Instead</h2>
+<p>Wine covers a wide range of Windows software, but some applications genuinely require Windows. The honest signals that Wine is the wrong tool:</p>
+<ul>
+<li>The application requires a <strong>kernel driver</strong> (hardware dongles, some DRM systems, certain security software)</li>
+<li>The application uses <strong>anti-cheat</strong> that inspects the Windows kernel (most online competitive games)</li>
+<li>You need <strong>the full Microsoft Office suite</strong> with macros, COM add-ins, and corporate MDM integration</li>
+<li>The application is <strong>enterprise software</strong> with hardware-locked licensing</li>
+<li>You need <strong>100% compatibility</strong> and cannot tolerate any rendering differences or crashes</li>
+</ul>
+<p>For these cases, a Windows VM via virt-manager (pre-installed on the KDE Plasma edition) gives you a complete Windows environment. VM disk images live in the <code>@libvirt</code> Btrfs subvolume — independent of the OS, surviving every update and rollback.</p>
+<p>For gaming that requires anti-cheat, GPU passthrough to a Windows VM gives native GPU performance. See <a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a> and <a href="https://blog.shani.dev/post/shani-os-gaming-deep-dive">Gaming on Shani OS</a>.</p>
+<p>---</p>
+<h2>Windows Apps vs the Full Ecosystem</h2>
+<p>Bottles and Wine are one option for running Windows software. Here is the full picture of what is available:</p>
+<p><strong>Bottles + Wine</strong> (this guide) — for Windows <code>.exe</code> applications that run well under Wine. Productivity tools, creative software, utilities, and legacy apps. Isolated per-app Wine prefixes managed via a graphical interface.</p>
+<p><strong>Steam + Proton</strong> — for Windows games in your Steam library. Proton is tuned specifically for gaming and handles DirectX, anti-tamper, and input mapping automatically. Guide: <a href="https://blog.shani.dev/post/shani-os-gaming-deep-dive">Gaming on Shani OS</a>.</p>
+<p><strong>Heroic Games Launcher</strong> — for Windows games from Epic Games Store, GOG, and Amazon Prime Gaming. Uses Wine-GE or Proton-GE runners. Guide: <a href="https://blog.shani.dev/post/shani-os-gaming-deep-dive">Gaming on Shani OS</a>.</p>
+<p><strong>Flatpak</strong> — the first place to check before Wine. Many apps that exist on Windows also have Linux-native Flatpak versions on Flathub — running the native version is always better than Wine. Guide: <a href="https://blog.shani.dev/post/flatpak-on-shani-os">Flatpak on Shani OS</a>.</p>
+<p><strong>Distrobox</strong> — for Windows tools that have Linux equivalents installable via <code>apt</code> or <code>pacman</code>, or for running Wine inside a full mutable Linux container for more complex setups. Guide: <a href="https://blog.shani.dev/post/distrobox-on-shani-os">Distrobox on Shani OS</a>.</p>
+<p><strong>Virtual Machines</strong> — for applications that require a real Windows kernel, kernel drivers, or full enterprise compatibility. virt-manager is pre-installed on the KDE Plasma edition. Guide: <a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a>.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://appdb.winehq.org">WineHQ AppDB</a> — compatibility database for Windows software under Wine</li>
+<li><a href="https://www.protondb.com">ProtonDB</a> — compatibility database for Windows games under Proton</li>
+<li><a href="https://docs.usebottles.com">Bottles documentation</a> — full Bottles reference</li>
+<li><a href="https://github.com/robbert-vdh/yabridge">yabridge</a> — Windows VST/VST3 plugins in Linux DAWs via Wine</li>
+<li><a href="https://blog.shani.dev/post/shani-os-gaming-deep-dive">Gaming on Shani OS</a> — Steam, Proton, Heroic, and the full gaming stack</li>
+<li><a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a> — full Windows VMs for apps that require a real Windows kernel</li>
+<li><a href="https://blog.shani.dev/post/flatpak-on-shani-os">Flatpak on Shani OS</a> — native Linux apps, the first stop before Wine</li>
+<li><a href="https://blog.shani.dev/post/distrobox-on-shani-os">Distrobox on Shani OS</a> — full mutable Linux environments</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a> — questions and compatibility reports</li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

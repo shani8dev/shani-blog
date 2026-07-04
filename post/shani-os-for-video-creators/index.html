@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="The complete video production stack on Shani OS — DaVinci Resolve, Kdenlive, OpenShot, OBS Studio for streaming and recording, Audacity and Ardour for audio, GPU-accelerated encoding, and everything a YouTuber, podcaster, or video editor needs from first boot.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS for Video Creators and Content Creators — Editing, Colour, Streaming, and Podcasting","description":"The complete video production stack on Shani OS — DaVinci Resolve, Kdenlive, OpenShot, OBS Studio for streaming and recording, Audacity and Ardour for audio, GPU-accelerated encoding, and everything a YouTuber, podcaster, or video editor needs from first boot.","url":"https://blog.shani.dev/post/shani-os-for-video-creators","datePublished":"2026-05-10T00:00:00.000Z","dateModified":"2026-05-10T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS for Video Creators and Content Creators — Editing, Colour, Streaming, and Podcasting","description":"The complete video production stack on Shani OS — DaVinci Resolve, Kdenlive, OpenShot, OBS Studio for streaming and recording, Audacity and Ardour for audio, GPU-accelerated encoding, and everything a YouTuber, podcaster, or video editor needs from first boot.","url":"https://blog.shani.dev/post/shani-os-for-video-creators","datePublished":"2026-05-10T00:00:00.000Z","dateModified":"2026-05-10T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,261 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Shani OS for Video Creators and Content Creators — Editing, Colour, Streaming, and Podcasting</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-10 · 10 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Video production on Linux has never been more capable. DaVinci Resolve — used in professional Hollywood post-production — has a full-featured free version with a native Linux build. OBS Studio on Linux is identical to Windows. GPU-accelerated encoding via NVENC, VAAPI (Intel/AMD), and AMF means fast exports without maxing your CPU. And the immutable architecture of Shani OS means your production environment never breaks mid-project.</p>
+<p>This guide covers the full content creator stack: video editing, colour grading, screen recording, live streaming, audio production, and podcast workflows.</p>
+<p>---</p>
+<h2>Video Editing</h2>
+<h3>DaVinci Resolve</h3>
+<p>DaVinci Resolve is the professional standard for colour grading and is increasingly used for end-to-end editing. The free version is extremely capable — the paid Studio licence adds noise reduction, certain effects, and collaboration features.</p>
+<p>DaVinci Resolve requires the proprietary NVIDIA or AMD driver (which Shani OS includes) and ships as a <code>.run</code> installer from Blackmagic Design. Install it inside a Distrobox container to keep it isolated from the immutable host:</p>
+<pre><code class="language-bash"># Create a dedicated Resolve container (Ubuntu 22.04 matches Resolve's tested platform)
+distrobox create --name resolve-studio \
+  --image ubuntu:22.04 \
+  --additional-flags &quot;--device=/dev/dri&quot;
+
+distrobox enter resolve-studio
+
+# Inside the container: install Resolve dependencies
+sudo apt update
+sudo apt install -y libglib2.0-0 libgl1 libglu1-mesa libx11-xcb1 \
+    libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 \
+    libxcb-render-util0 libxcb-xinerama0 libxcb-xkb1 libxkbcommon-x11-0 \
+    ocl-icd-libopencl1 libssl3
+
+# Download DaVinci Resolve from Blackmagic Design website
+# https://www.blackmagicdesign.com/products/davinciresolve
+
+# Run the installer
+chmod +x DaVinci_Resolve_*_Linux.run
+sudo ./DaVinci_Resolve_*_Linux.run</code></pre>
+<p>For NVIDIA GPU acceleration inside the container, use the CUDA container instead:</p>
+<pre><code class="language-bash">distrobox create --name resolve-cuda \
+  --image nvidia/cuda:12.3.0-devel-ubuntu22.04</code></pre>
+<p>After installation, export the Resolve launcher to your host desktop:</p>
+<pre><code class="language-bash">distrobox-export --app davinci-resolve --extra-flags &quot;--resolve&quot;</code></pre>
+<h3>Kdenlive</h3>
+<p>Kdenlive is the fully-featured open-source video editor with a timeline-based interface. It handles multi-track editing, transitions, effects, colour correction, and GPU-accelerated rendering via MLT framework.</p>
+<pre><code class="language-bash">flatpak install flathub org.kde.kdenlive</code></pre>
+<p>Kdenlive supports proxy editing (low-resolution proxies for smooth playback of high-res footage), nested sequences, and a full effects library. For most YouTubers and content creators, Kdenlive covers the complete editing workflow without needing DaVinci Resolve.</p>
+<h3>OpenShot</h3>
+<p>OpenShot is a simpler video editor suited to beginners and quick projects:</p>
+<pre><code class="language-bash">flatpak install flathub org.openshot.OpenShot</code></pre>
+<h3>Shotcut</h3>
+<p>Shotcut is a cross-platform editor with strong format support via FFmpeg:</p>
+<pre><code class="language-bash">flatpak install flathub org.shotcut.Shotcut</code></pre>
+<p>---</p>
+<h2>GPU-Accelerated Video Encoding</h2>
+<p>Fast export is critical for content creators. Shani OS has GPU video encoding support via VAAPI (Intel and AMD), NVENC (NVIDIA), and AMF (AMD).</p>
+<h3>FFmpeg with Hardware Acceleration</h3>
+<pre><code class="language-bash"># Intel/AMD — VAAPI encoding
+ffmpeg -i input.mp4 -c:v h264_vaapi -qp 24 -vf 'format=nv12,hwupload' output.mp4
+
+# H.265/HEVC via VAAPI
+ffmpeg -i input.mp4 -c:v hevc_vaapi -qp 24 -vf 'format=nv12,hwupload' output.mp4
+
+# NVIDIA — NVENC encoding
+ffmpeg -i input.mp4 -c:v h264_nvenc -preset p6 -cq 24 output.mp4
+
+# AV1 encoding (AMD RDNA 3 / Intel Arc)
+ffmpeg -i input.mp4 -c:v av1_vaapi -qp 24 -vf 'format=nv12,hwupload' output.mp4
+
+# Check available hardware encoders
+ffmpeg -encoders | grep -E &quot;vaapi|nvenc|amf&quot;
+
+# Check VAAPI device
+vainfo --display drm --device /dev/dri/renderD128</code></pre>
+<h3>HandBrake for Batch Transcoding</h3>
+<p>HandBrake provides a GUI for transcoding with VAAPI/NVENC hardware acceleration:</p>
+<pre><code class="language-bash">flatpak install flathub fr.handbrake.ghb</code></pre>
+<p>Enable hardware encoding in HandBrake: Preferences → Video → select H.264 (Intel QSV/NVENC/AMD VCE).</p>
+<p>---</p>
+<h2>Screen Recording and Live Streaming — OBS Studio</h2>
+<p>OBS Studio is pre-installed on neither edition but is the essential tool for any creator who streams or records:</p>
+<pre><code class="language-bash">flatpak install flathub com.obsproject.obs-studio</code></pre>
+<p>OBS on Shani OS supports:</p>
+<ul>
+<li>Screen capture via PipeWire (works with both GNOME and KDE Wayland sessions)</li>
+<li>Virtual camera output (via V4L2 loopback)</li>
+<li>NVIDIA NVENC, Intel QSV, and AMD AMF hardware encoding</li>
+<li>All major streaming platforms: YouTube, Twitch, Facebook, Instagram, X</li>
+<li>WebRTC streaming via the obs-webrtc plugin</li>
+</ul>
+<h3>OBS Plugins</h3>
+<pre><code class="language-bash"># Install common OBS plugins via Flatpak override or within OBS
+# Scene collection manager, noise suppression, etc. are available in OBS's
+# built-in Tools → Script editor and plugin manager</code></pre>
+<p><strong>Noise suppression</strong> for microphone audio: OBS includes RNNoise-based noise suppression as a built-in filter. Add it via the audio source's Filters menu — no plugin required.</p>
+<h3>PipeWire Screen Capture</h3>
+<p>OBS on Wayland uses PipeWire for screen capture. On Shani OS, this works automatically:</p>
+<ol>
+<li>In OBS, add a new Source → Screen Capture (PipeWire)</li>
+<li>A system dialog asks which screen or window to share</li>
+<li>Select your target and click Share</li>
+</ol>
+<p>For capturing individual windows (not full screen), the PipeWire capture dialog lets you select any open window.</p>
+<h3>Virtual Camera for Video Calls</h3>
+<p>OBS's virtual camera allows you to use your OBS scene (with overlays, filters, background removal) as your webcam input in any video call application:</p>
+<pre><code class="language-bash"># Enable V4L2 loopback (required for virtual camera)
+# This is handled automatically by OBS's Flatpak on Shani OS
+# Start Virtual Camera in OBS → Tools → Start Virtual Camera</code></pre>
+<p>---</p>
+<h2>Audio Production for Video</h2>
+<h3>Noise Removal and Audio Processing</h3>
+<p>For cleaning up voice recordings and podcast audio:</p>
+<pre><code class="language-bash"># Audacity — recording and audio editing
+flatpak install flathub org.audacityteam.Audacity
+
+# EasyEffects — system-wide audio processing (noise cancellation for live calls)
+flatpak install flathub com.github.wwmm.easyeffects</code></pre>
+<p>In Audacity, the Noise Reduction effect (Effect → Noise Reduction) is effective for removing background noise from voice recordings. Capture a noise profile from a section of silence, then apply it to the full track.</p>
+<h3>Ardour for Music and Full Audio Post-Production</h3>
+<p>For music production, podcast mixing with multiple tracks, or professional audio post for video:</p>
+<pre><code class="language-bash">flatpak install flathub org.ardour.Ardour</code></pre>
+<p>Ardour connects to PipeWire's JACK interface automatically on Shani OS. See <a href="https://blog.shani.dev/post/shani-os-audio-pipewire">Audio on Shani OS</a> for low-latency JACK setup.</p>
+<h3>Audio Interface Support</h3>
+<p>USB audio interfaces (Focusrite Scarlett, PreSonus AudioBox, Behringer U-Phoria, Rode AI-1) work class-compliant on Linux — plug in and PipeWire detects them automatically as new audio input/output devices. No drivers to install.</p>
+<pre><code class="language-bash"># Verify your audio interface appears
+pactl list sources short
+pactl list sinks short</code></pre>
+<p>---</p>
+<h2>Podcast Production</h2>
+<h3>Recording</h3>
+<p>For podcast recording, Audacity is the standard choice:</p>
+<pre><code class="language-bash">flatpak install flathub org.audacityteam.Audacity</code></pre>
+<p>For multi-track podcast recording (interviewing guests, recording separate tracks per person):</p>
+<ul>
+<li>Local guests: Ardour with multiple input channels from your USB interface</li>
+<li>Remote guests: record each participant's audio locally and merge in post (the "double-ender" technique)</li>
+</ul>
+<h3>Remote Recording</h3>
+<p><strong>Cleanfeed</strong> (<code>cleanfeed.net</code>) — browser-based high-quality remote recording. Works in Vivaldi or Firefox directly. No installation.</p>
+<p><strong>Zencastr</strong> and <strong>Riverside.fm</strong> — both work in the browser on Shani OS.</p>
+<h3>Editing and Export</h3>
+<pre><code class="language-bash"># Export podcast to MP3 at consistent loudness (EBU R128 / -16 LUFS for podcasts)
+ffmpeg -i raw_podcast.wav -af loudnorm=I=-16:LRA=11:TP=-1.5 \
+    -c:a libmp3lame -b:a 128k podcast_final.mp3
+
+# Or use Audacity's Loudness Normalisation effect
+# Effect → Loudness Normalisation → -16 LUFS integrated loudness</code></pre>
+<p>---</p>
+<h2>Video Format Conversion and Batch Processing</h2>
+<p>FFmpeg is pre-installed on Shani OS and handles virtually every video format:</p>
+<pre><code class="language-bash"># Convert to YouTube-optimised H.264
+ffmpeg -i input.mov -c:v libx264 -preset slow -crf 18 \
+    -c:a aac -b:a 192k -movflags faststart output.mp4
+
+# Convert vertical video for Reels/Shorts (crop to 9:16)
+ffmpeg -i input.mp4 -vf &quot;crop=ih*9/16:ih&quot; vertical_output.mp4
+
+# Create a timelapse from images
+ffmpeg -framerate 30 -pattern_type glob -i '*.jpg' \
+    -c:v libx264 -pix_fmt yuv420p timelapse.mp4
+
+# Extract audio from video
+ffmpeg -i video.mp4 -vn -c:a copy audio.aac
+
+# Add music to a video
+ffmpeg -i video.mp4 -i music.mp3 -c:v copy \
+    -c:a aac -map 0:v:0 -map 1:a:0 -shortest output.mp4
+
+# Batch convert all MOV files to MP4
+for f in *.mov; do
+  ffmpeg -i &quot;$f&quot; -c:v libx264 -crf 18 &quot;${f%.mov}.mp4&quot;
+done</code></pre>
+<p>---</p>
+<h2>Thumbnail Design</h2>
+<p>For YouTube thumbnails and social media graphics, see the <a href="https://blog.shani.dev/post/shani-os-for-designers-and-visual-creators">Shani OS for Designers guide</a>. Quick options:</p>
+<pre><code class="language-bash"># GIMP for custom thumbnails
+flatpak install flathub org.gimp.GIMP
+
+# Inkscape for vector-based thumbnails with text
+flatpak install flathub org.inkscape.Inkscape
+
+# Canva — browser-based (works in Vivaldi/Firefox)
+# canva.com</code></pre>
+<p>---</p>
+<h2>Webcam and Camera Setup</h2>
+<h3>USB Webcams</h3>
+<p>USB webcams are detected automatically on Shani OS and appear as V4L2 devices. No drivers needed for most Logitech, Razer, Microsoft, and generic webcams.</p>
+<pre><code class="language-bash"># List connected cameras
+ls /dev/video*
+v4l2-ctl --list-devices
+
+# Check what resolutions and formats your webcam supports
+v4l2-ctl -d /dev/video0 --list-formats-ext
+
+# Test your webcam
+mpv /dev/video0
+
+# Adjust webcam settings (brightness, contrast, focus)
+v4l2-ctl -d /dev/video0 --set-ctrl brightness=128
+v4l2-ctl -d /dev/video0 --list-ctrls</code></pre>
+<h3>DSLR/Mirrorless as Webcam</h3>
+<p>Use a DSLR or mirrorless camera as a high-quality webcam via HDMI capture card:</p>
+<pre><code class="language-bash"># Capture card appears as /dev/video0 or /dev/video1
+# Use it directly in OBS as a Video Capture Device source
+v4l2-ctl --list-devices</code></pre>
+<p>For gPhoto2-compatible cameras that support PTP live view, <code>gphoto2</code> can provide a video stream:</p>
+<pre><code class="language-bash">gphoto2 --stdout --capture-movie | ffmpeg -i - -vcodec rawvideo -pix_fmt yuv420p -threads 0 -f v4l2 /dev/video2</code></pre>
+<p>---</p>
+<h2>Social Media and YouTube Integration</h2>
+<h3>yt-dlp — Download Videos for Reference or Re-editing</h3>
+<pre><code class="language-bash"># Install yt-dlp via Nix
+nix-env -i yt-dlp
+
+# Download a video at best quality
+yt-dlp &quot;https://youtube.com/watch?v=...&quot;
+
+# Download audio only (for podcast source material or music)
+yt-dlp -x --audio-format mp3 &quot;https://youtube.com/watch?v=...&quot;
+
+# Download a playlist
+yt-dlp &quot;https://youtube.com/playlist?list=...&quot;</code></pre>
+<h3>Freetube — YouTube Desktop App</h3>
+<p>FreeTube provides a native YouTube desktop client with no ads and no tracking:</p>
+<pre><code class="language-bash">flatpak install flathub io.freetubeapp.FreeTube</code></pre>
+<p>---</p>
+<h2>System Performance for Video Work</h2>
+<p>For smooth 4K/6K timeline playback and fast renders, a few settings help:</p>
+<pre><code class="language-bash"># Enable performance power profile during active editing sessions
+powerprofilesctl set performance
+
+# Return to balanced when done
+powerprofilesctl set balanced
+
+# Monitor GPU and CPU usage during rendering
+nvidia-smi dmon    # NVIDIA
+radeontop          # AMD (host)
+intel_gpu_top      # Intel</code></pre>
+<p>Shani OS's earlyoom out-of-memory manager prevents system freezes during memory-intensive renders — background processes are sacrificed before your editing session is affected.</p>
+<p>---</p>
+<h2>Summary: Content Creator Stack</h2>
+<p>| Task | Tool | Install | |---|---|---| | Professional video editing + colour | DaVinci Resolve | Distrobox (Ubuntu container) | | Everyday video editing | Kdenlive | <code>flatpak install flathub org.kde.kdenlive</code> | | Screen recording + streaming | OBS Studio | <code>flatpak install flathub com.obsproject.obs-studio</code> | | Audio editing | Audacity | <code>flatpak install flathub org.audacityteam.Audacity</code> | | Music / audio post | Ardour | <code>flatpak install flathub org.ardour.Ardour</code> | | Live audio processing | EasyEffects | <code>flatpak install flathub com.github.wwmm.easyeffects</code> | | Video transcoding | HandBrake | <code>flatpak install flathub fr.handbrake.ghb</code> | | Format conversion | FFmpeg (pre-installed) | built-in | | Video downloading | yt-dlp | <code>nix-env -i yt-dlp</code> | | Thumbnail design | GIMP / Inkscape | see Designers guide |</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> — what to use for each type of software</li>
+<li><a href="https://blog.shani.dev/post/shani-os-audio-pipewire">Audio on Shani OS</a> — PipeWire, JACK, audio interfaces</li>
+<li><a href="https://blog.shani.dev/post/gpu-compute-on-shani-os">GPU Compute on Shani OS</a> — GPU-accelerated rendering</li>
+<li><a href="https://blog.shani.dev/post/shani-os-for-designers-and-visual-creators">Shani OS for Designers</a> — photo editing, illustration</li>
+<li><a href="https://blog.shani.dev/post/windows-apps-on-shani-os">Windows Apps on Shani OS</a> — Premiere Pro, After Effects via VM</li>
+<li><a href="https://docs.shani.dev">docs.shani.dev</a> — full reference</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

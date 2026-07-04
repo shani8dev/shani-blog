@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Homebrew works on Shani OS exactly as it does on macOS — install it once, use brew install for any of the thousands of formulae. A comparison with Nix to help you choose, and how both coexist.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Homebrew on Shani OS — For macOS Switchers and Those Who Prefer It","description":"Homebrew works on Shani OS exactly as it does on macOS — install it once, use brew install for any of the thousands of formulae. A comparison with Nix to help you choose, and how both coexist.","url":"https://blog.shani.dev/post/homebrew-on-shani-os","datePublished":"2026-04-28T00:00:00.000Z","dateModified":"2026-04-28T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Homebrew on Shani OS — For macOS Switchers and Those Who Prefer It","description":"Homebrew works on Shani OS exactly as it does on macOS — install it once, use brew install for any of the thousands of formulae. A comparison with Nix to help you choose, and how both coexist.","url":"https://blog.shani.dev/post/homebrew-on-shani-os","datePublished":"2026-04-28T00:00:00.000Z","dateModified":"2026-04-28T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,125 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Homebrew on Shani OS — For macOS Switchers and Those Who Prefer It</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-28 · 5 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>If you are coming from macOS and <code>brew install</code> is muscle memory, you do not need to abandon it on Shani OS. Homebrew installs to <code>/home/linuxbrew/.linuxbrew</code> — completely outside the read-only OS root — and works exactly as it does on macOS.</p>
+<p>That said, Shani OS also comes with Nix pre-installed, which solves the same problem in a different and, for many workflows, more powerful way. This guide covers setting up Homebrew, explains when to use it versus Nix, and shows how both coexist without conflict.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/software/homebrew">docs.shani.dev — Homebrew</a>.</p>
+<p>---</p>
+<h2>Installing Homebrew</h2>
+<pre><code class="language-bash"># Install Homebrew (the standard install script)
+/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&quot;
+
+# Add to your PATH (Homebrew will show you the exact commands at the end of install)
+# For Zsh — add to ~/.zshrc:
+eval &quot;$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)&quot;
+
+# Reload shell
+source ~/.zshrc
+
+# Verify
+brew --version</code></pre>
+<p>Homebrew installs to <code>/home/linuxbrew/.linuxbrew</code> on Linux, which is inside the <code>@home</code> subvolume. This means:</p>
+<ul>
+<li>Homebrew packages survive every OS update and rollback untouched</li>
+<li>Homebrew itself survives every OS update and rollback untouched</li>
+<li>No root required for any Homebrew operation</li>
+</ul>
+<p>---</p>
+<h2>Basic Usage</h2>
+<pre><code class="language-bash"># Install a formula
+brew install ripgrep
+brew install node
+brew install python
+brew install git
+brew install jq
+
+# Install a cask (GUI apps — limited on Linux, most are macOS-only)
+# brew install --cask firefox  # not available on Linux; use Flatpak instead
+
+# Search for packages
+brew search &quot;some-tool&quot;
+
+# Get info about a package
+brew info node
+
+# Update Homebrew itself
+brew update
+
+# Upgrade all installed packages
+brew upgrade
+
+# Upgrade a specific package
+brew upgrade node
+
+# Uninstall a package
+brew uninstall ripgrep
+
+# List installed packages
+brew list
+
+# Check for issues
+brew doctor</code></pre>
+<p>---</p>
+<h2>Homebrew vs the Full Ecosystem</h2>
+<p>Homebrew is a solid choice for macOS switchers who want continuity — it installs to <code>/home/linuxbrew/.linuxbrew</code> outside the read-only root and works identically to macOS. For new Shani OS users without a Homebrew habit, Nix is more powerful: it handles multiple versions without conflict and provides reproducible per-project environments via <code>shell.nix</code>. Both coexist fine — many macOS switchers run Homebrew initially and migrate specific workflows to Nix over time.</p>
+<p><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> covers all ecosystems including Flatpak, Distrobox, Podman, and VMs.</p>
+<h2>Package Overlap with Nix</h2>
+<p>Many tools are available in both Homebrew and Nixpkgs. If you have installed the same tool in both, the one earlier in your <code>$PATH</code> takes precedence. This is usually fine, but check if you ever see unexpected behaviour:</p>
+<pre><code class="language-bash"># See which version of a tool you are using
+which node
+which python3
+which git</code></pre>
+<p>To keep things clean, pick one tool manager for each package and stick with it.</p>
+<p>---</p>
+<h2>Homebrew and the Immutable Root</h2>
+<p>Homebrew on macOS writes to <code>/usr/local</code> or <code>/opt/homebrew</code>. On Linux, it writes to <code>/home/linuxbrew/.linuxbrew</code>. This is intentional — Homebrew Linux adopted a home-directory prefix precisely because many Linux systems (including immutable ones) do not allow writes to <code>/usr/local</code>.</p>
+<p>This means <code>brew install</code> works on Shani OS exactly as it does on macOS, with no workarounds or special configuration.</p>
+<p>---</p>
+<h2>Keeping Homebrew Updated</h2>
+<pre><code class="language-bash"># Update Homebrew's package database
+brew update
+
+# Upgrade all packages
+brew upgrade
+
+# See what is outdated
+brew outdated
+
+# Remove old versions of packages (saves disk space)
+brew cleanup
+
+# Remove all cached downloads
+brew cleanup --prune=all</code></pre>
+<p>Homebrew does not have automatic updates by default. Consider adding a cron job or alias:</p>
+<pre><code class="language-bash"># Add to ~/.zshrc for a reminder
+alias brewup='brew update &amp;&amp; brew upgrade &amp;&amp; brew cleanup'</code></pre>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://docs.shani.dev/doc/software/homebrew">docs.shani.dev — Homebrew</a> — full reference</li>
+<li><a href="https://blog.shani.dev/post/nix-on-shani-os">Nix on Shani OS</a> — the recommended alternative for complex dev environments</li>
+<li><a href="https://blog.shani.dev/post/flatpak-on-shani-os">Flatpak on Shani OS</a> — GUI applications</li>
+<li><a href="https://blog.shani.dev/post/snap-on-shani-os">Snap on Shani OS</a> — Snap Store apps</li>
+<li><a href="https://blog.shani.dev/post/appimage-on-shani-os">AppImage on Shani OS</a> — portable apps</li>
+<li><a href="https://blog.shani.dev/post/distrobox-on-shani-os">Distrobox on Shani OS</a> — full mutable Linux environments</li>
+<li><a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a> — full VMs with hardware isolation</li>
+<li><a href="https://blog.shani.dev/post/migrating-to-shani-os">Migrating to Shani OS</a> — full workflow translation guide</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

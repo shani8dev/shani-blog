@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="A workflow-by-workflow migration guide for users coming from traditional mutable Linux distributions. Every pacman, apt, and dnf habit has a clean equivalent on Shani OS — here is the full map.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Migrating to Shani OS from Ubuntu, Fedora, or Arch — A Practical Guide","description":"A workflow-by-workflow migration guide for users coming from traditional mutable Linux distributions. Every pacman, apt, and dnf habit has a clean equivalent on Shani OS — here is the full map.","url":"https://blog.shani.dev/post/migrating-to-shani-os","datePublished":"2026-04-19T00:00:00.000Z","dateModified":"2026-04-19T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Migrating to Shani OS from Ubuntu, Fedora, or Arch — A Practical Guide","description":"A workflow-by-workflow migration guide for users coming from traditional mutable Linux distributions. Every pacman, apt, and dnf habit has a clean equivalent on Shani OS — here is the full map.","url":"https://blog.shani.dev/post/migrating-to-shani-os","datePublished":"2026-04-19T00:00:00.000Z","dateModified":"2026-04-19T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,198 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Migrating to Shani OS from Ubuntu, Fedora, or Arch — A Practical Guide</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-19 · 9 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>The most common question from experienced Linux users considering Shani OS is: "I know how to manage a system with pacman/apt/dnf. What do I actually do differently here?"</p>
+<p>The honest answer is: not much changes in daily use. You still install apps, manage services, configure your system, and run development tools. The difference is that each category of software has a specific layer it belongs to — and once you understand the three-layer model, the new habits are straightforward.</p>
+<p>This guide is a direct translation guide. Every traditional workflow maps to a Shani OS equivalent. Full reference: <a href="https://docs.shani.dev/doc/concepts">docs.shani.dev</a>.</p>
+<p>---</p>
+<h2>The Mental Model Shift</h2>
+<p>On a traditional Linux distribution, software installation means writing files into the OS root. The package manager is the single source of truth for what is installed. You manage everything — system libraries, GUI apps, CLI tools, development runtimes — through the same tool.</p>
+<p>On Shani OS, the OS root is frozen. It is a verified, signed image. You do not write into it because doing so would undermine the entire reliability guarantee: if you can add arbitrary packages to the OS, the OS is no longer the reproducible artefact that the update pipeline verified.</p>
+<p>Instead, persistent layers sit alongside the OS, each in its own Btrfs subvolume:</p>
+<ol>
+<li><strong><code>@flatpak</code></strong> — GUI desktop applications (browsers, office, media, etc.)</li>
+<li><strong><code>@snapd</code></strong> — Snap packages when an app is only available on the Snap Store</li>
+<li><strong><code>@nix</code></strong> — CLI tools, development runtimes, and language toolchains</li>
+<li><strong><code>@containers</code></strong> — Distrobox and Podman OCI containers</li>
+<li><strong><code>@machines</code></strong> — systemd-nspawn system containers</li>
+<li><strong><code>@lxc</code></strong> / <strong><code>@lxd</code></strong> — LXC/LXD full system containers</li>
+<li><strong><code>@libvirt</code></strong> / <strong><code>@qemu</code></strong> — Virtual machine disk images</li>
+<li><strong><code>@waydroid</code></strong> — Android environment</li>
+</ol>
+<p>All survive every OS update and rollback. They are never touched by <code>shani-deploy</code>. They have their own update paths. They do not conflict with each other.</p>
+<p>---</p>
+<h2>Package Installation: The Full Translation Table</h2>
+<h3>GUI Applications</h3>
+<p>| Traditional | Shani OS | |---|---| | <code>sudo apt install firefox</code> | <code>flatpak install flathub org.mozilla.firefox</code> | | <code>sudo dnf install gimp</code> | <code>flatpak install flathub org.gimp.GIMP</code> | | <code>sudo pacman -S vlc</code> | <code>flatpak install flathub org.videolan.VLC</code> | | <code>yay -S spotify</code> | <code>flatpak install flathub com.spotify.Client</code> | | <code>sudo apt install code</code> | <code>flatpak install flathub com.visualstudio.code</code> |</p>
+<p>Search for the Flatpak app ID at <a href="https://flathub.org">flathub.org</a> or via <code>flatpak search &lt;n&gt;</code>. Most major GUI applications are on Flathub. If an app is only available on the Snap Store, <code>snap install &lt;n&gt;</code> works as a fallback — Snap is pre-configured on Shani OS and the <code>@snapd</code> subvolume persists across updates just like <code>@flatpak</code>.</p>
+<h3>Windows Applications</h3>
+<p>Windows <code>.exe</code> software runs through Wine — a compatibility layer that translates Windows API calls to Linux equivalents. No Windows licence required, no VM overhead for most apps.</p>
+<p>| Traditional | Shani OS | |---|---| | Run a Windows <code>.exe</code> installer | Open with Bottles — creates an isolated Wine environment | | Install a Windows productivity tool | Bottles → Create bottle → Run Executable | | Run legacy Windows software | Bottles with Wine Staging or Wine-GE runner | | Windows game (non-Steam) | Bottles with Wine-GE, or Heroic Games Launcher |</p>
+<p><strong>Bottles</strong> (<code>com.usebottles.bottles</code>) is pre-installed on the KDE Plasma edition and available on Flathub for the GNOME edition. It manages isolated Wine prefixes per application, handles runtime dependencies (Visual C++, .NET, DirectX) via its built-in dependency installer, and supports multiple Wine runners including Wine-GE and Proton-GE.</p>
+<p>For applications that require a real Windows kernel — hardware drivers, anti-cheat systems, enterprise software with kernel-level components — a Windows VM via virt-manager (pre-installed on KDE Plasma) or GNOME Boxes is the reliable path. VM disk images live in <code>@libvirt</code>, completely independent of the OS. Guide: <a href="https://blog.shani.dev/post/windows-apps-on-shani-os">Windows Apps on Shani OS</a> · <a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a>.</p>
+<p>For portable self-contained tools distributed as AppImages, download the <code>.AppImage</code>, make it executable, and run — or open with Gear Lever (pre-installed) to add it permanently to your launcher with automatic update checking.</p>
+<h3>CLI Tools and Development Runtimes</h3>
+<p>| Traditional | Shani OS | |---|---| | <code>sudo apt install nodejs</code> | <code>nix-env -iA nixpkgs.nodejs</code> | | <code>sudo pacman -S python</code> | <code>nix-env -iA nixpkgs.python312</code> | | <code>sudo dnf install rustup</code> | <code>nix-env -iA nixpkgs.rustup</code> | | <code>sudo apt install ripgrep</code> | <code>nix-env -iA nixpkgs.ripgrep</code> | | <code>sudo pacman -S kubectl</code> | <code>nix-env -iA nixpkgs.kubectl</code> | | <code>brew install bat</code> | <code>nix-env -iA nixpkgs.bat</code> | | <code>sudo apt install golang</code> | <code>nix-env -iA nixpkgs.go</code> | | <code>sudo pacman -S neovim</code> | <code>nix-env -iA nixpkgs.neovim</code> |</p>
+<p>Before using Nix, add a channel once:</p>
+<pre><code class="language-bash">nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+nix-channel --update</code></pre>
+<p>Then install anything from the 100,000+ packages at <a href="https://search.nixos.org/packages">search.nixos.org</a>:</p>
+<pre><code class="language-bash">nix-env -iA nixpkgs.package-name</code></pre>
+<h3>System-Level Software (Not Available)</h3>
+<p>Some categories of software cannot be installed into the OS root and must use alternatives:</p>
+<p>| Traditional | Shani OS Alternative | |---|---| | <code>sudo pacman -S nvidia</code> | Drivers are part of the OS image; already configured at install | | <code>sudo apt install linux-headers</code> | Kernel headers are in the OS image | | Kernel modules via DKMS | Custom modules are not supported; use upstream drivers | | <code>sudo apt install docker</code> | Use Podman (pre-installed, Docker-compatible) |</p>
+<p>This is a short list. Most software that experienced Linux users install falls into the GUI apps or CLI tools categories above, both of which have direct equivalents.</p>
+<p>---</p>
+<h2>System Management</h2>
+<h3>System Updates</h3>
+<p>| Traditional | Shani OS | |---|---| | <code>sudo apt upgrade</code> | <code>sudo shani-deploy</code> | | <code>sudo pacman -Syu</code> | <code>sudo shani-deploy</code> | | <code>sudo dnf upgrade</code> | <code>sudo shani-deploy</code> | | Reboot to apply kernel | Reboot after <code>shani-deploy</code> | | Roll back to previous packages | <code>sudo shani-deploy -r</code> (entire OS, instant) |</p>
+<p>The critical difference: <code>shani-deploy</code> replaces the entire OS image, not individual packages. There is no "partial update" state. Either the update applies fully and cleanly, or it does not apply at all. And if the new image causes problems, rollback takes you back to the previous complete OS state — not a partial undo.</p>
+<h3>Service Management</h3>
+<p>Service management with <code>systemctl</code> works identically:</p>
+<pre><code class="language-bash"># All standard systemctl commands work
+sudo systemctl enable sshd
+sudo systemctl start nginx
+sudo systemctl status nginx
+sudo systemctl restart NetworkManager
+
+# Enabling services persists via the /etc OverlayFS
+# Your enabled services survive OS updates</code></pre>
+<h3>Configuration Files</h3>
+<p>Editing <code>/etc</code> files works exactly as expected. Changes are stored in the OverlayFS upper layer (<code>@data</code>) and persist across every OS update and rollback:</p>
+<pre><code class="language-bash"># Edit any /etc file normally
+sudo nano /etc/ssh/sshd_config
+sudo nano /etc/hostname
+sudo nano /etc/hosts
+
+# Changes to /etc persist — they are yours across updates</code></pre>
+<p>To see what you have customised (what differs from the OS defaults):</p>
+<pre><code class="language-bash">ls /data/overlay/etc/upper/</code></pre>
+<p>If an <code>/etc</code> change causes a problem, you can revert a specific file to the OS default:</p>
+<pre><code class="language-bash">sudo rm /data/overlay/etc/upper/path/to/file
+# The OS default (lower OverlayFS layer) becomes active again</code></pre>
+<p>---</p>
+<h2>Development Workflows</h2>
+<h3>Multiple Versions of the Same Tool</h3>
+<p>One of the most common pain points on traditional distributions: needing Node 18 for one project and Node 22 for another. Package managers typically only have one version of a tool installed at a time.</p>
+<p>Nix solves this cleanly:</p>
+<pre><code class="language-bash"># Install both versions simultaneously — no conflict
+nix-env -iA nixpkgs.nodejs_18
+nix-env -iA nixpkgs.nodejs_22
+
+# Per-project shell with a specific version (does not install globally)
+nix-shell -p nodejs_18  # enters a shell with Node 18 on PATH
+nix-shell -p nodejs_22  # separate shell with Node 22
+
+# Reproducible project environment via shell.nix
+# Place in project root — everyone running nix-shell gets identical tools</code></pre>
+<p>Full Nix guide: <a href="https://blog.shani.dev/post/nix-on-shani-os">Nix on Shani OS</a>.</p>
+<h3>Full System Containers (LXC/LXD and systemd-nspawn)</h3>
+<p>For workflows that need a complete isolated Linux system — with its own init, services, and network stack, lighter than a full VM — two options are pre-installed:</p>
+<p><strong>LXC/LXD</strong> is the more full-featured option, with a built-in image catalog, port forwarding, and snapshot management. Container storage lives in <code>@lxc</code>/<code>@lxd</code>:</p>
+<pre><code class="language-bash">lxc launch ubuntu:24.04 myserver
+lxc exec myserver -- bash</code></pre>
+<p><strong>systemd-nspawn</strong> is the lightest option — no daemon, no image format, just point it at a Linux root directory and it boots. Container filesystems live in <code>@machines</code>:</p>
+<pre><code class="language-bash">sudo machinectl pull-tar --verify=no \
+  https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-basic.tar.zst archlinux
+sudo machinectl start archlinux
+sudo machinectl login archlinux</code></pre>
+<h3>Android Apps and Development</h3>
+<p>Waydroid runs a full hardware-accelerated Android stack in a container. Indian apps (BHIM, DigiLocker, IRCTC), streaming apps, and Android development testing all work without a separate device. The <code>@waydroid</code> subvolume persists across every OS update:</p>
+<pre><code class="language-bash">sudo waydroid init    # one-time setup
+waydroid session start
+waydroid show-full-ui
+waydroid app install myapp.apk    # test your APK with adb</code></pre>
+<p>Guide: <a href="https://blog.shani.dev/post/waydroid-android-on-shani-os">Waydroid on Shani OS</a>.</p>
+<p>The AUR is not directly available on Shani OS — but the full Arch Linux experience, including <code>yay</code> and the AUR, is one command away via Distrobox:</p>
+<pre><code class="language-bash"># Create a full Arch Linux container with AUR access
+distrobox create --name arch --image archlinux:latest
+distrobox enter arch
+
+# Inside: full pacman, yay, makepkg — everything works
+yay -S some-aur-package
+
+# Export a binary to your host desktop
+distrobox-export --bin /usr/bin/some-tool</code></pre>
+<p>Exported binaries from Distrobox containers appear in your host PATH and app launcher. BoxBuddy (pre-installed) gives you a graphical interface for creating and entering containers.</p>
+<h3>PPAs and Third-Party Repos (Ubuntu Users)</h3>
+<p>Third-party APT repos and PPAs are not available for the host OS, but the same approach works inside a Distrobox Ubuntu container:</p>
+<pre><code class="language-bash">distrobox create --name ubuntu-dev --image ubuntu:24.04
+distrobox enter ubuntu-dev
+
+# Inside: standard apt, add-apt-repository, PPAs — all work
+sudo add-apt-repository ppa:some/ppa
+sudo apt install some-package
+distrobox-export --bin /usr/bin/some-package</code></pre>
+<p>---</p>
+<h2>Filesystem Layout: What Changed</h2>
+<p>The parts of the filesystem you regularly interact with are the same. The OS root directories have different behaviour:</p>
+<p>| Directory | Behaviour | |---|---| | <code>/home</code> | Fully writable, stored in <code>@home</code> — unchanged from any Linux distro | | <code>/etc</code> | Writable via OverlayFS — your changes persist | | <code>/tmp</code> | Writable tmpfs — cleared on reboot as usual | | <code>/usr</code> | <strong>Read-only</strong> — OS files live here, you cannot modify them | | <code>/bin</code>, <code>/lib</code>, <code>/sbin</code> | Symlinks into <code>/usr</code> — effectively read-only | | <code>/var</code> | tmpfs — cleared on reboot; persistent state bind-mounted from <code>@data</code> | | <code>/nix</code> | Writable by Nix — your Nix packages live here (<code>@nix</code>) | | <code>/var/lib/flatpak</code> | Flatpak apps — writable via <code>@flatpak</code> | | <code>/var/lib/snapd</code> | Snap packages — writable via <code>@snapd</code> | | <code>/var/lib/containers</code> | Distrobox and Podman containers — writable via <code>@containers</code> | | <code>/var/lib/machines</code> | systemd-nspawn system containers — writable via <code>@machines</code> | | <code>/var/lib/lxd</code> | LXD containers — writable via <code>@lxd</code> | | <code>/var/lib/libvirt</code> | VM disk images — writable via <code>@libvirt</code> | | <code>/var/lib/waydroid</code> | Android environment — writable via <code>@waydroid</code> |</p>
+<p>The read-only nature of <code>/usr</code> is the main thing to internalise. Anything that tries to write to <code>/usr/local/bin</code> or install files into <code>/usr/share</code> will fail. Use Nix, Flatpak, Snap, or Distrobox instead.</p>
+<p>---</p>
+<h2>Shell and Terminal Experience</h2>
+<p>The shell environment is configured out of the box with the tools experienced Linux users expect:</p>
+<pre><code class="language-bash"># Already installed and configured
+echo $SHELL         # /usr/bin/zsh
+which starship      # /usr/bin/starship (prompt)
+which fzf           # /usr/bin/fzf (fuzzy finder)
+which bat           # already in PATH (Nix or system)
+which eza           # modern ls replacement
+
+# McFly for smart command history (replaces Ctrl+R)
+# Already integrated into the shell config</code></pre>
+<p>Your <code>.zshrc</code> and <code>.bashrc</code> in <code>$HOME</code> work exactly as expected. Shell configuration is in your home directory (<code>@home</code>), completely independent of the OS.</p>
+<p>---</p>
+<h2>Backup and Data Management</h2>
+<p>Before migrating, back up your existing system's data. After migrating, your home directory is your primary concern — the OS can always be reinstalled or rolled back, but your data lives in <code>@home</code>.</p>
+<pre><code class="language-bash"># restic is pre-installed — encrypted, versioned backups
+restic -r s3:s3.amazonaws.com/mybucket init
+restic -r s3:s3.amazonaws.com/mybucket backup ~/Documents ~/Projects ~/Pictures
+
+# rclone is pre-installed — sync to cloud storage
+rclone config  # set up Google Drive, S3, Backblaze, etc.
+rclone sync ~/Documents gdrive:Backup/Documents</code></pre>
+<p>Both <code>restic</code> and <code>rclone</code> configurations persist in <code>/data/varlib/</code> and survive OS updates.</p>
+<p>---</p>
+<h2>The Things That Just Work</h2>
+<p>These do not require any migration thought — they work on Shani OS exactly as they do on any Linux distribution:</p>
+<ul>
+<li>SSH, GPG keys, and credential management (stored in <code>~/.ssh</code> and <code>~/.gnupg</code>)</li>
+<li>Docker Compose workflows (use <code>podman compose</code> or <code>podman-docker</code> drop-in)</li>
+<li>Git repositories and configuration</li>
+<li>Terminal emulators, Tmux, and screen sessions</li>
+<li>Python virtual environments in <code>~/.venv</code> or project directories</li>
+<li>Node projects in <code>~/projects</code> with <code>node_modules</code></li>
+<li>Dotfiles managed by <code>stow</code>, <code>chezmoi</code>, or a bare git repo</li>
+<li>Any tool or script that lives in your home directory</li>
+</ul>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> — canonical "what to use when" guide with decision flowchart and comparison table</li>
+<li><a href="https://docs.shani.dev/doc/concepts">docs.shani.dev</a> — migration reference and key concepts</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions including rollback, file safety, and dual boot</li>
+<li><a href="https://blog.shani.dev/post/nix-on-shani-os">Nix on Shani OS</a> — detailed Nix workflow guide</li>
+<li><a href="https://blog.shani.dev/post/flatpak-on-shani-os">Flatpak on Shani OS</a> — full Flatpak guide</li>
+<li><a href="https://blog.shani.dev/post/distrobox-on-shani-os">Distrobox on Shani OS</a> — full Distrobox guide (AUR, apt, PPAs)</li>
+<li><a href="https://blog.shani.dev/post/windows-apps-on-shani-os">Windows Apps on Shani OS</a> — Wine, Bottles, and when to use a VM</li>
+<li><a href="https://blog.shani.dev/post/waydroid-android-on-shani-os">Waydroid on Shani OS</a> — Android apps</li>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a> — ask migration questions</li>
+</ul>
+<p><a href="https://shani.dev">Download Shani OS at shani.dev →</a></p>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

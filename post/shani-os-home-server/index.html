@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Turn any PC, mini PC, or old laptop into a home server that replaces your cloud subscriptions. Media streaming, AI models, file sync, home automation, password management, and a full education platform — all accessible from anywhere, with no public IP and no port forwarding.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS as a Home Server — Self-Host Everything, No Public IP Required","description":"Turn any PC, mini PC, or old laptop into a home server that replaces your cloud subscriptions. Media streaming, AI models, file sync, home automation, password management, and a full education platform — all accessible from anywhere, with no public IP and no port forwarding.","url":"https://blog.shani.dev/post/shani-os-home-server","datePublished":"2026-04-22T00:00:00.000Z","dateModified":"2026-04-22T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS as a Home Server — Self-Host Everything, No Public IP Required","description":"Turn any PC, mini PC, or old laptop into a home server that replaces your cloud subscriptions. Media streaming, AI models, file sync, home automation, password management, and a full education platform — all accessible from anywhere, with no public IP and no port forwarding.","url":"https://blog.shani.dev/post/shani-os-home-server","datePublished":"2026-04-22T00:00:00.000Z","dateModified":"2026-04-22T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,237 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Shani OS as a Home Server — Self-Host Everything, No Public IP Required</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-22 · 16 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>There is a laptop in a drawer somewhere in your home right now. It has a working CPU, a working GPU, and enough storage to outlast a dozen cloud subscriptions. It is doing nothing.</p>
+<p>A $150 mini PC from Amazon will outrun it — quieter, cooler, drawing 10 watts at idle — but the principle is the same. Any reasonably modern x86 machine can become a home server that streams your media library to every device you own, backs itself up automatically, runs AI language models with no API key, manages your smart home, and stores your passwords — all without a single monthly fee, and all accessible from anywhere in the world.</p>
+<p>Shani OS makes this practical rather than theoretical. This guide explains how.</p>
+<p>---</p>
+<h2>The Problem with Most Home Server Setups</h2>
+<p>Home servers fail in predictable ways. A system update pulls in a library version that breaks a running service. A config file gets silently overwritten. A rootful Docker daemon runs as root, and one misconfigured container is a privilege escalation away from owning the host. After two years of uptime, something stops working and nobody remembers exactly how it was set up.</p>
+<p>Shani OS is designed around the assumption that these problems are structural, not user error.</p>
+<p>The root filesystem is <strong>read-only and atomically managed</strong> — updates are applied as a complete image swap and activated on next boot, the same way your phone updates. If anything breaks, one command rolls the entire OS back to the previous generation. Your running containers live in a dedicated <code>@containers</code> Btrfs subvolume that is completely separate from the OS layer. When the OS updates, your containers do not move. When you roll back, your containers stay exactly where they were. There is no entanglement between the two.</p>
+<p>The practical result is a home server you can update fearlessly and leave running for years. On Shani OS, forgetting you have a server is a feature.</p>
+<p>---</p>
+<h2>Why Shani OS Specifically</h2>
+<p>Several properties matter when you are running services around the clock.</p>
+<p><strong>Security defaults that hold.</strong> firewalld is active from first boot with a default-deny inbound policy — nothing is exposed unless you explicitly open it. All containers run rootless via Podman — a container process runs as your user, not as root, so a container breakout lands in a fully restricted user context rather than on the host as root. fail2ban is pre-installed and integrates with firewalld automatically.</p>
+<p><strong>Remote access that doesn't require router configuration.</strong> Tailscale and Cloudflared ship pre-installed with their state persisted across OS updates. Authenticate once and the connection survives every reboot, update, and rollback indefinitely — you never need to re-run setup commands after a system update.</p>
+<p><strong>Reliable storage.</strong> The dedicated <code>@containers</code>, <code>@home</code>, and <code>@waydroid</code> Btrfs subvolumes use zstd compression. Container images, volumes, and user data all benefit from transparent deduplication and compression without manual setup. Btrfs snapshots created by <code>shani-deploy</code> let you inspect or restore previous states, though they live on the same drive and are not a substitute for offsite backups.</p>
+<p><strong>HTTPS everywhere, automatically.</strong> Caddy is pre-installed. Point a domain at a local service and Caddy provisions a TLS certificate — either via Let's Encrypt for public domains or via its built-in CA for private <code>.home.local</code> addresses. Your browser never shows a certificate warning.</p>
+<p><strong>SSH host keys that survive updates.</strong> SSH keys are persisted across OS updates and rollbacks — you will never see <code>REMOTE HOST IDENTIFICATION HAS CHANGED</code> after applying a system update.</p>
+<p>---</p>
+<h2>Hardware</h2>
+<p>Shani OS runs on any x86-64 machine. For a dedicated home server:</p>
+<p><strong>Mini PCs</strong> are the best choice for most people. An Intel N100 or N150 draws 10–15 W at idle, runs completely silent with passive cooling on many models, and handles everything in this guide simultaneously — media transcoding, several databases, a local AI model, and home automation. Street price: $100–180.</p>
+<p><strong>Old laptops</strong> work well if you already have one. The built-in battery acts as a UPS — the server survives a brief power outage without a shutdown. Passively cooled models run silently and draw very little power.</p>
+<p><strong>Old desktops</strong> offer more PCIe expansion for dedicated GPUs (significant for local AI inference), more storage bays, and 2.5G or 10G NIC options for fast LAN file sharing.</p>
+<p><strong>RAM guidance:</strong> 8 GB is comfortable for a full setup without AI models. 16 GB handles everything including a 7B parameter model running via Ollama. 32 GB opens up 13B+ models with room for everything else. For storage, plan for 1 TB minimum and expand from there — media libraries grow quickly, and container images add up.</p>
+<p>---</p>
+<h2>Remote Access Without a Public IP</h2>
+<p>This is the piece that makes home servers practical for most people. Your home connection almost certainly uses a dynamic IP, and many ISPs block inbound connections on ports 80 and 443. None of that matters with the approaches below — all of them work via outbound connections from your server, which any network permits.</p>
+<h3>Tailscale — Your Private Mesh Network</h3>
+<p>Tailscale creates a WireGuard mesh across all your devices. Your phone, laptop, work computer, and home server all get stable Tailscale IPs and hostnames and can reach each other directly — regardless of network, NAT, or firewall.</p>
+<pre><code class="language-bash"># Already installed on Shani OS — just authenticate
+sudo systemctl enable --now tailscaled
+sudo tailscale up
+
+# Enable Tailscale SSH — removes the need for managing sshd and firewall rules
+sudo tailscale up --ssh
+
+# Route all your traffic through your home connection when travelling
+sudo tailscale up --advertise-exit-node
+
+# Expose devices on your LAN that don't have Tailscale installed
+# (NAS, printers, IP cameras, smart home hubs)
+sudo tailscale up --advertise-routes=192.168.1.0/24</code></pre>
+<p>Once connected, your server is reachable at its Tailscale hostname from any of your devices. Jellyfin on port 8096? Open <code>http://shani-server:8096</code> on your phone at a coffee shop. It just works.</p>
+<p>Disable key expiry in the <a href="https://login.tailscale.com/admin/machines">Tailscale admin console</a> for your server — combined with Shani OS's persisted state, the machine stays connected indefinitely without any manual re-authentication.</p>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/tailscale">docs.shani.dev — Tailscale</a>.</p>
+<h3>Cloudflare Tunnel — Public HTTPS Without Opening Ports</h3>
+<p>If you want to share a service with others — a family Jellyfin, a shared Nextcloud, a Gitea for a small team — Cloudflare Tunnel gives you a real public HTTPS URL with automatic TLS, without touching your router or opening any inbound ports.</p>
+<pre><code class="language-bash">cloudflared login
+cloudflared tunnel create home-server
+
+cat &gt; ~/.cloudflared/config.yml &lt;&lt; 'EOF'
+tunnel: &lt;tunnel-id&gt;
+credentials-file: /home/user/.cloudflared/&lt;tunnel-id&gt;.json
+
+ingress:
+  - hostname: media.yourdomain.com
+    service: http://localhost:8096
+  - hostname: files.yourdomain.com
+    service: http://localhost:8384
+  - hostname: vault.yourdomain.com
+    service: http://localhost:8180
+  - service: http_status:404
+EOF
+
+cloudflared tunnel route dns home-server media.yourdomain.com
+cloudflared tunnel route dns home-server files.yourdomain.com
+
+sudo cloudflared service install
+sudo systemctl enable --now cloudflared</code></pre>
+<p>Protect exposed services with <strong>Cloudflare Access</strong> — require login via email OTP, Google, or GitHub before reaching your service. No code changes needed on your side.</p>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/cloudflared">docs.shani.dev — Cloudflared Tunnels</a>.</p>
+<h3>Pangolin — Self-Hosted Tunnels (Full Data Sovereignty)</h3>
+<p>Cloudflare Tunnel routes your traffic through Cloudflare's network. If you want the same experience with full control over your data path, Pangolin runs on a cheap VPS you own and creates an encrypted WireGuard tunnel back to your home server. Your traffic never touches a third-party network.</p>
+<pre><code class="language-bash"># Newt agent on your Shani OS machine — connects to your VPS-hosted Pangolin server
+podman run -d \
+  --name newt \
+  -e PANGOLIN_URL=https://pangolin.yourdomain.com \
+  -e NEWT_ID=&lt;your-newt-id&gt; \
+  -e NEWT_SECRET=&lt;your-newt-secret&gt; \
+  --restart unless-stopped \
+  fosrl/newt:latest</code></pre>
+<p>Full setup: <a href="https://docs.shani.dev/doc/servers/vpn-tunnels#pangolin">docs.shani.dev — VPN & Tunnels</a>.</p>
+<p>---</p>
+<h2>HTTPS for Local Services — Caddy</h2>
+<p>Every service on your home server should be reachable via HTTPS — even on your LAN. Without it, browsers warn about insecure connections, WebSockets behave inconsistently, and some apps (like Vaultwarden) require HTTPS for full functionality.</p>
+<p>Caddy is pre-installed on Shani OS and handles this automatically. It provisions and renews TLS certificates via Let's Encrypt for public domains, and via its own built-in CA for private <code>.home.local</code> addresses — no certificate warnings, no manual renewal, no Certbot cron job.</p>
+<p>Always bind container ports to <code>127.0.0.1</code> so services are not directly exposed to the network, then proxy through Caddy:</p>
+<pre><code class="language-bash">sudo systemctl enable --now caddy
+caddy validate --config /etc/caddy/Caddyfile    # validate before reloading
+sudo systemctl reload caddy                      # zero-downtime reload</code></pre>
+<p>Config file: <code>/etc/caddy/Caddyfile</code>. Changes persist across OS updates.</p>
+<pre><code class="language-caddyfile"># Public domain — HTTPS via Let's Encrypt (DNS must point to your server)
+jellyfin.yourdomain.com {
+    reverse_proxy localhost:8096
+}
+
+# Private .home.local domain — HTTPS via Caddy's internal CA (LAN only)
+jellyfin.home.local {
+    tls internal
+    reverse_proxy localhost:8096
+}
+
+nextcloud.home.local {
+    tls internal
+    reverse_proxy localhost:8080
+}
+
+# Protect any service with SSO via Authelia
+vault.yourdomain.com {
+    forward_auth localhost:9091 {
+        uri /api/verify?rd=https://auth.yourdomain.com
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
+    reverse_proxy localhost:8180
+}</code></pre>
+<p>For <code>.home.local</code> addresses, trust Caddy's internal CA once so browsers accept the certificates:</p>
+<pre><code class="language-bash">sudo trust anchor \
+  /var/lib/caddy/.local/share/caddy/pki/authorities/local/root.crt
+sudo update-ca-trust</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/caddy">docs.shani.dev — Caddy</a>.</p>
+<p>---</p>
+<h2>What You Can Run</h2>
+<p>The categories below cover the most common use cases. Each links to a wiki page with ready-to-run Podman commands, full configuration examples, and a Caddy reverse-proxy block for every service.</p>
+<h3>Media — <a href="https://docs.shani.dev/doc/servers/media">wiki</a></h3>
+<p><strong>Jellyfin</strong> streams your entire media library to phones, TVs, tablets, and laptops — hardware transcoding, multi-user support, and native apps on every platform. <strong>Immich</strong> handles photos: automatic mobile backup, AI face and object tagging, shared albums, and a Google Photos-rivalling timeline. The *<em>\</em>Arr stack<strong> (Radarr, Sonarr, Prowlarr, Lidarr) automates acquisition — request a title, it finds, downloads, renames, and drops it into Jellyfin without you lifting a finger. </strong>Navidrome<strong> covers music streaming, </strong>Audiobookshelf<strong> covers audiobooks and podcasts, </strong>Kavita<strong> and </strong>Komga<strong> cover ebooks and manga. </strong>Tdarr** handles automated video transcoding to optimise storage.</p>
+<h3>Productivity & Files — <a href="https://docs.shani.dev/doc/servers/productivity">wiki</a></h3>
+<p><strong>Nextcloud</strong> replaces Dropbox, Google Drive, Google Calendar, and Google Contacts in one deployment — file sync, calendar, contacts, and collaborative document editing via Collabora or OnlyOffice. <strong>Syncthing</strong> is the lighter alternative: pure peer-to-peer sync with no central server. <strong>Paperless-ngx</strong> OCRs, indexes, and tags every document you feed it so you can full-text search every receipt and contract you have ever scanned. Beyond files: <strong>Outline</strong> for team wikis, <strong>BookStack</strong> for structured documentation, <strong>Planka</strong> and <strong>Vikunja</strong> for task management, <strong>Ghost</strong> or <strong>WordPress</strong> for publishing, <strong>Penpot</strong> for design, <strong>n8n</strong> for workflow automation, <strong>Grocy</strong> for household management, and <strong>Monica</strong> for personal CRM.</p>
+<h3>AI & Local LLMs — <a href="https://docs.shani.dev/doc/servers/ai-llms">wiki</a></h3>
+<p>A mini PC with 16 GB of RAM runs a 7B parameter model at usable speeds — no API key, no usage limits, no data leaving your network. <strong>Ollama</strong> manages models (Llama, Mistral, Phi, Gemma, Qwen, DeepSeek) and serves them via an OpenAI-compatible REST API. <strong>Open WebUI</strong> puts a polished ChatGPT-style interface in front of it, with document RAG, web search via SearXNG, and voice via Whisper. <strong>Tabby</strong> is a self-hosted Copilot replacement that plugs directly into VS Code and JetBrains. <strong>ComfyUI</strong> and <strong>InvokeAI</strong> run Stable Diffusion locally. <strong>Flowise</strong> and <strong>Dify</strong> build production LLM pipelines visually. <strong>Langfuse</strong> gives you full observability over every prompt and completion.</p>
+<h3>Security & Identity — <a href="https://docs.shani.dev/doc/servers/security">wiki</a></h3>
+<p><strong>Vaultwarden</strong> is a Bitwarden-compatible password server — every Bitwarden client (mobile, browser, desktop) connects to your own hardware instead of Bitwarden's cloud. <strong>Authelia</strong> gates your entire self-hosted stack behind a single 2FA login page; <strong>Authentik</strong> adds full OIDC/SAML SSO for more complex setups. <strong>Step-CA</strong> is your own internal certificate authority. <strong>Wazuh</strong> provides SIEM and threat detection across all hosts. <strong>Suricata</strong> runs network IDS/IPS inline. <strong>CrowdSec</strong> and <strong>Fail2ban</strong> handle brute-force prevention at the firewall level.</p>
+<h3>Home Automation — <a href="https://docs.shani.dev/doc/servers/home-automation">wiki</a></h3>
+<p><strong>Home Assistant</strong> integrates 3,000+ devices — local execution means sub-50ms automations and no cloud dependency. If the internet goes down, your smart home keeps working. <strong>Zigbee2MQTT</strong> bridges 3,000+ Zigbee devices via a $15 USB coordinator with no proprietary hub. <strong>Frigate</strong> runs AI object detection on any RTSP camera on your GPU. <strong>ESPHome</strong> turns $5 ESP32 boards into custom sensors with YAML config and native Home Assistant integration. <strong>evcc</strong> optimises EV charging against solar production and grid tariffs.</p>
+<h3>Communication — <a href="https://docs.shani.dev/doc/servers/communication">wiki</a></h3>
+<p><strong>Matrix/Synapse</strong> (or the lighter <strong>Conduit</strong>) gives you end-to-end encrypted federated chat — your messages stay on your hardware, and you can still reach anyone on matrix.org. <strong>Mattermost</strong> and <strong>Rocket.Chat</strong> cover team chat. <strong>Jitsi Meet</strong> handles video calls. <strong>Ntfy</strong> and <strong>Gotify</strong> send push notifications from any script or cron job to your phone with a single <code>curl</code>. For community platforms: <strong>Discourse</strong> for forums, <strong>Mastodon</strong> for microblogging, <strong>Lemmy</strong> for link aggregation, <strong>PeerTube</strong> for video hosting.</p>
+<h3>Databases — <a href="https://docs.shani.dev/doc/servers/databases">wiki</a></h3>
+<p>Every database runs rootless via Podman with ports bound to <code>127.0.0.1</code> by default — nothing reaches your network unless you explicitly proxy it. Relational: <strong>PostgreSQL</strong>, <strong>MariaDB</strong>. Caching: <strong>Redis</strong>, <strong>Valkey</strong>, <strong>Dragonfly</strong>. Document: <strong>MongoDB</strong>, <strong>FerretDB</strong>. Message queues: <strong>Kafka</strong>, <strong>Redpanda</strong>, <strong>RabbitMQ</strong>, <strong>NATS</strong>. Graph: <strong>Neo4j</strong>. Time-series: <strong>TimescaleDB</strong>, <strong>InfluxDB</strong>. Search: <strong>MeiliSearch</strong>, <strong>Typesense</strong>, <strong>Elasticsearch</strong>, <strong>OpenSearch</strong>. Vector: <strong>Qdrant</strong>, <strong>Weaviate</strong>. Analytical: <strong>ClickHouse</strong>, <strong>DuckDB</strong>.</p>
+<h3>Developer Tools — <a href="https://docs.shani.dev/doc/servers/devtools">wiki</a></h3>
+<p><strong>Gitea</strong> or <strong>GitLab CE</strong> give you a full GitHub on your own hardware — issues, pull requests, wikis, and CI. <strong>Woodpecker CI</strong> runs pipelines triggered by Gitea pushes. <strong>code-server</strong> runs VS Code in the browser, reachable from any device on your tailnet. <strong>Harbor</strong> is a production container registry with vulnerability scanning. <strong>SonarQube</strong> runs continuous code quality and security analysis. <strong>Mailpit</strong> intercepts outbound email in development so nothing accidentally reaches real users.</p>
+<h3>Business Intelligence — <a href="https://docs.shani.dev/doc/servers/business-intelligence">wiki</a></h3>
+<p>Your databases already live on the server — your analytics stack runs next to them at zero egress cost. <strong>Metabase</strong> is the fastest path to charts for non-technical users. <strong>Apache Superset</strong> goes deeper with 40+ connectors and a full SQL IDE. <strong>Evidence.dev</strong> lets analysts write SQL in Markdown files and ship polished reports as a static site, version-controlled in Git. <strong>Plausible</strong> and <strong>Umami</strong> replace Google Analytics with GDPR-compliant, cookieless web analytics.</p>
+<h3>Finance — <a href="https://docs.shani.dev/doc/servers/finance">wiki</a></h3>
+<p><strong>Firefly III</strong> covers personal finance with double-entry bookkeeping, budgets, and recurring transactions. <strong>Actual Budget</strong> takes a zero-based envelope approach (YNAB-style) with data stored locally. <strong>Ghostfolio</strong> tracks investments with live prices and XIRR. <strong>Invoice Ninja</strong> handles freelancer invoicing with PDF output and online payments. <strong>Paisa</strong> is purpose-built for Indian personal finance — UPI, mutual funds, and Indian account types out of the box.</p>
+<h3>Medical & Health — <a href="https://docs.shani.dev/doc/servers/medical">wiki</a></h3>
+<p><strong>OpenEMR</strong> and <strong>OpenMRS</strong> are full electronic health record systems — visit notes, prescriptions, lab orders, scheduling, billing — relevant for small clinics or anyone who wants clinical data off cloud infrastructure. <strong>HAPI FHIR</strong> gives you a standards-based health data hub that any FHIR-compatible app can consume. <strong>Fasten Health</strong> connects to 1,000+ US health providers via SMART on FHIR and pulls your complete medical history into a local dashboard. <strong>Wger</strong> tracks workouts; <strong>Tandoor</strong> tracks nutrition with ingredient-level macros.</p>
+<h3>Education — <a href="https://docs.shani.dev/doc/servers/education">wiki</a></h3>
+<p><strong>Moodle</strong> is the world's most-deployed open-source LMS — courses, graded assignments, SCORM, H5P, and analytics, with no per-seat licensing. Pair it with <strong>BigBlueButton</strong> for live virtual classrooms. <strong>Open edX</strong> (via Tutor) powers MOOC-scale delivery — the same platform behind edX.org. <strong>ERPNext Education</strong> covers the full school ERP side: admissions, timetables, attendance, fees, and parent portals. <strong>Overleaf</strong> gives researchers and students a collaborative LaTeX editor.</p>
+<h3>Game Servers — <a href="https://docs.shani.dev/doc/servers/game-servers">wiki</a></h3>
+<p><strong>Minecraft</strong> (Java and Bedrock), <strong>Valheim</strong>, <strong>Terraria</strong>, <strong>Factorio</strong>, <strong>Satisfactory</strong>, and <strong>CS2</strong> all run as rootless containers. <strong>Pterodactyl</strong> and <strong>Crafty Controller</strong> provide web-based panels for managing multiple game server instances, resource limits, and console access from the browser.</p>
+<h3>IoT & Sensor Pipelines — <a href="https://docs.shani.dev/doc/servers/iot">wiki</a></h3>
+<p><strong>Mosquitto</strong> or <strong>EMQX</strong> broker MQTT from ESP32s, Shelly switches, and Tasmota devices. <strong>Telegraf</strong> ingests from 300+ sources and writes to <strong>InfluxDB</strong> for time-series storage. <strong>OwnTracks</strong> tracks your phone's GPS location via your own broker — no third party ever touches the data. The wiki covers the full pipeline through to Grafana dashboards and Prometheus alerts.</p>
+<h3>Mail — <a href="https://docs.shani.dev/doc/servers/mail">wiki</a></h3>
+<p>Self-hosting email requires a static IP, correct DNS (MX, SPF, DKIM, DMARC), and an ISP or VPS that allows port 25. <strong>Mailcow</strong> bundles the full stack (Postfix, Dovecot, Rspamd, SOGo, ClamAV). <strong>Stalwart</strong> is a modern single-binary alternative with native JMAP. Beyond servers: <strong>listmonk</strong> for newsletters, <strong>SimpleLogin</strong> and <strong>addy.io</strong> for email aliasing, <strong>Postal</strong> for transactional sending with delivery analytics and bounce handling.</p>
+<h3>Kubernetes & Container Orchestration — <a href="https://docs.shani.dev/doc/servers/kubernetes">wiki</a></h3>
+<p>When a single Podman host is not enough, Shani OS supports every major Kubernetes distribution. <strong>k3s</strong> is the fastest path to a working cluster — a single binary, a single command, and you have a fully conformant CNCF Kubernetes node running on your hardware. <strong>k0s</strong> is even more minimal. <strong>MicroK8s</strong> installs via Snap and adds capabilities (Istio, Knative, GPU support) with a one-line addon command. <strong>minikube</strong> and <strong>kind</strong> are the right tools for local development and CI testing. <strong>RKE2</strong> targets hardened production deployments. The wiki covers Helm, ArgoCD, Flux CD, cert-manager, Longhorn storage, Rancher, k9s, and the full in-cluster CI/CD stack (Tekton, Argo Workflows, Kaniko).</p>
+<h3>Clusters & High Availability — <a href="https://docs.shani.dev/doc/servers/clusters">wiki</a></h3>
+<p>For multi-node setups running on old hardware or a small homelab rack. The wiki covers production-grade HA for every major data store: <strong>Patroni + etcd + HAProxy</strong> for PostgreSQL, <strong>Redis Sentinel</strong> and <strong>Valkey Cluster</strong>, <strong>Elasticsearch</strong> and <strong>OpenSearch</strong> 3-node clusters, <strong>Kafka</strong> with KRaft (no ZooKeeper), <strong>Cassandra</strong> and <strong>ScyllaDB</strong>, <strong>MongoDB Replica Set</strong>, <strong>RabbitMQ Cluster</strong>, <strong>VictoriaMetrics Cluster</strong>, and a standalone <strong>etcd</strong> cluster for Kubernetes backing stores. Each entry includes a working compose file, quorum and split-brain explanations, and a troubleshooting section.</p>
+<h3>DevOps & Infrastructure — <a href="https://docs.shani.dev/doc/servers/devops">wiki</a></h3>
+<p>Your home server is also a local platform engineering environment. Beyond Gitea and Woodpecker CI (covered under Developer Tools), the DevOps wiki adds <strong>Atlantis</strong> for Terraform pull-request automation, <strong>Skaffold</strong> and <strong>Tilt</strong> for fast local Kubernetes development loops, <strong>Ansible AWX</strong> for playbook execution at scale, <strong>Consul</strong> and <strong>Nomad</strong> for service discovery and workload orchestration, <strong>Nexus Repository</strong> and <strong>Verdaccio</strong> for artifact and npm package management, <strong>Backstage</strong> as an internal developer portal, and a full selection of Infrastructure as Code tools (Terraform, Pulumi, OpenTofu).</p>
+<h3>OpenStack & Private Cloud — <a href="https://docs.shani.dev/doc/servers/openstack">wiki</a></h3>
+<p>For anyone who wants a full private cloud — tenant isolation, a Nova compute API, Cinder block volumes, Neutron networking, and a Horizon dashboard — on their own hardware. <strong>MicroStack</strong> (via Snap) installs a working all-in-one OpenStack in minutes. <strong>DevStack</strong> is the reference development environment. <strong>Kolla-Ansible</strong> is the production path, deploying each OpenStack service in a container with full HA support. The wiki covers the CLI tools, core service reference, Heat IaC templates, and integration with an existing k3s or Kubernetes cluster via Kuryr and Magnum.</p>
+<h3>Backups — <a href="https://docs.shani.dev/doc/servers/backups-sync">wiki</a></h3>
+<p>A server without offsite backups is one drive failure from total loss. <strong>Restic</strong> handles encrypted, deduplicated snapshots to any destination — local, SFTP, S3, or <strong>MinIO</strong> on a second machine. <strong>Rclone</strong> mirrors to 70+ cloud providers. <strong>Borgmatic</strong> wraps Borg with a single YAML config and automatic pruning. <strong>Litestream</strong> gives SQLite-backed apps continuous offsite replication with sub-second RPO.</p>
+<blockquote><p>⚠️ Btrfs snapshots created by <code>shani-deploy</code> live on the same drive. They protect against bad updates — not hardware failure. Offsite backups are non-negotiable.</p></blockquote>
+<p>---</p>
+<h2>Keeping Things Running</h2>
+<h3>Auto-Start on Boot</h3>
+<p>Generate a systemd user unit from any running container, then enable lingering so it starts at boot even without an active login session:</p>
+<pre><code class="language-bash">podman generate systemd --name jellyfin --new --files
+mkdir -p ~/.config/systemd/user
+mv container-jellyfin.service ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now container-jellyfin.service
+loginctl enable-linger $USER</code></pre>
+<h3>Automatic Container Updates</h3>
+<p>Podman's built-in auto-update pulls new images and recreates containers on a schedule. Add the label to any container you want updated automatically:</p>
+<pre><code class="language-bash">podman run -d \
+  --label io.containers.autoupdate=registry \
+  ... \
+  jellyfin/jellyfin
+
+# Preview what would update without applying
+podman auto-update --dry-run
+
+# Apply updates (or let the weekly timer do it automatically)
+podman auto-update</code></pre>
+<h3>Atomic OS Updates</h3>
+<p>Run updates when you choose — Shani OS does not update automatically. <code>shani-deploy</code> stages the new OS image while everything keeps running, then activates it on the next reboot. Your containers are entirely untouched throughout.</p>
+<pre><code class="language-bash"># Apply an update
+sudo shani-deploy
+
+# Roll back if anything is wrong after rebooting
+sudo shani-deploy -r</code></pre>
+<p>No rescue mode, no package manager archaeology, no manual state reconstruction. Full update reference: <a href="https://blog.shani.dev/post/shani-os-updates">Updates on Shani OS</a>.</p>
+<h3>Monitoring — <a href="https://docs.shani.dev/doc/servers/monitoring">wiki</a></h3>
+<p><strong>Uptime Kuma</strong> monitors every service and alerts via ntfy, Telegram, or email when something goes down. <strong>Gatus</strong> is the declarative alternative — health checks in YAML, versioned alongside your configs, with a built-in status page. <strong>Grafana + Prometheus + Loki</strong> cover metrics, dashboards, and log aggregation across every container. <strong>Dozzle</strong> shows live logs in the browser. <strong>Beszel</strong> gives you a lightweight multi-host overview.</p>
+<h3>Container Management — <a href="https://docs.shani.dev/doc/servers/management">wiki</a></h3>
+<p><strong>Portainer</strong>, <strong>Dockge</strong>, and <strong>Komodo</strong> provide graphical dashboards for containers, images, volumes, and compose stacks — all work with Podman's socket. <strong>Homepage</strong> assembles a live service dashboard with status indicators, system metrics, and bookmarks. <strong>Diun</strong> watches your running containers and notifies you when a new image version is available on the registry.</p>
+<p>---</p>
+<h2>The Full Self-Hosting Wiki</h2>
+<p>Every service has a ready-to-run Podman command in the wiki at <a href="https://docs.shani.dev/doc/servers">docs.shani.dev/doc/servers</a>:</p>
+<p>| Category | Services | |---|---| | <a href="https://docs.shani.dev/doc/servers/media">Media</a> | Jellyfin, Plex, Navidrome, Immich, Jellyseerr, \*Arr stack (Radarr, Sonarr, Lidarr, Prowlarr), qBittorrent, Pinchflat, Kavita, Audiobookshelf, PhotoPrism, Calibre-Web, Readarr, Bazarr, Overseerr, Tdarr, MeTube, Stash, Komga, TubeArchivist, Kometa | | <a href="https://docs.shani.dev/doc/servers/productivity">Productivity</a> | Nextcloud, Syncthing, Filebrowser, Paperless-ngx, Planka, Vikunja, Outline, Mealie, Miniflux, FreshRSS, Stirling PDF, Ghost, WordPress, BookStack, Wiki.js, HedgeDoc, CryptPad, Wallabag, Linkwarden, Monica, Rallly, Kimai, Grocy, Joplin Server, Penpot, Memos, AFFiNE, Hoarder, n8n, Actual Budget | | <a href="https://docs.shani.dev/doc/servers/ai-llms">AI & LLMs</a> | Ollama, Open WebUI, LocalAI, ComfyUI, Automatic1111, InvokeAI, Whisper, Kokoro TTS, Piper TTS, Tabby, AnythingLLM, LiteLLM, Perplexica, Flowise, Langfuse, Open WebUI Pipelines, Dify, Open Interpreter, SearXNG | | <a href="https://docs.shani.dev/doc/servers/security">Security</a> | Vaultwarden, Passbolt, Authelia, Authentik, Keycloak, Zitadel, CrowdSec, Fail2ban, Step-CA, Infisical, OpenBao, Wazuh, Greenbone, Trivy, Teleport, Coraza WAF, SafeLine WAF, Suricata, osquery, OWASP ZAP, Nuclei | | <a href="https://docs.shani.dev/doc/servers/home-automation">Home Automation</a> | Home Assistant, Mosquitto, Zigbee2MQTT, ESPHome, Node-RED, Matter Server, Frigate, go2rtc, Double Take, Z-Wave JS UI, Scrypted, AppDaemon, evcc, WLED | | <a href="https://docs.shani.dev/doc/servers/communication">Communication</a> | Matrix/Synapse, Conduit, Mattermost, Rocket.Chat, Zulip, Ntfy, Gotify, Jitsi Meet, Discourse, Mastodon, Lemmy, Pixelfed, PeerTube, Mumble, FreePBX/Asterisk, SimpleX, Chatwoot | | <a href="https://docs.shani.dev/doc/servers/mail">Mail</a> | Mailcow, Mailu, Stalwart, listmonk, SimpleLogin, addy.io, Postal, Roundcube, SnappyMail, SOGo | | <a href="https://docs.shani.dev/doc/servers/databases">Databases</a> | PostgreSQL, MariaDB, Redis, Valkey, KeyDB, Dragonfly, MongoDB, FerretDB, Apache Kafka, Redpanda, RabbitMQ, NATS, Neo4j, Cassandra, ScyllaDB, CockroachDB, TimescaleDB, InfluxDB, MeiliSearch, Typesense, Elasticsearch, OpenSearch, Qdrant, Weaviate, DuckDB, SurrealDB, Litestream, Adminer | | <a href="https://docs.shani.dev/doc/servers/devtools">Developer Tools</a> | Gitea, Forgejo, GitLab CE, Woodpecker CI, code-server, Coder, Nginx, Harbor, Private Registry, Mailpit, Matomo, n8n, Leantime, Twenty CRM, Huly, DocuSeal, SonarQube, act, Plane | | <a href="https://docs.shani.dev/doc/servers/business-intelligence">Business Intelligence</a> | Metabase, Apache Superset, Redash, Evidence.dev, Lightdash, ClickHouse, Plausible, Umami | | <a href="https://docs.shani.dev/doc/servers/finance">Finance</a> | Firefly III, Actual Budget, Ghostfolio, Invoice Ninja, ERPNext Accounting, hledger, Beancount, Kresus, Paisa, Rotki, Bitcoin/LND, Monero Node | | <a href="https://docs.shani.dev/doc/servers/medical">Medical & Health</a> | OpenMRS, OpenEMR, HAPI FHIR, Medplum, Fasten Health, Tandoor, Wger, Nextcloud Health | | <a href="https://docs.shani.dev/doc/servers/education">Education</a> | Moodle, Canvas LMS, Open edX, BigBlueButton, Greenlight, ERPNext Education, Gibbon, Chamilo, Kolibri, Overleaf, Anki Sync Server, ITflow, H5P | | <a href="https://docs.shani.dev/doc/servers/game-servers">Game Servers</a> | Minecraft Java, Minecraft Bedrock, Velocity Proxy, Valheim, Terraria, Factorio, Satisfactory, CS2, Pterodactyl, Crafty Controller | | <a href="https://docs.shani.dev/doc/servers/iot">IoT</a> | Mosquitto, EMQX, Telegraf, Node-RED, MQTT Exporter, Prometheus, Alertmanager, InfluxDB, Modbus, OPC-UA, OwnTracks | | <a href="https://docs.shani.dev/doc/servers/vpn-tunnels">VPN & Tunnels</a> | WireGuard, WG-Easy, Tailscale, Headscale, Headplane, Cloudflared, Pangolin, NetBird, Pritunl, Firezone, Nebula, ZeroTier, OpenVPN, Hysteria 2, Gluetun | | <a href="https://docs.shani.dev/doc/servers/networking">Network & DNS</a> | Pi-hole, AdGuard Home, Blocky, Unbound, Technitium, Nginx Proxy Manager, Traefik, HAProxy, SearXNG, LibreNMS, NetBox, Ntopng, OwnTracks | | <a href="https://docs.shani.dev/doc/servers/monitoring">Monitoring</a> | Prometheus, Alertmanager, Grafana, Grafana Alloy, Loki, Netdata, Uptime Kuma, Gatus, Beszel, Dozzle, Healthchecks, Speedtest Tracker, SmokePing, VictoriaMetrics, Grafana Tempo, Zabbix, SigNoz, OpenTelemetry Collector, Checkmk, Karma, Graylog, Changedetection.io | | <a href="https://docs.shani.dev/doc/servers/kubernetes">Kubernetes</a> | k3s, k0s, MicroK8s, minikube, kind, RKE2, kubeadm, Talos Linux, Helm, ArgoCD, Flux CD, Kustomize, cert-manager, Longhorn, Rancher, Lens/OpenLens, k9s, Kubernetes Dashboard, kube-prometheus-stack, Velero, Tekton, Argo Workflows, Kaniko, Argo Rollouts, ingress-nginx, NGINX Gateway Fabric, Sealed Secrets, External Secrets Operator, Goldilocks | | <a href="https://docs.shani.dev/doc/servers/clusters">Clusters & HA</a> | Patroni, etcd, HAProxy, Redis Sentinel, Valkey Cluster, Elasticsearch Cluster, OpenSearch Cluster, Kafka (KRaft), Cassandra, ScyllaDB, MongoDB Replica Set, RabbitMQ Cluster, VictoriaMetrics Cluster | | <a href="https://docs.shani.dev/doc/servers/devops">DevOps & Infrastructure</a> | Atlantis, Skaffold, Tilt, Ansible AWX, Consul, Nomad, Nexus Repository, Verdaccio, Backstage, Terraform, Pulumi, OpenTofu, Vault, Boundary, Packer | | <a href="https://docs.shani.dev/doc/servers/openstack">OpenStack & Private Cloud</a> | MicroStack, DevStack, Kolla-Ansible, OpenStack CLI, Nova, Neutron, Cinder, Glance, Keystone, Horizon, Heat, Octavia, Magnum, Kuryr | | <a href="https://docs.shani.dev/doc/servers/backups-sync">Backups & Sync</a> | Restic, Borgmatic, Duplicati, Rclone, MinIO, Kopia, Garage, Litestream | | <a href="https://docs.shani.dev/doc/servers/management">Management</a> | Portainer, Dockge, Yacht, Komodo, Homepage, Diun, auto-update, systemd integration, cleanup timers |</p>
+<p>---</p>
+<h2>One More Thing</h2>
+<p>The argument for self-hosting is usually framed around privacy or cost — and both are real. But there is a third reason that tends to matter more over time: <strong>ownership</strong>.</p>
+<p>Cloud services get shut down, acquired, repriced, or quietly degraded. Google Photos compression changed. Dropbox halved its free tier. Services that were free become paid; services that were paid disappear. When you run the server, those decisions belong to you.</p>
+<p>Shani OS is built with that in mind — an operating system that gets out of the way, updates without drama, and runs your services reliably for as long as you want to run them.</p>
+<p>---</p>
+<h2>Related Guides</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/podman-containers-on-shani-os">Podman on Shani OS</a> — rootless containers, Docker Compose compatibility, volumes, auto-start</li>
+<li><a href="https://blog.shani.dev/post/shani-os-networking-guide">Networking on Shani OS</a> — VPNs, Tailscale, SSH hardening, Caddy, firewall rules</li>
+<li><a href="https://blog.shani.dev/post/distrobox-on-shani-os">Distrobox on Shani OS</a> — full mutable Linux inside the immutable OS</li>
+<li><a href="https://blog.shani.dev/post/shani-os-updates">Updates on Shani OS</a> — update and rollback reference</li>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-btrfs-snapshots-and-backup">Btrfs Snapshots and Backup on Shani OS</a> — off-device backup strategy</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a> — questions, setups, and community support</li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

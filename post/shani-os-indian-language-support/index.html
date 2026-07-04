@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Indian language support on Shani OS is designed in from the start — not bolted on. Devanagari, Tamil, Telugu, Kannada, Malayalam, Gujarati, Punjabi, Bengali, and more: correct font rendering, IBus multilingual input, and Indian-English locale all configured at first boot.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Indian Language Support on Shani OS — Devanagari, Tamil, Telugu, and More","description":"Indian language support on Shani OS is designed in from the start — not bolted on. Devanagari, Tamil, Telugu, Kannada, Malayalam, Gujarati, Punjabi, Bengali, and more: correct font rendering, IBus multilingual input, and Indian-English locale all configured at first boot.","url":"https://blog.shani.dev/post/shani-os-indian-language-support","datePublished":"2026-05-03T00:00:00.000Z","dateModified":"2026-05-03T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Indian Language Support on Shani OS — Devanagari, Tamil, Telugu, and More","description":"Indian language support on Shani OS is designed in from the start — not bolted on. Devanagari, Tamil, Telugu, Kannada, Malayalam, Gujarati, Punjabi, Bengali, and more: correct font rendering, IBus multilingual input, and Indian-English locale all configured at first boot.","url":"https://blog.shani.dev/post/shani-os-indian-language-support","datePublished":"2026-05-03T00:00:00.000Z","dateModified":"2026-05-03T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,166 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Indian Language Support on Shani OS — Devanagari, Tamil, Telugu, and More</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-03 · 7 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Indian language support on Shani OS is not an afterthought or an optional add-on — it is a first-class feature built in from the start. This reflects the project's origins: Shani OS is built in India, for users who should not have to do extra work to use their native scripts on their operating system.</p>
+<p>Every script in the list below renders correctly at first boot without installing any additional packages: Devanagari (Hindi, Marathi, Sanskrit, Nepali), Tamil, Telugu, Kannada, Malayalam, Gujarati, Punjabi (Gurmukhi), Bengali (Bangla), Odia, Assamese, Urdu (Nastaliq), and Sindhi. The fontconfig pre-configuration at <code>90-indian-fonts.conf</code> ensures scripts render properly across all GTK, Qt, and web applications.</p>
+<p>---</p>
+<h2>What Is Pre-Configured</h2>
+<p><strong>Fonts:</strong> The Noto fonts family covers every major Indian script with consistent rendering quality. <code>noto-fonts</code> (Latin, Greek, Cyrillic), <code>noto-fonts-cjk</code> (CJK), and <code>noto-fonts-emoji</code> are all installed. Fontconfig is tuned with <code>90-indian-fonts.conf</code> which sets Noto as the preferred font family for each Indic script and configures correct rendering (ligature support, consonant clusters, vowel marks).</p>
+<p><strong>Input method:</strong> IBus (Intelligent Input Bus) is the default input method framework, configured at first boot. It handles switching between scripts while typing without affecting the system locale.</p>
+<p><strong>IBus engines pre-installed:</strong></p>
+<ul>
+<li><code>ibus-typing-booster</code> — predictive, context-aware input with support for multiple languages simultaneously</li>
+<li><code>ibus-libpinyin</code> — Chinese (Simplified and Traditional)</li>
+<li><code>ibus-anthy</code> — Japanese</li>
+<li><code>ibus-hangul</code> — Korean</li>
+<li><code>ibus-unikey</code> — Vietnamese</li>
+<li><code>m17n-lib</code> + <code>m17n-db</code> — transliteration for Arabic, Thai, and Indic scripts</li>
+</ul>
+<p><strong>Locale:</strong> <code>glibc-locales</code> with all locale data is installed. Indian regional locales (<code>hi_IN</code>, <code>ta_IN</code>, <code>te_IN</code>, <code>kn_IN</code>, <code>ml_IN</code>, <code>mr_IN</code>, <code>gu_IN</code>, <code>pa_IN</code>, <code>bn_IN</code>, etc.) are available without any additional packages.</p>
+<p>---</p>
+<h2>Setting the System Locale</h2>
+<p>During installation, you select your language and region. To change after installation:</p>
+<p><strong>GNOME:</strong> Settings → Region & Language → Language / Formats</p>
+<p><strong>KDE:</strong> System Settings → Regional Settings → Language / Formats</p>
+<p><strong>From the terminal:</strong></p>
+<pre><code class="language-bash"># List available locales
+locale -a | grep -i &quot;_IN&quot;
+
+# Set system locale (Hindi)
+sudo localectl set-locale LANG=hi_IN.UTF-8
+
+# Set locale for your user session only
+echo &quot;export LANG=hi_IN.UTF-8&quot; &gt;&gt; ~/.zshrc
+source ~/.zshrc
+
+# Check current locale
+locale</code></pre>
+<p>Common Indian locale identifiers:</p>
+<ul>
+<li><code>hi_IN.UTF-8</code> — Hindi</li>
+<li><code>ta_IN.UTF-8</code> — Tamil</li>
+<li><code>te_IN.UTF-8</code> — Telugu</li>
+<li><code>kn_IN.UTF-8</code> — Kannada</li>
+<li><code>ml_IN.UTF-8</code> — Malayalam</li>
+<li><code>mr_IN.UTF-8</code> — Marathi</li>
+<li><code>gu_IN.UTF-8</code> — Gujarati</li>
+<li><code>pa_IN.UTF-8</code> — Punjabi</li>
+<li><code>bn_IN.UTF-8</code> — Bengali</li>
+<li><code>en_IN.UTF-8</code> — Indian English (dates in DD/MM/YYYY, correct currency symbol)</li>
+</ul>
+<p>---</p>
+<h2>IBus Input Setup</h2>
+<p>IBus runs automatically in both GNOME and KDE sessions. To add Indian language input:</p>
+<p><strong>GNOME:</strong></p>
+<p>Settings → Keyboard → Input Sources → click <code>+</code> → Other → select your language → choose the input method</p>
+<p>For Hindi: <code>Hindi (Devanagari)</code> — choose between <code>Phonetic</code> (type Roman, get Devanagari) or <code>Inscript</code> (standard Indian keyboard layout).</p>
+<p><strong>KDE:</strong></p>
+<p>System Settings → Input Method → Add IBus engine</p>
+<p>Switch between input methods: <code>Super+Space</code> (GNOME) or configured shortcut (KDE).</p>
+<h3>IBus Typing Booster</h3>
+<p><code>ibus-typing-booster</code> is particularly powerful for Indian language input. It provides:</p>
+<ul>
+<li>Predictive word completion as you type</li>
+<li>Support for typing in multiple languages simultaneously (e.g., mixing Hindi and English)</li>
+<li>Emoji input</li>
+<li>Clipboard history integration</li>
+</ul>
+<p>Configure it via the IBus preferences: right-click the IBus icon in the system tray → Preferences → Typing Booster.</p>
+<h3>Transliteration Input (m17n)</h3>
+<p><code>m17n-lib</code> provides transliteration-based input for Indic scripts — type in Roman characters and get the corresponding Indic script output.</p>
+<pre><code>Type: na-ma-s-te   →  नमस्ते  (Hindi, using ibus-m17n hi-itrans)
+Type: vanakkam     →  வணக்கம்  (Tamil, using ibus-m17n ta-itrans)</code></pre>
+<p>To use m17n transliteration, add the relevant m17n engine in your IBus input sources:</p>
+<ul>
+<li><code>hi (itrans)</code> for Hindi transliteration</li>
+<li><code>ta (itrans)</code> for Tamil transliteration</li>
+<li><code>te (itrans)</code> for Telugu transliteration</li>
+</ul>
+<p>---</p>
+<h2>Font Rendering</h2>
+<p>All Indian scripts require complex text shaping — consonant clusters, vowel marks (matras), half-forms, and ligatures must be rendered correctly. Shani OS uses HarfBuzz for text shaping, which correctly handles all these features for all supported scripts.</p>
+<p>If you find that a specific application renders Indian scripts incorrectly (usually older applications that use their own text rendering), try:</p>
+<pre><code class="language-bash"># Force HarfBuzz for GTK apps
+export GTK_USE_GLYPH_CACHE=1
+
+# For Qt apps
+export QT_ENABLE_HIGHDPI_SCALING=1</code></pre>
+<p>Web browsers (Vivaldi, Firefox) use their own text rendering and handle Indian scripts correctly without any configuration.</p>
+<h3>Checking Font Coverage</h3>
+<pre><code class="language-bash"># Check which font is used for a specific character (requires fc-match)
+fc-match :lang=hi      # font for Hindi
+fc-match :lang=ta      # font for Tamil
+fc-match :lang=te      # font for Telugu
+
+# List all fonts that support a specific language
+fc-list :lang=hi | head -10</code></pre>
+<p>---</p>
+<h2>Indian Calendar and Date Formats</h2>
+<p>Setting your locale to an Indian regional locale (<code>hi_IN</code>, <code>en_IN</code>, etc.) automatically configures:</p>
+<ul>
+<li>Date format: DD/MM/YYYY</li>
+<li>Currency: ₹ (Indian Rupee)</li>
+<li>Number format: Indian numbering system (lakhs, crores) in supported applications</li>
+<li>First day of the week: Monday (standard in India)</li>
+</ul>
+<p>For Indian calendar systems (Vikram Samvat, Saka calendar), LibreOffice and some other applications support Indian calendar display. These are niche needs not covered by the OS locale system.</p>
+<p>---</p>
+<h2>Indian Language TTS (espeak-ng)</h2>
+<p><code>espeak-ng</code> (pre-installed as part of the accessibility stack) includes voices for Indian languages:</p>
+<pre><code class="language-bash"># Hindi TTS
+espeak-ng -v hi &quot;नमस्ते, यह शानि ओएस है&quot;
+
+# Tamil TTS
+espeak-ng -v ta &quot;வணக்கம்&quot;
+
+# Telugu TTS
+espeak-ng -v te &quot;నమస్కారం&quot;
+
+# Bengali TTS
+espeak-ng -v bn &quot;নমস্কার&quot;
+
+# Gujarati TTS
+espeak-ng -v gu &quot;નમસ્તે&quot;
+
+# List all Indian voices
+espeak-ng --voices | grep -E &quot; hi| ta| te| kn| ml| mr| gu| pa| bn&quot;</code></pre>
+<p>---</p>
+<h2>For Government and Institutional Use</h2>
+<p>For government, public sector, and educational deployments requiring Indian language support:</p>
+<ul>
+<li>All official Indian language scripts are fully supported out of the box</li>
+<li>No proprietary fonts or third-party packages required</li>
+<li>The entire font stack (Noto) is open source and freely distributable</li>
+<li>IBus and m17n libraries are open source</li>
+<li>No foreign telemetry — Shani OS collects zero usage data</li>
+<li>LUKS2 encryption with keys that never leave the device — no foreign key escrow</li>
+</ul>
+<p>For OEM and fleet deployments with Indian language requirements, contact <a href="https://shani.dev#enterprise">shani.dev — Enterprise</a>.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions answered</li>
+<li><a href="https://docs.shani.dev/doc/updates/shell">docs.shani.dev — Shell & Environment</a> — locale configuration reference</li>
+<li><a href="https://github.com/ibus/ibus/wiki">IBus documentation</a></li>
+<li><a href="https://fonts.google.com/noto">Noto Fonts</a> — the font family covering all Indian scripts</li>
+<li><a href="https://blog.shani.dev/post/shani-os-accessibility">Accessibility on Shani OS</a> — espeak-ng Indian TTS, braille support</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote>
+<blockquote><p><em>भारत में बना — Indian languages, first class.</em></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

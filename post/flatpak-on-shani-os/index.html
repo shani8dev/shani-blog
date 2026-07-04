@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="How Flatpak works on Shani OS, what apps are pre-installed, how to install more from Flathub, manage permissions with Flatseal, and why sandboxing is the right model for an immutable system.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Flatpak on Shani OS — Your Complete App Management Guide","description":"How Flatpak works on Shani OS, what apps are pre-installed, how to install more from Flathub, manage permissions with Flatseal, and why sandboxing is the right model for an immutable system.","url":"https://blog.shani.dev/post/flatpak-on-shani-os","datePublished":"2026-04-17T00:00:00.000Z","dateModified":"2026-04-17T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Flatpak on Shani OS — Your Complete App Management Guide","description":"How Flatpak works on Shani OS, what apps are pre-installed, how to install more from Flathub, manage permissions with Flatseal, and why sandboxing is the right model for an immutable system.","url":"https://blog.shani.dev/post/flatpak-on-shani-os","datePublished":"2026-04-17T00:00:00.000Z","dateModified":"2026-04-17T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,177 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Flatpak on Shani OS — Your Complete App Management Guide</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-17 · 8 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Flatpak is how you install and run GUI applications on Shani OS. Because the OS root is read-only, traditional package managers like <code>pacman</code> cannot add software to the base system — and they should not, since that software would be overwritten the next time <code>shani-deploy</code> updates the OS image. Flatpak solves this by storing applications in the <code>@flatpak</code> Btrfs subvolume, completely independent of the OS. Your apps survive every OS update and rollback untouched.</p>
+<p>This guide covers everything you need to know about Flatpak on Shani OS: what is pre-installed, how to install more, how to manage permissions, and how to keep your apps healthy. Full reference: <a href="https://docs.shani.dev/doc/software/flatpak">docs.shani.dev — Flatpak</a>.</p>
+<p>---</p>
+<h2>Why Flatpak Fits an Immutable OS</h2>
+<p>Flatpak was designed with sandboxing and OS independence in mind. Each application runs in its own confined environment — it does not reach into system directories or assume a specific OS layout. This is exactly what an immutable system needs: apps that live outside the OS and make no assumptions about its internals.</p>
+<p>The key properties:</p>
+<p><strong>Isolation from the OS.</strong> A Flatpak app runs against a bundled set of runtime libraries, not the host OS libraries. When Shani OS updates its system libraries, your Flatpak apps are unaffected — they use their own.</p>
+<p><strong>Isolation from other apps.</strong> Each Flatpak runs in a sandbox with access only to what it has been explicitly granted: specific filesystem paths, devices, network access, and portals. An app cannot read another app's data by default.</p>
+<p><strong>Persistent across updates and rollbacks.</strong> The <code>@flatpak</code> subvolume is separate from <code>@blue</code> and <code>@green</code>. Whether you are booting the old OS slot after a rollback or the new one after an update, the same <code>@flatpak</code> subvolume is mounted. Apps never need to be reinstalled after an OS change.</p>
+<p><strong>Auto-updates.</strong> Flatpak updates run on a 12-hour timer in the background. Your apps stay current without requiring manual intervention.</p>
+<p>---</p>
+<h2>Pre-Installed Apps</h2>
+<p>Both editions ship with these apps pre-installed and ready at first boot:</p>
+<p><strong>Universal (GNOME and KDE):</strong></p>
+<ul>
+<li><strong>Vivaldi Browser</strong> (<code>com.vivaldi.Vivaldi</code>) — featured browser with built-in ad blocking, tab groups, and reading mode</li>
+<li><strong>OnlyOffice Desktop Editors</strong> (<code>org.onlyoffice.desktopeditors</code>) — opens <code>.docx</code>, <code>.xlsx</code>, <code>.pptx</code> with high compatibility</li>
+<li><strong>Warehouse</strong> (<code>io.github.flattool.Warehouse</code>) — graphical Flatpak manager: install, remove, update, and inspect all your Flatpaks</li>
+<li><strong>Flatseal</strong> (<code>com.github.tchx84.Flatseal</code>) — manage Flatpak sandbox permissions without the terminal</li>
+<li><strong>Pods</strong> (<code>com.github.marhkb.Pods</code>) — graphical front-end for Podman container management</li>
+<li><strong>BoxBuddy</strong> (<code>io.github.dvlv.boxbuddyrs</code>) — create and manage Distrobox containers with a GUI</li>
+<li><strong>Gear Lever</strong> (<code>it.mijorus.gearlever</code>) — integrate AppImage files into your launcher</li>
+</ul>
+<p><strong>GNOME Edition additionally includes:</strong> GNOME's full suite of productivity and utility apps — Calculator, Calendar, Clocks, Maps, Weather, Text Editor, Loupe (image viewer), Papers (PDF viewer), Decibels (audio), Showtime (video), Snapshot (camera), Simple Scan, Sound Recorder, Font Viewer, Characters, Notes (Gnote), Seahorse (keys), Secrets (passwords), Connections (remote desktop), Network Displays, Extension Manager, Meld (diff), Impression (USB writer), Drawing, Fragments (torrents), Shortwave (internet radio), and a selection of games.</p>
+<p><strong>KDE Plasma Edition additionally includes:</strong> The complete gaming stack (Steam, Heroic, Lutris, RetroArch, Bottles, GOverlay, Oversteer, Piper, OpenRGB, AntiMicroX), KDE productivity apps (Okular, Gwenview, Elisa, Haruna, Kate, KolourPaint, Kompare, Kamoso, KRDC, ISO Image Writer, KGet, KTorrent, KCalc, Skanlite), a selection of KDE games, virt-manager with QEMU extension (the Flatpak bundles its own QEMU — there is no system QEMU package; see <a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a>), and the Kvantum theme engine.</p>
+<p>---</p>
+<h2>Installing Apps from Flathub</h2>
+<p>Flathub is the main Flatpak app repository and is pre-configured on both editions. Browse it at <a href="https://flathub.org">flathub.org</a> or install directly from the terminal:</p>
+<pre><code class="language-bash"># Install by app ID (most precise)
+flatpak install flathub org.mozilla.firefox
+flatpak install flathub com.spotify.Client
+flatpak install flathub com.visualstudio.code
+flatpak install flathub org.gimp.GIMP
+flatpak install flathub org.telegram.desktop
+flatpak install flathub com.discordapp.Discord
+flatpak install flathub org.videolan.VLC
+flatpak install flathub com.obsproject.Studio
+flatpak install flathub org.inkscape.Inkscape
+flatpak install flathub org.blender.Blender
+
+# Search for apps
+flatpak search firefox
+flatpak search &quot;video player&quot;</code></pre>
+<p>You can also install apps from GNOME Software (GNOME edition) or KDE Discover (KDE edition) — both are configured to use Flathub as the default source.</p>
+<p>---</p>
+<h2>Running Flatpak Apps</h2>
+<p>Apps installed via Flatpak appear in your application launcher automatically. You can also launch them from the terminal:</p>
+<pre><code class="language-bash"># Run an app
+flatpak run org.mozilla.firefox
+
+# Run with specific arguments
+flatpak run com.visualstudio.code /path/to/project
+
+# List all installed apps
+flatpak list --app
+
+# List all installed (apps + runtimes)
+flatpak list</code></pre>
+<p>---</p>
+<h2>Managing Permissions with Flatseal</h2>
+<p>Flatseal is your graphical tool for managing what each Flatpak app can access. Open it from your app launcher.</p>
+<p>Flatseal shows you every permission for every installed app — filesystem access, network access, device access, environment variables, and portal permissions. You can:</p>
+<ul>
+<li>Grant an app access to your entire home folder if it needs to open files from anywhere</li>
+<li>Restrict an app to only its own data directory for stronger privacy</li>
+<li>Enable or disable microphone, camera, and USB access per-app</li>
+<li>Review and revoke permissions that seem excessive</li>
+</ul>
+<p>Common permission adjustments from the terminal:</p>
+<pre><code class="language-bash"># Grant an app access to your home directory
+flatpak override --user --filesystem=home com.example.App
+
+# Grant access to a specific path only
+flatpak override --user --filesystem=/home/user/Documents com.example.App
+
+# Revoke network access (for offline-only tools)
+flatpak override --user --unshare=network com.example.App
+
+# Grant access to all devices (use carefully)
+flatpak override --user --device=all com.example.App
+
+# Show all overrides for an app
+flatpak override --user --show com.example.App
+
+# Reset all overrides for an app
+flatpak override --user --reset com.example.App</code></pre>
+<p>---</p>
+<h2>Using Warehouse</h2>
+<p>Warehouse (pre-installed) is your graphical Flatpak manager. It provides capabilities beyond what GNOME Software or KDE Discover offer:</p>
+<p><strong>Batch management.</strong> Select multiple apps and update, remove, or inspect them all at once.</p>
+<p><strong>Leftover data cleanup.</strong> When you uninstall an app, Warehouse can find and remove leftover app data from your home directory that the standard uninstall leaves behind.</p>
+<p><strong>Flatpak info.</strong> See exactly which runtime an app uses, its installed size, when it was last updated, its app ID, and its current permission set.</p>
+<p><strong>Pin versions.</strong> If a Flatpak update breaks an app, Warehouse lets you pin the app to a specific version and mask future updates until the issue is resolved.</p>
+<pre><code class="language-bash"># CLI equivalent: pin an app at its current commit
+flatpak mask com.example.App
+
+# Unpin
+flatpak mask --remove com.example.App</code></pre>
+<p>---</p>
+<h2>Keeping Apps Updated</h2>
+<p>Flatpak apps auto-update every 12 hours via a systemd timer. To update manually:</p>
+<pre><code class="language-bash"># Update all installed Flatpaks
+flatpak update
+
+# Update a specific app
+flatpak update org.mozilla.firefox
+
+# Check what would be updated (dry run)
+flatpak update --no-deploy</code></pre>
+<p>To see the history of recent updates:</p>
+<pre><code class="language-bash">flatpak history</code></pre>
+<p>---</p>
+<h2>File Access and the Portal System</h2>
+<p>Flatpak apps use portals to access files outside their sandbox. When an app opens a file picker dialog, that dialog is a portal — a sandboxed, secure interface that lets you grant the app access to a specific file or folder without giving it blanket filesystem access.</p>
+<p>This is why some apps in their sandboxed defaults can only access files you explicitly open through their file picker, not arbitrary paths. It is a feature, not a limitation — but it does mean that workflows that rely on drag-and-dropping files from the terminal into an app may behave differently.</p>
+<p>If you regularly work with files in specific locations and an app constantly asks for permission, use Flatseal to add that path as a permanent filesystem grant for that app.</p>
+<p>---</p>
+<h2>Removing Apps and Cleaning Up</h2>
+<pre><code class="language-bash"># Remove an app
+flatpak remove com.example.App
+
+# Remove an app and its data
+flatpak remove --delete-data com.example.App
+
+# Remove unused runtimes (saves significant disk space)
+flatpak uninstall --unused
+
+# Show disk usage by Flatpak
+flatpak list --app --columns=application,size
+du -sh /var/lib/flatpak ~/.local/share/flatpak</code></pre>
+<p>Running <code>flatpak uninstall --unused</code> periodically removes old runtime versions that apps no longer depend on. These can accumulate and consume several gigabytes over time.</p>
+<p>---</p>
+<h2>Adding Other Repositories</h2>
+<p>Flathub covers the vast majority of apps, but you can add other Flatpak repositories:</p>
+<pre><code class="language-bash"># Add a repository
+flatpak remote-add --if-not-exists myrepo https://repo.example.com/repo.flatpakrepo
+
+# List all configured repositories
+flatpak remotes
+
+# Remove a repository
+flatpak remote-delete myrepo</code></pre>
+<p>For organisations deploying Shani OS at scale, a private Flatpak repository is the recommended way to distribute internal applications — without touching the OS image at all.</p>
+<p>---</p>
+<h2>The Full Software Ecosystem on Shani OS</h2>
+<p>Flatpak is the primary recommendation for GUI desktop applications — it has the largest catalogue (Flathub), the best sandboxing, and auto-updates. For CLI tools, Nix is the right layer. For apps not on Flathub, Snap is the pre-configured fallback. For Windows apps, Bottles/Wine. For anything requiring a full distro environment, Distrobox. None of these conflict — each lives in its own Btrfs subvolume.</p>
+<p><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> has the complete decision flowchart and comparison table for every ecosystem on Shani OS.</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://flathub.org">flathub.org</a> — browse the full app catalogue</li>
+<li><a href="https://docs.shani.dev/doc/software/flatpak">docs.shani.dev — Flatpak</a> — full reference including advanced configuration</li>
+<li><a href="https://blog.shani.dev/post/snap-on-shani-os">Snap on Shani OS</a> — when to use Snap vs Flatpak</li>
+<li><a href="https://blog.shani.dev/post/appimage-on-shani-os">AppImage on Shani OS</a> — portable apps with Gear Lever</li>
+<li><a href="https://blog.shani.dev/post/nix-on-shani-os">Nix on Shani OS</a> — CLI tools and development environments</li>
+<li><a href="https://blog.shani.dev/post/distrobox-on-shani-os">Distrobox on Shani OS</a> — full mutable Linux environments</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a> — questions and app recommendations</li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="The April 2026 stable release: fixed UEFI installer, improved shani-deploy reliability, refreshed GNOME 50 and KDE Plasma 6 ISOs, and a full package manifest.">
   <meta name="twitter:image"       id="tw-image" content="/assets/images/shani-os-2026.04.15.png">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS 2026.04.15 — Release Notes","description":"The April 2026 stable release: fixed UEFI installer, improved shani-deploy reliability, refreshed GNOME 50 and KDE Plasma 6 ISOs, and a full package manifest.","url":"https://blog.shani.dev/post/2026-04-15-release-notes","datePublished":"2026-04-15T00:00:00.000Z","dateModified":"2026-04-15T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"/assets/images/shani-os-2026.04.15.png"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS 2026.04.15 — Release Notes","description":"The April 2026 stable release: fixed UEFI installer, improved shani-deploy reliability, refreshed GNOME 50 and KDE Plasma 6 ISOs, and a full package manifest.","url":"https://blog.shani.dev/post/2026-04-15-release-notes","datePublished":"2026-04-15T00:00:00.000Z","dateModified":"2026-04-15T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"/assets/images/shani-os-2026.04.15.png","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,154 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Release</span>
+        <h1 class="post-title">Shani OS 2026.04.15 — Release Notes</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-15 · 8 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Shani OS <strong>2026.04.15</strong> is now available — two refreshed ISO images, a fixed UEFI installer, and significantly improved <code>shani-deploy</code> reliability across interrupted downloads and edge-case boot sequences.</p>
+<blockquote><p>🗓️ <strong>Release Date:</strong> April 15, 2026</p></blockquote>
+<blockquote><p>🧱 <strong>Base:</strong> Arch Linux (rolling) with a read-only root filesystem</p></blockquote>
+<blockquote><p>🔁 <strong>Update model:</strong> Atomic blue/green updates via <code>shani-deploy</code></p></blockquote>
+<p>New to Shani OS? Start with <a href="/post/why-your-os-update-should-never-break-your-computer">Why Your OS Update Should Never Break Your Computer</a> for context on the design philosophy, then <a href="/post/shani-os-architecture-deep-dive">The Architecture Behind Shani OS</a> for the technical detail. For everyday usage and use-case guidance, see <a href="/post/shani-os-for-everyone">Shani OS for Everyone</a>. Full documentation lives at <a href="https://wiki.shani.dev">wiki.shani.dev</a>.</p>
+<p>---</p>
+<h2>Available Images</h2>
+<p>| Edition | Size | Best for | |---|---|---| | 🟢 GNOME Edition | ~5.4 GB | Work, study, Windows/macOS switchers, OEM deployments | | 🔵 KDE Plasma Edition | ~7.6 GB | Gaming, power users — full gaming stack pre-installed |</p>
+<p>Both ISOs are SHA256 checksummed and GPG signed with key <code>7B927BFFD4A9EAAA8B666B77DE217F3DA8014792</code>. See the <a href="https://wiki.shani.dev#installation">installation instructions at wiki.shani.dev</a> for the full verification walkthrough.</p>
+<p>---</p>
+<h2>What Changed in This Release</h2>
+<h3>Installer</h3>
+<p>The most significant fix in this release is a corrected UEFI installation flow. Previous releases had inconsistent behaviour on certain UEFI implementations — particularly around ESP partition detection and Shim enrollment on some OEM firmware. This release resolves those issues across the tested hardware matrix.</p>
+<p>Installation time is now approximately 10–15 minutes from USB boot to first login. The installer creates all Btrfs subvolumes, extracts the system image into <code>@blue</code>, snapshots it to <code>@green</code>, builds both Unified Kernel Images via <code>gen-efi</code>, and registers the UEFI boot entry — all without requiring any post-install configuration.</p>
+<h3>shani-deploy</h3>
+<p>Several reliability issues in the update and rollback pipeline have been resolved:</p>
+<ul>
+<li>Interrupted downloads now resume correctly via <code>aria2c</code> rather than restarting from zero</li>
+<li>The boot-count verification step — which confirms a new slot booted successfully before committing it as default — is more robust against edge-case timing</li>
+<li><code>--rollback</code> path handles the case where the inactive slot has no prior snapshot more gracefully</li>
+<li><code>shani-deploy --storage-info</code> now reports accurate compressed sizes using <code>compsize</code></li>
+<li><code>shani-update</code> background notification service (user-level systemd service) now more reliably detects new images and sends desktop notifications</li>
+</ul>
+<h3>shani-health</h3>
+<ul>
+<li><code>shani-health</code> new CLI for checking the health of a running Shani OS system — slot state, subvolume storage, service status, and filesystem integrity. Full reference: <a href="https://blog.shani.dev/post/shani-health-reference">shani-health Reference</a>.</li>
+</ul>
+<h3>Hardware Support</h3>
+<p>Firmware packages updated to <code>20260309-1</code> (AMD and Intel microcode included). GPU compatibility improvements cover recent AMD RDNA 3 and Intel Arc cards. Bluetooth and audio handling improvements target common laptop hardware — specifically Intel DSP audio via updated <code>sof-firmware</code>.</p>
+<p>---</p>
+<h2>Core System Versions</h2>
+<h3>Base</h3>
+<p>| Component | Version | |---|---| | Linux Kernel | <code>6.19.11.arch1-1</code> | | systemd | <code>260.1-1</code> | | glibc | <code>2.43+r5+g856c426a7534-1</code> | | Linux Firmware | <code>20260309-1</code> | | AMD Microcode | <code>20260309-1</code> | | Intel Microcode | <code>20260227-1</code> |</p>
+<h3>GNOME Edition</h3>
+<p>| Component | Version | |---|---| | GNOME Shell | <code>50.1-1</code> | | GTK 4 | <code>4.22.2-1</code> | | libadwaita | <code>1.9.0-1</code> | | Nautilus | <code>50.1-1</code> | | GDM | <code>50.0-1</code> |</p>
+<h3>KDE Plasma Edition</h3>
+<p>| Component | Version | |---|---| | KDE Plasma | <code>6.6.4-1</code> | | KDE Frameworks | <code>6.25.0-1</code> | | Qt 6 | <code>6.11.0-2</code> | | KWin | <code>6.6.4-1</code> | | Dolphin | <code>25.12.3-1</code> |</p>
+<p>---</p>
+<h2>Application Runtimes</h2>
+<p>Shani OS uses a multi-runtime model. Applications run entirely outside the base OS in dedicated Btrfs subvolumes, so they survive every update and rollback untouched. The <code>@nix</code> subvolume is shared between both OS slots — Nix packages installed while running <code>@blue</code> are equally available when running <code>@green</code>.</p>
+<p>| Runtime | Version | Purpose | |---|---|---| | Flatpak | <code>1.16.6-1</code> | Primary GUI apps — auto-updates every 12 hours | | Snap | <code>2.74.1-2</code> | Optional sandboxed apps | | Nix | <code>2.34.6-1</code> | Reproducible dev environments (<code>@nix</code> subvolume, shared across slots) | | Distrobox | <code>1.8.2.4-1</code> | Full mutable Linux containers (Ubuntu, Arch, Fedora) | | Podman | <code>5.8.1-2</code> | Rootless containers — Docker-compatible | | AppImage | - | Portable apps via Gear Lever |</p>
+<p>---</p>
+<h2>Shani OS Core Packages</h2>
+<p>| Package | Version | Role | |---|---|---| | shani-core | <code>1.2-13</code> | Core system integration layer | | shani-deploy | <code>0.0.1-54</code> | Atomic update and rollback tool | | shani-settings | <code>0.0.5-37</code> | System configuration helpers | | shani-desktop-gnome | <code>1.2-23</code> | GNOME edition metapackage | | shani-desktop-plasma | <code>1.0-25</code> | KDE Plasma edition metapackage |</p>
+<p>---</p>
+<h2>Pre-Installed Flatpaks</h2>
+<h3>GNOME Edition</h3>
+<p>The GNOME edition ships with a focused set of apps covering everyday computing needs:</p>
+<p><strong>Productivity & Utilities:</strong> Vivaldi Browser, OnlyOffice Desktop Editors, GNOME Text Editor, GNOME Calculator, GNOME Calendar, GNOME Clocks, GNOME Maps, GNOME Contacts, GNOME Notes (Gnote), Papers (PDF viewer), Loupe (image viewer), Snapshot (camera), Simple Scan, Sound Recorder, Font Viewer, Characters, Weather</p>
+<p><strong>Media:</strong> Decibels (audio player), Showtime (video player)</p>
+<p><strong>System Tools:</strong> Warehouse (Flatpak manager), Flatseal (Flatpak permissions), Pods (Podman GUI), BoxBuddy (Distrobox GUI), Gear Lever (AppImage manager), Impression (USB writer), Extension Manager, Seahorse (key manager), Secrets (password manager), GNOME Boxes (VM management), gSmartControl (disk health)</p>
+<p><strong>Connectivity:</strong> GNOME Connections (remote desktop client), Network Displays, Meld (diff tool)</p>
+<p><strong>Games:</strong> Nibbles, Mahjongg, Chess, Aisleriot, Quadrapassel, Sudoku</p>
+<p><strong>Graphics:</strong> Drawing (simple drawing app), Fragments (torrent client), Shortwave (internet radio)</p>
+<h3>KDE Plasma Edition</h3>
+<p>The KDE Plasma edition ships the GNOME system tools (Warehouse, Flatseal, Pods, BoxBuddy, Gear Lever) plus a complete gaming and productivity stack:</p>
+<p><strong>Gaming:</strong> Steam, Heroic Games Launcher (Epic/GOG/Amazon), Lutris, RetroArch, Bottles (Windows apps), GOverlay (MangoHud configurator), Oversteer (racing wheel configuration), AntiMicroX (gamepad mapper), OpenRGB (RGB lighting), Piper (gaming mouse configuration)</p>
+<p><strong>KDE Apps:</strong> Okular (documents), Gwenview (images), Elisa (music), Haruna (video), Kate (text editor), KolourPaint, Kompare (diff tool), Kamoso (camera), KRDC (remote desktop), ISO Image Writer, KGet, KTorrent, KCalc, Skanlite (scanner)</p>
+<p><strong>Games:</strong> KPatience, Knights (chess), KBlocks, KSnakeDuel, KMahjongg, Kapman, KSudoku</p>
+<p><strong>VM Tools:</strong> virt-manager, QEMU extension</p>
+<p><strong>Theming:</strong> Kvantum style engine</p>
+<p><strong>Vivaldi Browser and OnlyOffice Desktop Editors</strong> are included on both editions.</p>
+<p>---</p>
+<h2>Security Stack</h2>
+<p>All of the following are active from first boot, by default:</p>
+<ul>
+<li><strong>Six simultaneous Linux Security Modules:</strong> <code>landlock</code>, <code>lockdown</code>, <code>yama</code>, <code>integrity</code> (IMA/EVM), <code>apparmor</code>, <code>bpf</code></li>
+<li><strong>LUKS2 full-disk encryption</strong> with argon2id key derivation — opt-in at install</li>
+<li><strong>TPM2 auto-unlock</strong> — enroll with <code>sudo gen-efi enroll-tpm2</code> on first boot</li>
+<li><strong>Secure Boot</strong> via Shim + MOK-signed Unified Kernel Images, one per slot</li>
+<li><strong>Signed system images</strong> — SHA256 + GPG verified before every deployment</li>
+<li><strong>Zero telemetry</strong> — no usage data, crash reports, or analytics</li>
+<li><strong>Intel ME disabled</strong> by default (<code>mei</code>, <code>mei_me</code> kernel modules blacklisted)</li>
+<li><strong>firewalld</strong> active from first boot</li>
+</ul>
+<p>---</p>
+<h2>Atomic Update Model</h2>
+<p>Shani OS always maintains two complete, independently bootable system images:</p>
+<pre><code>shanios-blue  → @blue subvolume   (active slot)
+shanios-green → @green subvolume  (standby slot)</code></pre>
+<p>Update flow: download to inactive slot → verify checksum + signature → snapshot old slot → extract new image → generate signed UKI → switch bootloader default → reboot → 15-second startup check confirms success. If the new slot fails to boot three times, systemd-boot automatically falls back.</p>
+<p>---</p>
+<h2>Download</h2>
+<ul>
+<li><strong>GNOME Edition</strong> (~5.4 GB): <a href="https://sourceforge.net/projects/shanios/files/gnome/20260401/signed_shanios-gnome-2026.04.15-x86_64.iso/download">Download from SourceForge</a></li>
+<li><strong>KDE Plasma Edition</strong> (~7.6 GB): <a href="https://sourceforge.net/projects/shanios/files/plasma/20260401/signed_shanios-plasma-2026.04.15-x86_64.iso/download">Download from SourceForge</a></li>
+</ul>
+<p>Or visit <a href="https://shani.dev">shani.dev</a> for links, torrent files, and verification instructions.</p>
+<p>---</p>
+<h2>Verify</h2>
+<pre><code class="language-bash"># 1. Verify checksum
+sha256sum -c signed_shanios-gnome-2026.04.15-x86_64.iso.sha256
+
+# 2. Import the Shani OS signing key (once)
+gpg --keyserver keys.openpgp.org --recv-keys 7B927BFFD4A9EAAA8B666B77DE217F3DA8014792
+
+# 3. Verify GPG signature
+gpg --verify signed_shanios-gnome-2026.04.15-x86_64.iso.asc signed_shanios-gnome-2026.04.15-x86_64.iso</code></pre>
+<p>Write the ISO to a USB drive (minimum 8 GB) using <strong>Balena Etcher</strong> or <strong>Rufus</strong> (DD mode). Do not use Ventoy — it conflicts with the Shani OS bootloader.</p>
+<p>---</p>
+<h2>First Steps After Install</h2>
+<pre><code class="language-bash"># Firmware updates (BIOS, Thunderbolt, storage peripherals)
+fwupdmgr refresh &amp;&amp; fwupdmgr update
+
+# Add a Nix channel before installing any Nix packages (once, on fresh install)
+nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+nix-channel --update
+
+# Enroll TPM2 for automatic LUKS unlock (if you enabled encryption)
+sudo gen-efi enroll-tpm2
+
+# Update the system
+sudo shani-deploy
+
+# Check which slot you're running
+cat /data/current-slot</code></pre>
+<p>---</p>
+<h2>Documentation & Community</h2>
+<ul>
+<li><a href="https://docs.shani.dev">wiki.shani.dev</a> — full technical documentation</li>
+<li><a href="https://shani.dev">shani.dev</a> — download, overview, and feature details</li>
+<li><a href="https://github.com/shani8dev">github.com/shani8dev</a> — source code</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — troubleshooting after update</li>
+<li><a href="https://blog.shani.dev/post/shani-os-updates">Updates on Shani OS</a> — shani-deploy and shani-update reference</li>
+<li><a href="https://blog.shani.dev/post/shani-health-reference">shani-health Reference</a> — system health monitoring CLI</li>
+<li><a href="https://blog.shani.dev/post/shani-os-getting-started">Getting Started with Shani OS</a> — installation guide</li>
+<li><a href="https://docs.shani.dev">wiki.shani.dev</a> — full technical documentation</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+<p>---</p>
+</ul>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote>
+<blockquote><p><em>Shani OS 2026.04.15 — Reliable by design, consistent by default.</em></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Shani OS works for Windows and macOS switchers, developers, gamers, and IT administrators. This page points you to the right guide for your situation.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS for Everyone — Find Your Guide","description":"Shani OS works for Windows and macOS switchers, developers, gamers, and IT administrators. This page points you to the right guide for your situation.","url":"https://blog.shani.dev/post/shani-os-for-everyone","datePublished":"2026-04-13T00:00:00.000Z","dateModified":"2026-05-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS for Everyone — Find Your Guide","description":"Shani OS works for Windows and macOS switchers, developers, gamers, and IT administrators. This page points you to the right guide for your situation.","url":"https://blog.shani.dev/post/shani-os-for-everyone","datePublished":"2026-04-13T00:00:00.000Z","dateModified":"2026-05-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,74 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Shani OS for Everyone — Find Your Guide</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-13 · 2 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Shani OS is one operating system. The underlying architecture — atomic blue-green updates, immutable root, instant rollback, zero telemetry — is the same for everyone. What differs is how you use it.</p>
+<p>For the technical foundation: <a href="https://blog.shani.dev/post/why-os-updates-should-never-break">Why Your OS Update Should Never Break Your Computer</a> and <a href="https://blog.shani.dev/post/shani-os-architecture-deep-dive">The Architecture Behind Shani OS</a>. For the complete getting-started walkthrough: <a href="https://blog.shani.dev/post/shani-os-getting-started">Getting Started with Shani OS</a>.</p>
+<p>---</p>
+<h2>Coming from Windows or macOS</h2>
+<p>You want an OS that works reliably without a learning cliff. Vivaldi Browser and OnlyOffice Desktop Editors are pre-installed and handle your existing documents on day one. Software comes from Flatpak (equivalent to an app store) instead of installers. Your existing files and workflow move over directly.</p>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-getting-started">Getting Started with Shani OS</a> — installation and first boot</li>
+<li><a href="https://blog.shani.dev/post/shani-os-first-week">Your First Week with Shani OS</a> — day-by-day setup guide</li>
+<li><a href="https://blog.shani.dev/post/migrating-to-shani-os">Migrating to Shani OS</a> — if you're coming from Ubuntu, Fedora, or Arch</li>
+<li><a href="https://blog.shani.dev/post/windows-apps-on-shani-os">Windows Apps on Shani OS</a> — running Windows software via Wine/Bottles</li>
+<li><a href="https://blog.shani.dev/post/shani-os-for-general-desktop-users">Shani OS for General Desktop Users</a> — office, email, video calls, cloud storage</li>
+</ul>
+<p>---</p>
+<h2>For Developers</h2>
+<p>Your dev tools, runtimes, and environments live in Btrfs subvolumes completely independent of the OS. An OS update cannot break your dev setup. An OS rollback cannot remove packages you installed.</p>
+<ul>
+<li><a href="https://blog.shani.dev/post/nix-on-shani-os">Nix on Shani OS</a> — CLI tools and dev runtimes (the primary tool for developers)</li>
+<li><a href="https://blog.shani.dev/post/distrobox-on-shani-os">Distrobox on Shani OS</a> — full mutable Linux environment with any distro's package manager</li>
+<li><a href="https://blog.shani.dev/post/podman-containers-on-shani-os">Podman on Shani OS</a> — rootless OCI containers for services and databases</li>
+<li><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> — full decision guide for which tool to use</li>
+</ul>
+<p>---</p>
+<h2>For Gamers</h2>
+<p>The KDE Plasma edition ships Steam, Proton, Heroic Games Launcher, Lutris, MangoHud, GameScope, and a kernel tuned for low-latency gaming — all pre-installed and ready at first boot.</p>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-gaming-deep-dive">Gaming on Shani OS — The Full Stack, Explained</a> — complete gaming guide</li>
+<li><a href="https://blog.shani.dev/post/waydroid-android-on-shani-os">Running Android Apps with Waydroid</a> — Android games on your desktop</li>
+<li><a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a> — GPU passthrough for native gaming performance in a Windows VM</li>
+</ul>
+<p>---</p>
+<h2>For IT Administrators and Enterprises</h2>
+<p>Every machine in a fleet pulls from the same GPG-signed, SHA256-verified image — no per-device package drift. Boot counting detects failing OS slots and reverts automatically. Indian-language support is designed in from the start.</p>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment">Shani OS for OEMs and IT Fleets</a> — complete fleet deployment guide</li>
+<li><a href="https://blog.shani.dev/post/shani-os-security-deep-dive">Security Without Configuration</a> — the full security model</li>
+<li><a href="https://blog.shani.dev/post/shani-os-indian-language-support">Indian Language Support on Shani OS</a> — government and public-sector deployments</li>
+</ul>
+<p>---</p>
+<h2>Choosing Your Edition</h2>
+<p><strong>GNOME Edition</strong> (~5.4 GB) — work, study, Windows/macOS switchers, OEM deployments. Clean, focused interface. Vivaldi Browser and OnlyOffice pre-installed.</p>
+<p><strong>KDE Plasma Edition</strong> (~7.6 GB) — gamers and power users. Complete gaming stack pre-installed. Fully customisable desktop. virt-manager for VMs.</p>
+<p>Both editions include: the full immutable architecture, all security features, all app ecosystems (Flatpak, Snap, Nix, AppImage, Distrobox, Podman), and zero telemetry.</p>
+<p><strong>System requirements:</strong> UEFI firmware, 64-bit x86 CPU, 4 GB RAM (8 GB recommended), 32 GB storage (64 GB recommended). NVIDIA, AMD, and Intel graphics all work at first boot.</p>
+<p><a href="https://shani.dev">Download Shani OS at shani.dev →</a></p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-getting-started">Getting Started with Shani OS</a> — installation and first boot</li>
+<li><a href="https://blog.shani.dev/post/shani-os-first-week">Your First Week with Shani OS</a> — day-by-day setup guide</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions answered</li>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> — what to use for each type of software</li>
+<li><a href="https://docs.shani.dev">docs.shani.dev</a> — full documentation</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+<p>---</p>
+</ul>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

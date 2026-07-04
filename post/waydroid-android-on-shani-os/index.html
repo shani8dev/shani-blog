@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Waydroid runs a full hardware-accelerated Android stack inside a lightweight container on Shani OS — full Play Store access, ARM app compatibility, and native GPU performance. Here is how to set it up and get the most out of it.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Running Android Apps on Shani OS with Waydroid","description":"Waydroid runs a full hardware-accelerated Android stack inside a lightweight container on Shani OS — full Play Store access, ARM app compatibility, and native GPU performance. Here is how to set it up and get the most out of it.","url":"https://blog.shani.dev/post/waydroid-android-on-shani-os","datePublished":"2026-04-18T00:00:00.000Z","dateModified":"2026-04-18T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Running Android Apps on Shani OS with Waydroid","description":"Waydroid runs a full hardware-accelerated Android stack inside a lightweight container on Shani OS — full Play Store access, ARM app compatibility, and native GPU performance. Here is how to set it up and get the most out of it.","url":"https://blog.shani.dev/post/waydroid-android-on-shani-os","datePublished":"2026-04-18T00:00:00.000Z","dateModified":"2026-04-18T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,172 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Running Android Apps on Shani OS with Waydroid</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-18 · 7 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Waydroid runs a complete Android operating system in a lightweight Linux container, giving you access to the full Android app ecosystem on your Shani OS desktop. Unlike emulators that virtualise the entire hardware stack, Waydroid runs Android using your actual Linux kernel — specifically via the <code>binder</code> and <code>ashmem</code> kernel modules. The result is near-native performance, not the sluggishness of QEMU-based Android emulation. For running a full Windows or Linux VM with hardware-level isolation, see <a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a>.</p>
+<p>On Shani OS, Waydroid is pre-installed and pre-configured. The <code>@waydroid</code> Btrfs subvolume stores your Android environment independently of the OS — an OS update or rollback never touches your installed Android apps, their data, or your Google account login.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/software/waydroid">docs.shani.dev — Android (Waydroid)</a>.</p>
+<p>---</p>
+<h2>How Waydroid Works</h2>
+<p>Waydroid uses Android 11 (AOSP) as its base, running inside a Linux container managed by LXC. It communicates with the host Wayland compositor directly — Android apps render as native Wayland surfaces, which means GPU acceleration without an additional translation layer.</p>
+<p>The key components:</p>
+<ul>
+<li><strong><code>waydroid</code> daemon</strong> — manages the Android container lifecycle</li>
+<li><strong><code>binder</code> kernel module</strong> — provides Android's IPC mechanism</li>
+<li><strong>LXC container</strong> — isolates the Android userspace from the host Linux userspace</li>
+<li><strong>Hardware acceleration</strong> — Android's graphics pipeline talks directly to your GPU via the host's Mesa or NVIDIA driver</li>
+</ul>
+<p>ARM app compatibility is handled by <code>libhoudini</code> (Intel's ARM-to-x86 binary translation), included in the Shani OS Waydroid setup. Most ARM-compiled Android apps run transparently.</p>
+<p>---</p>
+<h2>First-Time Setup</h2>
+<p>Waydroid is pre-installed but needs one-time initialisation to download the Android image:</p>
+<pre><code class="language-bash">sudo waydroid init</code></pre>
+<p>This downloads the Android 11 image (around 800 MB), configures the container, and sets up the <code>@waydroid</code> subvolume. The <code>binder</code> kernel module and firewall rules are already configured in Shani OS, so the process is fully automated.</p>
+<p>After initialisation completes:</p>
+<pre><code class="language-bash"># Start the Waydroid session
+waydroid session start
+
+# Launch the full Android UI
+waydroid show-full-ui</code></pre>
+<p>The Android home screen appears in a window. On first launch, it takes 30–60 seconds for the Android environment to fully start.</p>
+<p>---</p>
+<h2>Running Apps</h2>
+<p>Waydroid supports two display modes:</p>
+<p><strong>Full UI mode</strong> opens the complete Android home screen in a window. You navigate it exactly like an Android tablet.</p>
+<p><strong>App mode</strong> launches a specific Android app directly as a standalone window on your Linux desktop, without showing the Android home screen. Installed Android apps appear in your Linux app launcher automatically and can be launched in app mode.</p>
+<pre><code class="language-bash"># Launch the full Android environment
+waydroid show-full-ui
+
+# Install an APK
+waydroid app install /path/to/app.apk
+
+# Launch a specific installed app by package name
+waydroid app launch com.example.app
+
+# List installed Android apps
+waydroid app list</code></pre>
+<p>---</p>
+<h2>Google Play Store and GApps</h2>
+<p>The default Waydroid image is AOSP without Google services. For apps that require the Play Store or Google Play Services, you need to install GApps (Google Apps). The recommended method on Shani OS:</p>
+<pre><code class="language-bash"># Install the Waydroid script tool
+pip install waydroid-script --break-system-packages
+
+# Install GApps (MindTheGapps is the most compatible option)
+sudo waydroid-script install gapps
+
+# After installation, restart Waydroid
+waydroid session stop
+waydroid session start</code></pre>
+<p>After GApps installation, open the Waydroid full UI, open the Play Store, and sign in with your Google account. Once signed in, the Play Store works identically to a physical Android device.</p>
+<p><strong>Important:</strong> Google's device certification requirement means you need to register your Waydroid device ID with Google before the Play Store allows app downloads. After signing in:</p>
+<ol>
+<li>Open a browser inside Waydroid and navigate to <code>google.com/android/uncertified</code></li>
+<li>Enter the Android ID from <code>adb shell settings get secure android_id</code></li>
+<li>Wait 10–15 minutes, then retry the Play Store</li>
+</ol>
+<p>---</p>
+<h2>ARM App Compatibility</h2>
+<p>Most Android apps in the Play Store are compiled for ARM processors, not x86. Waydroid handles this transparently via <code>libhoudini</code>, Intel's ARM-to-x86 binary translation layer, which is included in the <code>waydroid init</code> setup.</p>
+<p>Apps that work without issues under translation: most social media apps, streaming apps, productivity tools, casual games, and the vast majority of the Play Store catalogue.</p>
+<p>Apps that may have issues: apps with native ARM libraries that do heavy compute work (some games, augmented reality apps), apps that detect and block binary translation (usually DRM-heavy games).</p>
+<p>For x86-native Android apps, Waydroid runs them directly without any translation overhead.</p>
+<p>---</p>
+<h2>Performance Tuning</h2>
+<p><strong>GPU acceleration</strong> is enabled by default on Intel and AMD GPUs. Verify it is working:</p>
+<pre><code class="language-bash"># Check GPU info inside the Android container
+adb shell dumpsys SurfaceFlinger | grep &quot;GLES&quot;
+# Should show your actual GPU, not a software renderer</code></pre>
+<p>On NVIDIA GPUs, hardware acceleration requires additional configuration. See <a href="https://docs.shani.dev/doc/software/waydroid">docs.shani.dev — Waydroid NVIDIA</a> for the specific steps.</p>
+<p><strong>Resolution and DPI:</strong> If Android apps look too large or too small:</p>
+<pre><code class="language-bash"># Set display density (default is 96 for a 1080p display)
+waydroid prop set persist.waydroid.width 1920
+waydroid prop set persist.waydroid.height 1080
+waydroid prop set persist.waydroid.dpi 240
+waydroid session stop &amp;&amp; waydroid session start</code></pre>
+<p><strong>Multi-touch and input:</strong> Touch events from a touchscreen, stylus events, and gamepad input all pass through to the Android environment. For devices without a touchscreen, mouse input is translated to touch events.</p>
+<p>---</p>
+<h2>File Sharing Between Shani OS and Android</h2>
+<p>Waydroid exposes a shared folder at <code>~/waydroid/data/media/0/</code> on the host. Files placed here appear in Android's file manager. Files saved by Android apps to shared storage appear in this directory on the host.</p>
+<pre><code class="language-bash"># Copy a file into Android's storage
+cp ~/Downloads/file.pdf ~/waydroid/data/media/0/Documents/
+
+# Access files Android apps saved
+ls ~/waydroid/data/media/0/Download/</code></pre>
+<p>You can also use <code>adb</code> for file transfer and debugging:</p>
+<pre><code class="language-bash"># Connect adb to Waydroid (get the IP first)
+adb connect $(waydroid status | grep IP | awk '{print $NF}')
+
+# Push a file
+adb push file.pdf /sdcard/Documents/
+
+# Pull a file
+adb pull /sdcard/Download/app-output.txt ~/Downloads/
+
+# Open a shell inside Android
+adb shell</code></pre>
+<p>---</p>
+<h2>Managing the Android Environment</h2>
+<pre><code class="language-bash"># Check Waydroid status
+waydroid status
+
+# Stop the Waydroid session
+waydroid session stop
+
+# Check the Waydroid service
+systemctl status waydroid-container.service
+
+# View Waydroid logs
+journalctl -u waydroid-container.service -f
+
+# Restart from scratch (keeps your apps and data)
+waydroid session stop
+waydroid session start</code></pre>
+<p>The Android environment persists in the <code>@waydroid</code> Btrfs subvolume. Even after an OS update or rollback, your installed apps, account logins, and app data are intact.</p>
+<p>To fully reset Waydroid (wipes all Android apps and data):</p>
+<pre><code class="language-bash">sudo waydroid init -f</code></pre>
+<p>---</p>
+<h2>Use Cases on Shani OS</h2>
+<p><strong>Indian apps that have no Linux equivalent.</strong> BHIM, PhonePe, Paytm, DigiLocker, IRCTC, and many government apps are Android-only. Waydroid lets you run them natively on your Shani OS desktop without a separate phone.</p>
+<p><strong>Streaming apps with DRM.</strong> Netflix, Disney+, and Amazon Prime Video work in Waydroid with Widevine DRM support (included in GApps), enabling HD playback that some Linux browsers cannot achieve.</p>
+<p><strong>Android development testing.</strong> Run your APK directly in Waydroid alongside your development tools on the host. Use <code>adb</code> for device communication exactly as you would with a physical device.</p>
+<p><strong>Games.</strong> Casual and mid-tier Android games run well under Waydroid with hardware acceleration. For ARM-heavy 3D games, performance depends on how well <code>libhoudini</code> translates the specific game's native libraries.</p>
+<p>---</p>
+<h2>Troubleshooting</h2>
+<p><strong>Waydroid session fails to start:</strong></p>
+<pre><code class="language-bash"># Check the service status
+systemctl status waydroid-container.service
+journalctl -u waydroid-container.service -n 50
+
+# Check binder module
+lsmod | grep binder
+
+# Re-initialise if needed
+sudo waydroid init</code></pre>
+<p><strong>Play Store says device is not certified:</strong> Follow the device registration steps described in the GApps section above. After registering, wait at least 15 minutes before trying the Play Store again.</p>
+<p><strong>Android UI is very slow:</strong> Confirm hardware acceleration is active by checking the GLES output as described in the Performance Tuning section. If using software rendering, check your GPU driver status on the host.</p>
+<p><strong>Apps crash immediately:</strong> Most crashes are ARM translation failures. Check if an x86 version of the app is available in the Play Store (some apps publish both). For essential apps without an x86 build, the Distrobox approach (running a full Android SDK in a container for development) may be more reliable.</p>
+<p>Full troubleshooting guide: <a href="https://docs.shani.dev/doc/software/waydroid">docs.shani.dev — Android (Waydroid)</a>.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions answered</li>
+<li><a href="https://docs.shani.dev/doc/software/waydroid">docs.shani.dev — Android (Waydroid)</a> — full setup and configuration reference</li>
+<li><a href="https://docs.waydro.id">Waydroid documentation</a> — upstream project documentation</li>
+<li><a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a> — full VMs for Windows, Linux, and GPU passthrough</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a> — Waydroid questions and support</li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

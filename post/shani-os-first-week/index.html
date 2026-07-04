@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="A day-by-day walkthrough for new Shani OS users: getting encryption and updates sorted on day one, then systematically setting up email, cloud sync, printing, dev tools, backups, and daily habits through the first week.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Your First Week with Shani OS — From Install to Fully Set Up","description":"A day-by-day walkthrough for new Shani OS users: getting encryption and updates sorted on day one, then systematically setting up email, cloud sync, printing, dev tools, backups, and daily habits through the first week.","url":"https://blog.shani.dev/post/shani-os-first-week","datePublished":"2026-05-12T00:00:00.000Z","dateModified":"2026-05-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Your First Week with Shani OS — From Install to Fully Set Up","description":"A day-by-day walkthrough for new Shani OS users: getting encryption and updates sorted on day one, then systematically setting up email, cloud sync, printing, dev tools, backups, and daily habits through the first week.","url":"https://blog.shani.dev/post/shani-os-first-week","datePublished":"2026-05-12T00:00:00.000Z","dateModified":"2026-05-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,179 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Your First Week with Shani OS — From Install to Fully Set Up</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-12 · 9 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p><code>shani-os-getting-started</code> covers installation and first boot. This guide covers the week after: what to do each day to go from "freshly installed" to "fully set up and comfortable." It is written for general users — not developers, not gamers specifically — though developers will find the Day 4 section useful.</p>
+<p>Most steps are 5–15 minutes. None require the terminal unless you want to use it.</p>
+<p>---</p>
+<h2>Day 1 — The Foundations</h2>
+<h3>Step 1: Secure your encryption (if you enabled LUKS2)</h3>
+<p>If you enabled full-disk encryption during installation (strongly recommended for laptops), run this once:</p>
+<pre><code class="language-bash">sudo gen-efi enroll-tpm2</code></pre>
+<p>This seals your LUKS decryption key into your laptop's TPM2 chip. From now on, the disk unlocks automatically when you boot on your own machine — no passphrase prompt on every startup. Your passphrase remains valid as a backup.</p>
+<p>If the command completes without errors, reboot and confirm the disk unlocks silently.</p>
+<p>If you didn't enable encryption during install and want it: reinstall with the encryption checkbox ticked. There is no safe in-place conversion path. Back up your files first with <code>restic</code> or <code>rclone</code> (both are pre-installed).</p>
+<h3>Step 2: Run your first OS update</h3>
+<pre><code class="language-bash">sudo shani-deploy</code></pre>
+<p>This downloads the latest OS image to the inactive slot, verifies it, and stages it for the next reboot. It takes 5–15 minutes depending on your connection. You can keep using the system while it runs. Reboot when convenient.</p>
+<p>After rebooting, <code>shani-update</code> will confirm you're on the new system and ask if everything looks good. If anything seems wrong, <code>sudo shani-deploy -r</code> and a reboot returns you to the previous state in under a minute.</p>
+<h3>Step 3: Add a Nix channel (one-time)</h3>
+<p>Nix is pre-installed but needs one setup command before you can use it:</p>
+<pre><code class="language-bash">nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+nix-channel --update</code></pre>
+<p>After this, <code>nix-env -iA nixpkgs.packagename</code> installs any of 100,000+ CLI tools. You won't need this today unless you want a specific tool — it's there when you need it.</p>
+<h3>Step 4: Check your firmware</h3>
+<pre><code class="language-bash">fwupdmgr refresh &amp;&amp; fwupdmgr update</code></pre>
+<p>This updates your BIOS, Thunderbolt firmware, and storage peripheral firmware. If a firmware update installs, reboot and then re-enroll TPM2 (firmware changes reset the PCR values the TPM uses):</p>
+<pre><code class="language-bash">sudo gen-efi cleanup-tpm2
+sudo gen-efi enroll-tpm2</code></pre>
+<p>---</p>
+<h2>Day 2 — Communication and Cloud</h2>
+<h3>Email</h3>
+<p>Install Thunderbird for a full desktop email client:</p>
+<pre><code class="language-bash">flatpak install flathub org.mozilla.Thunderbird</code></pre>
+<p>Open Thunderbird → Account Settings → Add Mail Account. It auto-configures server settings for Gmail, Outlook, Fastmail, ProtonMail (via Bridge), and most IMAP providers.</p>
+<p>For Microsoft Exchange (corporate email), Thunderbird handles it natively via its EWS support, or install GNOME Evolution which has built-in Exchange:</p>
+<pre><code class="language-bash">flatpak install flathub org.gnome.Evolution</code></pre>
+<h3>Cloud Storage</h3>
+<p><strong>GNOME Online Accounts</strong> (Settings → Online Accounts) integrates Google Drive, Nextcloud, and Microsoft 365 directly into your file manager with no extra app:</p>
+<ul>
+<li>Add your Google account → Google Drive appears in Nautilus file manager</li>
+<li>Add a Nextcloud account → files sync automatically via the Nextcloud client</li>
+</ul>
+<p>For Nextcloud with full sync:</p>
+<pre><code class="language-bash">flatpak install flathub com.nextcloud.desktopclient.nextcloud</code></pre>
+<p>For Dropbox:</p>
+<pre><code class="language-bash">flatpak install flathub com.dropbox.Client</code></pre>
+<h3>Calendar and Contacts</h3>
+<p><strong>GNOME Calendar</strong> is pre-installed. Connect it to your Google Calendar or Nextcloud via GNOME Online Accounts (Settings → Online Accounts → add your account → enable Calendar).</p>
+<p>For a task manager that syncs with Google Tasks or Nextcloud:</p>
+<pre><code class="language-bash">flatpak install flathub org.gnome.Tasks</code></pre>
+<p>---</p>
+<h2>Day 3 — Peripherals and Phone</h2>
+<h3>Set Up Your Printer</h3>
+<p>Most modern printers (post-2016, Wi-Fi or USB) work automatically. Open Settings → Printers. Your printer should appear. If it doesn't:</p>
+<ol>
+<li>For HP printers: run <code>hp-setup</code> in a terminal</li>
+<li>For Epson/Brother/Canon: check Settings → Printers → Add → your model should be in the list</li>
+<li>Full guide: <a href="https://blog.shani.dev/post/shani-os-printing-and-scanning">Printing and Scanning on Shani OS</a></li>
+</ol>
+<h3>Pair Your Bluetooth Devices</h3>
+<p>GNOME: Settings → Bluetooth → put your device in pairing mode → click it.</p>
+<p>KDE: System tray Bluetooth icon → pair.</p>
+<p>Bluetooth headphones, keyboards, mice, speakers, and gaming controllers all work at first boot. Paired devices persist across every OS update and rollback — pair once, stay paired.</p>
+<h3>Connect Your Phone (KDE Connect / GSConnect)</h3>
+<p>For Android users: install the <strong>KDE Connect</strong> app from the Play Store. Both phone and laptop need to be on the same Wi-Fi network.</p>
+<ul>
+<li><strong>GNOME edition:</strong> Open Extension Manager (pre-installed) → enable GSConnect → the phone icon appears in your top bar</li>
+<li><strong>KDE Plasma edition:</strong> KDE Connect is already in the system tray</li>
+</ul>
+<p>Accept the pairing request on your phone. From then on: phone notifications appear on your desktop, clipboard syncs both ways, you can send files between phone and desktop, and your phone battery level shows in the status bar.</p>
+<p>Guide: <a href="https://blog.shani.dev/post/shani-os-kde-connect">KDE Connect and GSConnect on Shani OS</a></p>
+<h3>Set Your Language and Input Method</h3>
+<p>If you need to type in an Indian language: Settings → Keyboard → Input Sources → click <code>+</code> → Other → select your language (Hindi, Tamil, Telugu, etc.) → choose Phonetic or InScript layout.</p>
+<p>Switch between English and your language with <code>Super+Space</code>.</p>
+<p>Guide: <a href="https://blog.shani.dev/post/shani-os-indian-language-support">Indian Language Support on Shani OS</a></p>
+<p>---</p>
+<h2>Day 4 — Apps and Software</h2>
+<p>By now the system is set up. Day 4 is about installing the software you actually use.</p>
+<h3>Install Apps via Flatpak (GUI method)</h3>
+<p>Open <strong>Warehouse</strong> (pre-installed) → it shows everything installed and lets you browse Flathub. Or use GNOME Software / KDE Discover — both are pre-configured with Flathub.</p>
+<p>Common installs:</p>
+<pre><code class="language-bash">flatpak install flathub org.mozilla.firefox          # Firefox
+flatpak install flathub com.spotify.Client           # Spotify
+flatpak install flathub org.telegram.desktop         # Telegram
+flatpak install flathub org.signal.Signal            # Signal
+flatpak install flathub com.bitwarden.desktop        # Bitwarden (password manager)
+flatpak install flathub md.obsidian.Obsidian         # Obsidian (notes)
+flatpak install flathub org.gimp.GIMP                # GIMP (image editing)
+flatpak install flathub us.zoom.Zoom                 # Zoom</code></pre>
+<h3>For Developers</h3>
+<p>Set up a Distrobox container for your main development work:</p>
+<pre><code class="language-bash"># Arch Linux (for AUR access)
+distrobox create --name dev --image archlinux:latest
+distrobox enter dev
+
+# Or Ubuntu (for apt and PPAs)
+distrobox create --name ubuntu-dev --image ubuntu:24.04
+distrobox enter ubuntu-dev</code></pre>
+<p>Your home directory (<code>~/projects</code>, etc.) is the same inside and outside the container.</p>
+<p>Then install your language runtime via Nix (outside any container):</p>
+<pre><code class="language-bash">nix-env -iA nixpkgs.nodejs_22    # Node.js
+nix-env -iA nixpkgs.rustup       # Rust
+nix-env -iA nixpkgs.python312    # Python
+nix-env -iA nixpkgs.go           # Go</code></pre>
+<p>Guide: <a href="https://blog.shani.dev/post/nix-on-shani-os">Nix on Shani OS</a></p>
+<h3>AppImages</h3>
+<p>For apps that are only available as AppImages (some creative tools, nightly builds): download the <code>.AppImage</code> file, open <strong>Gear Lever</strong> (pre-installed), and drag the file in. It integrates the app into your launcher and tracks updates automatically.</p>
+<p>---</p>
+<h2>Day 5 — Backups</h2>
+<p>The OS backs itself up via atomic snapshots — you can always roll back the OS. But your files in <code>@home</code> need their own backup. Set this up now, before you forget.</p>
+<h3>Quick Local Backup with restic</h3>
+<p><code>restic</code> is pre-installed. Set it up against an external drive or cloud storage:</p>
+<pre><code class="language-bash"># External drive backup
+restic -r /media/yourname/backup/restic init
+restic -r /media/yourname/backup/restic backup ~/Documents ~/Pictures ~/Projects
+
+# Verify it worked
+restic -r /media/yourname/backup/restic snapshots
+restic -r /media/yourname/backup/restic check</code></pre>
+<p>For cloud backups (S3, Backblaze B2, SFTP):</p>
+<pre><code class="language-bash">restic -r s3:s3.amazonaws.com/your-bucket init
+restic -r s3:s3.amazonaws.com/your-bucket backup ~/Documents ~/Pictures</code></pre>
+<p>Store the password in <code>~/.config/restic-password</code> (mode 600).</p>
+<h3>Automate It</h3>
+<pre><code class="language-bash">crontab -e
+# Add: 0 2 * * * restic -r /media/backup/restic --password-file ~/.config/restic-password backup ~/Documents ~/Pictures ~/Projects</code></pre>
+<p>Guide: <a href="https://blog.shani.dev/post/shani-os-btrfs-snapshots-and-backup">Btrfs Snapshots and Backup on Shani OS</a></p>
+<p>---</p>
+<h2>Day 6 — Shell and Terminal</h2>
+<p>If you use the terminal at all, spend 15 minutes learning what's already set up.</p>
+<p><strong>McFly</strong> replaces <code>Ctrl+R</code> for command history — it's context-aware and learns from your usage. Press <code>Ctrl+R</code> and start typing any fragment of a command you've run before.</p>
+<p><strong>FZF</strong> is bound to <code>Ctrl+T</code> (insert file path fuzzy search) and <code>Alt+C</code> (fuzzy cd). Try <code>Alt+C</code> and type part of any directory name.</p>
+<p><strong>bat</strong> replaces <code>cat</code> with syntax highlighting: <code>bat file.py</code></p>
+<p><strong>eza</strong> replaces <code>ls</code>: <code>eza -la --git</code> shows a directory listing with git status per file</p>
+<p><strong>Starship prompt</strong> shows your git branch and status as you navigate project directories.</p>
+<p>The shell is Zsh by default, configured with syntax highlighting (commands turn green when valid) and autosuggestions (press right arrow to accept a suggestion from history).</p>
+<p>Guide: <a href="https://blog.shani.dev/post/shani-os-shell-and-terminal">The Shell Experience on Shani OS</a></p>
+<p>---</p>
+<h2>Day 7 — Know Your System</h2>
+<p>By the end of your first week, it's worth spending a few minutes understanding the configuration you've made and how to check on things.</p>
+<h3>See What You've Customised</h3>
+<pre><code class="language-bash"># What /etc files have you changed from OS defaults?
+find /data/overlay/etc/upper/ -type f | sort
+
+# What services have you enabled?
+systemctl list-unit-files --state=enabled | grep -v &quot;systemd\|dbus\|getty&quot;</code></pre>
+<h3>Check System Health</h3>
+<pre><code class="language-bash">shani-health</code></pre>
+<p>This shows slot state, storage usage, service health, and filesystem status in one place.</p>
+<h3>Know How Updates Work</h3>
+<p><code>shani-update</code> runs automatically. When a new OS image is available, a notification appears. You apply it with <code>sudo shani-deploy</code>, reboot when ready, and if anything is wrong, <code>sudo shani-deploy -r</code> undoes it.</p>
+<p>Your apps (Flatpak, Nix, containers) update independently on their own schedules and are never affected by OS updates.</p>
+<h3>Keep a Note of Your Setup</h3>
+<p>Write down which Flatpak apps you installed, any Nix packages, and any Distrobox containers you created. If you ever reinstall, this list gets you back to a working setup in 30 minutes. Your actual files in <code>@home</code> always survive, but knowing what tools you had is useful.</p>
+<p>---</p>
+<h2>What's Next</h2>
+<p>Once you're comfortable with daily use, these guides go deeper on specific areas:</p>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-for-general-desktop-users">Shani OS for General Desktop Users</a> — full productivity stack coverage</li>
+<li><a href="https://blog.shani.dev/post/distrobox-on-shani-os">Distrobox on Shani OS</a> — full mutable Linux environments</li>
+<li><a href="https://blog.shani.dev/post/nix-on-shani-os">Nix on Shani OS</a> — developer toolchain management</li>
+<li><a href="https://blog.shani.dev/post/shani-os-security-deep-dive">Security Without Configuration</a> — understanding the security model</li>
+<li><a href="https://blog.shani.dev/post/shani-os-system-configuration">System Configuration on Shani OS</a> — /etc, services, what persists</li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="KDE Connect (KDE edition) and GSConnect (GNOME edition) link your Android phone to your Shani OS desktop — notifications mirrored, files shared, clipboard synced, remote input, SMS from desktop, and media control. Firewall rules are pre-configured.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"KDE Connect and GSConnect on Shani OS — Your Phone and Desktop, Together","description":"KDE Connect (KDE edition) and GSConnect (GNOME edition) link your Android phone to your Shani OS desktop — notifications mirrored, files shared, clipboard synced, remote input, SMS from desktop, and media control. Firewall rules are pre-configured.","url":"https://blog.shani.dev/post/shani-os-kde-connect","datePublished":"2026-05-04T00:00:00.000Z","dateModified":"2026-05-04T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"KDE Connect and GSConnect on Shani OS — Your Phone and Desktop, Together","description":"KDE Connect (KDE edition) and GSConnect (GNOME edition) link your Android phone to your Shani OS desktop — notifications mirrored, files shared, clipboard synced, remote input, SMS from desktop, and media control. Firewall rules are pre-configured.","url":"https://blog.shani.dev/post/shani-os-kde-connect","datePublished":"2026-05-04T00:00:00.000Z","dateModified":"2026-05-04T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,120 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">KDE Connect and GSConnect on Shani OS — Your Phone and Desktop, Together</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-04 · 6 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>KDE Connect is one of the most useful integrations available on Linux — it connects your Android phone to your desktop over your local Wi-Fi network, enabling a tight integration that rivals what you get with Apple's Handoff or Samsung's Link to Windows.</p>
+<p>On Shani OS, the firewall rules required for KDE Connect are pre-configured at installation — ports 1714–1764 are open in the public zone. You never need to manually configure the firewall.</p>
+<p><strong>KDE Plasma edition:</strong> KDE Connect is pre-installed. Open it from the system tray or System Settings → KDE Connect.</p>
+<p><strong>GNOME edition:</strong> GSConnect (a GNOME Shell extension that implements the KDE Connect protocol) is pre-installed as a GNOME Shell extension. Enable it in Extension Manager (pre-installed) and it appears in the top bar.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/networking/kdeconnect">docs.shani.dev — KDE Connect</a>.</p>
+<p>---</p>
+<h2>Setting Up</h2>
+<h3>On Your Phone</h3>
+<p>Install the <strong>KDE Connect</strong> app from:</p>
+<ul>
+<li><a href="https://play.google.com/store/apps/details?id=org.kde.kdeconnect_tp">Google Play Store</a></li>
+<li><a href="https://f-droid.org/packages/org.kde.kdeconnect_tp/">F-Droid</a></li>
+</ul>
+<p>Both phone and desktop must be on the <strong>same Wi-Fi network</strong>.</p>
+<h3>On KDE Plasma</h3>
+<ol>
+<li>Open KDE Connect from the system tray (phone icon) or System Settings</li>
+<li>Your phone should appear in the device list automatically</li>
+<li>Click the phone name → "Pair"</li>
+<li>Accept the pairing request on your phone</li>
+</ol>
+<h3>On GNOME (GSConnect)</h3>
+<ol>
+<li>Open Extension Manager → enable GSConnect</li>
+<li>A new icon appears in the top bar</li>
+<li>Click it → your phone appears → click "Pair"</li>
+<li>Accept on your phone</li>
+</ol>
+<p>---</p>
+<h2>Features</h2>
+<h3>Notification Mirroring</h3>
+<p>Phone notifications appear on your desktop as standard desktop notifications. Reply to messages directly from the desktop notification popup (for supported apps like WhatsApp, Messages, Gmail).</p>
+<h3>Shared Clipboard</h3>
+<p>Copy something on your phone → paste it on your desktop. Copy on desktop → paste on phone. The clipboard syncs automatically in both directions.</p>
+<h3>File Sharing</h3>
+<pre><code>From desktop to phone:
+- Right-click any file in Nautilus/Dolphin → &quot;Send to Phone via KDE Connect&quot;
+- Or drag files into the KDE Connect device panel
+
+From phone to desktop:
+- Use the &quot;Share&quot; option on Android → KDE Connect
+- Files arrive in ~/Downloads on desktop</code></pre>
+<h3>Remote Input</h3>
+<p>Use your phone as a touchpad or keyboard for your desktop — useful when your desktop is connected to a TV or when you want to control media from across the room.</p>
+<h3>SMS / Messages from Desktop</h3>
+<p>Read and reply to SMS messages from your desktop keyboard. Supports most Android SMS apps.</p>
+<h3>Media Control</h3>
+<p>Control media playback on your desktop from your phone — pause, skip, adjust volume. Also works in reverse: control phone audio from the desktop.</p>
+<h3>Run Commands</h3>
+<p>Configure custom commands on your desktop that can be triggered from your phone. For example: lock the screen, run a script, open a specific application.</p>
+<pre><code>KDE Connect → Device settings → Run Commands → Add Command
+Name: Lock Screen
+Command: loginctl lock-session</code></pre>
+<h3>Remote Filesystem Access</h3>
+<p>Browse your phone's storage from the desktop file manager. On KDE, the phone appears as a location in Dolphin. On GNOME, it mounts via GSConnect.</p>
+<h3>Battery Level</h3>
+<p>See your phone's battery percentage in the desktop status bar.</p>
+<p>---</p>
+<h2>Troubleshooting</h2>
+<h3>Phone Not Appearing</h3>
+<p>Both devices must be on the same Wi-Fi network. Check that:</p>
+<pre><code class="language-bash"># Verify the firewall rules are in place
+sudo firewall-cmd --list-all | grep 1714
+
+# If missing (should not be needed on Shani OS, but just in case):
+sudo firewall-cmd --permanent --add-port=1714-1764/tcp
+sudo firewall-cmd --permanent --add-port=1714-1764/udp
+sudo firewall-cmd --reload</code></pre>
+<p>Also check the KDE Connect app on your phone is not blocked by Android's battery optimisation. In Android Settings → Battery → KDE Connect → "Don't optimise."</p>
+<h3>Pairing Fails</h3>
+<pre><code class="language-bash"># Restart KDE Connect daemon
+systemctl --user restart kdeconnectd    # KDE
+# or
+systemctl --user restart gsconnect      # GNOME
+
+# Check daemon status
+systemctl --user status kdeconnectd
+journalctl --user -u kdeconnectd -n 30</code></pre>
+<h3>Connection Drops Frequently</h3>
+<p>Android may kill the KDE Connect background process to save battery. Disable battery optimisation for the KDE Connect app:</p>
+<p>Android Settings → Apps → KDE Connect → Battery → Unrestricted</p>
+<p>---</p>
+<h2>KDE Connect via Tailscale (Remote Access)</h2>
+<p>KDE Connect normally requires the same local Wi-Fi network. With Tailscale (pre-installed on Shani OS), you can use KDE Connect over the internet when you are away from home:</p>
+<pre><code class="language-bash"># On Shani OS desktop: start Tailscale
+sudo tailscale up
+
+# On your phone: install the Tailscale app and join your tailnet
+
+# Add your phone's Tailscale IP to KDE Connect manually
+# KDE Connect → Add Device → enter Tailscale IP</code></pre>
+<p>Full Tailscale guide: <a href="https://blog.shani.dev/post/shani-os-networking-guide">Networking on Shani OS</a>.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://docs.shani.dev/doc/networking/kdeconnect">docs.shani.dev — KDE Connect</a> — full reference</li>
+<li><a href="https://kdeconnect.kde.org">kdeconnect.kde.org</a> — official documentation</li>
+<li><a href="https://blog.shani.dev/post/shani-os-networking-guide">Networking on Shani OS</a> — Tailscale for remote access</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

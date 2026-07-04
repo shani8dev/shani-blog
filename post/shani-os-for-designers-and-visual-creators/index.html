@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="A complete guide for photographers, illustrators, UI/UX designers, 3D artists, and visual creators on Shani OS — GIMP, Inkscape, Krita, Blender, Darktable, RawTherapee, Figma via browser, colour management, display calibration, and tablet support. Everything works at first boot.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS for Designers and Visual Creators — Photo Editing, Vector, UI Design, and 3D","description":"A complete guide for photographers, illustrators, UI/UX designers, 3D artists, and visual creators on Shani OS — GIMP, Inkscape, Krita, Blender, Darktable, RawTherapee, Figma via browser, colour management, display calibration, and tablet support. Everything works at first boot.","url":"https://blog.shani.dev/post/shani-os-for-designers-and-visual-creators","datePublished":"2026-05-10T00:00:00.000Z","dateModified":"2026-05-10T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS for Designers and Visual Creators — Photo Editing, Vector, UI Design, and 3D","description":"A complete guide for photographers, illustrators, UI/UX designers, 3D artists, and visual creators on Shani OS — GIMP, Inkscape, Krita, Blender, Darktable, RawTherapee, Figma via browser, colour management, display calibration, and tablet support. Everything works at first boot.","url":"https://blog.shani.dev/post/shani-os-for-designers-and-visual-creators","datePublished":"2026-05-10T00:00:00.000Z","dateModified":"2026-05-10T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,258 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Shani OS for Designers and Visual Creators — Photo Editing, Vector, UI Design, and 3D</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-10 · 10 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Shani OS runs an excellent creative workstation. The Linux creative software ecosystem has matured significantly — Blender is industry-standard, Krita is used by professional illustrators, Darktable handles RAW processing that rivals Lightroom, and Inkscape covers most vector design workflows. For tools that only exist on macOS or Windows (Figma natively, Affinity suite, Adobe CC), the practical paths are covered here too.</p>
+<p>This guide covers the full creative stack: raster editing, vector illustration, RAW photography, UI/UX design, 3D, and display/colour management. GPU acceleration works on all vendors via OpenCL or CUDA inside Distrobox containers where needed. Graphics tablets are supported out of the box.</p>
+<p>Full reference: <a href="https://docs.shani.dev">docs.shani.dev</a>.</p>
+<p>---</p>
+<h2>Raster Editing — GIMP</h2>
+<p>GIMP is the primary open-source raster image editor. The Flatpak version on Flathub is always the most current:</p>
+<pre><code class="language-bash">flatpak install flathub org.gimp.GIMP</code></pre>
+<p>GIMP supports layers, masks, non-destructive adjustments via GEGL, scripting via Script-Fu and Python-Fu, and a plugin ecosystem. For Photoshop-like layout, the <strong>PhotoGIMP</strong> patch reorganises the interface and keybindings to match Photoshop muscle memory.</p>
+<h3>Useful GIMP Plugins and Extensions</h3>
+<pre><code class="language-bash"># G'MIC — hundreds of image processing filters
+flatpak install flathub org.gimp.GIMP.Plugin.GMic
+
+# Resynthesizer — content-aware fill (similar to Photoshop's Heal Selection)
+# Install via GIMP's Script-Fu console or plugin manager
+
+# BIMP — batch image processing
+# Available via GIMP Plugin Registry or compiled from source</code></pre>
+<p>For <strong>Photoshop</strong> users: GIMP covers most photo editing, compositing, and retouching workflows. The tools that genuinely require Photoshop (Camera Raw with full lens profiles, Generative Fill, some 3D workflows) have alternatives — Darktable for RAW, GIMP's Heal for retouching. If your work is production-critical and Photoshop-specific, see the Windows Apps section for running Photoshop via Bottles/Wine or in a Windows VM.</p>
+<p>---</p>
+<h2>Photography and RAW Processing</h2>
+<h3>Darktable</h3>
+<p>Darktable is a non-destructive RAW processor and digital darkroom. It supports virtually every camera RAW format via LibRaw, including recent Sony, Canon, Nikon, and Fujifilm bodies. Its processing pipeline uses floating-point colour science comparable to what serious photographers need.</p>
+<pre><code class="language-bash">flatpak install flathub org.darktable.Darktable</code></pre>
+<p>Key Darktable features for serious photographers:</p>
+<ul>
+<li>Scene-referred colour pipeline with exposure and colour balance modules</li>
+<li>Tone equaliser, filmic RGB, and sigmoid tone curves</li>
+<li>Lens correction via lensfun database</li>
+<li>Noise reduction (non-local means, wavelets)</li>
+<li>Colour calibration with built-in colour checker workflow</li>
+<li>Tethered shooting via gPhoto2 (most DSLRs and mirrorless cameras)</li>
+<li>Export to TIFF, JPEG, WebP, and AVIF</li>
+</ul>
+<h3>RawTherapee</h3>
+<p>RawTherapee is an alternative RAW processor with a different approach to tone curves and colour management. Some photographers prefer its handling of highlights and shadows.</p>
+<pre><code class="language-bash">flatpak install flathub com.rawtherapee.RawTherapee</code></pre>
+<h3>digiKam</h3>
+<p>For managing large photo libraries with metadata, face recognition, geotagging, and organisation:</p>
+<pre><code class="language-bash">flatpak install flathub org.kde.digikam</code></pre>
+<p>digiKam integrates with Darktable and RawTherapee for editing and provides a full photo asset management workflow.</p>
+<h3>Tethered Shooting</h3>
+<p>Most DSLRs and mirrorless cameras work tethered over USB via gPhoto2, which is pre-installed on Shani OS:</p>
+<pre><code class="language-bash"># List connected cameras
+gphoto2 --list-cameras | grep -i &quot;your camera model&quot;
+
+# Check what's connected
+gphoto2 --auto-detect
+
+# Capture to disk
+gphoto2 --capture-image-and-download
+
+# Continuous tethered shooting
+gphoto2 --capture-tethered</code></pre>
+<p>Darktable also supports tethered shooting natively — connect your camera, open Darktable, and use the tethering view.</p>
+<p>---</p>
+<h2>Vector Illustration — Inkscape</h2>
+<p>Inkscape is the mature open-source vector illustration application. It handles SVG natively and exports to PDF, PNG, EPS, and DXF. The Flatpak is the recommended install:</p>
+<pre><code class="language-bash">flatpak install flathub org.inkscape.Inkscape</code></pre>
+<p>Inkscape covers logo design, icon creation, technical illustration, and print-ready artwork. The Inkscape 1.x releases significantly improved performance, typography handling, and the overall interface.</p>
+<p>For <strong>Illustrator</strong> users: Inkscape opens AI files (via PDF compatibility layer) and handles most Illustrator workflows. Complex brush strokes and some effects may not transfer perfectly. For production work that requires precise Illustrator compatibility, Affinity Designer via Wine (see below) or a Windows VM is the most reliable path.</p>
+<p>---</p>
+<h2>Digital Painting and Illustration — Krita</h2>
+<p>Krita is purpose-built for digital painting and illustration. It is used by professional concept artists and illustrators and ships with one of the best brush engines available on any platform.</p>
+<pre><code class="language-bash">flatpak install flathub org.kde.krita</code></pre>
+<p>Krita features:</p>
+<ul>
+<li>Advanced brush engine with stabilisers, lazy mouse, and texture brushes</li>
+<li>HDR painting support</li>
+<li>Non-destructive layers with blend modes</li>
+<li>Vector layers alongside raster layers</li>
+<li>Animation support (frame-by-frame and tweening)</li>
+<li>Python scripting API</li>
+<li>Built-in colour management via LittleCMS</li>
+</ul>
+<p>For digital artists: Krita is the right choice over GIMP for illustration and concept art. GIMP is better for photo editing and compositing; Krita is better for painting from scratch.</p>
+<p>---</p>
+<h2>UI/UX Design</h2>
+<h3>Figma — Browser</h3>
+<p>Figma works fully in Vivaldi or Firefox via browser — no native app required. Performance in the browser is identical to the native Electron app. Use Figma at <code>figma.com</code> in your browser.</p>
+<p>For offline work or plugin-heavy workflows, the Figma Linux desktop app can be installed as an AppImage or via a community-maintained Flatpak:</p>
+<pre><code class="language-bash"># Figma via AppImage (manage with Gear Lever, pre-installed)
+# Download from figma.com/downloads or community builds
+
+# Or via unofficial Flatpak
+flatpak install flathub io.github.Figma_Linux.figma_linux</code></pre>
+<h3>Penpot — Open Source Figma Alternative</h3>
+<p>Penpot is an open-source design tool that closely mirrors Figma's interface and workflow. It runs as a web application:</p>
+<pre><code class="language-bash"># Self-hosted Penpot via Podman (pre-installed)
+podman run -d --name penpot \
+  -p 3449:3449 \
+  penpotapp/frontend:latest
+
+# Or use the hosted version at penpot.app (free account available)</code></pre>
+<h3>GNOME Builder / Cambalache for GTK App Design</h3>
+<p>For designing GNOME/GTK application interfaces:</p>
+<pre><code class="language-bash"># Cambalache — GTK UI designer
+flatpak install flathub ar.xjuan.Cambalache
+
+# GNOME Builder — full IDE with UI design
+flatpak install flathub org.gnome.Builder</code></pre>
+<p>---</p>
+<h2>3D Modelling and Animation — Blender</h2>
+<p>Blender is pre-installed on neither edition but is the obvious first install for 3D work:</p>
+<pre><code class="language-bash">flatpak install flathub org.blender.Blender</code></pre>
+<p>Blender on Shani OS benefits from GPU acceleration. For NVIDIA, Cycles render uses CUDA via the CUDA Distrobox container (set up CUDA as described in <a href="https://blog.shani.dev/post/gpu-compute-on-shani-os">GPU Compute on Shani OS</a>). For AMD, Cycles uses HIP/ROCm. For CPU-only rendering, no additional setup is needed.</p>
+<pre><code class="language-bash"># NVIDIA CUDA rendering with Blender:
+# 1. Set up CUDA container: distrobox create --name cuda-dev --image nvidia/cuda:12.3.0-devel-ubuntu22.04
+# 2. Run Blender from inside the CUDA container
+# OR set CYCLES_CUDA in the Flatpak override
+
+# AMD ROCm rendering:
+# Edit → Preferences → System → Cycles Render Devices → HIP
+# Select your AMD GPU</code></pre>
+<p>For heavy rendering workloads, running Blender inside the ROCm or CUDA Distrobox container gives access to the full compute stack. See <a href="https://blog.shani.dev/post/gpu-compute-on-shani-os">GPU Compute on Shani OS</a> for the full container setup.</p>
+<p>---</p>
+<h2>Colour Management and Display Calibration</h2>
+<p>Colour accuracy matters for photography, design, and print work. Shani OS uses colord for system-wide colour management — it is pre-installed and active.</p>
+<h3>Checking Colour Profiles</h3>
+<pre><code class="language-bash"># List installed ICC profiles
+colormgr get-profiles
+
+# Check currently assigned profiles per display
+colormgr get-devices
+
+# Assign an ICC profile to a display
+colormgr device-add-profile &quot;xrandr-display-name&quot; &quot;/path/to/profile.icc&quot;</code></pre>
+<h3>Display Calibration with DisplayCAL</h3>
+<p>DisplayCAL is the standard open-source calibration application. It works with colourimeters (X-Rite i1Display, Datacolor Spyder, etc.):</p>
+<pre><code class="language-bash"># Install DisplayCAL
+flatpak install flathub net.displaycal.DisplayCAL</code></pre>
+<p>DisplayCAL generates ICC profiles that are loaded by colord and applied system-wide — affecting all colour-managed applications (GIMP, Darktable, Inkscape, Krita).</p>
+<h3>Colour-Managed Applications</h3>
+<p>Applications that respect ICC profiles via colord or LittleCMS:</p>
+<ul>
+<li>GIMP — enable in Edit → Preferences → Color Management</li>
+<li>Darktable — full colour management built in; assign your display profile in Preferences</li>
+<li>Krita — Settings → Color Management → assign display profile</li>
+<li>Inkscape — enable in File → Document Properties → Color</li>
+</ul>
+<p>---</p>
+<h2>Graphics Tablet Support</h2>
+<p>Graphics tablets (Wacom, Huion, XP-Pen, Gaomon) are supported out of the box on Shani OS via the <code>libwacom</code> and <code>xf86-input-wacom</code> / <code>libinput</code> stack.</p>
+<pre><code class="language-bash"># Check if your tablet is detected
+libwacom-list-local-tablets
+
+# Detailed tablet info
+libwacom-show-stylus
+
+# Check input devices
+libinput list-devices | grep -A5 -i &quot;wacom\|huion\|xp-pen&quot;</code></pre>
+<h3>Tablet Configuration</h3>
+<p><strong>GNOME:</strong> Settings → Wacom Tablet (appears automatically when a tablet is connected)</p>
+<ul>
+<li>Button mapping</li>
+<li>Pressure curve</li>
+<li>Tablet orientation (portrait/landscape)</li>
+<li>Stylus button assignment</li>
+</ul>
+<p><strong>KDE:</strong> System Settings → Input Devices → Drawing Tablet</p>
+<p><strong>For Huion and XP-Pen tablets</strong> that are not in libwacom's database yet, the <code>OpenTabletDriver</code> project provides broader support:</p>
+<pre><code class="language-bash"># Install OpenTabletDriver via AppImage (managed by Gear Lever)
+# Download from: https://github.com/OpenTabletDriver/OpenTabletDriver/releases</code></pre>
+<p>OpenTabletDriver is userspace-only and supports a much wider range of newer Huion, XP-Pen, and Gaomon tablets.</p>
+<p>---</p>
+<h2>Font Management</h2>
+<p>Designers need good font management. Fonts installed to <code>~/.local/share/fonts/</code> are immediately available to all applications:</p>
+<pre><code class="language-bash"># Install fonts for your user
+mkdir -p ~/.local/share/fonts/
+cp ~/Downloads/*.ttf ~/.local/share/fonts/
+fc-cache -fv ~/.local/share/fonts/
+
+# Search for installed fonts
+fc-list | grep -i &quot;FontName&quot;
+
+# Install Google Fonts (entire library)
+# Clone or download to ~/.local/share/fonts/</code></pre>
+<p><strong>Font Manager</strong> (graphical font manager):</p>
+<pre><code class="language-bash">flatpak install flathub org.gnome.FontManager</code></pre>
+<p>Font Manager lets you browse, preview, install, and organise fonts without touching the terminal.</p>
+<p>---</p>
+<h2>Screen Capture and Asset Export</h2>
+<pre><code class="language-bash"># Screenshot tools
+# GNOME: PrtSc key or gnome-screenshot
+# KDE: Spectacle (pre-installed on KDE)
+
+# Flameshot — annotated screenshots
+flatpak install flathub org.flameshot.Flameshot
+
+# Export at multiple resolutions from Inkscape (SVG → PNG)
+inkscape --export-filename=icon-1x.png --export-width=64 icon.svg
+inkscape --export-filename=icon-2x.png --export-width=128 icon.svg
+inkscape --export-filename=icon-3x.png --export-width=192 icon.svg
+
+# Batch export from Inkscape (scripted)
+for size in 16 32 48 64 128 256; do
+  inkscape --export-filename=&quot;icon-${size}.png&quot; --export-width=$size icon.svg
+done</code></pre>
+<p>---</p>
+<h2>Running Affinity Suite and Adobe CC</h2>
+<h3>Affinity Designer / Photo / Publisher via Bottles</h3>
+<p>Affinity Designer 1.x and Affinity Photo 1.x run well under Wine via Bottles (pre-installed on KDE Plasma, available on Flathub for GNOME):</p>
+<pre><code class="language-bash"># Install Bottles if on GNOME
+flatpak install flathub com.usebottles.bottles</code></pre>
+<p>Inside Bottles, create a new bottle using the "Application" preset and install the Affinity app's Windows installer. Affinity Designer 2.x and Photo 2.x have mixed results — check <a href="https://appdb.winehq.org">WineHQ AppDB</a> and the Bottles community for current compatibility.</p>
+<h3>Adobe Creative Cloud</h3>
+<p>Adobe CC apps do not have official Linux support and do not run reliably under Wine. The realistic options:</p>
+<ul>
+<li><strong>Photoshop alternatives:</strong> GIMP + RawTherapee + Darktable covers most workflows</li>
+<li><strong>Illustrator alternative:</strong> Inkscape + Affinity Designer via Bottles</li>
+<li><strong>Premiere Pro alternative:</strong> Kdenlive, DaVinci Resolve (see the <a href="https://blog.shani.dev/post/shani-os-for-video-creators">Video Creators guide</a>)</li>
+<li><strong>After Effects alternative:</strong> Natron, Kdenlive effects</li>
+<li><strong>If Adobe CC is non-negotiable:</strong> A Windows VM via virt-manager (KDE Plasma, pre-installed) with GPU passthrough gives you a full Windows environment with native Adobe performance</li>
+</ul>
+<p>Guide: <a href="https://blog.shani.dev/post/windows-apps-on-shani-os">Windows Apps on Shani OS</a> · <a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a>.</p>
+<p>---</p>
+<h2>Print Workflow</h2>
+<p>For designers working with print output, colour-accurate proof printing requires ICC profile support in both the application and the printer driver. CUPS on Shani OS supports ICC profiles:</p>
+<pre><code class="language-bash"># Assign an ICC profile to a printer for colour-accurate output
+lpadmin -p &quot;PrinterName&quot; -o ColorModel=RGB -o cupsICCProfile=/path/to/profile.icc
+
+# Soft proofing in GIMP: View → Proof Colors → select printer profile
+# Soft proofing in Darktable: soft-proof module in darkroom</code></pre>
+<p>Guide: <a href="https://blog.shani.dev/post/shani-os-printing-and-scanning">Printing and Scanning on Shani OS</a>.</p>
+<p>---</p>
+<h2>Summary: Creative Stack at a Glance</h2>
+<p>| Workflow | Tool | Install | |---|---|---| | RAW photography | Darktable | <code>flatpak install flathub org.darktable.Darktable</code> | | RAW alternative | RawTherapee | <code>flatpak install flathub com.rawtherapee.RawTherapee</code> | | Photo library | digiKam | <code>flatpak install flathub org.kde.digikam</code> | | Raster editing | GIMP + G'MIC | <code>flatpak install flathub org.gimp.GIMP</code> | | Digital painting | Krita | <code>flatpak install flathub org.kde.krita</code> | | Vector illustration | Inkscape | <code>flatpak install flathub org.inkscape.Inkscape</code> | | UI/UX design | Figma (browser) or Penpot | figma.com or penpot.app | | 3D modelling | Blender | <code>flatpak install flathub org.blender.Blender</code> | | Font management | Font Manager | <code>flatpak install flathub org.gnome.FontManager</code> | | Screenshots | Flameshot | <code>flatpak install flathub org.flameshot.Flameshot</code> | | Display calibration | DisplayCAL | <code>flatpak install flathub net.displaycal.DisplayCAL</code> |</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> — what to use for each type of software</li>
+<li><a href="https://blog.shani.dev/post/gpu-compute-on-shani-os">GPU Compute on Shani OS</a> — GPU acceleration for Blender cycles</li>
+<li><a href="https://blog.shani.dev/post/windows-apps-on-shani-os">Windows Apps on Shani OS</a> — Affinity, Adobe via Wine or VM</li>
+<li><a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a> — full Windows VM for Adobe CC</li>
+<li><a href="https://blog.shani.dev/post/shani-os-printing-and-scanning">Printing and Scanning on Shani OS</a> — colour printing</li>
+<li><a href="https://blog.shani.dev/post/shani-os-for-video-creators">Shani OS for Video Creators</a> — video editing, colour grading, streaming</li>
+<li><a href="https://docs.shani.dev">docs.shani.dev</a> — full reference</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

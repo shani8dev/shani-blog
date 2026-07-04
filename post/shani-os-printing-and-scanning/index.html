@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="How printing and scanning work on Shani OS — driverless IPP-over-USB and network discovery, CUPS configuration, manufacturer-specific drivers for HP, Epson, Brother, Canon, and scanner setup via SANE and sane-airscan.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Printing and Scanning on Shani OS — CUPS, Driverless Printing, and SANE","description":"How printing and scanning work on Shani OS — driverless IPP-over-USB and network discovery, CUPS configuration, manufacturer-specific drivers for HP, Epson, Brother, Canon, and scanner setup via SANE and sane-airscan.","url":"https://blog.shani.dev/post/shani-os-printing-and-scanning","datePublished":"2026-04-24T00:00:00.000Z","dateModified":"2026-04-24T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Printing and Scanning on Shani OS — CUPS, Driverless Printing, and SANE","description":"How printing and scanning work on Shani OS — driverless IPP-over-USB and network discovery, CUPS configuration, manufacturer-specific drivers for HP, Epson, Brother, Canon, and scanner setup via SANE and sane-airscan.","url":"https://blog.shani.dev/post/shani-os-printing-and-scanning","datePublished":"2026-04-24T00:00:00.000Z","dateModified":"2026-04-24T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,196 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Printing and Scanning on Shani OS — CUPS, Driverless Printing, and SANE</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-24 · 6 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Shani OS ships a comprehensive printing and scanning stack that handles most modern hardware without any driver installation. The CUPS print system, <code>ipp-usb</code> for driverless USB printing, <code>sane-airscan</code> for driverless network scanning, and manufacturer-specific drivers for HP, Epson, Brother, and Canon are all pre-installed.</p>
+<p>Printer and scanner configuration persists across every OS update and rollback via bind mounts from <code>@data</code> — you set up your printer once and it stays set up forever.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/troubleshooting">docs.shani.dev — Printing & Scanning</a>.</p>
+<p>---</p>
+<h2>Driverless Printing (Most Modern Printers)</h2>
+<p>Any printer manufactured after roughly 2016 that supports IPP Everywhere (AirPrint, Mopria) works without any driver installation. Plug in via USB or connect to your network and CUPS discovers it automatically.</p>
+<h3>USB Printers</h3>
+<p><code>ipp-usb</code> is pre-installed and enabled. When you plug in a modern USB printer, <code>ipp-usb</code> creates a network-accessible IPP endpoint for it. CUPS then sees the printer as a network printer.</p>
+<pre><code class="language-bash"># Check if ipp-usb detected your printer
+systemctl status ipp-usb
+journalctl -u ipp-usb -n 20
+
+# List detected ipp-usb devices
+ippusbxd --list   # if available
+ls /dev/usb/</code></pre>
+<p>Most USB printers appear automatically in GNOME Printers or KDE Print Manager.</p>
+<h3>Network Printers</h3>
+<p>Network printers (Wi-Fi and Ethernet) are discovered via Avahi (mDNS/DNS-SD), which is active from first boot. Printers on the same network appear automatically in GNOME Printers (Settings → Printers) and KDE System Settings → Printers.</p>
+<pre><code class="language-bash"># Manually discover network printers
+avahi-browse -r _ipp._tcp
+avahi-browse -r _ipps._tcp    # secure IPP
+
+# Add a printer by its network address (when auto-discovery fails)
+lpadmin -p &quot;MyPrinter&quot; -E -v &quot;ipp://192.168.1.100/ipp/print&quot; -m everywhere</code></pre>
+<h3>Adding Printers via GUI</h3>
+<p><strong>GNOME:</strong> Settings → Printers → Unlock → click <code>+</code></p>
+<p><strong>KDE:</strong> System Settings → Printers → Add Printer</p>
+<p>Both interfaces show discovered printers. Select one, confirm the settings, and print a test page.</p>
+<p>---</p>
+<h2>Manufacturer-Specific Drivers</h2>
+<p>For older printers or printers that need a proprietary driver, the following are pre-installed:</p>
+<h3>HP Printers (hplip-minimal)</h3>
+<pre><code class="language-bash"># HP printer setup tool
+hp-setup
+
+# Check HP device status
+hp-check
+
+# HP print and scan tool
+hp-toolbox
+
+# List detected HP devices
+hp-info</code></pre>
+<p>For full HP functionality including ink levels and alignment, <code>hp-setup</code> handles most HP LaserJet and DeskJet models.</p>
+<h3>Epson Printers (epson-inkjet-printer-escpr2)</h3>
+<p>Epson's ESC/P-R2 driver covers most modern Epson inkjet printers. The driver is pre-installed — connect your printer and it should be detected.</p>
+<pre><code class="language-bash"># Check if Epson driver is loaded
+lpinfo -m | grep -i epson</code></pre>
+<h3>Brother Printers (brlaser)</h3>
+<pre><code class="language-bash"># Check available Brother models
+lpinfo -m | grep -i brother
+
+# Add a Brother printer with the brlaser driver
+lpadmin -p &quot;BrotherHL&quot; -E -v &quot;usb://Brother/...&quot; -m brother/brhl1110.ppd</code></pre>
+<h3>Canon Printers (cnijfilter2)</h3>
+<pre><code class="language-bash"># List available Canon models
+lpinfo -m | grep -i canon</code></pre>
+<h3>Generic PCL Printers</h3>
+<p><code>foo2zjs-nightly</code> and <code>splix</code> cover many generic PCL and SPL printers. If your printer is not covered by a specific driver, try:</p>
+<pre><code class="language-bash">lpinfo -m | grep -i &quot;postscript\|pcl\|generic&quot;</code></pre>
+<p>---</p>
+<h2>CUPS Web Interface</h2>
+<p>CUPS provides a web administration interface at <code>http://localhost:631</code>:</p>
+<pre><code class="language-bash"># Ensure CUPS is running
+systemctl status cups.socket
+
+# Open the web interface
+xdg-open http://localhost:631</code></pre>
+<p>From the CUPS web interface you can add printers, manage print queues, view job history, and configure printer options.</p>
+<p>---</p>
+<h2>Command-Line Printing</h2>
+<pre><code class="language-bash"># Print a file
+lpr document.pdf
+lpr -P &quot;PrinterName&quot; document.pdf
+
+# Print with options
+lpr -o sides=two-sided-long-edge document.pdf   # duplex
+lpr -o media=A4 document.pdf                    # paper size
+lpr -o number-up=2 document.pdf                 # 2 pages per sheet
+
+# List available printers
+lpstat -p
+
+# Check print queue
+lpq
+lpq -P &quot;PrinterName&quot;
+
+# Cancel a job
+lprm &lt;job-id&gt;
+lprm -P &quot;PrinterName&quot; -
+
+# List available printer options
+lpoptions -p &quot;PrinterName&quot; -l</code></pre>
+<p>---</p>
+<h2>Scanning with SANE</h2>
+<p>SANE (Scanner Access Now Easy) is the Linux scanning backend. <code>sane-airscan</code> extends it with support for network scanners that use IPP Scan (AirScan) — most modern multi-function printers.</p>
+<h3>Discovering Scanners</h3>
+<pre><code class="language-bash"># List all detected scanners
+scanimage -L
+
+# List network scanners discovered by sane-airscan
+sudo journalctl -u saned -n 20</code></pre>
+<p><strong>GNOME:</strong> Simple Scan is pre-installed. Open it from your application launcher — it detects available scanners automatically.</p>
+<p><strong>KDE:</strong> Skanlite is pre-installed. Open it from your application launcher.</p>
+<h3>Command-Line Scanning</h3>
+<pre><code class="language-bash"># Scan to a file (auto-detects the first available scanner)
+scanimage &gt; scan.pnm
+
+# Scan to PNG
+scanimage --format=png &gt; scan.png
+
+# Scan at 300 DPI
+scanimage --resolution=300 &gt; scan.pnm
+
+# Scan a specific area (in mm)
+scanimage --scan-area=&quot;A4&quot; &gt; scan.pnm
+
+# List available scanner options
+scanimage --help -d &quot;SCANNER_DEVICE_NAME&quot;</code></pre>
+<p>---</p>
+<h2>Network Scanning (sane-airscan)</h2>
+<p><code>sane-airscan</code> discovers and uses network scanners automatically, no configuration required for most devices. If auto-discovery does not work:</p>
+<pre><code class="language-bash"># Create manual configuration
+sudo nano /etc/sane.d/airscan.conf
+
+# Add your scanner manually
+[devices]
+&quot;My Scanner&quot; = http://192.168.1.100:9095/</code></pre>
+<p>---</p>
+<h2>Troubleshooting Printing</h2>
+<h3>Printer Appears Offline</h3>
+<pre><code class="language-bash"># Check CUPS status
+lpstat -r
+
+# Restart CUPS
+sudo systemctl restart cups
+
+# Enable a printer that shows as disabled
+sudo cupsenable &quot;PrinterName&quot;
+sudo cupsaccept &quot;PrinterName&quot;</code></pre>
+<h3>USB Printer Not Detected</h3>
+<pre><code class="language-bash"># Check if the kernel sees the printer
+lsusb | grep -i &quot;printer\|hp\|epson\|brother\|canon&quot;
+
+# Check ipp-usb
+systemctl restart ipp-usb
+journalctl -u ipp-usb -n 30
+
+# Check CUPS permissions
+ls -la /dev/usb/</code></pre>
+<h3>Scanner Not Detected</h3>
+<pre><code class="language-bash"># Check scanner permissions
+lsusb | grep -i &quot;scanner\|hp\|epson&quot;
+
+# Try with sudo to rule out permissions
+sudo scanimage -L
+
+# If found with sudo but not as user, add yourself to the scanner group
+# (Shani OS does this automatically for new users, but check)
+groups | grep scanner</code></pre>
+<p>Full troubleshooting reference: <a href="https://docs.shani.dev/doc/troubleshooting">docs.shani.dev — Printing & Scanning</a>.</p>
+<p>---</p>
+<h2>Persistence Across Updates</h2>
+<p>CUPS printer configuration lives in <code>/var/lib/cups/</code> and <code>/etc/cups/</code>. Both persist via Shani OS's bind mount system:</p>
+<ul>
+<li><code>/var/lib/cups</code> is bind-mounted from <code>/data/varlib/cups</code></li>
+<li><code>/etc/cups</code> changes persist via the OverlayFS</li>
+</ul>
+<p>You configure your printer once. OS updates and rollbacks leave your printer configuration completely untouched.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://docs.shani.dev/doc/troubleshooting">docs.shani.dev — Printing & Scanning</a> — troubleshooting reference</li>
+<li><a href="https://www.cups.org/documentation.html">CUPS documentation</a></li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

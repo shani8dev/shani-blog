@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Bluetooth on Shani OS works at first boot for audio, gaming controllers, keyboards, mice, file transfer, and tethering. Paired devices persist across every OS update and rollback. Here is everything you need to know.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Bluetooth on Shani OS — Headphones, Controllers, File Transfer, and Pairing","description":"Bluetooth on Shani OS works at first boot for audio, gaming controllers, keyboards, mice, file transfer, and tethering. Paired devices persist across every OS update and rollback. Here is everything you need to know.","url":"https://blog.shani.dev/post/shani-os-bluetooth","datePublished":"2026-04-25T00:00:00.000Z","dateModified":"2026-04-25T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Bluetooth on Shani OS — Headphones, Controllers, File Transfer, and Pairing","description":"Bluetooth on Shani OS works at first boot for audio, gaming controllers, keyboards, mice, file transfer, and tethering. Paired devices persist across every OS update and rollback. Here is everything you need to know.","url":"https://blog.shani.dev/post/shani-os-bluetooth","datePublished":"2026-04-25T00:00:00.000Z","dateModified":"2026-04-25T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,161 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Bluetooth on Shani OS — Headphones, Controllers, File Transfer, and Pairing</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-25 · 5 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Shani OS ships the full BlueZ 5.x Bluetooth stack with support for audio (including high-quality codecs), gaming controllers, keyboards, mice, file transfer, and mobile tethering. Everything works at first boot.</p>
+<p>Bluetooth pairing data lives in <code>/var/lib/bluetooth</code>, which is bind-mounted from <code>/data/varlib/bluetooth</code> — your paired devices survive every OS update and rollback. You pair a device once and it stays paired.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/troubleshooting">docs.shani.dev — Bluetooth</a>.</p>
+<p>---</p>
+<h2>What Works at First Boot</h2>
+<ul>
+<li><strong>Headphones and speakers</strong> — SBC, AAC, aptX, LDAC, and LC3 codecs all supported via PipeWire</li>
+<li><strong>Gaming controllers</strong> — PlayStation DualShock 4, DualSense 5, Xbox controllers (via xpadneo or kernel driver), Nintendo Switch Pro, 8BitDo controllers, Steam Controller</li>
+<li><strong>Keyboards and mice</strong> — standard HID Bluetooth profile</li>
+<li><strong>File transfer</strong> — OBEX via GNOME Files (Nautilus) or KDE's Bluetooth settings</li>
+<li><strong>Phone tethering</strong> — personal hotspot sharing from an Android or iOS phone</li>
+<li><strong>Bluetooth printing</strong> — via <code>bluez-cups</code> (pre-installed)</li>
+</ul>
+<p>---</p>
+<h2>Pairing Devices</h2>
+<h3>GNOME</h3>
+<p>GNOME Settings → Bluetooth → enable Bluetooth → put your device in pairing mode → click the device name → confirm the pairing code if prompted.</p>
+<p>Bluedevil widget (GNOME): click the Bluetooth icon in the top bar.</p>
+<h3>KDE Plasma</h3>
+<p>System Settings → Bluetooth, or click the Bluetooth icon in the system tray. KDE's Bluedevil is pre-installed and handles pairing from the taskbar.</p>
+<h3>Command Line</h3>
+<pre><code class="language-bash"># Start the Bluetooth controller
+bluetoothctl
+
+# Inside bluetoothctl interactive shell:
+power on
+agent on
+default-agent
+scan on
+
+# Wait for your device to appear, then:
+pair XX:XX:XX:XX:XX:XX
+trust XX:XX:XX:XX:XX:XX
+connect XX:XX:XX:XX:XX:XX
+
+scan off
+exit</code></pre>
+<pre><code class="language-bash"># One-liner alternatives (non-interactive)
+bluetoothctl power on
+bluetoothctl scan on &amp;
+bluetoothctl pair XX:XX:XX:XX:XX:XX
+bluetoothctl trust XX:XX:XX:XX:XX:XX
+bluetoothctl connect XX:XX:XX:XX:XX:XX
+
+# List paired devices
+bluetoothctl devices
+
+# Disconnect a device
+bluetoothctl disconnect XX:XX:XX:XX:XX:XX
+
+# Remove a pairing
+bluetoothctl remove XX:XX:XX:XX:XX:XX</code></pre>
+<p>---</p>
+<h2>Audio Codecs</h2>
+<p>PipeWire handles Bluetooth audio. Supported codecs (SBC, AAC, aptX, aptX HD, LDAC up to 990 kbps, LC3 for Bluetooth LE Audio) are negotiated automatically — if your headphones support LDAC, PipeWire uses it with no configuration needed.</p>
+<p>To check the active codec or switch profiles manually, see the <a href="https://blog.shani.dev/post/shani-os-audio-pipewire">Audio on Shani OS</a> guide which covers codec selection, profile switching, and EasyEffects for audio processing.</p>
+<p>---</p>
+<h2>Gaming Controllers</h2>
+<p>Xbox, PlayStation, Nintendo Switch, and 8BitDo controllers all work via Bluetooth. No drivers to install — the kernel drivers and game-devices-udev rules are pre-configured.</p>
+<pre><code class="language-bash"># Pair a PlayStation DualSense (PS5 controller)
+# Hold PS + Create buttons until the light bar flashes
+bluetoothctl
+&gt; scan on
+&gt; pair XX:XX:XX:XX:XX:XX
+&gt; trust XX:XX:XX:XX:XX:XX
+&gt; connect XX:XX:XX:XX:XX:XX
+
+# Pair an Xbox controller
+# Hold Xbox button until it flashes rapidly
+bluetoothctl
+&gt; scan on
+&gt; pair XX:XX:XX:XX:XX:XX
+
+# Check controller is detected
+ls /dev/input/js*
+cat /proc/bus/input/devices | grep -A 5 &quot;DualSense\|Xbox\|Switch&quot;</code></pre>
+<p>In Steam, controllers are recognised automatically through Steam Input. For non-Steam games, <code>AntiMicroX</code> (Flatpak) handles button remapping.</p>
+<p>---</p>
+<h2>File Transfer</h2>
+<p>Sending files to a phone or another computer over Bluetooth:</p>
+<p><strong>GNOME:</strong> Open Nautilus → right-click a file → Send To → Bluetooth. Or open the Bluetooth settings and use the "Send File" option for a paired device.</p>
+<p><strong>KDE:</strong> Open Dolphin → right-click a file → Send via Bluetooth.</p>
+<p><strong>Command line:</strong></p>
+<pre><code class="language-bash"># Send a file to a Bluetooth device
+bluetooth-sendto --device=XX:XX:XX:XX:XX:XX file.pdf</code></pre>
+<p>Receiving files — GNOME and KDE both show a notification when another device sends a file. Accept it to save to <code>~/Downloads</code>.</p>
+<p>---</p>
+<h2>Phone Tethering</h2>
+<p>Android and iPhone personal hotspot tethering over Bluetooth (Bluetooth PAN) works with NetworkManager:</p>
+<pre><code class="language-bash"># Pair your phone first (see above)
+# Then in NetworkManager, use the phone as a network device
+nmcli connection show  # check for bluetooth connection
+nmcli device connect XX:XX:XX:XX:XX:XX  # connect via BT</code></pre>
+<p>In GNOME Settings → Network → Bluetooth, your paired phone should appear as a network source when its hotspot is active.</p>
+<p>---</p>
+<h2>Troubleshooting</h2>
+<h3>Bluetooth Adapter Not Found</h3>
+<pre><code class="language-bash"># Check if adapter is detected
+hciconfig -a
+rfkill list bluetooth
+
+# Unblock if soft-blocked
+rfkill unblock bluetooth
+
+# Restart Bluetooth service
+sudo systemctl restart bluetooth</code></pre>
+<h3>Device Pairs But Won't Connect</h3>
+<pre><code class="language-bash"># Remove and re-pair
+bluetoothctl remove XX:XX:XX:XX:XX:XX
+bluetoothctl scan on
+bluetoothctl pair XX:XX:XX:XX:XX:XX
+bluetoothctl trust XX:XX:XX:XX:XX:XX
+
+# Check logs for errors
+journalctl -u bluetooth -n 50</code></pre>
+<h3>Headphones Connect But No Audio</h3>
+<pre><code class="language-bash"># Check PipeWire sees the device
+pactl list cards | grep -i bluetooth
+
+# Restart PipeWire audio stack
+systemctl --user restart pipewire pipewire-pulse wireplumber
+
+# Manually set audio output to Bluetooth headphones
+pactl set-default-sink bluez_output.XX_XX_XX_XX_XX_XX.1</code></pre>
+<h3>Audio Quality Is Poor (Stuck on SBC)</h3>
+<p>Some headphones need a nudge to negotiate a better codec:</p>
+<pre><code class="language-bash"># Check available profiles
+pactl list cards | grep -A 30 &quot;bluez_card&quot;
+
+# Force a higher-quality profile
+pactl set-card-profile bluez_card.XX_XX_XX_XX_XX_XX a2dp-sink-ldac
+# or
+pactl set-card-profile bluez_card.XX_XX_XX_XX_XX_XX a2dp-sink-aac</code></pre>
+<p>Full Bluetooth troubleshooting: <a href="https://docs.shani.dev/doc/troubleshooting">docs.shani.dev — Bluetooth</a>.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://docs.shani.dev/doc/troubleshooting">docs.shani.dev — Bluetooth</a> — troubleshooting reference</li>
+<li><a href="https://blog.shani.dev/post/shani-os-gaming-deep-dive">Gaming on Shani OS</a> — gaming controller configuration</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

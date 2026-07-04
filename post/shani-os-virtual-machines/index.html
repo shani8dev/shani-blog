@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="How to run fast, hardware-accelerated VMs on Shani OS — setting up KVM with virt-manager, running Windows with VirtIO drivers, GPU passthrough for gaming or ML, and why the @libvirt subvolume keeps your VMs safe across every OS update.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Virtual Machines on Shani OS — QEMU/KVM, virt-manager, GPU Passthrough, and Windows VMs","description":"How to run fast, hardware-accelerated VMs on Shani OS — setting up KVM with virt-manager, running Windows with VirtIO drivers, GPU passthrough for gaming or ML, and why the @libvirt subvolume keeps your VMs safe across every OS update.","url":"https://blog.shani.dev/post/shani-os-virtual-machines","datePublished":"2026-04-16T00:00:00.000Z","dateModified":"2026-04-16T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Virtual Machines on Shani OS — QEMU/KVM, virt-manager, GPU Passthrough, and Windows VMs","description":"How to run fast, hardware-accelerated VMs on Shani OS — setting up KVM with virt-manager, running Windows with VirtIO drivers, GPU passthrough for gaming or ML, and why the @libvirt subvolume keeps your VMs safe across every OS update.","url":"https://blog.shani.dev/post/shani-os-virtual-machines","datePublished":"2026-04-16T00:00:00.000Z","dateModified":"2026-04-16T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,204 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Virtual Machines on Shani OS — QEMU/KVM, virt-manager, GPU Passthrough, and Windows VMs</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-16 · 9 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>QEMU/KVM on Shani OS runs VMs with near-native performance. The virtualisation stack is delivered via Flatpak on both editions: the KDE Plasma edition ships <code>org.virt_manager.virt-manager</code> and <code>org.virt_manager.virt_manager.Extension.Qemu</code> pre-installed; the GNOME edition ships GNOME Boxes (<code>org.gnome.Boxes</code>) pre-installed as a Flatpak. OVMF (UEFI for VMs), VirtIO drivers, Spice, and looking-glass are available via Flatpak on both. There is no system QEMU package — all VM tooling runs through the Flatpak stack, which bundles its own QEMU.</p>
+<p>VM disk images live in the <code>@libvirt</code> and <code>@qemu</code> Btrfs subvolumes, which use the <code>nodatacow</code> mount option — CoW is disabled for VM disks to avoid write amplification and improve I/O performance. These subvolumes are completely independent of the OS slots; your VMs survive every OS update and rollback untouched.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/software/vms">docs.shani.dev — Virtual Machines</a>. Troubleshooting: <a href="https://docs.shani.dev/doc/troubleshooting">docs.shani.dev — VM Issues</a>.</p>
+<p>---</p>
+<h2>Prerequisites</h2>
+<p>Virtualisation must be enabled in BIOS/UEFI. Check that Intel VT-x or AMD-V is active:</p>
+<pre><code class="language-bash"># Check if KVM is available
+lscpu | grep -E &quot;Virtualization|VT&quot;
+ls /dev/kvm  # should exist
+
+# Check CPU supports virtualisation
+grep -E &quot;vmx|svm&quot; /proc/cpuinfo | head -1
+# vmx = Intel, svm = AMD</code></pre>
+<p>If <code>/dev/kvm</code> does not exist, enable Intel VT-x or AMD-V in BIOS and reboot.</p>
+<p>For GPU passthrough, IOMMU must also be enabled. The Shani OS kernel is built with <code>intel_iommu=on</code> and <code>amd_iommu=on</code> already set as defaults — you just need to enable the feature in BIOS:</p>
+<pre><code class="language-bash"># Verify IOMMU is active
+dmesg | grep -i iommu | head -5
+# Should show: &quot;IOMMU enabled&quot; or &quot;Adding to iommu group&quot;</code></pre>
+<p>---</p>
+<h2>Setting Up virt-manager</h2>
+<p>virt-manager is the GUI frontend for libvirt and QEMU/KVM. On the KDE Plasma edition it is pre-installed as a Flatpak. On the GNOME edition, GNOME Boxes is pre-installed instead — see the GNOME Boxes section below. To install virt-manager on the GNOME edition:</p>
+<pre><code class="language-bash">flatpak install flathub org.virt_manager.virt-manager
+flatpak install flathub org.virt_manager.virt_manager.Extension.Qemu</code></pre>
+<p>Launch virt-manager:</p>
+<pre><code class="language-bash">flatpak run org.virt_manager.virt-manager</code></pre>
+<p>---</p>
+<h2>GNOME Boxes (GNOME Edition)</h2>
+<p>GNOME Boxes is pre-installed on the GNOME edition as a Flatpak (<code>org.gnome.Boxes</code>) and provides a simple interface for creating and running VMs. It handles QEMU/KVM automatically without manual libvirt configuration.</p>
+<p>To create a VM in GNOME Boxes: open Boxes → click <strong>+</strong> → <strong>Create a Virtual Machine</strong> → select your ISO. Boxes configures sensible defaults automatically.</p>
+<p>For advanced VM configuration (CPU pinning, GPU passthrough, custom XML), use virt-manager instead — install it via Flatpak:</p>
+<pre><code class="language-bash">flatpak install flathub org.virt_manager.virt-manager
+flatpak install flathub org.virt_manager.virt_manager.Extension.Qemu
+flatpak run org.virt_manager.virt-manager</code></pre>
+<p>---</p>
+<h2>Creating a Windows VM</h2>
+<p>Windows VMs with VirtIO drivers run with near-native disk and network performance. Download two ISOs before starting:</p>
+<ol>
+<li><strong>Windows ISO</strong> — from Microsoft's official media creation tool</li>
+<li><strong>VirtIO drivers ISO</strong> — from <a href="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/">fedorapeople.org/groups/virt/virtio-win/direct-downloads/</a> (latest stable)</li>
+</ol>
+<h3>In virt-manager:</h3>
+<ol>
+<li><strong>New VM</strong> → Local install media → select your Windows ISO</li>
+<li><strong>Memory:</strong> 8 GB+ recommended; <strong>CPUs:</strong> half your physical cores</li>
+<li><strong>Storage:</strong> Use the default <code>/var/lib/libvirt/images/</code> path, which maps to <code>@libvirt</code></li>
+<li><strong>Before finishing:</strong> check "Customize configuration before install"</li>
+</ol>
+<h3>Customise for performance:</h3>
+<p>In the VM configuration before starting:</p>
+<ul>
+<li><strong>Firmware:</strong> Set to UEFI (OVMF) — required for Secure Boot and TPM</li>
+<li><strong>Disk bus:</strong> Change from IDE to <strong>VirtIO</strong></li>
+<li><strong>NIC model:</strong> Change to <strong>VirtIO</strong></li>
+<li><strong>Video:</strong> Change to <strong>VirtIO</strong> (if not doing GPU passthrough)</li>
+<li><strong>Add hardware:</strong> Add a second CDROM pointing to the VirtIO drivers ISO</li>
+</ul>
+<h3>During Windows installation:</h3>
+<p>When Windows setup asks "Where do you want to install Windows?" and shows no drives, you need to load the VirtIO disk driver:</p>
+<ol>
+<li>Click "Load driver"</li>
+<li>Browse to the VirtIO CD → <code>amd64\w11\</code> (or <code>w10\</code>)</li>
+<li>Select the VirtIO SCSI driver</li>
+<li>Complete installation normally</li>
+</ol>
+<p>After Windows installs, open the VirtIO CD in Windows Explorer and run <code>virtio-win-guest-tools.exe</code> to install all remaining drivers (network, balloon, Spice agent).</p>
+<p>---</p>
+<h2>Performance Tuning</h2>
+<h3>CPU Pinning</h3>
+<p>For VMs that need consistent performance, pin virtual CPUs to specific physical cores. Check your NUMA topology first:</p>
+<pre><code class="language-bash">lscpu --all --extended
+# or
+lstopo  # if installed</code></pre>
+<p>In virt-manager → CPU → Manually set CPU topology, then under XML edit:</p>
+<pre><code class="language-xml">&lt;vcpupin vcpu='0' cpuset='2'/&gt;
+&lt;vcpupin vcpu='1' cpuset='3'/&gt;
+&lt;vcpupin vcpu='2' cpuset='4'/&gt;
+&lt;vcpupin vcpu='3' cpuset='5'/&gt;</code></pre>
+<p>For gaming VMs, pin cores from the same NUMA node and avoid core 0 (used by the host kernel).</p>
+<h3>Memory Ballooning and Hugepages</h3>
+<pre><code class="language-xml">&lt;!-- Memory balloon for dynamic memory --&gt;
+&lt;memballoon model='virtio'&gt;
+  &lt;alias name='balloon0'/&gt;
+&lt;/memballoon&gt;</code></pre>
+<p>For high-performance VMs (gaming, ML), static hugepages eliminate TLB pressure:</p>
+<pre><code class="language-bash"># Check available hugepages
+cat /proc/meminfo | grep Huge
+
+# Allocate hugepages at boot (edit /etc/sysctl.d/99-hugepages.conf)
+echo &quot;vm.nr_hugepages = 4096&quot; | sudo tee /etc/sysctl.d/99-hugepages.conf</code></pre>
+<pre><code class="language-xml">&lt;!-- In VM XML, use hugepages --&gt;
+&lt;memoryBacking&gt;
+  &lt;hugepages/&gt;
+&lt;/memoryBacking&gt;</code></pre>
+<h3>VirtIO-FS for Shared Directories</h3>
+<p>VirtIO-FS is faster than Samba or NFS for sharing directories between host and VM:</p>
+<pre><code class="language-xml">&lt;filesystem type='mount' accessmode='passthrough'&gt;
+  &lt;driver type='virtiofs'/&gt;
+  &lt;source dir='/home/username/shared'/&gt;
+  &lt;target dir='shared'/&gt;
+&lt;/filesystem&gt;</code></pre>
+<p>In Windows VM:</p>
+<pre><code>Mount via WinFsp + VirtIO-FS driver (from virtio-win-guest-tools)</code></pre>
+<p>In Linux VM:</p>
+<pre><code class="language-bash">mount -t virtiofs shared /mnt/host-shared</code></pre>
+<p>---</p>
+<h2>GPU Passthrough</h2>
+<p>GPU passthrough dedicates a physical GPU to a VM — the VM gets direct, unmediated hardware access and achieves native GPU performance. This is used for gaming VMs (running Windows games with native GPU speed) and ML workloads.</p>
+<p>You need at least two GPUs: one for the host desktop (typically integrated Intel/AMD) and one to pass through to the VM (typically a discrete NVIDIA or AMD card).</p>
+<h3>Isolate the GPU</h3>
+<p>Find the GPU's PCI IDs:</p>
+<pre><code class="language-bash">lspci -nnk | grep -A 3 &quot;NVIDIA\|AMD/ATI&quot;
+# Note the [XXXX:XXXX] IDs for the GPU and its audio function</code></pre>
+<p>Bind the GPU to the <code>vfio-pci</code> driver at boot. Add to <code>/etc/modprobe.d/vfio.conf</code>:</p>
+<pre><code>options vfio-pci ids=XXXX:XXXX,XXXX:XXXX
+softdep nvidia pre: vfio-pci
+softdep amdgpu pre: vfio-pci</code></pre>
+<p>Add <code>vfio_pci vfio vfio_iommu_type1</code> to your initramfs modules and regenerate:</p>
+<pre><code class="language-bash">sudo gen-efi generate --slot $(cat /data/current-slot)</code></pre>
+<p>After reboot:</p>
+<pre><code class="language-bash"># Verify GPU is bound to vfio-pci
+lspci -k | grep -A 3 &quot;NVIDIA\|AMD&quot;
+# Should show: Kernel driver in use: vfio-pci</code></pre>
+<h3>Add GPU to VM</h3>
+<p>In virt-manager → Add Hardware → PCI Host Device → select your GPU (and its audio function). Set the VM firmware to UEFI.</p>
+<p>For Looking Glass (render the VM display at near-zero latency on the host):</p>
+<pre><code class="language-bash"># Install Looking Glass client
+nix-env -iA nixpkgs.looking-glass-client
+
+# Run (after VM starts)
+looking-glass-client</code></pre>
+<p>Full GPU passthrough guide: <a href="https://docs.shani.dev/doc/software/vms">docs.shani.dev — Virtual Machines</a>. For gaming-specific passthrough setup (single-GPU, Looking Glass, Proton integration): <a href="https://blog.shani.dev/post/shani-os-gaming-deep-dive">Gaming on Shani OS</a>.</p>
+<p>---</p>
+<h2>macOS VMs</h2>
+<p>Running macOS in a VM on Shani OS is possible via OSX-KVM:</p>
+<pre><code class="language-bash"># Clone the OSX-KVM project
+git clone --depth 1 https://github.com/kholia/OSX-KVM.git
+cd OSX-KVM
+
+# Follow the setup instructions for your macOS version
+# The project handles the OpenCore bootloader and image download</code></pre>
+<p>macOS VMs are useful for iOS development, cross-platform testing, and running macOS-only software without owning Apple hardware.</p>
+<p>---</p>
+<h2>VM Snapshots and Backup</h2>
+<p>Snapshots are managed through virt-manager's GUI: right-click a VM → <strong>Manage Snapshots</strong> → <strong>+</strong> to create, or select a snapshot and click <strong>Revert</strong> to restore.</p>
+<p>VM disk images are qcow2 files stored in the <code>@libvirt</code> subvolume. To back one up, shut down the VM first then copy the image:</p>
+<pre><code class="language-bash"># Find your VM disk image location in virt-manager:
+# VM details → Storage → note the image path (e.g. /var/lib/libvirt/images/vmname.qcow2)
+
+# Back up the disk image (VM must be shut down)
+rsync -avz /var/lib/libvirt/images/vmname.qcow2 /path/to/backup/</code></pre>
+<p>Note: <code>qemu-img</code> is bundled inside the virt-manager Flatpak and is not on your system PATH. For image conversion or compression, use the Btrfs snapshot approach below — it is faster, space-efficient, and covers all VMs at once.</p>
+<p>Btrfs snapshots of the <code>@libvirt</code> subvolume provide instant, space-efficient backups of all VMs at once:</p>
+<pre><code class="language-bash"># Snapshot all VM disks at once (VMs should be shut down for consistency)
+sudo btrfs subvolume snapshot /var/lib/libvirt /snapshots/libvirt-$(date +%Y%m%d)</code></pre>
+<p>---</p>
+<h2>Networking VMs</h2>
+<p>virt-manager's Flatpak uses QEMU's user-mode networking (slirp) by default — VMs can access the internet and the host can reach the VM via its local IP, but the VM is not directly visible on your LAN.</p>
+<p>To find the VM's IP address, check inside the guest:</p>
+<pre><code class="language-bash"># Inside a Linux VM
+ip addr show</code></pre>
+<p>For a Windows VM, check Settings → Network or run <code>ipconfig</code> in cmd.</p>
+<p>For VMs that need to be accessible from other machines on your LAN, a macvtap interface is the practical option without a system libvirt installation. In virt-manager → VM details → NIC → change Source to <strong>macvtap</strong> and mode to <strong>Bridge</strong>.</p>
+<p>Full networking guide: <a href="https://blog.shani.dev/post/shani-os-networking-guide">Networking on Shani OS</a>.</p>
+<p>---</p>
+<h2>Running Shani OS as a Guest VM</h2>
+<p>If you are running Shani OS inside a hypervisor (VirtualBox, VMware, QEMU/KVM), the appropriate guest tools are pre-installed and grouped under <code>shani-video-guest.target</code>:</p>
+<ul>
+<li><strong>QEMU/KVM guests:</strong> <code>spice-vdagent</code> (clipboard, display resize) and <code>qemu-guest-agent</code> (host-initiated snapshots, graceful shutdown) start automatically</li>
+<li><strong>VirtualBox guests:</strong> <code>virtualbox-guest-utils</code> provides shared folders, seamless mode, and display scaling</li>
+<li><strong>VMware guests:</strong> <code>open-vm-tools</code> provides VMware-specific integration</li>
+</ul>
+<p>These activate automatically when the relevant hypervisor is detected. No manual configuration required.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions answered</li>
+<li><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> — what to use for each type of software</li>
+<li><a href="https://docs.shani.dev/doc/software/vms">docs.shani.dev — Virtual Machines</a> — full KVM/libvirt reference</li>
+<li><a href="https://docs.shani.dev/doc/troubleshooting">docs.shani.dev — VM Issues</a> — troubleshooting</li>
+<li><a href="https://blog.shani.dev/post/systemd-nspawn-on-shani-os">systemd-nspawn on Shani OS</a> — lightweight system containers without a daemon</li>
+<li><a href="https://blog.shani.dev/post/lxc-lxd-on-shani-os">LXC and LXD on Shani OS</a> — full system containers lighter than VMs</li>
+<li><a href="https://docs.shani.dev/doc/software/distrobox">Distrobox on Shani OS</a> — lighter-weight containers with full distro package managers</li>
+<li><a href="https://blog.shani.dev/post/shani-os-gaming-deep-dive">Gaming on Shani OS — GPU Passthrough</a> — gaming-focused GPU passthrough details</li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

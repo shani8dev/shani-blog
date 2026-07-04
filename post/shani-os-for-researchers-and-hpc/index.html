@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="How Shani OS makes scientific computing reproducible from the ground up — Apptainer for cluster workloads, Nix for pinned environments, AMD ROCm and NVIDIA CUDA via Distrobox containers, DVC for data versioning, and a GPG-signed host OS that is itself a verifiable artefact.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS for Researchers and HPC — Reproducible Environments from Desktop to Cluster","description":"How Shani OS makes scientific computing reproducible from the ground up — Apptainer for cluster workloads, Nix for pinned environments, AMD ROCm and NVIDIA CUDA via Distrobox containers, DVC for data versioning, and a GPG-signed host OS that is itself a verifiable artefact.","url":"https://blog.shani.dev/post/shani-os-for-researchers-and-hpc","datePublished":"2026-04-16T00:00:00.000Z","dateModified":"2026-04-16T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS for Researchers and HPC — Reproducible Environments from Desktop to Cluster","description":"How Shani OS makes scientific computing reproducible from the ground up — Apptainer for cluster workloads, Nix for pinned environments, AMD ROCm and NVIDIA CUDA via Distrobox containers, DVC for data versioning, and a GPG-signed host OS that is itself a verifiable artefact.","url":"https://blog.shani.dev/post/shani-os-for-researchers-and-hpc","datePublished":"2026-04-16T00:00:00.000Z","dateModified":"2026-04-16T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,170 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Shani OS for Researchers and HPC — Reproducible Environments from Desktop to Cluster</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-16 · 12 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Reproducibility is the central challenge of modern scientific computing. You produce a result on your workstation. A collaborator cannot replicate it. A cluster job produces different output six months later because the software environment drifted. A reviewer asks for the exact environment used — and it no longer exists.</p>
+<p>Shani OS approaches this problem at every layer. The host OS is a cryptographically signed, immutable artefact — it is itself reproducible and verifiable. Apptainer, the HPC standard for container portability, is pre-installed and configured. Nix provides declarative, pinned environments for local work. GPU drivers for NVIDIA, AMD, and Intel ship on the host; the compute toolchains (ROCm, CUDA, oneAPI) run cleanly inside Distrobox containers or Apptainer images, keeping the immutable host clean while giving you full hardware acceleration. The full stack — from kernel to container to workload — can be described, versioned, and reproduced.</p>
+<p>This post covers the tools and workflows that make Shani OS well-suited for research computing. Full reference documentation lives at <a href="https://docs.shani.dev">docs.shani.dev</a>.</p>
+<p>---</p>
+<h2>The Host OS as a Reproducible Artefact</h2>
+<p>Most discussions of research reproducibility focus on the software environment inside a container. But containers run on top of a host OS, and the host matters — kernel version, security policy, driver behaviour, glibc version. If the host is a traditional mutable Linux system, it drifts. Package upgrades accumulate. The host on your workstation diverges from the host on the cluster login node.</p>
+<p>Shani OS fixes this at the architecture level. Every release is a GPG-signed, SHA256-verified image deployed atomically via <code>shani-deploy</code>. The host OS you run today is the identical, byte-for-byte verified image that came out of the build pipeline. It does not drift. Two machines on the same release channel run the same kernel, the same glibc, the same systemd — verified by the same cryptographic signature.</p>
+<p>When you submit a container to a cluster, the Apptainer image captures the software layer. The host below it is the Shani OS release version — a documented, versioned, immutable artefact. The full stack is describable: "Apptainer image <code>sha256:...</code> on Shani OS <code>2026.04.15</code>."</p>
+<p>For the full architecture: <a href="https://blog.shani.dev/post/shani-os-architecture-deep-dive">The Architecture Behind Shani OS</a>.</p>
+<p>---</p>
+<h2>Apptainer (Singularity) for HPC</h2>
+<p>Apptainer — formerly Singularity, the de facto standard for HPC container portability — is pre-installed on Shani OS. No configuration required. It runs as an unprivileged user, which is what most clusters require.</p>
+<p>The core idea: you build a single <code>.sif</code> file that captures your entire software environment — libraries, Python packages, tools, environment variables. That same file runs identically on your Shani OS workstation and on any SLURM/PBS/LSF cluster that has Apptainer installed. Full NVIDIA (<code>--nv</code>) and AMD ROCm (<code>--rocm</code>) GPU passthrough is built in — no driver bundling needed.</p>
+<pre><code class="language-bash"># Pull and run an image
+apptainer pull docker://ubuntu:22.04
+apptainer exec --nv pytorch.sif python3 train.py
+
+# Build a reproducible environment from a .def file
+apptainer build --fakeroot myresearch.sif myresearch.def</code></pre>
+<p>The <code>.def</code> definition file is your environment specification — version-controllable, reviewable, and shareable. Anyone with Apptainer can build the identical image from the same <code>.def</code>. Keep it in version control alongside your code; the <code>.sif</code> is just the build artefact.</p>
+<p>Full guide including definition files, SLURM/PBS job scripts, MPI, persistent overlays, and GPU detail: <a href="https://blog.shani.dev/post/apptainer-on-shani-os">Apptainer on Shani OS →</a></p>
+<p>---</p>
+<h2>Nix for Pinned Local Environments</h2>
+<p>For local development and analysis work, Nix provides something Apptainer does not: precise, declarative package specifications with cryptographic pinning, without container overhead.</p>
+<p>Nix is pre-installed on Shani OS. The <code>@nix</code> Btrfs subvolume is shared between both OS slots, so your Nix environments survive every OS update and rollback untouched. Add a channel once:</p>
+<pre><code class="language-bash">nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+nix-channel --update</code></pre>
+<h3>Pinned Environments with shell.nix</h3>
+<p>A <code>shell.nix</code> file is a precise description of your environment — every package, every version, determined by the Nixpkgs commit you pin to:</p>
+<pre><code class="language-nix"># shell.nix for a bioinformatics analysis
+{ pkgs ? import (fetchTarball {
+    # Pin to a specific Nixpkgs commit for full reproducibility
+    url = &quot;https://github.com/NixOS/nixpkgs/archive/6adf48f53d819a7b6e15672817fa069e5f8f8c42.tar.gz&quot;;
+    sha256 = &quot;0hg612fmfzmb5k9rk1f2b5cwb1bhlh8l3d4a9qn8m9r1c5q3g0j&quot;;
+  }) {}
+}:
+
+pkgs.mkShell {
+  buildInputs = with pkgs; [
+    python311
+    python311Packages.numpy
+    python311Packages.scipy
+    python311Packages.pandas
+    python311Packages.matplotlib
+    python311Packages.biopython
+    r
+    rPackages.ggplot2
+    rPackages.dplyr
+    blast
+    samtools
+    bwa
+  ];
+}</code></pre>
+<pre><code class="language-bash"># Enter the environment
+nix-shell
+
+# Anyone running this shell.nix gets byte-identical packages
+# The sha256 hash pins the exact Nixpkgs snapshot</code></pre>
+<p>For a simpler but less strictly pinned approach, <code>nix-env -iA</code> installs packages into your profile:</p>
+<pre><code class="language-bash"># Install common scientific tools
+nix-env -iA nixpkgs.python311
+nix-env -iA nixpkgs.julia
+nix-env -iA nixpkgs.octave
+nix-env -iA nixpkgs.gnuplot
+nix-env -iA nixpkgs.texlive.combined.scheme-full  # Full LaTeX
+nix-env -iA nixpkgs.pandoc
+nix-env -iA nixpkgs.zotero</code></pre>
+<p>Full Nix guide: <a href="https://blog.shani.dev/post/nix-on-shani-os">Nix on Shani OS</a>.</p>
+<p>---</p>
+<h2>GPU Workloads — NVIDIA CUDA and AMD ROCm</h2>
+<p>Shani OS ships GPU drivers pre-installed: <code>nvidia-open</code> and <code>nvidia-utils</code> for NVIDIA, and the open AMDGPU kernel driver with <code>vulkan-radeon</code> for AMD, and <code>vulkan-intel</code> with Intel media drivers for Intel hardware. The compute toolchains — ROCm, CUDA development libraries, oneAPI — are not on the host. They run inside Distrobox containers using the vendor's official images.</p>
+<p>This is the cleanest pattern for an immutable OS: the host provides verified, stable drivers; the compute environment is isolated in a container that you control entirely. The container lives in <code>@containers</code> and survives every OS update and rollback.</p>
+<p><strong>AMD ROCm:</strong></p>
+<pre><code class="language-bash">distrobox create --name rocm-dev \
+  --image rocm/dev-ubuntu-22.04:latest \
+  --additional-flags &quot;--device=/dev/kfd --device=/dev/dri --group-add video --group-add render&quot;
+distrobox enter rocm-dev
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.0</code></pre>
+<p><strong>NVIDIA CUDA:</strong></p>
+<pre><code class="language-bash">distrobox create --name cuda-dev --image nvidia/cuda:12.3.0-devel-ubuntu22.04
+distrobox enter cuda-dev
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121</code></pre>
+<p>For cluster jobs, Apptainer's <code>--nv</code> and <code>--rocm</code> flags inject the host GPU driver into your SIF image automatically — no driver bundling needed in the image itself.</p>
+<p>Full GPU compute guide — ROCm and CUDA container setup, HIP cross-vendor portability, Jupyter with GPU access, and monitoring: <a href="https://blog.shani.dev/post/gpu-compute-on-shani-os">GPU Compute on Shani OS →</a></p>
+<p>---</p>
+<h2>Jupyter and Interactive Computing</h2>
+<p>Jupyter runs on Shani OS via Nix (<code>nix-env -iA nixpkgs.jupyter</code>), via Distrobox (recommended for GPU-accelerated notebooks — enter your CUDA or ROCm container and run <code>jupyter lab</code>), or via Flatpak (<code>flatpak install flathub org.jupyter.JupyterLab</code>). The GPU compute post covers each path in detail: <a href="https://blog.shani.dev/post/gpu-compute-on-shani-os">GPU Compute on Shani OS →</a></p>
+<p>---</p>
+<h2>Version Control and Data Management</h2>
+<h3>Git and Data Versioning</h3>
+<pre><code class="language-bash">git config --global user.name &quot;Your Name&quot;
+git config --global user.email &quot;you@institution.edu&quot;
+
+# DVC (Data Version Control) for large datasets — via Nix
+nix-env -iA nixpkgs.dvc
+
+dvc init
+dvc add data/raw_dataset.csv
+dvc remote add -d myremote s3://my-research-bucket
+dvc push</code></pre>
+<h3>Backup with restic</h3>
+<p>Your research data warrants encrypted, versioned backups. <code>restic</code> is pre-installed:</p>
+<pre><code class="language-bash"># Initialise a backup repository (S3, local, SFTP, or Backblaze)
+restic -r s3:s3.amazonaws.com/my-research-bucket init
+
+# Backup your data and analysis directories
+restic -r s3:s3.amazonaws.com/my-research-bucket backup \
+    ~/data ~/analysis ~/notebooks
+
+# Verify backup integrity
+restic -r s3:s3.amazonaws.com/my-research-bucket check
+
+# Restore a specific snapshot
+restic -r s3:s3.amazonaws.com/my-research-bucket restore latest --target ~/restored</code></pre>
+<p><code>restic</code>'s configuration lives in <code>/data/varlib/restic</code> and survives OS updates. Full guide: <a href="https://docs.shani.dev/doc/system/backup">docs.shani.dev — Backup</a>.</p>
+<p>---</p>
+<h2>Remote Access for Cluster Workflows</h2>
+<h3>SSH to Cluster Login Nodes</h3>
+<pre><code class="language-bash"># Enable SSH agent for key forwarding to cluster
+eval &quot;$(ssh-agent -s)&quot;
+ssh-add ~/.ssh/id_ed25519
+
+# Connect to cluster with agent forwarding (for git, etc.)
+ssh -A username@cluster.institution.edu
+
+# Transfer files efficiently
+rsync -avz --progress ~/analysis/ cluster:~/analysis/</code></pre>
+<h3>Tailscale for Institution VPN</h3>
+<p>For institutions using standard VPN setups, Tailscale provides a simpler alternative where your Shani OS workstation joins a mesh network with your cluster:</p>
+<pre><code class="language-bash">sudo tailscale up
+# Your machine gets a stable Tailscale IP reachable from the cluster and vice versa</code></pre>
+<p>Tailscale state persists across OS updates at <code>/data/varlib/tailscale</code>. Full guide: <a href="https://docs.shani.dev/doc/networking/tailscale">docs.shani.dev — Tailscale</a>.</p>
+<p>---</p>
+<h2>The Reproducibility Stack, Summarised</h2>
+<p>| Layer | Tool | What it pins | |---|---|---| | Host OS | Shani OS release + GPG key | Kernel, drivers, system libraries | | Local environment | <code>shell.nix</code> with commit hash | Exact package versions + dependencies | | Container | Apptainer <code>.sif</code> + <code>.def</code> | Full userspace environment | | GPU compute | ROCm / CUDA version inside Distrobox or SIF | Compute toolchain, independent of immutable host — see <a href="https://blog.shani.dev/post/gpu-compute-on-shani-os">GPU Compute on Shani OS</a> | | Data | DVC + restic | Dataset versions + encrypted backups | | Code | Git | Source history |</p>
+<p>Each layer is independently verifiable. The combination gives you a research stack that another group can, in principle, reproduce exactly — from the OS version to the training data to the analysis code — regardless of whether they run NVIDIA or AMD hardware.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> — what to use for each type of software</li>
+<li><a href="https://docs.shani.dev/doc/software/containers">docs.shani.dev — Containers</a> — Apptainer, Podman, Distrobox full reference</li>
+<li><a href="https://docs.shani.dev/doc/software/nix">docs.shani.dev — Nix Package Manager</a> — Nix setup and usage on Shani OS</li>
+<li><a href="https://docs.shani.dev/doc/software/vms">docs.shani.dev — Virtual Machines</a> — GPU passthrough via VFIO for ML workloads</li>
+<li><a href="https://docs.shani.dev/doc/system/backup">docs.shani.dev — Backup</a> — rclone and restic configuration</li>
+<li><a href="https://blog.shani.dev/post/gpu-compute-on-shani-os">GPU Compute on Shani OS</a> — ROCm, CUDA, HIP, Intel oneAPI via Distrobox</li>
+<li><a href="https://blog.shani.dev/post/apptainer-on-shani-os">Apptainer on Shani OS</a> — full guide: definition files, SLURM/PBS scripts, MPI, overlays, GPU detail</li>
+<li><a href="https://blog.shani.dev/post/nix-on-shani-os">Nix on Shani OS</a> — detailed Nix guide</li>
+<li><a href="https://blog.shani.dev/post/shani-os-architecture-deep-dive">The Architecture Behind Shani OS</a> — how subvolumes and slots work</li>
+</ul>
+<p><a href="https://shani.dev">Download Shani OS at shani.dev →</a></p>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

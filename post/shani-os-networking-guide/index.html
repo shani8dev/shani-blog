@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="A practical guide to every network capability built into Shani OS — from WireGuard and Tailscale mesh VPNs to Caddy reverse proxy, SSH hardening, Cloudflare tunnels, LAN file sharing, brute-force protection, and enterprise services.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Networking on Shani OS — VPNs, Tailscale, SSH, Caddy, and More","description":"A practical guide to every network capability built into Shani OS — from WireGuard and Tailscale mesh VPNs to Caddy reverse proxy, SSH hardening, Cloudflare tunnels, LAN file sharing, brute-force protection, and enterprise services.","url":"https://blog.shani.dev/post/shani-os-networking-guide","datePublished":"2026-04-22T00:00:00.000Z","dateModified":"2026-04-22T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Networking on Shani OS — VPNs, Tailscale, SSH, Caddy, and More","description":"A practical guide to every network capability built into Shani OS — from WireGuard and Tailscale mesh VPNs to Caddy reverse proxy, SSH hardening, Cloudflare tunnels, LAN file sharing, brute-force protection, and enterprise services.","url":"https://blog.shani.dev/post/shani-os-networking-guide","datePublished":"2026-04-22T00:00:00.000Z","dateModified":"2026-04-22T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,489 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Networking on Shani OS — VPNs, Tailscale, SSH, Caddy, and More</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-22 · 18 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Shani OS ships a comprehensive networking stack — from basic Wi-Fi management to zero-trust mesh VPNs, automatic HTTPS, brute-force protection, LAN file sharing, remote desktop, and enterprise directory services. Most of it is active from first boot. This guide covers every component, what it does, and how to configure it.</p>
+<p>Full networking documentation: <a href="https://docs.shani.dev/doc/networking">docs.shani.dev — Networking</a>.</p>
+<p>---</p>
+<h2>What's Pre-Installed</h2>
+<p>Every Shani OS system ships with:</p>
+<ul>
+<li><strong>NetworkManager</strong> — wired, wireless, and mobile broadband (3G/4G/5G), active by default, handles DHCP and DNS from your router</li>
+<li><strong>All VPN protocols</strong> — OpenVPN, WireGuard, L2TP/IPsec, PPTP, strongSwan/IKEv2, Cisco AnyConnect, GlobalProtect, SSTP, Fortinet SSL, VPNC — all usable without installing anything</li>
+<li><strong>openresolv</strong> — DNS broker that keeps NetworkManager, VPNs, Tailscale, and dnsmasq from overwriting each other's DNS config</li>
+<li><strong>Tailscale</strong> — WireGuard-based zero-config mesh VPN, pre-installed, state persisted across updates</li>
+<li><strong>Cloudflared</strong> — Cloudflare Zero Trust tunnels for public HTTPS without port forwarding</li>
+<li><strong>WireGuard</strong> — kernel-native VPN, tools pre-installed for raw peer-to-peer tunnels</li>
+<li><strong>firewalld</strong> — active from first boot with a default-deny inbound policy</li>
+<li><strong>fail2ban</strong> — automated banning of repeated authentication failures, integrates with firewalld</li>
+<li><strong>OpenSSH</strong> — pre-installed, not enabled by default</li>
+<li><strong>Caddy</strong> — modern reverse proxy with automatic HTTPS via Let's Encrypt and a built-in CA for private addresses</li>
+<li><strong>Samba / NFS</strong> — SMB file sharing for Windows and macOS; NFS for Linux-to-Linux</li>
+<li><strong>rsyncd</strong> — rsync daemon for efficient network file synchronisation</li>
+<li><strong>SSHFS</strong> — mount remote directories over SSH as local filesystems</li>
+<li><strong>NBD</strong> — network block device for exposing raw block storage over the network</li>
+<li><strong>KDE Connect / GSConnect</strong> — phone integration with firewall rules pre-configured</li>
+<li><strong>Avahi</strong> — mDNS/DNS-SD (Bonjour) for <code>hostname.local</code> discovery on the LAN</li>
+<li><strong>dnsmasq</strong> — local DNS caching, custom hostnames, and DHCP (not active by default)</li>
+<li><strong>ModemManager</strong> — 3G/4G/5G modem management, integrates with NetworkManager</li>
+<li><strong>snmpd</strong> — SNMP daemon for external monitoring systems (Zabbix, Nagios, LibreNMS)</li>
+<li><strong>slapd</strong> — OpenLDAP server for centralised directory and authentication services</li>
+<li><strong>Kerberos 5</strong> — enterprise mutual authentication and Active Directory integration</li>
+</ul>
+<p>---</p>
+<h2>NetworkManager & DNS</h2>
+<p><strong>NetworkManager is active by default</strong> on Shani OS and manages all connections — wired, Wi-Fi, mobile broadband, and VPN. It handles DHCP automatically: when you connect to a network, NetworkManager obtains an IP address and the router's DNS servers and writes them to <code>/etc/resolv.conf</code> via <strong>openresolv</strong>.</p>
+<p>openresolv is the broker between all DNS-aware programs. Rather than any single program owning <code>/etc/resolv.conf</code>, every interface registers its nameservers via the <code>resolvconf</code> command, and openresolv merges them into one consistent file. When you connect a VPN, switch Wi-Fi networks, or bring up Tailscale, DNS updates automatically — no manual editing needed.</p>
+<blockquote><p><strong>Note:</strong> Shani OS does <strong>not</strong> use <code>systemd-resolved</code>. Commands like <code>resolvectl status</code> will not work. Use <code>resolvconf -l</code> and <code>cat /etc/resolv.conf</code> instead.</p></blockquote>
+<pre><code class="language-bash"># Show all connections and their state
+nmcli device status
+
+# Connect to a Wi-Fi network
+nmcli device wifi connect &quot;SSID&quot; password &quot;yourpassword&quot;
+
+# Set a static IP on a wired connection
+nmcli connection modify &quot;Wired connection 1&quot; \
+  ipv4.method manual \
+  ipv4.addresses 192.168.1.50/24 \
+  ipv4.gateway 192.168.1.1 \
+  ipv4.dns &quot;1.1.1.1,8.8.8.8&quot;
+nmcli connection up &quot;Wired connection 1&quot;
+
+# Interactive terminal UI (useful over SSH)
+nmtui
+
+# Inspect the current DNS resolvers
+resolvconf -l          # one block per registered interface
+cat /etc/resolv.conf   # final merged output
+
+# Force regeneration after a manual config change
+sudo resolvconf -u</code></pre>
+<p>Full guides: <a href="https://docs.shani.dev/doc/networking/networkmanager-vpn">NetworkManager & VPN</a> · <a href="https://docs.shani.dev/doc/networking/openresolv">openresolv</a>.</p>
+<p>---</p>
+<h2>Firewall</h2>
+<p><code>firewalld</code> is active from first boot. The default zone denies all inbound connections except what you explicitly allow. It uses a zone-based model — different interfaces can have different trust levels — and manages nftables under the hood.</p>
+<pre><code class="language-bash"># Confirm the firewall is running
+sudo firewall-cmd --state
+
+# Show all active rules
+sudo firewall-cmd --list-all
+
+# Open a named service
+sudo firewall-cmd --permanent --add-service=ssh
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-service=https
+sudo firewall-cmd --reload
+
+# Open a specific port
+sudo firewall-cmd --permanent --add-port=8080/tcp
+sudo firewall-cmd --reload
+
+# Block a specific IP
+sudo firewall-cmd --permanent \
+  --add-rich-rule='rule family=&quot;ipv4&quot; source address=&quot;1.2.3.4&quot; reject'
+sudo firewall-cmd --reload
+
+# Allow SSH only from your LAN
+sudo firewall-cmd --permanent \
+  --add-rich-rule='rule family=&quot;ipv4&quot; source address=&quot;192.168.1.0/24&quot; service name=&quot;ssh&quot; accept'
+sudo firewall-cmd --reload</code></pre>
+<p>KDE Plasma includes a Firewall applet for GUI management. <code>firewall-config</code> is also available.</p>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/firewalld">docs.shani.dev — Firewall (firewalld)</a>.</p>
+<p>---</p>
+<h2>Fail2ban — Brute-Force Protection</h2>
+<p>fail2ban monitors log files for repeated authentication failures and temporarily bans offending IPs via firewalld. <strong>Not enabled by default</strong> — enable it on any machine running public-facing services.</p>
+<pre><code class="language-bash">sudo systemctl enable --now fail2ban
+
+# Overall status — all active jails and ban counts
+sudo fail2ban-client status
+
+# SSH jail status
+sudo fail2ban-client status sshd
+
+# Manually ban / unban an IP
+sudo fail2ban-client set sshd banip 1.2.3.4
+sudo fail2ban-client set sshd unbanip 1.2.3.4</code></pre>
+<p>Tune the SSH jail — create <code>/etc/fail2ban/jail.d/sshd-local.conf</code>:</p>
+<pre><code class="language-ini">[sshd]
+enabled  = true
+port     = ssh
+maxretry = 5
+bantime  = 1h
+findtime = 10m</code></pre>
+<p>Whitelist your own IP ranges so you can never accidentally lock yourself out — create <code>/etc/fail2ban/jail.d/local.conf</code>:</p>
+<pre><code class="language-ini">[DEFAULT]
+ignoreip = 127.0.0.1/8 ::1 192.168.1.0/24 100.64.0.0/10</code></pre>
+<p><code>100.64.0.0/10</code> covers the entire Tailscale CGNAT address range.</p>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/fail2ban">docs.shani.dev — Fail2ban</a>.</p>
+<p>---</p>
+<h2>Tailscale — Private Mesh Network</h2>
+<p>Tailscale builds a WireGuard-encrypted mesh across all your devices. Every device gets a stable Tailscale IP (<code>100.x.x.x</code>) and a DNS hostname. Devices reach each other directly regardless of NAT, firewall, or network — no port forwarding, no dynamic DNS, no router configuration.</p>
+<p>Tailscale is pre-installed with state persisted in <code>/data/varlib/tailscale</code>. You stay authenticated across every OS update, rollback, and reboot.</p>
+<pre><code class="language-bash"># Start the daemon and authenticate (opens a browser)
+sudo systemctl enable --now tailscaled
+sudo tailscale up
+
+# Enable Tailscale SSH — eliminates sshd, authorized_keys, and open firewall ports
+sudo tailscale up --ssh
+
+# Check your Tailscale IP and peer status
+tailscale ip
+tailscale status
+
+# Diagnose connectivity
+tailscale netcheck
+tailscale ping &lt;device-name&gt;
+
+# Expose your home LAN to all tailnet devices (subnet router)
+sudo tailscale up --advertise-routes=192.168.1.0/24
+
+# Route travelling devices' internet traffic through your home connection (exit node)
+sudo tailscale up --advertise-exit-node</code></pre>
+<p>Disable key expiry in the <a href="https://login.tailscale.com/admin/machines">admin console</a> for server machines so the device stays connected indefinitely.</p>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/tailscale">docs.shani.dev — Tailscale VPN</a>.</p>
+<p>---</p>
+<h2>WireGuard (Manual)</h2>
+<p>WireGuard kernel support and tools are pre-installed. Use raw WireGuard when you control both endpoints and want a static tunnel to a VPS or router without a coordination server.</p>
+<pre><code class="language-bash"># Generate a key pair on each peer
+sudo install -d -m 700 /etc/wireguard
+wg genkey | sudo tee /etc/wireguard/privatekey | wg pubkey | sudo tee /etc/wireguard/publickey
+sudo chmod 600 /etc/wireguard/privatekey</code></pre>
+<p>Peer-to-peer tunnel — <code>/etc/wireguard/wg0.conf</code>:</p>
+<pre><code class="language-ini">[Interface]
+Address    = 10.0.0.1/24
+PrivateKey = &lt;this-peer-private-key&gt;
+ListenPort = 51820
+
+[Peer]
+PublicKey           = &lt;other-peer-public-key&gt;
+Endpoint            = 203.0.113.10:51820
+AllowedIPs          = 10.0.0.2/32
+PersistentKeepalive = 25</code></pre>
+<pre><code class="language-bash">sudo wg-quick up wg0
+sudo systemctl enable --now wg-quick@wg0    # start at boot
+sudo wg show                                 # status, handshake, traffic counters
+
+sudo firewall-cmd --permanent --add-port=51820/udp
+sudo firewall-cmd --reload</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/wireguard">docs.shani.dev — WireGuard (Manual)</a>.</p>
+<p>---</p>
+<h2>SSH</h2>
+<p>OpenSSH is pre-installed but <code>sshd</code> is not enabled by default. Use <strong>Tailscale SSH</strong> for access between your own devices — no open ports, no key management. Enable <code>sshd</code> for machines that need access from non-Tailscale clients.</p>
+<pre><code class="language-bash">sudo systemctl enable --now sshd
+ss -tlnp | grep 22    # confirm it's listening</code></pre>
+<p>SSH host keys persist across OS updates and rollbacks — your <code>known_hosts</code> fingerprints stay valid after every system update.</p>
+<h3>Hardening (<code>/etc/ssh/sshd_config</code>)</h3>
+<pre><code class="language-text">Port 2222
+PasswordAuthentication no
+PermitRootLogin no
+AllowUsers youruser
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com
+MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com
+ClientAliveInterval 900
+ClientAliveCountMax 0
+UseDNS no</code></pre>
+<pre><code class="language-bash">sudo sshd -t                        # validate config before applying
+sudo systemctl restart sshd
+sudo firewall-cmd --permanent --add-port=2222/tcp
+sudo firewall-cmd --reload</code></pre>
+<h3>Tunnels</h3>
+<pre><code class="language-bash">ssh -L 8096:localhost:8096 user@shani-server   # local forward: remote Jellyfin at localhost:8096
+ssh -R 3000:localhost:3000 user@shani-server   # remote forward: expose local port on server
+ssh -D 1080 user@shani-server                  # dynamic SOCKS proxy
+ssh -N -f -L 5432:localhost:5432 user@shani-server   # background tunnel to remote Postgres</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/openssh">docs.shani.dev — OpenSSH</a>.</p>
+<h3>SSHFS — Mount Remote Directories</h3>
+<p>SSHFS mounts any SSH-accessible directory as a local folder using FUSE. No server-side software needed beyond a working SSH connection.</p>
+<pre><code class="language-bash">mkdir -p ~/remote
+sshfs user@shani-server:/path/to/data ~/remote \
+  -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=3
+fusermount -u ~/remote    # unmount</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/sshfs">docs.shani.dev — SSHFS</a>.</p>
+<p>---</p>
+<h2>Caddy — Automatic HTTPS Reverse Proxy</h2>
+<p>Caddy provisions and renews TLS certificates automatically — via Let's Encrypt for public domains, and via its built-in CA for private <code>.home.local</code> addresses. Always bind container ports to <code>127.0.0.1</code> and proxy through Caddy so services are never directly exposed to the network.</p>
+<p>Config file: <code>/etc/caddy/Caddyfile</code>. Changes persist across OS updates.</p>
+<pre><code class="language-bash">sudo systemctl enable --now caddy
+caddy validate --config /etc/caddy/Caddyfile    # validate before reloading
+sudo systemctl reload caddy                      # zero-downtime reload</code></pre>
+<pre><code class="language-caddyfile"># Public domain — HTTPS via Let's Encrypt
+app.example.com {
+    reverse_proxy localhost:8080
+}
+
+# Private domain — HTTPS via Caddy's internal CA
+jellyfin.home.local {
+    tls internal
+    reverse_proxy localhost:8096
+}
+
+# SSO via Authelia
+service.example.com {
+    forward_auth localhost:9091 {
+        uri /api/verify?rd=https://auth.example.com
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
+    reverse_proxy localhost:8080
+}</code></pre>
+<p>Trust the internal CA once on your Shani OS machine so browsers accept <code>.home.local</code> certificates:</p>
+<pre><code class="language-bash">sudo trust anchor \
+  /var/lib/caddy/.local/share/caddy/pki/authorities/local/root.crt
+sudo update-ca-trust</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/caddy">docs.shani.dev — Caddy</a>.</p>
+<p>---</p>
+<h2>Cloudflare Tunnels — Public HTTPS Without Port Forwarding</h2>
+<p>Cloudflared exposes local services at a real public HTTPS URL with no static IP, no port forwarding, and no open inbound firewall ports. Use it to share services with others over the internet; use Tailscale for private access between your own devices.</p>
+<pre><code class="language-bash">cloudflared login
+cloudflared tunnel create my-home-server
+
+cat &gt; ~/.cloudflared/config.yml &lt;&lt; 'EOF'
+tunnel: &lt;YOUR-TUNNEL-UUID&gt;
+credentials-file: /home/user/.cloudflared/&lt;UUID&gt;.json
+
+ingress:
+  - hostname: media.example.com
+    service: http://localhost:8096
+  - hostname: vault.example.com
+    service: http://localhost:8180
+  - service: http_status:404
+EOF
+
+cloudflared tunnel route dns my-home-server media.example.com
+cloudflared tunnel route dns my-home-server vault.example.com
+
+sudo cloudflared service install
+sudo systemctl enable --now cloudflared</code></pre>
+<p>Protect services with <strong>Cloudflare Access</strong> (Zero Trust dashboard → Access → Applications) — require login via email OTP, Google, or GitHub with no code changes on your side.</p>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/cloudflared">docs.shani.dev — Cloudflared Tunnels</a>.</p>
+<p>---</p>
+<h2>VPN Client Configuration</h2>
+<p>All VPN protocol plugins ship pre-installed — nothing to install.</p>
+<p><strong>GUI:</strong> GNOME → Settings → Network → + → VPN / KDE → System Settings → Connections → + → VPN</p>
+<pre><code class="language-bash"># OpenVPN
+nmcli connection import type openvpn file /path/to/client.ovpn
+nmcli connection up client
+
+# WireGuard
+nmcli connection import type wireguard file /etc/wireguard/wg0.conf
+nmcli connection up wg0
+
+# Cisco AnyConnect / GlobalProtect
+openconnect --protocol=anyconnect vpn.example.com
+openconnect --protocol=gp vpn.example.com
+
+# Fortinet SSL VPN
+openfortivpn vpn.example.com:443 --username=youruser</code></pre>
+<p>Split DNS — sending <code>.corp</code> queries to the VPN while everything else uses your regular DNS — works automatically via openresolv. When a VPN connects and pushes a domain-specific nameserver, openresolv routes matching queries to it with no manual configuration.</p>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/networkmanager-vpn">docs.shani.dev — NetworkManager & VPN</a>.</p>
+<p>---</p>
+<h2>dnsmasq — Local DNS & DHCP</h2>
+<p>dnsmasq is pre-installed but <strong>not active by default</strong>. Enable it when you want local domain names (<code>.home</code>), a DNS cache, or DHCP control on your LAN.</p>
+<pre><code class="language-bash">sudo systemctl enable --now dnsmasq</code></pre>
+<p><code>/etc/dnsmasq.conf</code>:</p>
+<pre><code class="language-ini">server=1.1.1.1
+server=8.8.8.8
+domain-needed
+bogus-priv
+
+# Custom local hostnames
+address=/nas.home/192.168.1.10
+address=/printer.home/192.168.1.20
+
+# DNS cache
+cache-size=1000
+
+# DHCP (uncomment to activate)
+# dhcp-range=192.168.1.100,192.168.1.200,12h
+# dhcp-option=3,192.168.1.1</code></pre>
+<p>To route all DNS through dnsmasq (adding caching and custom <code>.home</code> domains), tell openresolv to use it:</p>
+<pre><code class="language-bash">echo 'name_servers=127.0.0.1' | sudo tee -a /etc/resolvconf.conf
+sudo resolvconf -u</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/dnsmasq">docs.shani.dev — dnsmasq</a>.</p>
+<p>---</p>
+<h2>File Sharing</h2>
+<h3>Samba — Windows & macOS</h3>
+<pre><code class="language-bash">sudo systemctl enable --now smb nmb</code></pre>
+<p>Add a share to <code>/etc/samba/smb.conf</code>:</p>
+<pre><code class="language-ini">[SharedFiles]
+    path = /home/youruser/shared
+    browseable = yes
+    read only = no
+    valid users = youruser</code></pre>
+<pre><code class="language-bash">sudo smbpasswd -a youruser
+testparm
+sudo systemctl restart smb nmb
+sudo firewall-cmd --permanent --add-service=samba &amp;&amp; sudo firewall-cmd --reload</code></pre>
+<p>Connect from Windows: <code>\\192.168.1.100\SharedFiles</code> · macOS: <code>smb://192.168.1.100/SharedFiles</code>.</p>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/samba">docs.shani.dev — Samba</a>.</p>
+<h3>NFS — Linux-to-Linux</h3>
+<pre><code class="language-bash">sudo systemctl enable --now nfs-server
+echo &quot;/home/youruser/shared  192.168.1.0/24(rw,sync,no_subtree_check)&quot; \
+  | sudo tee -a /etc/exports
+sudo exportfs -arv
+sudo firewall-cmd --permanent \
+  --add-service=nfs --add-service=rpcbind --add-service=mountd
+sudo firewall-cmd --reload
+
+# Mount on client
+sudo mount -t nfs 192.168.1.100:/home/youruser/shared /mnt/remote</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/nfs">docs.shani.dev — NFS</a>.</p>
+<h3>rsyncd — Efficient Network Sync</h3>
+<p>The rsync daemon exposes file modules over <code>rsync://</code> for fast synchronisation without requiring SSH access.</p>
+<pre><code class="language-bash">sudo systemctl enable --now rsyncd</code></pre>
+<p><code>/etc/rsyncd.conf</code>:</p>
+<pre><code class="language-ini">[backup]
+    path = /home/user/backups
+    read only = false
+    auth users = syncuser
+    secrets file = /etc/rsyncd.secrets
+    hosts allow = 192.168.1.0/24</code></pre>
+<pre><code class="language-bash">echo &quot;syncuser:StrongPassword&quot; | sudo tee /etc/rsyncd.secrets
+sudo chmod 600 /etc/rsyncd.secrets
+
+# Sync from client
+rsync -avz --progress /local/dir/ rsync://syncuser@192.168.1.100/backup/</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/rsyncd">docs.shani.dev — rsyncd</a>.</p>
+<h3>NBD — Network Block Device</h3>
+<p>NBD exports a raw block device or image file over the network. The client mounts it as a local block device (<code>/dev/nbd0</code>). Useful for thin-client boot images and centralised VM disk storage.</p>
+<pre><code class="language-bash"># Server
+sudo systemctl enable --now nbd-server
+# Restrict to LAN — NBD has no built-in authentication
+sudo firewall-cmd --permanent \
+  --add-rich-rule='rule family=&quot;ipv4&quot; source address=&quot;192.168.1.0/24&quot; port port=&quot;10809&quot; protocol=&quot;tcp&quot; accept'
+sudo firewall-cmd --reload
+
+# Client
+sudo modprobe nbd
+sudo nbd-client 192.168.1.100 10809 /dev/nbd0
+sudo mount /dev/nbd0 /mnt/remote-disk</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/nbd">docs.shani.dev — NBD</a>.</p>
+<p>---</p>
+<h2>Remote Desktop</h2>
+<pre><code class="language-bash"># Connect to a Windows machine (FreeRDP, pre-installed)
+xfreerdp /v:192.168.1.100 /u:username /dynamic-resolution /gfx</code></pre>
+<p><strong>Enable inbound connections:</strong> KDE: Settings → Remote Desktop → Enable Remote Desktop (kRDP). GNOME: Settings → Sharing → Remote Desktop (supports RDP and VNC simultaneously).</p>
+<pre><code class="language-bash">sudo firewall-cmd --permanent --add-service=rdp    # RDP port 3389
+sudo firewall-cmd --permanent --add-port=5900/tcp  # VNC
+sudo firewall-cmd --reload</code></pre>
+<blockquote><p>Never expose RDP or VNC directly to the internet. Use Tailscale — no open ports, no certificate warnings.</p></blockquote>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/remote-desktop">docs.shani.dev — Remote Desktop</a>.</p>
+<p>---</p>
+<h2>KDE Connect — Phone Integration</h2>
+<p>KDE Connect integrates your Android or iOS phone with your Shani OS desktop over the LAN. Firewall rules are pre-configured — no manual setup needed after install.</p>
+<p>Features: shared clipboard, file transfer, notification mirroring, remote input (phone as touchpad/keyboard), media controls.</p>
+<p>Install the app (<a href="https://play.google.com/store/apps/details?id=org.kde.kdeconnect_tp">Android</a> / <a href="https://apps.apple.com/app/kde-connect/id1580245991">iOS</a>), ensure both devices are on the same Wi-Fi, and accept the pairing request.</p>
+<pre><code class="language-bash">systemctl --user status kdeconnectd                          # confirm daemon is running
+kdeconnect-cli --list-devices                                # list discovered devices
+kdeconnect-cli --share /path/to/file --device &lt;id&gt;          # send a file to phone
+kdeconnect-cli --ring --device &lt;id&gt;                         # ring your phone to find it</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/kdeconnect">docs.shani.dev — KDE Connect</a>.</p>
+<p>---</p>
+<h2>Local Service Discovery (Avahi / mDNS)</h2>
+<p>Avahi is <strong>active by default</strong>. Your machine is reachable as <code>hostname.local</code> on the LAN without any DNS server. CUPS printers, Samba shares, and KDE Connect all advertise via Avahi.</p>
+<pre><code class="language-bash">avahi-browse -at                          # discover all services on the LAN
+avahi-browse _ssh._tcp                    # find SSH servers
+avahi-browse _ipp._tcp                    # find printers
+avahi-resolve --name myhostname.local     # resolve a .local hostname to IP</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/avahi">docs.shani.dev — Avahi (mDNS)</a>.</p>
+<p>---</p>
+<h2>Mobile Broadband (3G/4G/5G)</h2>
+<p>ModemManager is pre-installed and integrates with NetworkManager. Plug in a supported modem and a Mobile Broadband connection is created automatically — configure the APN from Settings → Network.</p>
+<pre><code class="language-bash">mmcli -L        # list detected modems
+mmcli -m 0      # signal strength, SIM status, bearer details</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/modemmanager">docs.shani.dev — ModemManager</a>.</p>
+<p>---</p>
+<h2>SNMP Monitoring</h2>
+<p>snmpd allows external monitoring systems (Zabbix, Nagios, LibreNMS, PRTG) to query your machine's status.</p>
+<blockquote><p>⚠️ Use SNMPv3 with authentication and privacy for any network that isn't fully trusted — SNMPv2c transmits the community string in plaintext.</p></blockquote>
+<pre><code class="language-bash">sudo systemctl enable --now snmpd
+
+# Restrict to your LAN
+sudo firewall-cmd --permanent \
+  --add-rich-rule='rule family=&quot;ipv4&quot; source address=&quot;192.168.1.0/24&quot; port port=&quot;161&quot; protocol=&quot;udp&quot; accept'
+sudo firewall-cmd --reload
+
+# Create an SNMPv3 user with auth + encryption (recommended)
+sudo systemctl stop snmpd
+sudo net-snmp-create-v3-user \
+  -ro -A &quot;MyAuthPassword&quot; -a SHA -X &quot;MyPrivPassword&quot; -x AES monitoruser
+sudo systemctl start snmpd</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/snmpd">docs.shani.dev — snmpd</a>.</p>
+<p>---</p>
+<h2>OpenLDAP — Centralised Directory</h2>
+<p>slapd provides centralised authentication and directory services. Database files persist in <code>/data/varlib/openldap</code> across OS updates.</p>
+<pre><code class="language-bash">sudo systemctl enable --now slapd
+slappasswd                  # generate a password hash for LDIF files
+
+# Search the directory
+ldapsearch -x -H ldap://localhost -b dc=shanios,dc=local
+
+sudo firewall-cmd --permanent --add-service=ldap --add-service=ldaps
+sudo firewall-cmd --reload</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/slapd">docs.shani.dev — OpenLDAP (slapd)</a>.</p>
+<p>---</p>
+<h2>Kerberos 5 — Enterprise Authentication</h2>
+<p>Kerberos provides strong mutual authentication and is required by Active Directory environments. Kerberos database files persist in <code>/data/varlib/kerberos</code> across OS updates.</p>
+<pre><code class="language-bash">sudo systemctl enable --now krb5kdc kadmin
+
+kinit youruser@SHANIOS.LOCAL   # obtain a ticket
+klist                           # show active tickets and expiry
+kinit -R                        # renew before expiry
+kdestroy                        # destroy all tickets
+
+sudo firewall-cmd --permanent --add-port=88/tcp --add-port=88/udp   # KDC
+sudo firewall-cmd --permanent --add-port=749/tcp                     # kadmin
+sudo firewall-cmd --reload</code></pre>
+<p>Full guide: <a href="https://docs.shani.dev/doc/networking/kerberos">docs.shani.dev — Kerberos</a>.</p>
+<p>---</p>
+<h2>Backup — rclone and restic</h2>
+<p>Both <code>rclone</code> and <code>restic</code> are pre-installed on Shani OS.</p>
+<pre><code class="language-bash">rclone config                                        # configure a cloud remote (interactive)
+rclone sync ~/Documents gdrive:Backup/Documents --progress
+
+export RESTIC_REPOSITORY=&quot;rclone:gdrive:shanios-backups&quot;
+export RESTIC_PASSWORD_FILE=&quot;$HOME/.config/restic/password&quot;
+restic init
+restic backup /home /var/lib/containers
+restic snapshots
+restic forget --keep-daily 7 --keep-weekly 4 --keep-monthly 6 --prune
+restic check</code></pre>
+<p>Automate with a systemd user timer and a dead man's switch (Healthchecks) so you're alerted if a backup silently fails.</p>
+<p>Full guide: <a href="https://docs.shani.dev/doc/system/backup">docs.shani.dev — Backup & Recovery</a>.</p>
+<p>---</p>
+<h2>Network Services via Podman</h2>
+<p>Any network service also runs as a rootless Podman container on Shani OS, surviving every OS update untouched. The self-hosting wiki covers ready-to-run commands for:</p>
+<ul>
+<li><strong><a href="https://docs.shani.dev/doc/servers/vpn-tunnels">VPN & Tunnels</a></strong> — WG-Easy, Headscale + Headplane, Cloudflared, Pangolin, Pritunl, Firezone, Nebula, ZeroTier, NetBird</li>
+<li><strong><a href="https://docs.shani.dev/doc/servers/networking">Network & DNS</a></strong> — Pi-hole, AdGuard Home, Nginx Proxy Manager, Traefik, Caddy, Unbound, SearXNG, Homepage dashboard</li>
+<li><strong><a href="https://docs.shani.dev/doc/servers/mail">Mail Servers</a></strong> — Mailcow, Mailu, Stalwart, Roundcube, SnappyMail</li>
+<li><strong><a href="https://docs.shani.dev/doc/servers/monitoring">Monitoring</a></strong> — Prometheus, Grafana, Loki, Netdata, Uptime Kuma, Gatus, Dozzle</li>
+</ul>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://docs.shani.dev/doc/networking">docs.shani.dev — Networking</a> — full networking documentation</li>
+<li><a href="https://docs.shani.dev/doc/servers">docs.shani.dev/servers</a> — self-hosting wiki with ready-to-run Podman commands</li>
+<li><a href="https://blog.shani.dev/post/shani-os-home-server">Shani OS as a Home Server</a> — self-hosting guide with service catalogue</li>
+<li><a href="https://blog.shani.dev/post/podman-containers-on-shani-os">Podman on Shani OS</a> — rootless containers reference</li>
+<li><a href="https://blog.shani.dev/post/shani-os-kde-connect">KDE Connect on Shani OS</a> — phone + desktop integration</li>
+<li><a href="https://blog.shani.dev/post/shani-os-btrfs-snapshots-and-backup">Btrfs Snapshots and Backup on Shani OS</a> — restic and rclone backup guide</li>
+<li><a href="https://blog.shani.dev/post/shani-os-updates">Updates on Shani OS</a> — update and rollback reference</li>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — network troubleshooting and general diagnostics</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

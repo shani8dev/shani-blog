@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Everything pre-installed on the KDE Plasma edition and why it matters: Steam + Proton, MangoHud, GameScope, Ananicy, kernel tuning, NVIDIA setup, peripheral support, and why immutability makes Shani OS the most reliable gaming OS on Linux.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Gaming on Shani OS — The Full Stack, Explained","description":"Everything pre-installed on the KDE Plasma edition and why it matters: Steam + Proton, MangoHud, GameScope, Ananicy, kernel tuning, NVIDIA setup, peripheral support, and why immutability makes Shani OS the most reliable gaming OS on Linux.","url":"https://blog.shani.dev/post/shani-os-gaming-deep-dive","datePublished":"2026-04-16T00:00:00.000Z","dateModified":"2026-04-16T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Gaming on Shani OS — The Full Stack, Explained","description":"Everything pre-installed on the KDE Plasma edition and why it matters: Steam + Proton, MangoHud, GameScope, Ananicy, kernel tuning, NVIDIA setup, peripheral support, and why immutability makes Shani OS the most reliable gaming OS on Linux.","url":"https://blog.shani.dev/post/shani-os-gaming-deep-dive","datePublished":"2026-04-16T00:00:00.000Z","dateModified":"2026-04-16T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,151 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Gaming</span>
+        <h1 class="post-title">Gaming on Shani OS — The Full Stack, Explained</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-16 · 10 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>The KDE Plasma edition of Shani OS ships a complete, pre-configured gaming stack. Not a collection of packages you need to configure — a stack that works at first boot, tuned for low-latency gaming, with every major launcher ready, NVIDIA drivers configured, and peripherals detected automatically.</p>
+<p>This post explains what is included, what each component does, and why an immutable OS is actually an advantage for gaming. Gaming troubleshooting: <a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a>. Full hardware list: <a href="https://docs.shani.dev/doc/intro/whats-included">docs.shani.dev — Gaming Hardware & Performance</a>.</p>
+<p>---</p>
+<h2>The Pre-Installed Gaming Stack</h2>
+<p>The KDE Plasma edition ships the following gaming tools as Flatpaks, all pre-installed and ready at first boot:</p>
+<p><strong>Steam</strong> (<code>com.valvesoftware.Steam</code>) — Steam is pre-installed and Proton (Valve's Windows game compatibility layer) is enabled. Most Windows-only games in your Steam library run on Linux through Proton. The <a href="https://www.protondb.com">ProtonDB</a> community database shows compatibility ratings for tens of thousands of games.</p>
+<p><strong>Heroic Games Launcher</strong> (<code>com.heroicgameslauncher.hgl</code>) — the open-source launcher for Epic Games Store, GOG, and Amazon Prime Gaming libraries. Log in with your accounts and access your entire library outside Steam.</p>
+<p><strong>Lutris</strong> (<code>net.lutris.Lutris</code>) — a gaming platform that handles everything else: emulators, itch.io, Humble Bundle, GOG, and community-written install scripts for games that need custom setup.</p>
+<p><strong>Bottles</strong> (<code>com.usebottles.bottles</code>) — for Windows applications that need a more controlled Wine environment. Useful for games or tools that Proton handles poorly, or for Windows software you need alongside games.</p>
+<p><strong>RetroArch</strong> (<code>org.libretro.RetroArch</code>) — multi-system emulator frontend, pre-installed with the RetroArch core library ready to download. Covers everything from NES to PlayStation 2 and beyond.</p>
+<p>---</p>
+<h2>Windows Compatibility — Wine, Proton, and Bottles</h2>
+<p>Running Windows games and software on Linux is handled through Wine — a compatibility layer that translates Windows API calls to Linux equivalents. You do not need Windows. You do not need a VM. Wine runs Windows <code>.exe</code> files directly on your Linux desktop.</p>
+<p><strong>Proton</strong> is Valve's distribution of Wine, bundled with Steam and tuned specifically for gaming. It includes DXVK (DirectX 9/10/11 → Vulkan translation), VKD3D-Proton (DirectX 12 → Vulkan), and Steam Input. Proton is what makes the majority of Steam's Windows-only catalogue run on Linux. It is managed entirely within Steam — no separate installation.</p>
+<pre><code class="language-bash"># Enable Proton for a Steam game:
+# Steam → Library → right-click game → Properties → Compatibility
+# → &quot;Force the use of a specific Steam Play compatibility tool&quot;
+# → Select Proton version
+
+# Useful Steam launch options for Wine/Proton:
+# PROTON_LOG=1 %command%            — enable detailed Wine/Proton logging
+# DXVK_ASYNC=1 %command%            — async shader compilation (reduces stutter)
+# PROTON_USE_WINED3D=1 %command%    — use OpenGL-based wined3d instead of DXVK
+# PROTON_NO_ESYNC=1 %command%       — disable esync (try if a game crashes)</code></pre>
+<p><strong>Bottles</strong> (<code>com.usebottles.bottles</code>) is pre-installed on the KDE Plasma edition. It provides a clean interface for creating isolated Wine environments ("bottles") for non-Steam Windows software — games from GOG installers, Windows tools, legacy software. Each bottle has its own Wine prefix and can be configured independently.</p>
+<pre><code class="language-bash"># Install winetricks dependencies for a specific game inside a Bottles bottle:
+# Bottles → select bottle → Dependencies → search and install
+# (Bottles manages winetricks automatically — no terminal needed)</code></pre>
+<p><strong>Heroic Games Launcher</strong> also handles Wine/Proton for Epic and GOG games — it uses its own Wine runners and can download specific Proton-GE or Wine-GE versions for compatibility.</p>
+<p><strong><a href="https://www.protondb.com">ProtonDB</a></strong> is the community-maintained database of game compatibility. Before trying a game, check its ProtonDB rating and user reports for any launch flags needed.</p>
+<p>---</p>
+<h2>Performance Overlay and Post-Processing</h2>
+<p><strong>GOverlay</strong> (<code>io.github.benjamimgois.goverlay</code>) is the graphical configuration tool for MangoHud, pre-installed on the KDE Plasma edition. It provides an easy interface for setting up your performance overlay without editing config files manually.</p>
+<p>MangoHud itself overlays real-time performance information on any Vulkan or OpenGL game — FPS, CPU and GPU utilisation, temperatures, VRAM usage, frame times. To enable it in Steam, add <code>MANGOHUD=1 %command%</code> to a game's launch options. GOverlay lets you configure exactly which metrics appear and where.</p>
+<p><strong>vkBasalt</strong> applies post-processing effects to any Vulkan game without modifying the game itself. Effects available: CAS sharpening (reduces blur from upscaling), FXAA, SMAA, and LUT colour grading.</p>
+<pre><code class="language-bash"># Enable sharpening for a game (Steam launch options)
+ENABLE_VKBASALT=1 %command%
+
+# Configuration
+nano ~/.config/vkBasalt.conf</code></pre>
+<p><strong>GameScope</strong> is a Wayland compositor designed for games. It handles frame pacing, manages refresh rate, and provides a contained rendering environment. Particularly useful for frame limiting with better pacing than vsync and for games that do not respect Wayland natively.</p>
+<pre><code class="language-bash"># In Steam launch options
+gamescope -f -W 1920 -H 1080 -- %command%</code></pre>
+<p><strong>GameMode</strong> is a daemon that applies CPU governor switching and process priority tuning when a game starts. It is configured to run globally on Shani OS — every game benefits automatically without per-game configuration.</p>
+<p>---</p>
+<h2>Peripheral Configuration</h2>
+<p><strong>Oversteer</strong> (<code>io.github.berarma.Oversteer</code>) is pre-installed for racing wheel configuration. Supported wheels include:</p>
+<ul>
+<li><strong>Logitech:</strong> G25, G27, G29, G923 — including force feedback</li>
+<li><strong>Thrustmaster:</strong> T150, T300, T500, TS-PC, TX</li>
+<li><strong>Fanatec:</strong> CSL, Podium series</li>
+</ul>
+<p><strong>Piper</strong> (<code>org.freedesktop.Piper</code>) provides a graphical interface for configuring gaming mice — DPI, buttons, and profiles. Works with Logitech, Razer, Steelseries, Corsair, and more via libratbag.</p>
+<p><strong>OpenRGB</strong> (<code>org.openrgb.OpenRGB</code>) controls RGB lighting for motherboards, RAM, fans, peripherals, and GPUs from multiple vendors — a unified interface across brands that would otherwise require separate Windows software.</p>
+<p><strong>AntiMicroX</strong> (<code>io.github.antimicrox.antimicrox</code>) maps gamepad buttons to keyboard/mouse actions, useful for games with poor controller support or for accessibility remapping.</p>
+<p>Xbox controllers (wired and Bluetooth), PlayStation DualShock 4, DualSense 5, Nintendo Switch Pro, and 8BitDo controllers all work without configuration via the Steam Input system and kernel gamepad drivers.</p>
+<p>---</p>
+<h2>Kernel Tuning for Gaming</h2>
+<p>The kernel parameters embedded in Shani OS's Unified Kernel Images are tuned for low-latency interactive workloads:</p>
+<p><strong>High-resolution timers:</strong> HPET and RTC timer sources run at 3072 Hz (versus the kernel default of 64 Hz). This improves input responsiveness and frame scheduling precision.</p>
+<p><strong>CFS scheduler tuning:</strong> Custom time slice values for the Completely Fair Scheduler reduce scheduling latency for game threads competing with background processes.</p>
+<p><strong>Memory map limits:</strong> <code>vm.max_map_count</code> is set to 2147483642 — required by some large open-world games that map thousands of memory regions.</p>
+<p><strong>Ananicy-cpp:</strong> A background daemon that monitors running processes and adjusts CPU and I/O priorities based on a database of known applications. When a game goes active, background tasks (browser tabs, update daemons, file indexers) are automatically deprioritised.</p>
+<p>---</p>
+<h2>GPU Support</h2>
+<p><strong>AMD (RDNA 1, RDNA 2, RDNA 3):</strong> AMD GPUs use the open-source RADV Vulkan driver and amdgpu kernel driver, both included in the kernel and Mesa stack. No additional installation required.</p>
+<pre><code class="language-bash"># Check AMD GPU status
+glxinfo | grep &quot;OpenGL renderer&quot;
+vulkaninfo --summary
+radeontop  # real-time GPU stats</code></pre>
+<p><strong>Intel (Arc and integrated):</strong> Intel Arc discrete GPUs use the ANV Vulkan driver and xe kernel driver. Intel integrated graphics work for lighter gaming and emulation.</p>
+<p><strong>NVIDIA:</strong> Drivers are configured at first boot on the KDE Plasma edition. The proprietary <code>nvidia-open</code> kernel module is installed and available in the initramfs.</p>
+<p><strong>Hybrid Graphics (Optimus laptops):</strong> <code>switcheroo-control</code> and <code>nvidia-prime</code> are pre-installed and handle automatic GPU selection. For forcing discrete GPU:</p>
+<pre><code class="language-bash">prime-run game-binary
+# or in Steam launch options:
+# __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia %command%</code></pre>
+<p>If NVIDIA drivers do not load on first boot, check Secure Boot configuration: <a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a>.</p>
+<p>For GPU passthrough — dedicating a discrete GPU entirely to a Windows VM for native gaming performance — <code>virt-manager</code> is pre-installed on the KDE Plasma edition (<code>org.virt_manager.virt-manager</code> Flatpak). See the full VFIO setup in <a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a>.</p>
+<p>---</p>
+<h2>VR Headsets</h2>
+<p>udev rules for supported VR headsets are pre-configured. Supported hardware includes HTC Vive and Vive Pro (via SteamVR + OpenVR), Valve Index (native Linux support via SteamVR), and PSVR (PS4, PS5) via PSVRFramework + SteamVR. Plug in and launch SteamVR.</p>
+<p>---</p>
+<h2>Android Games via Waydroid</h2>
+<p>Waydroid runs a full Android stack in a lightweight container — hardware-accelerated on Intel and AMD GPUs, with ARM binary translation for apps compiled for ARM. It is pre-configured on the KDE Plasma edition.</p>
+<pre><code class="language-bash"># First-time setup
+sudo waydroid init
+
+# Launch Android environment
+waydroid session start
+waydroid show-full-ui
+
+# Install an APK
+waydroid app install game.apk</code></pre>
+<p>Guide: <a href="https://docs.shani.dev/doc/software/waydroid">docs.shani.dev — Android (Waydroid)</a>.</p>
+<p>---</p>
+<h2>Why Immutability Is an Advantage for Gaming</h2>
+<p>The common objection to immutable Linux for gaming is: "I can't install packages directly — what about mod tools and game-specific utilities?" The immutable model is actually better for gaming stability.</p>
+<p><strong>An OS update never breaks your gaming session.</strong> <code>shani-deploy</code> prepares the new OS in the background on the inactive slot. Your running system — including Steam, your game library, active downloads — is never touched. When you decide to reboot, the new OS is ready.</p>
+<p><strong>Your game library survives everything.</strong> Steam's library lives in your home directory (<code>@home</code>). The <code>@flatpak</code> subvolume holds Flatpak-installed launchers. Neither is affected by OS updates or rollbacks.</p>
+<p><strong>No dependency conflicts.</strong> Gaming tools (Steam, MangoHud, GameScope, Proton) run as Flatpaks or are part of the verified OS image. They do not conflict with dev tools, system tools, or anything you install via Nix or Distrobox — because those live in separate Btrfs subvolumes.</p>
+<p><strong>Regression recovery.</strong> If a Proton update breaks a specific game, use Steam's own Proton version selector to pin a specific Proton version per game. If an OS update breaks something at the kernel or driver level, <code>sudo shani-deploy -r</code> takes you back to the verified previous state in under a minute.</p>
+<p>---</p>
+<h2>Common Gaming Commands</h2>
+<pre><code class="language-bash"># Check Vulkan is working
+vulkaninfo --summary
+
+# Useful Steam launch options:
+# PROTON_LOG=1 %command%           — enable Proton debug logging
+# DXVK_ASYNC=1 %command%           — async shader compilation (reduces stutters)
+# MANGOHUD=1 %command%              — enable performance overlay
+# ENABLE_VKBASALT=1 %command%       — enable post-processing
+# MANGOHUD_DLSYM=1 MANGOHUD=1 %command%  — for OpenGL games
+
+# Force a specific Proton version for a Steam game
+# Steam → Game Properties → Compatibility → Force specific Proton version
+
+# Check GameMode is active
+gamemoded -s</code></pre>
+<p>Full gaming troubleshooting: <a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a>.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions answered</li>
+<li><a href="https://docs.shani.dev/doc/intro/whats-included">docs.shani.dev — Gaming Hardware & Performance</a> — full hardware compatibility list</li>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — troubleshooting</li>
+<li><a href="https://docs.shani.dev/doc/software/waydroid">docs.shani.dev — Android (Waydroid)</a> — Android gaming setup</li>
+<li><a href="https://www.protondb.com">ProtonDB</a> — community Wine/Proton compatibility database</li>
+<li><a href="https://appdb.winehq.org">WineHQ AppDB</a> — compatibility reports for non-game Windows software</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a> — gaming discussions and support</li>
+</ul>
+<p><a href="https://shani.dev">Download Shani OS KDE Plasma Edition at shani.dev →</a></p>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

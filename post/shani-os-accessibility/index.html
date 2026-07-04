@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Shani OS ships a complete accessibility stack at first boot — Orca screen reader with espeak-ng TTS, braille display support via brltty, display magnification, high-contrast themes, keyboard navigation, and assistive technology infrastructure. Nothing to install.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Accessibility on Shani OS — Screen Reader, Braille, Magnification, and More","description":"Shani OS ships a complete accessibility stack at first boot — Orca screen reader with espeak-ng TTS, braille display support via brltty, display magnification, high-contrast themes, keyboard navigation, and assistive technology infrastructure. Nothing to install.","url":"https://blog.shani.dev/post/shani-os-accessibility","datePublished":"2026-04-29T00:00:00.000Z","dateModified":"2026-04-29T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Accessibility on Shani OS — Screen Reader, Braille, Magnification, and More","description":"Shani OS ships a complete accessibility stack at first boot — Orca screen reader with espeak-ng TTS, braille display support via brltty, display magnification, high-contrast themes, keyboard navigation, and assistive technology infrastructure. Nothing to install.","url":"https://blog.shani.dev/post/shani-os-accessibility","datePublished":"2026-04-29T00:00:00.000Z","dateModified":"2026-04-29T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,204 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Accessibility on Shani OS — Screen Reader, Braille, Magnification, and More</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-29 · 6 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Shani OS ships a complete accessibility stack under <code>shani-accessibility</code> — pre-installed and available from the moment you log in. This covers screen reading for blind and low-vision users, braille display output, display magnification, high-contrast visual themes, keyboard-only navigation, and speech synthesis.</p>
+<p>All accessibility tools survive every OS update and rollback. Your accessibility preferences are stored in your home directory and the <code>@data</code> configuration overlay.</p>
+<p>---</p>
+<h2>The Accessibility Stack</h2>
+<p>The following are pre-installed on all editions:</p>
+<ul>
+<li><strong>Orca</strong> — the primary screen reader for GNOME; works with all AT-SPI2-accessible applications</li>
+<li><strong>espeak-ng</strong> — text-to-speech engine; Orca's default TTS voice; supports 100+ languages including Indian languages</li>
+<li><strong>espeakup</strong> — connects espeak-ng to the console for speech at the login prompt and in the terminal (no graphical desktop required)</li>
+<li><strong>speech-dispatcher</strong> — unified speech abstraction layer; applications request TTS through this without needing to know which TTS engine is installed</li>
+<li><strong>brltty</strong> — braille display driver and translator; supports 150+ braille display models; available after boot (not in initramfs)</li>
+<li><strong>liblouis</strong> — braille translation tables for 200+ languages including contracted (grade 2) braille</li>
+<li><strong>at-spi2-core</strong> — accessibility infrastructure that all accessible applications use to expose their UI to Orca and other AT tools</li>
+<li><strong>ddcutil</strong> — controls monitor brightness and contrast via DDC/CI (Display Data Channel), useful for low-vision users who need specific screen settings</li>
+</ul>
+<p>---</p>
+<h2>Screen Reader (Orca)</h2>
+<p>Orca is the standard Linux screen reader. It reads the desktop, application menus, dialog boxes, web content, and text aloud using espeak-ng.</p>
+<h3>Enabling Orca</h3>
+<p><strong>GNOME:</strong></p>
+<ul>
+<li>Settings → Accessibility → Screen Reader → toggle on</li>
+<li>Or press <code>Super+Alt+S</code> to toggle immediately</li>
+</ul>
+<p><strong>KDE Plasma:</strong></p>
+<ul>
+<li>System Settings → Accessibility → Screen Reader → enable Orca</li>
+</ul>
+<p><strong>From the terminal:</strong></p>
+<pre><code class="language-bash"># Start Orca
+orca
+
+# Start Orca with verbose mode
+orca --debug
+
+# Check Orca preferences
+orca --setup</code></pre>
+<h3>Key Orca Commands</h3>
+<p>Orca uses the Orca key (by default: <code>Insert</code> on desktop, <code>Caps Lock</code> on laptop). Common shortcuts:</p>
+<pre><code>Orca+F1           — Orca help
+Orca+Space        — toggle flat review mode
+Orca+H            — read current window title
+Orca+T            — read current time
+Orca+F            — read current focus
+Orca+Up Arrow     — read current line
+Orca+Right Arrow  — read next word
+Tab               — move between interactive elements</code></pre>
+<p>Full key binding reference in Orca's preferences (<code>orca --setup</code>).</p>
+<p>---</p>
+<h2>Text-to-Speech (espeak-ng)</h2>
+<p>espeak-ng provides TTS voices for Orca and can be used independently:</p>
+<pre><code class="language-bash"># Speak text from the terminal
+espeak-ng &quot;Hello, this is Shani OS&quot;
+
+# Speak a file
+espeak-ng -f document.txt
+
+# List available voices (includes Indian languages)
+espeak-ng --voices
+
+# Use a specific voice
+espeak-ng -v hi &quot;नमस्ते&quot;          # Hindi
+espeak-ng -v ta &quot;வணக்கம்&quot;         # Tamil
+espeak-ng -v en-us &quot;Hello&quot;        # US English
+espeak-ng -v en-in &quot;Hello&quot;        # Indian English
+
+# Control speed and pitch
+espeak-ng -s 150 -p 60 &quot;Slower, lower pitch&quot;
+
+# Write to a WAV file
+espeak-ng &quot;Text to save&quot; -w output.wav</code></pre>
+<h3>speech-dispatcher</h3>
+<p>For applications that use speech-dispatcher (rather than espeak-ng directly):</p>
+<pre><code class="language-bash"># Test speech-dispatcher
+spd-say &quot;Testing speech output&quot;
+
+# Check which TTS module is active
+spd-conf -D
+
+# List available voices
+spd-say -L</code></pre>
+<p>---</p>
+<h2>Braille Display Support (brltty)</h2>
+<p>brltty provides braille display support. It is pre-installed but starts on-demand when a braille display is connected.</p>
+<pre><code class="language-bash"># Check brltty status
+systemctl status brltty
+
+# Start brltty manually
+sudo systemctl start brltty
+
+# List supported braille display models
+brltty --list-devices
+
+# Configure your display model
+sudo nano /etc/brltty.conf
+# Set: braille-driver &lt;your-driver&gt;
+# Set: braille-device &lt;your-device&gt;  e.g. usb: or bluetooth:</code></pre>
+<p>Common display driver codes: <code>al</code> (Alva), <code>bm</code> (Baum), <code>eu</code> (EuroBraille), <code>fs</code> (FreedomScientific), <code>ht</code> (Handy Tech), <code>hw</code> (HumanWare), <code>ninepoint</code>, <code>vs</code> (VisioBraille).</p>
+<p><code>liblouis</code> provides the translation tables for contracting and expanding braille in 200+ languages including Bharati (unified Indian language braille), Tamil braille, and Hindi/Devanagari braille.</p>
+<p>---</p>
+<h2>Visual Accessibility</h2>
+<h3>Display Magnification</h3>
+<p><strong>GNOME:</strong></p>
+<ul>
+<li>Settings → Accessibility → Zoom → toggle on</li>
+<li>Magnification factor, colour effects, and crosshair are configurable</li>
+<li>Or press <code>Super+Alt+8</code> to toggle zoom</li>
+</ul>
+<p><strong>KDE Plasma:</strong></p>
+<ul>
+<li>System Settings → Accessibility → Desktop Zoom</li>
+</ul>
+<pre><code class="language-bash"># GNOME: control zoom from terminal
+gsettings set org.gnome.accessibility.magnifier magnifier-active true
+gsettings set org.gnome.accessibility.magnifier mag-factor 2.0
+
+# Quick zoom in/out (keyboard)
+# Super+= or Super+scroll to zoom in
+# Super-- to zoom out</code></pre>
+<h3>High Contrast Themes</h3>
+<p><strong>GNOME:</strong></p>
+<ul>
+<li>Settings → Accessibility → High Contrast → toggle on</li>
+<li>Alternatively, the Papirus icon theme (pre-installed) has good contrast</li>
+</ul>
+<p><strong>KDE Plasma:</strong></p>
+<ul>
+<li>System Settings → Colors → choose "High Contrast" scheme</li>
+<li>System Settings → Accessibility → toggle various contrast options</li>
+</ul>
+<h3>Cursor Size</h3>
+<p><strong>GNOME:</strong> Settings → Accessibility → Cursor Size</p>
+<p><strong>KDE:</strong> System Settings → Input Devices → Mouse → Cursor Size</p>
+<pre><code class="language-bash"># Set cursor size via gsettings (GNOME)
+gsettings set org.gnome.desktop.interface cursor-size 48</code></pre>
+<h3>Colour Blindness Filters</h3>
+<p><strong>GNOME:</strong> Settings → Accessibility → Colour Filters — choose from Deuteranopia, Protanopia, Tritanopia, or Greyscale</p>
+<p>---</p>
+<h2>Keyboard and Input Accessibility</h2>
+<h3>Sticky Keys</h3>
+<p>Hold a modifier key (Ctrl, Alt, Shift) and it stays active until you press the next key. For users who cannot hold multiple keys simultaneously.</p>
+<p><strong>GNOME:</strong> Settings → Accessibility → Typing → Sticky Keys</p>
+<p><strong>KDE:</strong> System Settings → Accessibility → Sticky Keys</p>
+<h3>Slow Keys</h3>
+<p>Introduces a delay before a keypress is accepted. Prevents accidental key presses.</p>
+<p><strong>GNOME:</strong> Settings → Accessibility → Typing → Slow Keys</p>
+<h3>Bounce Keys</h3>
+<p>Ignores rapid repeated keypresses. For users with tremors.</p>
+<p><strong>GNOME:</strong> Settings → Accessibility → Typing → Bounce Keys</p>
+<h3>On-Screen Keyboard</h3>
+<p><strong>GNOME:</strong> the on-screen keyboard activates automatically when a text field is focused and no physical keyboard is detected. It can be forced on in Settings → Accessibility → Typing → Screen Keyboard.</p>
+<p><strong>KDE:</strong> Virtual keyboard is available via Input Method settings.</p>
+<p>---</p>
+<h2>Monitor Brightness via DDC/CI</h2>
+<p><code>ddcutil</code> controls monitor brightness and contrast through the DDC/CI standard without requiring proprietary software:</p>
+<pre><code class="language-bash"># List detected monitors
+ddcutil detect
+
+# Get current brightness (feature 0x10)
+ddcutil getvcp 10
+
+# Set brightness to 40%
+ddcutil setvcp 10 40
+
+# Get contrast
+ddcutil getvcp 12
+
+# Get all adjustable features
+ddcutil capabilities</code></pre>
+<p>This works on most external monitors and some laptop panels. Useful for users with photosensitivity or specific contrast requirements.</p>
+<p>---</p>
+<h2>Accessibility on the Login Screen</h2>
+<p><code>espeakup</code> connects espeak-ng to the console speech bridge — this means speech is available at the TTY login prompt before the graphical desktop loads. This is particularly useful for headless or fallback access.</p>
+<p>GDM (GNOME's login manager) and SDDM (KDE's login manager) both support Orca at the graphical login screen — Orca auto-starts when the login screen detects an accessibility request.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions answered</li>
+<li>GNOME Accessibility: [Settings → Accessibility]</li>
+<li>KDE Accessibility: [System Settings → Accessibility]</li>
+<li>Orca documentation: <a href="https://help.gnome.org/users/orca/stable/">gnome.org/orca</a></li>
+<li>brltty documentation: <a href="https://brltty.app">brltty.app</a></li>
+<li><a href="https://t.me/shani8dev">Telegram community</a> — questions and support</li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Which Android apps work in Waydroid on Shani OS — Indian banking and government apps, streaming services, DRM status, and practical workarounds for apps that are blocked. Includes a tested compatibility list for common Indian apps.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Android App Compatibility on Shani OS — What Works, What Doesn't, and Workarounds","description":"Which Android apps work in Waydroid on Shani OS — Indian banking and government apps, streaming services, DRM status, and practical workarounds for apps that are blocked. Includes a tested compatibility list for common Indian apps.","url":"https://blog.shani.dev/post/shani-os-android-app-compatibility","datePublished":"2026-05-12T00:00:00.000Z","dateModified":"2026-05-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Android App Compatibility on Shani OS — What Works, What Doesn't, and Workarounds","description":"Which Android apps work in Waydroid on Shani OS — Indian banking and government apps, streaming services, DRM status, and practical workarounds for apps that are blocked. Includes a tested compatibility list for common Indian apps.","url":"https://blog.shani.dev/post/shani-os-android-app-compatibility","datePublished":"2026-05-12T00:00:00.000Z","dateModified":"2026-05-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,77 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Android App Compatibility on Shani OS — What Works, What Doesn't, and Workarounds</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-12 · 7 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Waydroid runs Android 11 (AOSP) in a hardware-accelerated container. Most apps work. Some don't — primarily those that use Play Integrity / SafetyNet checks, kernel-level anti-cheat, or heavy ARM JIT that doesn't translate well on x86. This guide covers the practical compatibility picture for common Indian and international apps.</p>
+<p>For Waydroid setup, see <a href="https://blog.shani.dev/post/waydroid-android-on-shani-os">Waydroid on Shani OS</a>. For the GApps installation needed to use the Play Store, see that guide's GApps section.</p>
+<p>---</p>
+<h2>How Compatibility Works</h2>
+<p>Waydroid runs on your host Linux kernel using Android's <code>binder</code> IPC. The x86 translation (libhoudini) handles ARM-compiled apps. Most app issues fall into one of three categories:</p>
+<p><strong>Passes Play Integrity / SafetyNet check → works fine.</strong> The majority of utility apps, productivity tools, social media, and general apps.</p>
+<p><strong>Fails Play Integrity (banking, DRM apps) → blocked.</strong> Apps that perform root/integrity checks will refuse to run or will crash at startup. This is a policy decision by the app developer, not a Waydroid limitation.</p>
+<p><strong>ARM-heavy compute (games, AR) → may be slow or crash.</strong> Apps with native ARM libraries that do intensive computation — complex 3D games, augmented reality — may perform poorly or fail under translation. x86-native apps run at full speed.</p>
+<p>---</p>
+<h2>Indian Government and Utility Apps</h2>
+<p>| App | Status | Notes | |---|---|---| | <strong>DigiLocker</strong> | ✓ Works | Requires GApps | | <strong>UMANG</strong> | ✓ Works | Requires GApps | | <strong>mAadhaar</strong> | ⚠ Limited | Opens but biometric features unavailable | | <strong>Aarogya Setu</strong> | ✓ Works | Health tracking features functional | | <strong>MyGov</strong> | ✓ Works | | | <strong>ePathshala</strong> | ✓ Works | | | <strong>DIKSHA</strong> | ✓ Works | Educational content plays correctly | | <strong>NPS (National Pension System)</strong> | ✓ Works | |</p>
+<p>---</p>
+<h2>Transport and Travel</h2>
+<p>| App | Status | Notes | |---|---|---| | <strong>IRCTC Rail Connect</strong> | ✓ Works | Full booking and PNR status | | <strong>IRCTC Air</strong> | ✓ Works | | | <strong>Ola</strong> | ✓ Works | Requires GApps for Maps | | <strong>Uber</strong> | ✓ Works | Requires GApps | | <strong>Rapido</strong> | ✓ Works | | | <strong>RedBus</strong> | ✓ Works | | | <strong>MakeMyTrip</strong> | ✓ Works | | | <strong>Yatra</strong> | ✓ Works | | | <strong>Google Maps</strong> | ✓ Works | Requires GApps |</p>
+<p>---</p>
+<h2>Payments and Banking</h2>
+<p>Banking apps are the most commonly asked-about category. Most major Indian banking apps fail Play Integrity checks and will not work in Waydroid. This is a deliberate security policy by the banks, not a Waydroid bug.</p>
+<p>| App | Status | Notes | |---|---|---| | <strong>BHIM</strong> | ⚠ Limited | Opens, basic UPI may work; biometric blocked | | <strong>PhonePe</strong> | ✗ Blocked | Play Integrity check fails | | <strong>Google Pay</strong> | ✗ Blocked | Requires device certification | | <strong>Paytm</strong> | ⚠ Limited | Wallet features work; UPI blocked | | <strong>Amazon Pay</strong> | ⚠ Limited | Shopping payments work; UPI blocked | | <strong>SBI Yono</strong> | ✗ Blocked | Root/integrity check at launch | | <strong>HDFC Mobile Banking</strong> | ✗ Blocked | | | <strong>ICICI iMobile</strong> | ✗ Blocked | | | <strong>Axis Mobile</strong> | ✗ Blocked | | | <strong>Kotak Mobile Banking</strong> | ✗ Blocked | |</p>
+<p><strong>Workaround for banking apps:</strong> Use the bank's website in Vivaldi or Firefox. Most major Indian banks have full-featured mobile web apps that work without any Play Integrity requirement. For OTP receipt, your physical phone handles SMS — you can use KDE Connect to read SMS messages on your Shani OS desktop while completing a transaction in the browser.</p>
+<p>---</p>
+<h2>Streaming and Entertainment</h2>
+<p>| App | Status | Notes | |---|---|---| | <strong>JioCinema</strong> | ✓ Works | HD playback; sports events require GApps | | <strong>Hotstar / Disney+</strong> | ✓ Works | Requires GApps; up to HD | | <strong>SonyLIV</strong> | ✓ Works | Requires GApps | | <strong>ZEE5</strong> | ✓ Works | | | <strong>MX Player</strong> | ✓ Works | | | <strong>Netflix</strong> | ⚠ Limited | GApps required; limited to 480p (Widevine L3 only) | | <strong>Amazon Prime Video</strong> | ⚠ Limited | GApps required; limited to 480p | | <strong>YouTube</strong> | ✓ Works | Full quality; GApps or Vanced/ReVanced recommended | | <strong>Spotify</strong> | ✓ Works | Requires GApps | | <strong>JioSaavn</strong> | ✓ Works | | | <strong>Gaana</strong> | ✓ Works | | | <strong>Wynk Music</strong> | ✓ Works | |</p>
+<p><strong>Note on Netflix/Amazon streaming quality:</strong> Waydroid provides Widevine L3 certification only. L1 (required for HD/4K in apps) is not available. For HD Netflix and Amazon Prime Video, use the browser — Vivaldi has Widevine built in, and both services work at HD quality in Vivaldi or Firefox on the desktop.</p>
+<p>---</p>
+<h2>Communication</h2>
+<p>| App | Status | Notes | |---|---|---| | <strong>WhatsApp</strong> | ✓ Works | Requires GApps; needs phone number for initial setup | | <strong>Telegram</strong> | ✓ Works | Also available as a native Flatpak — prefer that | | <strong>Signal</strong> | ✓ Works | Also available as a native Flatpak — prefer that | | <strong>Instagram</strong> | ✓ Works | Requires GApps | | <strong>Twitter / X</strong> | ✓ Works | Requires GApps | | <strong>Snapchat</strong> | ⚠ Limited | Opens but camera features unreliable | | <strong>Google Meet</strong> | ✓ Works | Requires GApps; use browser version for reliability | | <strong>Zoom</strong> | ✓ Works | Native Flatpak available — prefer that for video calls | | <strong>Microsoft Teams</strong> | ✓ Works | Browser version is more reliable |</p>
+<p>For messaging apps with native Flatpak alternatives (Telegram, Signal, WhatsApp via web), the native app is always the better choice — better performance, better desktop integration, no ARM translation overhead.</p>
+<p>---</p>
+<h2>Shopping</h2>
+<p>| App | Status | Notes | |---|---|---| | <strong>Amazon India</strong> | ✓ Works | Requires GApps | | <strong>Flipkart</strong> | ✓ Works | Requires GApps | | <strong>Meesho</strong> | ✓ Works | | | <strong>Myntra</strong> | ✓ Works | | | <strong>Zepto / Blinkit / Swiggy Instamart</strong> | ✓ Works | Location permissions required | | <strong>Swiggy</strong> | ✓ Works | | | <strong>Zomato</strong> | ✓ Works | |</p>
+<p>---</p>
+<h2>Games</h2>
+<p>| Category | Status | Notes | |---|---|---| | Casual games (2D, puzzle, word) | ✓ Works | Generally excellent | | Mid-tier 3D games (BGMI, Free Fire) | ⚠ Limited | BGMI has anti-cheat block; Free Fire works | | <strong>BGMI / PUBG Mobile</strong> | ✗ Blocked | Kernel-level anti-cheat | | Gacha / RPG games | ✓ Usually works | Most work; some with heavy anti-cheat don't | | <strong>Genshin Impact</strong> | ✓ Works | Full gameplay; some performance variation | | Emulated retro games | ✓ Works | Excellent on x86 |</p>
+<p>For blocked games with kernel-level anti-cheat: there is no workaround within Waydroid. Use a physical device or a dedicated Windows VM.</p>
+<p>---</p>
+<h2>Workarounds Summary</h2>
+<p><strong>For blocked banking apps:</strong> Use the bank's mobile website in Vivaldi or Firefox. Bookmark it to your browser home screen for quick access.</p>
+<p><strong>For limited DRM streaming:</strong> Use Vivaldi or Firefox for Netflix and Amazon Prime Video (HD quality). Hotstar and JioCinema have better Waydroid compatibility.</p>
+<p><strong>For apps that need Play Certification:</strong> After installing GApps, register your device ID at <code>google.com/android/uncertified</code> and wait 15 minutes. This resolves the Play Store "device not certified" warning and improves Play Protect pass rates for some apps.</p>
+<p><strong>For messaging apps that have native Linux alternatives:</strong> Use the Flatpak version. Telegram, Signal, and WhatsApp Web are all better experiences as native desktop apps than via Waydroid.</p>
+<p><strong>For games with ARM-only builds:</strong> Check if an x86 version exists in the Play Store — some games publish both.</p>
+<p>---</p>
+<h2>Checking App Compatibility</h2>
+<p>If an app isn't in the table above:</p>
+<ol>
+<li>Install it and try it — the failure mode is usually immediate (app crashes on launch = Play Integrity block; or poor performance = ARM translation issue)</li>
+<li>Check <a href="https://github.com/waydroid/waydroid/issues">github.com/waydroid</a> for reports</li>
+<li>Ask in the <a href="https://t.me/shani8dev">Telegram community</a> — someone else has probably tried it</li>
+</ol>
+<p>For apps that fail Play Integrity, there is generally no fix within Waydroid. The recommended workaround is the bank/service's mobile website.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/waydroid-android-on-shani-os">Waydroid on Shani OS</a> — full setup guide</li>
+<li><a href="https://docs.waydro.id">Waydroid documentation</a> — upstream project</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a> — app compatibility questions</li>
+<li><a href="https://docs.shani.dev/doc/software/waydroid">docs.shani.dev — Android (Waydroid)</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

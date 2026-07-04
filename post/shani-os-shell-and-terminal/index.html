@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Shani OS ships a fully configured, modern shell environment — Zsh with syntax highlighting and autosuggestions, Starship prompt, McFly neural-network history, FZF fuzzy search, and a complete toolkit of CLI tools. Here is how it all fits together.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"The Shell Experience on Shani OS — Zsh, Starship, McFly, FZF, and More","description":"Shani OS ships a fully configured, modern shell environment — Zsh with syntax highlighting and autosuggestions, Starship prompt, McFly neural-network history, FZF fuzzy search, and a complete toolkit of CLI tools. Here is how it all fits together.","url":"https://blog.shani.dev/post/shani-os-shell-and-terminal","datePublished":"2026-04-22T00:00:00.000Z","dateModified":"2026-04-22T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"The Shell Experience on Shani OS — Zsh, Starship, McFly, FZF, and More","description":"Shani OS ships a fully configured, modern shell environment — Zsh with syntax highlighting and autosuggestions, Starship prompt, McFly neural-network history, FZF fuzzy search, and a complete toolkit of CLI tools. Here is how it all fits together.","url":"https://blog.shani.dev/post/shani-os-shell-and-terminal","datePublished":"2026-04-22T00:00:00.000Z","dateModified":"2026-04-22T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,234 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">The Shell Experience on Shani OS — Zsh, Starship, McFly, FZF, and More</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-22 · 7 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Most Linux distributions ship a minimal shell environment and leave the rest to you. Shani OS takes the opposite approach: the shell is configured properly from the start, with tools that developers and power users usually spend hours assembling themselves.</p>
+<p>Everything described in this post is pre-installed and active on first boot — no configuration required unless you want to customise further. Your shell configuration lives in your home directory (<code>~/.zshrc</code>, <code>~/.config/starship.toml</code>), completely independent of the OS. It survives every OS update and rollback untouched.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/updates/shell">docs.shani.dev — Shell & Environment</a>.</p>
+<p>---</p>
+<h2>The Default Shell: Zsh</h2>
+<p>Zsh is the default shell on Shani OS. Every new user account is automatically configured with <code>/bin/zsh</code>. Bash and Fish are also installed and available — switch with <code>chsh -s /bin/bash</code> or <code>chsh -s /bin/fish</code> if you prefer.</p>
+<p>Zsh is configured with three plugins that bring Fish-style interactivity:</p>
+<p><strong>Syntax highlighting</strong> (<code>zsh-syntax-highlighting</code>): commands turn green as you type them if they are valid, red if they are not. Typos are visible before you press Enter.</p>
+<p><strong>Autosuggestions</strong> (<code>zsh-autosuggestions</code>): as you type, a ghost-text suggestion appears based on your command history. Press the right arrow key or <code>End</code> to accept the suggestion. The longer you use the shell, the more accurate the suggestions become.</p>
+<p><strong>History substring search</strong> (<code>zsh-history-substring-search</code>): press the up arrow with a partial command typed to cycle through every history entry that contains that substring — not just entries that start with what you typed.</p>
+<p>Zsh completions (<code>zsh-completions</code>) are configured for hundreds of commands including <code>git</code>, <code>systemctl</code>, <code>podman</code>, <code>flatpak</code>, <code>nix-env</code>, and <code>shani-deploy</code>.</p>
+<p>---</p>
+<h2>Starship Prompt</h2>
+<p><a href="https://starship.rs">Starship</a> replaces the default Zsh prompt with a fast, informative, and configurable one. It is written in Rust and adds no perceptible latency to the prompt.</p>
+<p>What Starship shows by default:</p>
+<ul>
+<li>Current directory (shortened to the last two components)</li>
+<li>Git branch and status (modified files, ahead/behind remote)</li>
+<li>Active Python virtualenv</li>
+<li>Node.js version (when in a Node project directory)</li>
+<li>Rust toolchain version (when <code>Cargo.toml</code> is present)</li>
+<li>Exit code of the last command (when non-zero)</li>
+<li>Command duration (for long-running commands)</li>
+</ul>
+<p>To customise your Starship configuration:</p>
+<pre><code class="language-bash"># Starship config file
+nano ~/.config/starship.toml
+
+# Example: change the prompt character
+# [character]
+# success_symbol = &quot;[❯](green)&quot;
+# error_symbol = &quot;[❯](red)&quot;
+
+# Full configuration reference
+starship config</code></pre>
+<p>---</p>
+<h2>McFly: Neural Network Command History</h2>
+<p><a href="https://github.com/cantino/mcfly">McFly</a> replaces the standard <code>Ctrl+R</code> history search with a local, on-device neural network that learns from your usage patterns. It runs entirely on your machine — no data leaves your system.</p>
+<p>Standard <code>Ctrl+R</code> gives you a linear search through history, most recent first. McFly gives you:</p>
+<ul>
+<li><strong>Context-aware results</strong>: commands relevant to your current directory are ranked higher</li>
+<li><strong>Exit-code awareness</strong>: failed commands are deprioritised</li>
+<li><strong>Pattern learning</strong>: commands you run frequently in a given context surface at the top</li>
+<li><strong>Search as you type</strong>: fuzzy matching across your full history</li>
+</ul>
+<p>Press <code>Ctrl+R</code> to activate McFly. Type any fragment of the command you want. Navigate with arrow keys. Press Enter to execute.</p>
+<p>McFly's database lives in <code>~/.local/share/mcfly/history.db</code> — a SQLite file in your home directory that persists across everything and grows more useful over time.</p>
+<p>---</p>
+<h2>FZF: Fuzzy Finder</h2>
+<p><a href="https://github.com/junegunn/fzf">FZF</a> is integrated into the Zsh configuration and provides fuzzy search for files, history, and directories via keyboard shortcuts.</p>
+<p><strong><code>Ctrl+R</code></strong> — History search (McFly is bound here by default; if you prefer pure FZF, switch in <code>.zshrc</code>)</p>
+<p><strong><code>Ctrl+T</code></strong> — Insert a file path. Opens a fuzzy file finder for the current directory tree. Navigate with arrow keys, type to filter. Press Enter to insert the selected path at the cursor position.</p>
+<p><strong><code>Alt+C</code></strong> — Change directory. Opens a fuzzy directory finder. Navigate with arrow keys, type to filter. Press Enter to <code>cd</code> to the selected directory.</p>
+<p>FZF can also be used directly in scripts and pipelines:</p>
+<pre><code class="language-bash"># Interactively select from a list
+ls | fzf
+
+# Select a running process to kill
+ps aux | fzf | awk '{print $2}' | xargs kill
+
+# Select a git branch to checkout
+git branch | fzf | xargs git checkout
+
+# Search and preview files
+fzf --preview 'cat {}'</code></pre>
+<p>---</p>
+<h2>Pre-Installed CLI Tools</h2>
+<p>These tools are available immediately without installing anything:</p>
+<h3>File Search and Navigation</h3>
+<pre><code class="language-bash"># ripgrep — faster grep with better defaults
+rg &quot;search term&quot;           # search recursively from current dir
+rg &quot;pattern&quot; src/          # search in a specific directory
+rg -l &quot;pattern&quot;            # list only file names
+rg --type py &quot;import&quot;      # search only Python files
+
+# fd — modern find replacement
+fd &quot;filename&quot;              # find files by name
+fd -e py                   # find by extension
+fd --type d                # find directories only
+fd -x command {}           # run a command on each result
+
+# fzf (covered above)
+fzf</code></pre>
+<h3>File Viewing</h3>
+<pre><code class="language-bash"># bat — cat with syntax highlighting and line numbers
+bat file.py
+bat --language json file.json
+bat -n file.txt            # with line numbers only
+
+# eza — modern ls replacement
+eza                        # basic listing
+eza -l                     # long format
+eza --tree                 # tree view
+eza -la --git              # with git status per file</code></pre>
+<h3>System Monitoring</h3>
+<pre><code class="language-bash"># htop — interactive process viewer
+htop
+
+# fastfetch — system information summary
+fastfetch
+
+# ncdu — disk usage analyser (interactive)
+ncdu
+
+# tree — directory tree view
+tree
+tree -L 2                  # limit depth
+tree --gitignore           # respect .gitignore</code></pre>
+<h3>Text Processing</h3>
+<pre><code class="language-bash"># jq — JSON processor
+echo '{&quot;key&quot;: &quot;value&quot;}' | jq .
+curl api.example.com/data | jq '.results[].name'
+
+# Awk, sed, grep — standard tools all present
+awk '{print $1}' file.txt
+sed 's/old/new/g' file.txt
+grep -r &quot;pattern&quot; .</code></pre>
+<h3>Compression</h3>
+<pre><code class="language-bash"># 7zip handles everything
+7z a archive.7z file.txt
+7z x archive.7z
+
+# Standard tools
+tar xzf archive.tar.gz
+unzip archive.zip
+unrar x archive.rar</code></pre>
+<p>---</p>
+<h2>Shell Configuration Files</h2>
+<p>Your shell configuration lives in your home directory:</p>
+<pre><code>~/.zshrc               — Zsh configuration (plugins, aliases, env vars)
+~/.bashrc              — Bash configuration
+~/.profile             — login shell config (shared between shells)
+~/.config/starship.toml — Starship prompt configuration
+~/.local/share/mcfly/  — McFly history database</code></pre>
+<p>All of these are in <code>@home</code> — completely independent of the OS. They are never touched by OS updates or rollbacks.</p>
+<h3>Adding Aliases</h3>
+<pre><code class="language-bash"># Add to ~/.zshrc
+nano ~/.zshrc
+
+# Examples
+alias ll='eza -la'
+alias cat='bat'
+alias find='fd'
+alias grep='rg'
+alias update='sudo shani-deploy update'
+alias status='cat /data/current-slot'</code></pre>
+<h3>Environment Variables</h3>
+<pre><code class="language-bash"># In ~/.zshrc or ~/.profile
+export EDITOR=vim
+export PATH=&quot;$HOME/.local/bin:$PATH&quot;
+export DOCKER_HOST=unix:///run/user/$UID/podman/podman.sock</code></pre>
+<p>---</p>
+<h2>Multiple Shells</h2>
+<p>All three major shells are installed:</p>
+<pre><code class="language-bash"># Check available shells
+cat /etc/shells
+
+# Switch default shell
+chsh -s /bin/bash    # switch to Bash
+chsh -s /bin/fish    # switch to Fish
+chsh -s /bin/zsh     # switch back to Zsh (default)</code></pre>
+<p>Fish has its own syntax (not POSIX-compatible) but excellent interactive features built-in — autosuggestions, syntax highlighting, and web-based configuration all come standard. If you prefer Fish, switch with <code>chsh</code> and your entire interactive experience becomes Fish-based.</p>
+<p>---</p>
+<h2>Tmux</h2>
+<p>Tmux (terminal multiplexer) is pre-installed. It lets you split your terminal into panes, create multiple windows, and detach from sessions that keep running in the background.</p>
+<pre><code class="language-bash"># Start a new session
+tmux
+
+# Start a named session
+tmux new -s work
+
+# Split horizontally
+Ctrl+B then %
+
+# Split vertically
+Ctrl+B then &quot;
+
+# Switch panes
+Ctrl+B then arrow keys
+
+# Detach from session (session keeps running)
+Ctrl+B then D
+
+# List sessions
+tmux ls
+
+# Reattach to a session
+tmux attach -t work</code></pre>
+<p>Tmux configuration lives in <code>~/.tmux.conf</code>. The default configuration on Shani OS is minimal — add your own preferences there.</p>
+<p>---</p>
+<h2>Installing Additional Shell Tools via Nix</h2>
+<p>Nix is the right tool for installing additional CLI utilities that are not pre-installed:</p>
+<pre><code class="language-bash"># Set up Nix channel first (once)
+nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+nix-channel --update
+
+# Install additional tools
+nix-env -iA nixpkgs.tldr          # simplified man pages
+nix-env -iA nixpkgs.bottom        # better htop
+nix-env -iA nixpkgs.delta         # better git diff
+nix-env -iA nixpkgs.lazygit       # terminal UI for git
+nix-env -iA nixpkgs.zoxide        # smarter cd with frecency
+nix-env -iA nixpkgs.starship      # update Starship if needed</code></pre>
+<p>All Nix-installed tools survive OS updates and rollbacks, are immediately on your <code>$PATH</code>, and do not touch the immutable OS root.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> — what to use for each type of software</li>
+<li><a href="https://blog.shani.dev/post/shani-os-first-week">Your First Week with Shani OS</a> — day-by-day setup guide</li>
+<li><a href="https://docs.shani.dev/doc/updates/shell">docs.shani.dev — Shell & Environment</a> — full shell configuration reference</li>
+<li><a href="https://blog.shani.dev/post/nix-on-shani-os">Nix on Shani OS</a> — installing additional CLI tools</li>
+<li><a href="https://blog.shani.dev/post/distrobox-on-shani-os">Distrobox on Shani OS</a> — tools that need a full distro environment</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

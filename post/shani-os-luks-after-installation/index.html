@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Full-disk encryption must be enabled at install time on Shani OS. This guide covers what to do if you missed it, and the complete reference for managing LUKS2 on an already-encrypted system: keyslots, passphrases, keyfiles, header backup, TPM2, and emergency recovery.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"LUKS2 Encryption on Shani OS — Setup, Management, and Recovery","description":"Full-disk encryption must be enabled at install time on Shani OS. This guide covers what to do if you missed it, and the complete reference for managing LUKS2 on an already-encrypted system: keyslots, passphrases, keyfiles, header backup, TPM2, and emergency recovery.","url":"https://blog.shani.dev/post/shani-os-luks-after-installation","datePublished":"2026-05-09T00:00:00.000Z","dateModified":"2026-05-09T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"LUKS2 Encryption on Shani OS — Setup, Management, and Recovery","description":"Full-disk encryption must be enabled at install time on Shani OS. This guide covers what to do if you missed it, and the complete reference for managing LUKS2 on an already-encrypted system: keyslots, passphrases, keyfiles, header backup, TPM2, and emergency recovery.","url":"https://blog.shani.dev/post/shani-os-luks-after-installation","datePublished":"2026-05-09T00:00:00.000Z","dateModified":"2026-05-09T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,206 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">LUKS2 Encryption on Shani OS — Setup, Management, and Recovery</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-09 · 8 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Full-disk encryption on Shani OS is a single checkbox in the installer. If you skipped it, the correct path is to reinstall — not to attempt to encrypt an existing installation in place.</p>
+<p>This guide covers why that is the right call, how to reinstall cleanly, and then — for users who already have an encrypted system — a complete reference for everything you can do with LUKS2: managing keyslots and passphrases, adding keyfiles, backing up the LUKS header, enrolling TPM2 auto-unlock, and recovering from worst-case scenarios.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/security/luks">docs.shani.dev — LUKS</a>.</p>
+<p>---</p>
+<h2>If You Missed Encryption at Install: Reinstall</h2>
+<p>Encrypting an existing unencrypted Shani OS installation requires wiping the root partition entirely. There is no in-place conversion. Attempting it by hand means: backing up all data, booting from USB, repartitioning, creating a LUKS container, recreating the Btrfs subvolume layout, restoring data, regenerating UKIs, and re-enrolling TPM2. Each step is an opportunity for data loss. The Shani OS installer does all of this correctly in a few clicks.</p>
+<p><strong>The right approach:</strong></p>
+<ol>
+<li>Back up your home directory and any data you want to keep:</li>
+</ol>
+<pre><code class="language-bash">   # restic is pre-installed
+   restic -r /media/external/backup init
+   restic -r /media/external/backup backup ~/
+   restic -r /media/external/backup backup /data/
+   restic -r /media/external/backup check
+   </code></pre>
+<ol>
+<li>Download the latest Shani OS ISO from <a href="https://shani.dev">shani.dev</a> and write it to a USB drive</li>
+<li>Boot from the USB and run the installer</li>
+<li>On the disk setup screen, <strong>enable full-disk encryption</strong> — it is a single toggle</li>
+<li>Complete installation, reboot, and restore your home directory from the backup</li>
+</ol>
+<p>The installer creates the LUKS2 container with <code>argon2id</code> KDF, creates all Btrfs subvolumes, configures <code>/etc/crypttab</code>, and generates the UKIs with the correct LUKS UUID embedded. Everything is wired up correctly from the start.</p>
+<p>After reinstalling, enroll TPM2 for passwordless unlock:</p>
+<pre><code class="language-bash">sudo gen-efi enroll-tpm2</code></pre>
+<p>That's it. The rest of this guide is for users who already have an encrypted system and want to manage it.</p>
+<p>---</p>
+<h2>Why LUKS2 with argon2id</h2>
+<p>Shani OS uses LUKS2 with the <code>argon2id</code> key derivation function:</p>
+<ul>
+<li><strong>argon2id</strong> is memory-hard — it requires a large amount of RAM to compute, making GPU and ASIC brute-force attacks orders of magnitude more expensive than with older PBKDF2-based setups</li>
+<li><strong>LUKS2</strong> supports multiple keyslots, allowing you to have a passphrase, a keyfile, and a TPM2-sealed key all active simultaneously</li>
+<li>The passphrase you choose still matters — argon2id slows attackers down but a weak passphrase is still a weak passphrase</li>
+</ul>
+<p>Default encryption parameters used by the Shani OS installer:</p>
+<pre><code>Cipher:      aes-xts-plain64
+Key size:    512 bits
+PBKDF:       argon2id
+Memory cost: 1048576 KB (1 GB)
+Time cost:   4 iterations
+Parallelism: 4 threads</code></pre>
+<p>---</p>
+<h2>Checking Encryption Status</h2>
+<pre><code class="language-bash"># Is the root partition encrypted?
+lsblk -f | grep -E &quot;crypt|luks&quot;
+# Should show crypto_LUKS under your root partition (e.g. nvme0n1p2)
+
+# View the full LUKS header — version, cipher, KDF, all keyslots
+sudo cryptsetup luksDump /dev/nvme0n1p2
+
+# Confirm the active mapper device
+cat /proc/mounts | grep mapper</code></pre>
+<p>Look for <code>Version: 2</code>, <code>cipher: aes-xts-plain64</code>, and <code>PBKDF: argon2id</code>. If you see <code>pbkdf2</code> instead of <code>argon2id</code>, your KDF is significantly weaker — you can convert it:</p>
+<pre><code class="language-bash">sudo cryptsetup luksConvertKey --pbkdf argon2id /dev/nvme0n1p2</code></pre>
+<p>---</p>
+<h2>Managing Keyslots</h2>
+<p>LUKS2 supports up to 32 keyslots. Each keyslot holds an independent key that can decrypt the volume. You can have a primary passphrase, a backup passphrase, a keyfile, and a TPM2-sealed key all active at once.</p>
+<h3>Adding a Second Passphrase (Recovery Key)</h3>
+<p>Adding a second passphrase gives you a backup if you forget the first, or a separate passphrase for a trusted person:</p>
+<pre><code class="language-bash">sudo cryptsetup luksAddKey /dev/nvme0n1p2
+# Enter any existing passphrase when prompted, then set the new one</code></pre>
+<h3>Changing Your Passphrase</h3>
+<p>LUKS does not have a "change passphrase" operation — you add a new keyslot then remove the old one:</p>
+<pre><code class="language-bash"># Step 1: Add the new passphrase (creates a new keyslot)
+sudo cryptsetup luksAddKey /dev/nvme0n1p2
+
+# Step 2: Find the keyslot number of the old passphrase
+sudo cryptsetup luksDump /dev/nvme0n1p2 | grep -A2 &quot;Keyslot&quot;
+
+# Step 3: Remove the old keyslot
+sudo cryptsetup luksKillSlot /dev/nvme0n1p2 &lt;keyslot-number&gt;
+# You will be prompted to authenticate with any remaining valid key</code></pre>
+<h3>Adding a Keyfile</h3>
+<p>Keyfiles are useful for automated unlock scenarios or as a recovery key stored securely off-device:</p>
+<pre><code class="language-bash"># Generate a strong random keyfile
+sudo dd if=/dev/urandom of=/root/luks-keyfile bs=512 count=8
+sudo chmod 400 /root/luks-keyfile
+
+# Add the keyfile as an additional LUKS keyslot
+sudo cryptsetup luksAddKey /dev/nvme0n1p2 /root/luks-keyfile
+
+# Verify all keyslots
+sudo cryptsetup luksDump /dev/nvme0n1p2 | grep -E &quot;Keyslot|Token&quot;</code></pre>
+<p>Store the keyfile off-device. Losing it does not lock you out as long as you still have your passphrase.</p>
+<h3>Removing a Keyslot</h3>
+<pre><code class="language-bash"># Remove a specific keyslot by number
+sudo cryptsetup luksKillSlot /dev/nvme0n1p2 &lt;keyslot-number&gt;
+
+# Or remove by key (prompts for the key to remove)
+sudo cryptsetup luksRemoveKey /dev/nvme0n1p2</code></pre>
+<p>Never remove all keyslots — leave at least your passphrase slot intact.</p>
+<p>---</p>
+<h2>Backing Up the LUKS Header</h2>
+<p>The LUKS header stores all keyslots. If it gets corrupted — by a disk failure, accidental overwrite, or filesystem error — the encrypted data is permanently and completely unrecoverable. Back up the header:</p>
+<pre><code class="language-bash">sudo cryptsetup luksHeaderBackup /dev/nvme0n1p2 \
+  --header-backup-file ~/luks-header-backup-$(date +%Y%m%d).img
+
+# Store this file off-device — external drive, encrypted cloud storage
+# Verify it is readable
+file ~/luks-header-backup-*.img</code></pre>
+<p>Restoring from a header backup:</p>
+<pre><code class="language-bash"># This restores the keyslots as they were at backup time
+sudo cryptsetup luksHeaderRestore /dev/nvme0n1p2 \
+  --header-backup-file luks-header-backup-20260401.img</code></pre>
+<p>Back up the header again any time you add or remove a keyslot.</p>
+<p>---</p>
+<h2>TPM2 Auto-Unlock</h2>
+<p>TPM2 auto-unlock seals your LUKS key into the TPM2 chip so the disk unlocks silently on boot — no passphrase prompt — as long as the boot chain is unmodified. Your passphrase always remains valid as a fallback.</p>
+<h3>Enrolling</h3>
+<pre><code class="language-bash"># gen-efi handles PCR policy selection and KDF validation automatically
+sudo gen-efi enroll-tpm2</code></pre>
+<p>You will be prompted for your LUKS passphrase. The PCR policy is chosen based on your Secure Boot state:</p>
+<ul>
+<li><strong>Secure Boot enabled:</strong> PCR 0 + PCR 7 — firmware measurements and Secure Boot certificate state</li>
+<li><strong>Secure Boot disabled:</strong> PCR 0 only — firmware measurements only (weaker)</li>
+</ul>
+<p>After enrolling, reboot and confirm the disk unlocks silently.</p>
+<h3>After Firmware Updates</h3>
+<p>If <code>fwupdmgr update</code> updated your BIOS, PCR 0 changes. The TPM will not release the key, so you will be prompted for your passphrase on the next boot. This is expected behaviour.</p>
+<pre><code class="language-bash"># After booting with passphrase, clean up the stale slot and re-enroll
+sudo gen-efi cleanup-tpm2
+sudo gen-efi enroll-tpm2</code></pre>
+<h3>After Secure Boot Changes</h3>
+<p>When you enable, disable, or change enrolled Secure Boot keys, PCR 7 changes. Re-enroll:</p>
+<pre><code class="language-bash">sudo gen-efi cleanup-tpm2
+sudo gen-efi enroll-tpm2</code></pre>
+<h3>Adding a TPM2 PIN (Second Factor)</h3>
+<p>For stronger protection, require a short PIN in addition to TPM2 binding. <code>gen-efi enroll-tpm2</code> prompts you to opt in during enrollment. Plymouth will ask for the PIN at boot — the disk only unlocks if both the TPM measurement matches and the PIN is correct.</p>
+<h3>Verifying TPM2 State</h3>
+<pre><code class="language-bash"># Confirm TPM2 enrollment is present
+sudo cryptsetup luksDump /dev/nvme0n1p2 | grep systemd-tpm2
+
+# List all keyslots and tokens
+sudo cryptsetup luksDump /dev/nvme0n1p2 | grep -A5 &quot;Token&quot;
+
+# List available TPM2 devices
+sudo systemd-cryptenroll --tpm2-device=list</code></pre>
+<p>Full TPM2 reference: <a href="https://docs.shani.dev/doc/security/tpm2">docs.shani.dev — TPM2 Enrollment</a>.</p>
+<p>---</p>
+<h2>Verifying Encryption is Working</h2>
+<pre><code class="language-bash"># Confirm the partition type
+lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT
+# nvme0n1p2 should show crypto_LUKS
+
+# Check the mapper device is active
+ls -la /dev/mapper/shani_root
+
+# Full header dump
+sudo cryptsetup luksDump /dev/nvme0n1p2</code></pre>
+<p>---</p>
+<h2>Emergency Recovery</h2>
+<h3>Forgotten Passphrase, No Backup Key</h3>
+<p>If you have no backup passphrase, no keyfile, and no TPM2 enrollment — the data is <strong>unrecoverable</strong>. This is the intended security guarantee of LUKS2.</p>
+<p>Boot from the Shani OS USB, reinstall, and restore from your data backups.</p>
+<h3>Have a Backup Keyfile</h3>
+<pre><code class="language-bash"># Boot from Shani OS USB
+# Open the encrypted partition using the keyfile
+sudo cryptsetup open /dev/nvme0n1p2 shani_root \
+  --key-file /path/to/luks-keyfile
+
+# Mount and access your data
+sudo mount -o subvol=@home /dev/mapper/shani_root /mnt/home
+sudo mount -o subvol=@data /dev/mapper/shani_root /mnt/data</code></pre>
+<h3>Have a Header Backup (Corrupted Header)</h3>
+<pre><code class="language-bash"># Boot from Shani OS USB
+# Restore the header backup first
+sudo cryptsetup luksHeaderRestore /dev/nvme0n1p2 \
+  --header-backup-file luks-header-backup.img
+
+# Then open with your passphrase as normal
+sudo cryptsetup open /dev/nvme0n1p2 shani_root</code></pre>
+<h3>TPM2 Won't Unlock (Firmware Changed)</h3>
+<pre><code class="language-bash"># Boot and enter your passphrase when prompted
+# Then re-enroll TPM2 with current PCR values
+sudo gen-efi cleanup-tpm2
+sudo gen-efi enroll-tpm2</code></pre>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions answered</li>
+<li><a href="https://docs.shani.dev/doc/security/luks">docs.shani.dev — LUKS</a> — full reference</li>
+<li><a href="https://docs.shani.dev/doc/security/tpm2">docs.shani.dev — TPM2 Enrollment</a> — passwordless unlock setup</li>
+<li><a href="https://blog.shani.dev/post/gen-efi-and-secure-boot">gen-efi and Secure Boot on Shani OS</a> — UKI generation and TPM2</li>
+<li><a href="https://blog.shani.dev/post/shani-os-security-deep-dive">Security Without Configuration</a> — security model overview</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a> — ask for help before attempting recovery procedures</li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

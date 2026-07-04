@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="A detailed walkthrough of how Shani OS is structured on disk — every Btrfs subvolume, every mount, every step from image signing to your running desktop.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"The Architecture Behind Shani OS — Subvolumes, Slots, and the Update Pipeline","description":"A detailed walkthrough of how Shani OS is structured on disk — every Btrfs subvolume, every mount, every step from image signing to your running desktop.","url":"https://blog.shani.dev/post/shani-os-architecture-deep-dive","datePublished":"2026-04-12T00:00:00.000Z","dateModified":"2026-04-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"The Architecture Behind Shani OS — Subvolumes, Slots, and the Update Pipeline","description":"A detailed walkthrough of how Shani OS is structured on disk — every Btrfs subvolume, every mount, every step from image signing to your running desktop.","url":"https://blog.shani.dev/post/shani-os-architecture-deep-dive","datePublished":"2026-04-12T00:00:00.000Z","dateModified":"2026-04-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,164 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Engineering</span>
+        <h1 class="post-title">The Architecture Behind Shani OS — Subvolumes, Slots, and the Update Pipeline</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-12 · 10 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>The <a href="https://blog.shani.dev/post/why-os-updates-should-never-break">previous post in this series</a> explained <em>why</em> the traditional OS update model is broken and what Shani OS does differently at a conceptual level. This post goes one layer deeper: exactly how everything is structured on disk, why each decision was made, and how the pieces connect.</p>
+<p>The full reference documentation — every subvolume, every mount option, every bind mount, the complete boot sequence — lives at <a href="https://docs.shani.dev">docs.shani.dev</a>. This post is the guided tour; the wiki is the reference manual.</p>
+<p>---</p>
+<h2>The Btrfs Layout</h2>
+<p>Shani OS's entire persistence model is built on Btrfs subvolumes. There are two partitions on disk: a 1 GB FAT32 EFI System Partition (ESP) for the bootloader and Unified Kernel Images, and one Btrfs partition that holds everything else.</p>
+<pre><code>/dev/sdX
+├── EFI System Partition (FAT32, 1 GB)
+│   └── shanios-blue.efi, shanios-green.efi (UKIs, MOK-signed)
+└── Btrfs filesystem
+    ├── @blue          ← OS slot A (read-only root)
+    ├── @green         ← OS slot B (read-only root)
+    ├── @data          ← /etc overlay, service state, slot tracking
+    ├── @home          ← /home (user data)
+    ├── @log           ← /var/log (persistent logs)
+    ├── @cache         ← /var/cache
+    ├── @flatpak       ← /var/lib/flatpak
+    ├── @nix           ← /nix (shared across both slots)
+    ├── @containers    ← /var/lib/containers (Podman)
+    ├── @snapd         ← /var/lib/snapd
+    ├── @waydroid      ← /var/lib/waydroid
+    ├── @libvirt       ← /var/lib/libvirt (nodatacow — VM disks)
+    ├── @qemu          ← /var/lib/qemu  (nodatacow — VM disks)
+    ├── @machines      ← /var/lib/machines (systemd-nspawn)
+    ├── @lxc / @lxd    ← LXC and LXD containers
+    └── @swap          ← /swap (nodatacow — required for swapfile)</code></pre>
+<p>Image integrity is underpinned by <code>ostree</code> and <code>composefs</code>, which verify the OS subvolume contents. <code>squashfuse</code> enables read-only squashfs mounts where needed during the boot and recovery sequence.</p>
+<p>Only <code>@blue</code> and <code>@green</code> are OS images. Every other subvolume holds data that is independent of which OS slot is running. This is the core guarantee: <strong>an OS update or rollback touches exactly two subvolumes and nothing else</strong>. Your home directory, your Flatpak apps, your Snap packages, your Nix packages, your containers, and your configuration all survive every update unchanged.</p>
+<p>---</p>
+<h2>The Two Slots</h2>
+<p><code>@blue</code> and <code>@green</code> are complete, independently bootable operating systems. At any given moment, exactly one is the active slot. The other is either an older version (your rollback target) or a freshly prepared update (your next boot).</p>
+<p>The active slot is recorded in <code>/data/current-slot</code>. <code>shani-deploy</code> reads this to determine which slot to write the next update into.</p>
+<p>Both slots are mounted read-only at runtime. The kernel enforces this — it is not a file permission or an ACL. If a process running as root attempts to write to <code>/usr</code>, the kernel refuses. The filesystem is physically read-only.</p>
+<p>The boot entries in systemd-boot are labelled clearly:</p>
+<ul>
+<li><code>shanios-blue (Active)</code> — the currently running slot</li>
+<li><code>shanios-green (Candidate)</code> — the standby slot</li>
+</ul>
+<p>After each deployment, <code>shani-deploy</code> rewrites both entries. The newly updated slot is labelled Active with <code>+3-0</code> boot-count tries set. If it fails to reach multi-user.target within three attempts, systemd-boot automatically falls back to the Candidate slot.</p>
+<p><code>shani-update</code> runs automatically via a systemd user timer — 15 minutes after boot and every 2 hours — checking for new versions and surfacing the appropriate dialog for fallback boots, pending reboots, or available updates.</p>
+<p>---</p>
+<h2>How /etc Stays Writable</h2>
+<p>A fully read-only root creates an obvious problem: <code>/etc</code> needs to be writable. You need to configure things, enable services, manage SSH keys, and edit network settings.</p>
+<p>Shani OS solves this with OverlayFS. At boot, three layers are assembled:</p>
+<ul>
+<li><strong>Lower layer</strong>: the read-only <code>/etc</code> from the active OS slot</li>
+<li><strong>Upper layer</strong>: a writable directory in <code>@data/overlay/etc/upper</code></li>
+<li><strong>Work directory</strong>: <code>@data/overlay/etc/work</code> (required by the kernel for atomic copy-up operations)</li>
+</ul>
+<p>The result is mounted at <code>/etc</code>. Reads see both layers merged. Writes go to the upper layer in <code>@data</code>.</p>
+<pre><code>overlay /etc overlay rw,lowerdir=/etc,upperdir=/data/overlay/etc/upper,\
+workdir=/data/overlay/etc/work,index=off,metacopy=off,\
+x-systemd.requires-mounts-for=/data 0 0</code></pre>
+<p>This has an important property: when you update to a new OS slot, the lower layer changes (new OS defaults), but the upper layer in <code>@data</code> is untouched. Your customisations survive. Configuration you have never touched automatically gets the new default. Configuration you have touched is yours, until you explicitly change it.</p>
+<p>To see what you have customised:</p>
+<pre><code class="language-bash">ls -la /data/overlay/etc/upper</code></pre>
+<p>---</p>
+<h2>Why /var Is tmpfs</h2>
+<p><code>/var</code> is mounted as a volatile tmpfs — it is cleared on every reboot. This is set via the <code>systemd.volatile=state</code> kernel parameter embedded in the Unified Kernel Image.</p>
+<p>The traditional Linux assumption is that <code>/var</code> accumulates state over time: package databases, service state files, caches, lock files, runtime sockets. On an immutable OS, this creates a problem: after an OS update, the service state in <code>/var</code> may be inconsistent with the new software version's expectations.</p>
+<p>The solution is to make <code>/var</code> transient. Critical service state that needs to survive reboots is stored in <code>@data</code> and bind-mounted back into the appropriate <code>/var</code> paths at boot. Everything else starts clean.</p>
+<p>The bind-mounted paths include everything you would expect to persist: Wi-Fi passwords and VPN configs (<code>/var/lib/NetworkManager</code>), Bluetooth pairings, printer configuration, Tailscale keys, SSH host keys, fingerprint enrollment, TPM2 sealed objects, and more. The full list is in <a href="https://docs.shani.dev/doc/arch/filesystem">Persistent Bind Mounts at docs.shani.dev</a>.</p>
+<p>This eliminates an entire class of bugs caused by accumulated cruft in <code>/var</code> across OS versions.</p>
+<p>---</p>
+<h2>The Update Pipeline in Full</h2>
+<p>Here is every step <code>shani-deploy update</code> runs, in order.</p>
+<h3>1. Fetch and Verify</h3>
+<pre><code class="language-bash"># Download version manifest from R2 CDN (with SourceForge fallback)
+# e.g. https://downloads.shani.dev/&lt;profile&gt;/stable.txt
+
+# Download image — streamed with resume support via aria2c, wget, or curl
+# SHA256 verified after download
+# GPG signature verified against known public key</code></pre>
+<p>Nothing is written to the OS subvolumes until both the checksum and signature verify. A corrupted or tampered image never touches your system. If the download is interrupted, it resumes from where it stopped.</p>
+<h3>2. Snapshot the Inactive Slot</h3>
+<pre><code class="language-bash">btrfs subvolume snapshot @green @green.$(date +%Y%m%d-%H%M%S)</code></pre>
+<p>This snapshot is created before any changes to the inactive slot. If the update partially writes and something goes wrong, this snapshot is your recovery point.</p>
+<h3>3. Extract the New Image</h3>
+<pre><code class="language-bash"># Decompress and receive the btrfs send stream into a temp workspace
+zstd -d --long=31 -T0 shanios-&lt;version&gt;-&lt;profile&gt;.zst -c | btrfs receive /mnt/temp_update
+
+# Extraction succeeded — now swap the candidate slot
+btrfs subvolume delete @green
+btrfs subvolume snapshot /mnt/temp_update/shanios_base @green
+btrfs property set -f -ts @green ro true</code></pre>
+<p><code>btrfs receive</code> reconstructs the subvolume from the send stream. The result is byte-for-byte identical to the subvolume that was snapshotted, signed, and shipped. This is not package application or a diff — it is a complete, verified reconstitution of exactly what passed build QA.</p>
+<h3>4. Generate the UKI</h3>
+<p>A Unified Kernel Image bundles the kernel, initramfs, and kernel command line into a single signed EFI binary. <code>gen-efi</code> generates and signs a new UKI for the updated slot. <code>shani-deploy</code> runs this inside a chroot of the candidate slot:</p>
+<pre><code class="language-bash">gen-efi configure green</code></pre>
+<p>The kernel cmdline embedded in the UKI is regenerated from the live disk state — current LUKS UUID, swap offset, keyboard layout — and written to <code>/etc/kernel/install_cmdline_green</code> before <code>dracut</code> assembles the UKI. Signing uses the MOK keypair at <code>/etc/secureboot/keys/MOK.key</code> and <code>MOK.crt</code>. The signed UKI is placed in the ESP and the bootloader is updated to set it as the next-boot default.</p>
+<h3>5. Boot Counting</h3>
+<p>The new entry is registered with systemd-boot's boot counting. The entry filename gets a <code>+3-0</code> suffix: 3 tries allowed, 0 done. Each failed boot attempt decrements the tries-left counter. If it reaches zero, systemd-boot automatically falls back to the previous slot's UKI.</p>
+<p>If the new slot boots successfully, <code>bless-boot</code> calls <code>bootctl set-good</code>, which renames the entry from <code>+3-0</code> to <code>+3-3</code> (done equals left), stopping the countdown. The slot becomes the permanent default.</p>
+<p>---</p>
+<h2>Application Isolation</h2>
+<p>The <code>@flatpak</code>, <code>@nix</code>, and <code>@containers</code> subvolumes exist entirely outside the OS slots.</p>
+<p>Updates are independent. <code>flatpak update</code> and <code>shani-deploy</code> do not interact. You can update your apps without touching the OS. An OS rollback does not roll back your applications.</p>
+<p>Both slots share the same application data. When you boot from <code>@blue</code> or <code>@green</code>, both mount the same <code>@flatpak</code> subvolume. An app updated while running <code>@blue</code> is also updated when running <code>@green</code>. There is no duplication, no per-slot application state, and no re-downloading apps after a slot switch.</p>
+<p>Nix is particularly well-suited to this model. Nix's store is content-addressed and immutable by design — a path in <code>/nix/store</code> always refers to exactly one thing, and it is never modified in place. The <code>@nix</code> subvolume shared between both slots is internally consistent regardless of which OS slot accesses it.</p>
+<p>---</p>
+<h2>The Security Stack</h2>
+<p>Shani OS enables six Linux Security Modules simultaneously at boot. Most distributions enable one (typically AppArmor or SELinux):</p>
+<p>| Module | Function | |---|---| | AppArmor | Per-process capability profiles | | Landlock | Filesystem access control for unprivileged processes | | Lockdown | Restricts kernel features that could bypass security (integrity mode) | | Yama | Restricts ptrace scope across process trees | | Integrity (IMA/EVM) | Measures and enforces file integrity at runtime | | BPF LSM | Programmable security hooks for custom eBPF policy |</p>
+<p>The read-only root is itself a security primitive. An attacker who achieves root access during a session cannot write a persistent backdoor into <code>/usr/bin</code> — the OS is physically read-only. Persistence requires compromising the update pipeline, which requires bypassing GPG signature verification.</p>
+<p>For the full security model: <a href="https://docs.shani.dev/doc/security">docs.shani.dev — Security</a>.</p>
+<p>---</p>
+<h2>What You Can and Cannot Customise</h2>
+<p><strong>You can:</strong></p>
+<ul>
+<li>Install any Flatpak, Snap, AppImage, or Nix package — these live outside the OS</li>
+<li>Run any container via Podman, Distrobox, LXC, or LXD — also outside the OS</li>
+<li>Edit any file in <code>/etc</code> — changes persist via OverlayFS in <code>@data</code></li>
+<li>Enable/disable systemd services — changes persist via OverlayFS</li>
+<li>Modify <code>/home</code> freely — completely independent of the OS</li>
+<li>Use <code>virt-manager</code> and <code>libvirt</code> for full VMs — stored in <code>@libvirt</code></li>
+<li>Run Android apps via Waydroid — state in <code>@waydroid</code></li>
+</ul>
+<p><strong>You cannot:</strong></p>
+<ul>
+<li>Install packages directly to the OS root (the root is read-only; use Flatpak, Snap, Nix, or Distrobox instead)</li>
+<li>Modify files in <code>/usr</code> at runtime</li>
+<li>Build a custom OS image without going through the <code>shani-deploy</code> pipeline</li>
+</ul>
+<p>For the migration guide mapping every traditional Linux workflow to its Shani OS equivalent: <a href="https://docs.shani.dev/doc/concepts">docs.shani.dev</a>.</p>
+<p>---</p>
+<h2>Storage Efficiency</h2>
+<p>The dual-slot architecture sounds expensive on disk, but is not in practice. Btrfs Copy-on-Write shares unchanged data blocks between <code>@blue</code> and <code>@green</code>. Only changed files consume additional space — typically around 18% overhead compared to a single-image system.</p>
+<p>On top of that, <code>bees</code> (the background deduplication daemon) continuously deduplicates shared content across all subvolumes. <code>shani-deploy --storage-info</code> and <code>sudo compsize /</code> show accurate compressed and deduplicated sizes.</p>
+<p>Btrfs zstd compression, applied to all subvolumes except VM disk images and swap, typically reduces the OS image footprint by 30–50%.</p>
+<p>---</p>
+<h2>Practical Outcomes</h2>
+<p>All of this machinery produces a simple end state: updates never break a running system, rollback is always available in one command, and the security posture is strong by default.</p>
+<p>The <a href="https://blog.shani.dev/post/shani-os-2026-04-15-release">2026.04.15 release</a> is the current stable image. Full documentation: <a href="https://docs.shani.dev">docs.shani.dev</a>.</p>
+<p><a href="https://shani.dev">Download Shani OS at shani.dev →</a></p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/why-os-updates-should-never-break">Why Your OS Update Should Never Break Your Computer</a> — the philosophy behind the architecture</li>
+<li><a href="https://blog.shani.dev/post/shani-os-security-deep-dive">Security Without Configuration</a> — the security model in detail</li>
+<li><a href="https://blog.shani.dev/post/gen-efi-and-secure-boot">gen-efi and Secure Boot on Shani OS</a> — UKI generation and Secure Boot chain</li>
+<li><a href="https://docs.shani.dev">docs.shani.dev</a> — full technical documentation</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions answered</li>
+<li><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> — what to use for each type of software</li>
+<li><a href="https://blog.shani.dev/post/shani-os-updates">Updates on Shani OS</a> — update and rollback reference</li>
+</ul>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

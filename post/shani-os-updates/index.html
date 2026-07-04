@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="The complete guide to Shani OS updates: how shani-update detects and surfaces updates automatically, and the full shani-deploy flag reference for every scenario — update, rollback, dry-run, cleanup, channel management, and automated fleet deployments.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Updates on Shani OS — shani-update, shani-deploy, and the Full Reference","description":"The complete guide to Shani OS updates: how shani-update detects and surfaces updates automatically, and the full shani-deploy flag reference for every scenario — update, rollback, dry-run, cleanup, channel management, and automated fleet deployments.","url":"https://blog.shani.dev/post/shani-os-updates","datePublished":"2026-05-12T00:00:00.000Z","dateModified":"2026-05-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Updates on Shani OS — shani-update, shani-deploy, and the Full Reference","description":"The complete guide to Shani OS updates: how shani-update detects and surfaces updates automatically, and the full shani-deploy flag reference for every scenario — update, rollback, dry-run, cleanup, channel management, and automated fleet deployments.","url":"https://blog.shani.dev/post/shani-os-updates","datePublished":"2026-05-12T00:00:00.000Z","dateModified":"2026-05-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,216 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Updates on Shani OS — shani-update, shani-deploy, and the Full Reference</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-12 · 12 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Shani OS has two tools in its update pipeline. <code>shani-update</code> is the user-facing manager — it runs automatically, detects what state the system is in, and presents appropriate dialogs. <code>shani-deploy</code> is the underlying engine that downloads, verifies, and applies OS images. Understanding both is understanding the full update system.</p>
+<p>For the architecture behind atomic updates — how blue/green slots, Btrfs, and boot counting work — see <a href="https://blog.shani.dev/post/shani-os-architecture-deep-dive">The Architecture Behind Shani OS</a>. For the philosophy: <a href="https://blog.shani.dev/post/why-os-updates-should-never-break">Why Your OS Update Should Never Break Your Computer</a>. Full reference: <a href="https://docs.shani.dev/doc/updates/system">docs.shani.dev — System Updates</a>.</p>
+<p>---</p>
+<h2>shani-deploy Quick Reference</h2>
+<pre><code class="language-bash">sudo shani-deploy                        # update (stable channel)
+sudo shani-deploy -r                     # roll back to previous slot
+sudo shani-deploy -d                     # dry-run — simulate without changes
+sudo shani-deploy -c                     # cleanup old backups and cached downloads
+sudo shani-deploy -o                     # on-demand block deduplication
+sudo shani-deploy -t latest              # use latest channel for this run
+sudo shani-deploy -f                     # force redeploy even if already current
+sudo shani-deploy -v                     # verbose output
+sudo shani-deploy --set-channel stable   # permanently set update channel
+sudo shani-deploy --set-channel latest
+sudo shani-deploy --skip-self-update     # skip self-update check
+sudo shani-deploy --update-genefi        # pull latest gen-efi for this run</code></pre>
+<p>---</p>
+<h2>Part 1 — shani-update: The User-Facing Manager</h2>
+<p><code>shani-update</code> runs automatically in two ways: via a desktop autostart entry (<code>shani-update --startup</code>) that fires at login after a 15-second delay, and via a systemd user timer that triggers 15 minutes after boot and every 2 hours thereafter. It can also be run manually at any time.</p>
+<h3>What shani-update Does on Each Run</h3>
+<p>Every invocation works through a fixed priority sequence. Each step can short-circuit the rest.</p>
+<p><strong>1. Fallback boot detection</strong></p>
+<p><code>shani-update</code> compares the booted subvolume (from <code>/proc/cmdline</code>) against <code>/data/current-slot</code>. If they differ and a <code>/data/boot_failure</code> marker is present, the newly deployed slot failed to boot and the system fell back automatically.</p>
+<p>A dialog appears offering to run <code>shani-deploy -r</code> to clean the failed slot. If confirmed, <code>shani-deploy -r</code> runs in a terminal via <code>pkexec</code>, then a follow-up dialog offers an immediate reboot.</p>
+<p><strong>2. Reboot-needed check</strong></p>
+<p>If <code>/run/shanios/reboot-needed</code> exists, a staged update is waiting. A dialog offers to restart now or later. This file is on a tmpfs and clears automatically on reboot.</p>
+<p><strong>3. Candidate boot check</strong></p>
+<p>If the booted slot differs from <code>current-slot</code> but there's no failure marker, you're running the newly deployed slot for the first time. A dialog confirms this and offers rollback if anything seems wrong.</p>
+<p><strong>4. Update check</strong></p>
+<p>If the system is in a clean steady state, <code>shani-update</code> checks network connectivity, fetches the latest release metadata from the CDN, and compares it against <code>/etc/shani-version</code>. If a newer version is available, a dialog asks whether to install now or defer. Deferring schedules a reminder in 24 hours via <code>systemd-run --user</code>.</p>
+<p>When the user confirms, <code>shani-update</code> detects the running terminal emulator and launches <code>shani-deploy</code> inside it via <code>pkexec</code>.</p>
+<h3>shani-update Usage</h3>
+<pre><code class="language-bash"># Run at login (used by the autostart entry — 15s delay)
+shani-update --startup
+
+# Run interactively — same checks, no startup delay
+shani-update
+
+# Roll back the inactive slot immediately
+shani-update --rollback
+shani-update -r
+
+# Force deploy even if already current
+shani-update --force
+shani-update -f
+
+# Use a specific channel for this run
+shani-update --channel latest
+shani-update -t latest
+
+# Verbose output
+shani-update --verbose
+shani-update -v
+
+# Dry-run — simulate without changes
+shani-update --dry-run
+shani-update -d</code></pre>
+<h3>Logs and Status</h3>
+<pre><code class="language-bash"># View recent shani-update activity
+cat ~/.cache/shani-update.log
+
+# Via journalctl
+journalctl -t shani-update -n 50
+
+# Check the timer status
+systemctl --user status shani-update.timer
+
+# Run an immediate interactive check
+shani-update</code></pre>
+<h3>GUI Support</h3>
+<p><code>shani-update</code> supports <code>yad</code> (preferred), <code>zenity</code>, and <code>kdialog</code>, tried in order. All dialogs have configurable timeouts — fallback/reboot dialogs: 5 minutes; update dialogs: 2 minutes before auto-dismissal and deferral. When no GUI is available (SSH, headless), it falls back to <code>notify-send</code> or an interactive console prompt.</p>
+<p>---</p>
+<h2>Part 2 — shani-deploy: The Update Engine</h2>
+<h3>How shani-deploy Updates Itself</h3>
+<p>Before doing anything else, <code>shani-deploy</code> checks GitHub for a newer version of itself. If found, it re-executes with all current state preserved — so you always run the latest deployment logic. Use <code>--skip-self-update</code> to bypass this in network-restricted environments.</p>
+<h3>Core Operations</h3>
+<h4><code>sudo shani-deploy</code> — Update</h4>
+<p>Steps performed in order:</p>
+<ol>
+<li>Self-update check (re-execs if newer version found)</li>
+<li>Slot detection — determines active and candidate slots</li>
+<li>System inhibit — blocks sleep, shutdown, lid-close for the duration</li>
+<li>Boot validation — confirms the boot environment is consistent</li>
+<li>Space check — requires at least 10 GB free on the Btrfs filesystem</li>
+<li>Fetch metadata — downloads release manifest from CDN (R2 primary, SourceForge fallback)</li>
+<li>Already current check — exits cleanly if already on latest (unless <code>-f</code> is used)</li>
+<li>Download — streams the image with resume support via <code>aria2c</code>, then <code>wget</code>, then <code>curl</code></li>
+<li>SHA256 verify — verifies checksum after download</li>
+<li>GPG verify — verifies signature against the Shani OS key (<code>7B927BFFD4A9EAAA8B666B77DE217F3DA8014792</code>)</li>
+<li>Snapshot — takes a timestamped Btrfs snapshot of the inactive slot before writing</li>
+<li>Extract — pipes the verified image into <code>btrfs receive</code></li>
+<li>UKI generation — runs <code>gen-efi configure &lt;inactive-slot&gt;</code> inside a chroot of the new slot</li>
+<li>Boot entry update — new slot becomes next-boot default with <code>+3-0</code> boot count tries</li>
+<li>Reboot marker — writes <code>/run/shanios/reboot-needed</code> so <code>shani-update</code> can show a restart dialog</li>
+</ol>
+<p>Nothing in your running OS is touched at any point. The chroot bind-mounts <code>data</code>, <code>etc</code>, <code>var</code>, and <code>swap</code> from the live system so <code>gen-efi</code> has access to MOK keys, vconsole config, and swap offset.</p>
+<h4><code>sudo shani-deploy -r</code> — Rollback</h4>
+<p>Restores the inactive slot from its most recent timestamped Btrfs snapshot and sets it as the next-boot default. Run this from the OS copy you want to <strong>keep</strong>. The running system is never touched.</p>
+<pre><code class="language-bash"># Check which slot you are on
+cat /data/current-slot
+
+# Roll back
+sudo shani-deploy -r
+
+# Reboot
+sudo reboot</code></pre>
+<h4><code>sudo shani-deploy -d</code> — Dry-Run</h4>
+<p>Simulates the entire update process without making any changes. Downloads metadata and shows what would happen — no image download, no writes.</p>
+<h3>Cleanup and Maintenance</h3>
+<p><strong><code>sudo shani-deploy -c</code></strong> — Removes timestamped slot backup snapshots and cached download files. Safe to run at any time; does not remove the active or inactive slot or any user data.</p>
+<p><strong><code>sudo shani-deploy -o</code></strong> — Runs an on-demand <code>duperemove</code> block deduplication pass across the entire Btrfs root. Takes several minutes on large filesystems, safe during normal use.</p>
+<p>---</p>
+<h2>Update Channels</h2>
+<p>Two channels are available:</p>
+<p><strong><code>stable</code></strong> (default) — Monthly validated builds, full QA cycle. Recommended for all users.</p>
+<p><strong><code>latest</code></strong> — More frequent releases, closer to cutting-edge, less QA time.</p>
+<pre><code class="language-bash"># Use latest for one update only
+sudo shani-deploy -t latest
+
+# Switch permanently
+sudo shani-deploy --set-channel latest
+sudo shani-deploy --set-channel stable
+
+# Check current channel
+cat /etc/shani-channel</code></pre>
+<p>Both <code>shani-deploy</code> and <code>shani-update</code> read from <code>/etc/shani-channel</code>.</p>
+<p>---</p>
+<h2>Boot Counting and Automatic Rollback</h2>
+<p>After an update, the new slot is registered with <code>+3-0</code> boot-count tries:</p>
+<ul>
+<li><strong>Successful boot:</strong> <code>bless-boot</code> calls <code>bootctl set-good</code>, the slot becomes the permanent default.</li>
+<li><strong>Failed boot:</strong> systemd-boot decrements the count on each attempt. After three failures it falls back to the previous slot automatically — no user action required, works even if the system can't reach the login prompt.</li>
+</ul>
+<p>On the next successful login, <code>shani-update</code> detects the fallback and offers to clean the failed slot.</p>
+<p>---</p>
+<h2>Understanding Slot State Files</h2>
+<pre><code class="language-bash"># Active slot
+cat /data/current-slot
+
+# Reboot-needed marker (tmpfs, cleared on reboot)
+cat /run/shanios/reboot-needed
+
+# Boot state markers in /data/
+# boot-ok           — written on successful boot
+# boot_failure      — fallback was detected
+# boot_hard_failure — slot failed to mount entirely
+# boot_failure.acked — shani-update acknowledged the failure
+
+# Slot backup snapshots (root Btrfs volume)
+sudo btrfs subvolume list / | grep backup
+# @blue_backup_YYYYMMDD-HHMMSS
+# @green_backup_YYYYMMDD-HHMMSS</code></pre>
+<p>---</p>
+<h2>Advanced Flags</h2>
+<p><strong><code>-f</code> / <code>--force</code></strong> — Force redeploy even if already on the latest version. Useful for repairing a corrupted slot.</p>
+<p><strong><code>-v</code> / <code>--verbose</code></strong> — Debug-level logging showing every command and detailed progress.</p>
+<p><strong><code>--skip-self-update</code></strong> — Skip the GitHub self-update check. Use in network-restricted environments or when testing a specific version.</p>
+<p><strong><code>--update-genefi</code></strong> — Downloads the latest <code>gen-efi</code> from GitHub and uses it for this deployment without installing it to the host. Useful when a <code>gen-efi</code> fix is available before the next OS image.</p>
+<p>---</p>
+<h2>Automated Updates (Fleet / Unattended)</h2>
+<p>For fleet deployments, disable the user-facing autostart and timer, and drive updates directly:</p>
+<pre><code class="language-bash"># Disable autostart system-wide
+sudo rm /etc/xdg/autostart/shani-update.desktop
+
+# Disable and mask the user timer system-wide
+sudo systemctl --global disable shani-update.timer
+sudo systemctl --global mask shani-update.timer</code></pre>
+<p>Then drive updates on your schedule:</p>
+<pre><code class="language-bash"># /etc/systemd/system/shani-autoupdate.service
+[Unit]
+Description=Shani OS Automatic Update
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/shani-deploy
+
+# /etc/systemd/system/shani-autoupdate.timer
+[Unit]
+Description=Weekly Shani OS Update
+
+[Timer]
+OnCalendar=Sunday 02:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target</code></pre>
+<pre><code class="language-bash">sudo systemctl enable --now shani-autoupdate.timer</code></pre>
+<p><code>shani-deploy</code> writes <code>/run/shanios/reboot-needed</code> after staging. Check for this marker in your maintenance window logic and schedule the reboot separately.</p>
+<p>See <a href="https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment">Shani OS for OEMs and IT Fleets</a> for the full fleet deployment guide.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://docs.shani.dev/doc/updates/system">docs.shani.dev — System Updates</a> — full configuration reference</li>
+<li><a href="https://blog.shani.dev/post/shani-os-architecture-deep-dive">The Architecture Behind Shani OS</a> — how slots and the update pipeline work</li>
+<li><a href="https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment">Shani OS for OEMs and IT Fleets</a> — fleet deployment guide</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Apptainer is the HPC standard for portable, reproducible containers — pre-installed on Shani OS, no root required, runs the same SIF image on your workstation and on any SLURM/PBS cluster. Build once, run anywhere, with full NVIDIA and AMD ROCm GPU support.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Apptainer (Singularity) on Shani OS — HPC Containers for Workstation and Cluster","description":"Apptainer is the HPC standard for portable, reproducible containers — pre-installed on Shani OS, no root required, runs the same SIF image on your workstation and on any SLURM/PBS cluster. Build once, run anywhere, with full NVIDIA and AMD ROCm GPU support.","url":"https://blog.shani.dev/post/apptainer-on-shani-os","datePublished":"2026-05-07T00:00:00.000Z","dateModified":"2026-05-07T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Apptainer (Singularity) on Shani OS — HPC Containers for Workstation and Cluster","description":"Apptainer is the HPC standard for portable, reproducible containers — pre-installed on Shani OS, no root required, runs the same SIF image on your workstation and on any SLURM/PBS cluster. Build once, run anywhere, with full NVIDIA and AMD ROCm GPU support.","url":"https://blog.shani.dev/post/apptainer-on-shani-os","datePublished":"2026-05-07T00:00:00.000Z","dateModified":"2026-05-07T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,295 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Apptainer (Singularity) on Shani OS — HPC Containers for Workstation and Cluster</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-07 · 8 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Apptainer — formerly Singularity — is the container runtime built for HPC. Where Docker and Podman are designed for services and development workflows, Apptainer is designed for a specific problem: running a portable, self-contained environment on machines you do not control. Clusters. Shared login nodes. HPC systems where you cannot run a root daemon, cannot install packages, and cannot guarantee that the host OS matches your workstation.</p>
+<p>Apptainer solves this by packaging your entire software environment — libraries, Python packages, tools, environment variables — into a single <code>.sif</code> (Singularity Image Format) file. That file runs identically on your Shani OS workstation and on any cluster that has Apptainer installed. No divergence. No "works on my machine."</p>
+<p>On Shani OS, Apptainer is pre-installed. No configuration required. It runs as an unprivileged user out of the box.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/software/containers">docs.shani.dev — Containers</a>.</p>
+<p>---</p>
+<h2>Apptainer vs Podman vs Distrobox</h2>
+<p>| | Apptainer | Podman | Distrobox | |---|---|---|---| | Primary use case | HPC / cluster portability | Services, dev containers | Mutable dev environments | | Image format | SIF (single file) | OCI layers | OCI layers | | Root required | No | No | No | | Home dir shared | Yes (by default) | No | Yes (by default) | | GPU passthrough | <code>--nv</code> / <code>--rocm</code> flags | Manual device flags | Manual device flags | | Cluster-compatible | Yes — runs anywhere Apptainer is installed | No | No | | Mutable at runtime | No (images are read-only) | Yes | Yes |</p>
+<p><strong>Use Apptainer when:</strong></p>
+<ul>
+<li>You need to run the same environment on your workstation and on a SLURM/PBS/LSF cluster</li>
+<li>You are working with collaborators who need to reproduce your exact environment</li>
+<li>You want a single portable file you can archive alongside your data and code</li>
+<li>The cluster you submit to has Apptainer/Singularity installed (most do)</li>
+</ul>
+<p>---</p>
+<h2>Basic Usage</h2>
+<pre><code class="language-bash"># Pull an image from Docker Hub (converted to SIF automatically)
+apptainer pull docker://ubuntu:22.04
+apptainer pull docker://python:3.11-slim
+apptainer pull docker://rocm/pytorch:latest
+
+# Run the default runscript of a container
+apptainer run ubuntu_22.04.sif
+
+# Execute a specific command
+apptainer exec ubuntu_22.04.sif python3 --version
+apptainer exec ubuntu_22.04.sif bash -c &quot;pip list&quot;
+
+# Open an interactive shell
+apptainer shell ubuntu_22.04.sif
+
+# Run with NVIDIA GPU support
+apptainer exec --nv pytorch_latest.sif python3 -c &quot;import torch; print(torch.cuda.is_available())&quot;
+
+# Run with AMD ROCm GPU support
+apptainer exec --rocm rocm_pytorch.sif python3 -c &quot;import torch; print(torch.cuda.is_available())&quot;
+
+# Bind mount a host directory into the container
+apptainer exec --bind /home/$USER/data:/data myimage.sif python3 /data/analysis.py
+
+# Multiple bind mounts
+apptainer exec \
+  --bind /home/$USER/data:/data \
+  --bind /home/$USER/scripts:/scripts \
+  myimage.sif python3 /scripts/run.py</code></pre>
+<p>By default, Apptainer automatically binds your home directory into the container. Your files are available at the same paths inside and outside.</p>
+<p>---</p>
+<h2>Pulling Images from Different Sources</h2>
+<pre><code class="language-bash"># From Docker Hub
+apptainer pull docker://ubuntu:22.04
+apptainer pull docker://nvidia/cuda:12.3.0-devel-ubuntu22.04
+apptainer pull docker://rocm/dev-ubuntu-22.04:latest
+
+# From GitHub Container Registry
+apptainer pull docker://ghcr.io/some-org/some-image:latest
+
+# From Sylabs Cloud Library (Apptainer's native registry)
+apptainer pull library://lolcow
+
+# Save with a specific name
+apptainer pull --name my-pytorch.sif docker://pytorch/pytorch:2.2.0-cuda12.1-cudnn8-runtime
+
+# Inspect an image before running it
+apptainer inspect ubuntu_22.04.sif
+apptainer inspect --runscript ubuntu_22.04.sif
+apptainer inspect --labels ubuntu_22.04.sif</code></pre>
+<p>---</p>
+<h2>Building Reproducible Images</h2>
+<p>The real power of Apptainer for research is the definition file (<code>.def</code>). It is a complete, text-based, version-controllable description of your environment. Anyone with Apptainer can build the identical image from the same <code>.def</code> file.</p>
+<h3>A Basic Research Environment</h3>
+<pre><code># python-research.def
+Bootstrap: docker
+From: ubuntu:22.04
+
+%post
+    apt-get update -y &amp;&amp; apt-get install -y \
+        python3 python3-pip python3-dev \
+        git wget curl build-essential
+
+    pip3 install --no-cache-dir \
+        numpy==1.26.4 \
+        scipy==1.12.0 \
+        pandas==2.2.1 \
+        matplotlib==3.8.3 \
+        scikit-learn==1.4.1 \
+        jupyter==1.0.0
+
+%environment
+    export PATH=/usr/local/bin:$PATH
+    export PYTHONPATH=/usr/local/lib/python3/dist-packages
+
+%runscript
+    exec python3 &quot;$@&quot;
+
+%labels
+    Author your.name@institution.edu
+    Version 1.0
+    Description Python 3.11 research environment — paper XYZ reproducibility</code></pre>
+<pre><code class="language-bash"># Build it (--fakeroot avoids needing real root)
+apptainer build --fakeroot python-research.sif python-research.def
+
+# Verify
+apptainer inspect --labels python-research.sif
+
+# Test
+apptainer exec python-research.sif python3 -c &quot;import numpy; print(numpy.__version__)&quot;
+
+# Share — the .sif file is fully self-contained
+# Collaborators run: apptainer exec python-research.sif python3 their_script.py</code></pre>
+<h3>A Bioinformatics Environment</h3>
+<pre><code># bioinformatics.def
+Bootstrap: docker
+From: ubuntu:22.04
+
+%post
+    apt-get update -y &amp;&amp; apt-get install -y \
+        python3 python3-pip \
+        samtools bwa bowtie2 \
+        bedtools fastqc trimmomatic \
+        r-base r-cran-ggplot2 r-cran-dplyr
+
+    pip3 install --no-cache-dir \
+        biopython snakemake pysam
+
+%environment
+    export PATH=/usr/local/bin:$PATH
+
+%labels
+    Version 2.1
+    Description Bioinformatics pipeline environment</code></pre>
+<h3>A PyTorch + CUDA Environment</h3>
+<pre><code># pytorch-cuda.def
+Bootstrap: docker
+From: nvidia/cuda:12.3.0-devel-ubuntu22.04
+
+%post
+    apt-get update -y &amp;&amp; apt-get install -y python3 python3-pip
+
+    pip3 install --no-cache-dir \
+        torch==2.2.0+cu121 \
+        torchvision torchaudio \
+        --index-url https://download.pytorch.org/whl/cu121
+
+    pip3 install --no-cache-dir \
+        transformers datasets accelerate \
+        wandb tensorboard
+
+%environment
+    export PATH=/usr/local/bin:$PATH
+
+%runscript
+    exec python3 &quot;$@&quot;</code></pre>
+<pre><code class="language-bash">apptainer build --fakeroot pytorch-cuda.sif pytorch-cuda.def
+
+# Run with GPU access
+apptainer exec --nv pytorch-cuda.sif python3 train.py</code></pre>
+<p>---</p>
+<h2>Submitting to HPC Clusters</h2>
+<p>The <code>.sif</code> file you build and test on your Shani OS workstation is exactly what you submit to the cluster. Copy the file to shared storage and reference it in your job script.</p>
+<h3>SLURM</h3>
+<pre><code class="language-bash">#!/bin/bash
+#SBATCH --job-name=my_analysis
+#SBATCH --nodes=1
+#SBATCH --ntasks=8
+#SBATCH --mem=32G
+#SBATCH --gres=gpu:1
+#SBATCH --time=04:00:00
+#SBATCH --output=job_%j.log
+
+# Load Apptainer module if needed (many clusters require this)
+# module load apptainer   # uncomment if cluster uses modules
+
+# Run with NVIDIA GPU
+apptainer exec --nv \
+  --bind /scratch/$USER/data:/data \
+  /scratch/$USER/pytorch-cuda.sif \
+  python3 /home/$USER/analysis/train.py --config config.yaml
+
+# For AMD GPU clusters, swap --nv for --rocm
+# apptainer exec --rocm ...</code></pre>
+<h3>PBS/Torque</h3>
+<pre><code class="language-bash">#!/bin/bash
+#PBS -N my_analysis
+#PBS -l nodes=1:ppn=8:gpus=1
+#PBS -l mem=32gb
+#PBS -l walltime=04:00:00
+
+cd $PBS_O_WORKDIR
+
+apptainer exec --nv \
+  --bind /scratch/$USER/data:/data \
+  /scratch/$USER/pytorch-cuda.sif \
+  python3 analysis/train.py</code></pre>
+<h3>Parallel Jobs with MPI</h3>
+<p>Apptainer supports MPI-enabled containers for multi-node jobs. The MPI on the host must match the MPI version inside the container (hybrid model):</p>
+<pre><code class="language-bash"># Launch an MPI job where mpirun is on the host
+mpirun -np 32 apptainer exec --nv \
+  /scratch/$USER/mpi-app.sif \
+  /app/my_mpi_program</code></pre>
+<p>---</p>
+<h2>GPU Support in Detail</h2>
+<p>Apptainer's <code>--nv</code> and <code>--rocm</code> flags automatically inject the host GPU runtime libraries into the container at runtime. You do not need to bundle drivers in the SIF image — the container stays driver-version agnostic and will work as long as the library ABI is compatible.</p>
+<pre><code class="language-bash"># NVIDIA — inject CUDA runtime from host
+apptainer exec --nv myimage.sif nvidia-smi
+apptainer exec --nv myimage.sif python3 -c &quot;import torch; print(torch.cuda.device_count())&quot;
+
+# AMD ROCm — inject ROCm runtime from host
+apptainer exec --rocm myimage.sif rocm-smi
+apptainer exec --rocm myimage.sif python3 -c &quot;import torch; print(torch.cuda.is_available())&quot;
+
+# Check what GPU libraries are being injected
+apptainer exec --nv --debug myimage.sif true 2&gt;&amp;1 | grep -i nvidia</code></pre>
+<p>This means the same <code>.sif</code> file works across cluster generations as long as the container's CUDA/ROCm version is compatible with the host driver. No rebuilding per cluster.</p>
+<p>---</p>
+<h2>Persistent Overlays</h2>
+<p>By default, Apptainer images are read-only. If you need to install additional packages temporarily or persist data inside the container:</p>
+<pre><code class="language-bash"># Create a writable overlay (stored separately, layered over the read-only SIF)
+apptainer overlay create --size 512 my-overlay.img
+
+# Use it
+apptainer exec --overlay my-overlay.img myimage.sif bash
+
+# Inside: install extra packages — they persist in the overlay
+pip install some-extra-package
+
+# Next run with the same overlay: the package is still there
+apptainer exec --overlay my-overlay.img myimage.sif python3 -c &quot;import some_extra_package&quot;</code></pre>
+<p>For a fully writable sandbox (useful during image development):</p>
+<pre><code class="language-bash"># Create a writable sandbox directory
+apptainer build --sandbox my-sandbox/ docker://ubuntu:22.04
+
+# Enter in writable mode
+apptainer shell --writable my-sandbox/
+
+# Inside: make changes, install packages, test your .def file
+apt-get install -y some-tool
+
+# Convert the tested sandbox back to a SIF
+apptainer build final.sif my-sandbox/</code></pre>
+<p>---</p>
+<h2>Caching and Storage</h2>
+<p>Apptainer caches pulled images in <code>~/.apptainer/cache</code> by default. On Shani OS, your home directory lives in the <code>@home</code> subvolume and persists across OS updates, so the cache survives updates naturally.</p>
+<pre><code class="language-bash"># See cache size
+du -sh ~/.apptainer/cache
+
+# Clear the cache
+apptainer cache clean
+
+# Change cache location (e.g. to a scratch disk)
+export APPTAINER_CACHEDIR=/scratch/$USER/apptainer-cache</code></pre>
+<p>Pulled and built <code>.sif</code> files are standalone files — store them wherever makes sense for your workflow. On a cluster, typically on your scratch or project storage. Locally, wherever you keep project files.</p>
+<p>---</p>
+<h2>Practical Tips</h2>
+<p><strong>Pin your base image versions.</strong> Use <code>From: ubuntu:22.04</code> not <code>From: ubuntu:latest</code>. This ensures your <code>.def</code> file builds the same image six months from now.</p>
+<p><strong>Record package versions in your <code>.def</code> file.</strong> Use <code>pip install package==X.Y.Z</code> not just <code>pip install package</code>. Your future self and collaborators will thank you.</p>
+<p><strong>Keep the <code>.def</code> file in version control alongside your code.</strong> The <code>.sif</code> file is a build artefact — the <code>.def</code> is the source. Commit the <code>.def</code>, not the binary.</p>
+<p><strong>Test locally before submitting to cluster.</strong> Run your full pipeline on a small dataset locally with <code>apptainer exec</code> before writing the job script. Cluster queue time is expensive.</p>
+<p><strong>Use <code>--bind</code> explicitly for data directories.</strong> Don't rely on automatic home binding for large datasets — be explicit about what goes where.</p>
+<p>---</p>
+<h2>Apptainer vs the Full Ecosystem</h2>
+<p>Apptainer is the right tool when cluster portability and long-term reproducibility are the primary requirements — a single <code>.sif</code> file that runs identically on your Shani OS workstation and any SLURM/PBS/LSF cluster. For OCI services and local development, Podman is the right tool. For a full mutable distro environment, Distrobox. For GUI apps, Flatpak. For CLI tools, Nix. For full hardware isolation, VMs.</p>
+<p><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> has the complete decision guide with a flowchart and comparison table.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://docs.shani.dev/doc/software/containers">docs.shani.dev — Containers</a> — full Apptainer reference</li>
+<li><a href="https://blog.shani.dev/post/shani-os-for-researchers-and-hpc">Shani OS for Researchers and HPC</a> — full research computing stack: Nix, GPU compute, DVC, remote access</li>
+<li><a href="https://apptainer.org/docs/user/latest/">Apptainer documentation</a> — official upstream docs</li>
+<li><a href="https://cloud.sylabs.io/library">Sylabs Cloud Library</a> — ready-made HPC SIF images</li>
+<li><a href="https://blog.shani.dev/post/podman-containers-on-shani-os">Podman on Shani OS</a> — OCI containers and services</li>
+<li><a href="https://blog.shani.dev/post/distrobox-on-shani-os">Distrobox on Shani OS</a> — mutable dev containers with full distro package managers</li>
+<li><a href="https://blog.shani.dev/post/nix-on-shani-os">Nix on Shani OS</a> — CLI tools and dev environments</li>
+<li><a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a> — full VMs with hardware isolation</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

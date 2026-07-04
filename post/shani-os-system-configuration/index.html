@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="The /etc OverlayFS on Shani OS means all your configuration changes persist normally across every OS update and rollback. This guide covers editing config files, managing systemd services, enabling services, kernel parameters, and inspecting what you have customised.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"System Configuration on Shani OS — /etc, Services, and What Persists","description":"The /etc OverlayFS on Shani OS means all your configuration changes persist normally across every OS update and rollback. This guide covers editing config files, managing systemd services, enabling services, kernel parameters, and inspecting what you have customised.","url":"https://blog.shani.dev/post/shani-os-system-configuration","datePublished":"2026-05-06T00:00:00.000Z","dateModified":"2026-05-06T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"System Configuration on Shani OS — /etc, Services, and What Persists","description":"The /etc OverlayFS on Shani OS means all your configuration changes persist normally across every OS update and rollback. This guide covers editing config files, managing systemd services, enabling services, kernel parameters, and inspecting what you have customised.","url":"https://blog.shani.dev/post/shani-os-system-configuration","datePublished":"2026-05-06T00:00:00.000Z","dateModified":"2026-05-06T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,245 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">System Configuration on Shani OS — /etc, Services, and What Persists</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-06 · 7 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>The most common question about configuring an immutable OS is: "If the root is read-only, how do I change things?" The answer on Shani OS is: exactly the same way you would on any Linux distribution.</p>
+<p>The <code>/etc</code> directory is writable via an OverlayFS mount. Your changes are stored in <code>/data/overlay/etc/upper/</code> — separate from the OS image — and layered on top of the read-only OS defaults at boot. When the OS updates, your customisations in the overlay are untouched. When you rollback, same story. Your configuration is always yours.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/updates/config">docs.shani.dev — System Configuration</a> and <a href="https://docs.shani.dev/doc/arch/overlay">docs.shani.dev — Overlay Filesystem</a>.</p>
+<p>---</p>
+<h2>Editing Configuration Files</h2>
+<p>Nothing special is required. Edit files in <code>/etc</code> exactly as you would on any Linux system:</p>
+<pre><code class="language-bash"># Edit SSH configuration
+sudo nano /etc/ssh/sshd_config
+
+# Edit hostname
+sudo nano /etc/hostname
+
+# Edit hosts file
+sudo nano /etc/hosts
+
+# Edit fstab (careful — errors here prevent boot)
+sudo nano /etc/fstab
+
+# Edit locale
+sudo nano /etc/locale.conf
+
+# Edit environment variables
+sudo nano /etc/environment</code></pre>
+<p>Changes take effect immediately (or after service restart for daemon config). They survive every OS update and rollback.</p>
+<p>---</p>
+<h2>Understanding the /etc Overlay</h2>
+<p>The OverlayFS mechanism is worth understanding because it explains some subtle behaviours:</p>
+<pre><code>Lower layer (read-only): /etc from the active @blue or @green slot
+Upper layer (writable):  /data/overlay/etc/upper/
+Merged view:             /etc (what you see and interact with)</code></pre>
+<p>When you read <code>/etc/ssh/sshd_config</code>, the kernel checks the upper layer first. If your modified version is there, you see it. If not, you see the OS default from the lower layer.</p>
+<p>When you write to <code>/etc/ssh/sshd_config</code>, the kernel performs a "copy-up": it copies the file from the lower layer to the upper layer, then applies your changes. From then on, your version is in the upper layer.</p>
+<p>When the OS updates (new lower layer), your upper-layer files are untouched. You see your modified version. Files you have never touched automatically reflect the new OS defaults from the new lower layer.</p>
+<h3>Inspecting Your Customisations</h3>
+<pre><code class="language-bash"># See everything you have changed from OS defaults
+find /data/overlay/etc/upper/ -type f | sort
+
+# Compare a modified file to the OS default
+diff /data/overlay/etc/upper/ssh/sshd_config \
+     /etc/ssh/sshd_config
+
+# List just the filenames
+ls -la /data/overlay/etc/upper/</code></pre>
+<h3>Reverting a Specific File to OS Default</h3>
+<pre><code class="language-bash"># Remove the upper-layer version — the OS default becomes active again
+sudo rm /data/overlay/etc/upper/ssh/sshd_config
+
+# For a directory
+sudo rm -rf /data/overlay/etc/upper/some/directory/</code></pre>
+<h3>Resetting All /etc Customisations</h3>
+<p>Do not use raw <code>rm -rf</code> to wipe the overlay — this leaves the work directory in an inconsistent state and does not reset the other persistent state directories (<code>/data/varlib</code>, <code>/data/varspool</code>) that services depend on. Use <code>shani-reset</code> instead:</p>
+<pre><code class="language-bash"># Factory reset all persistent system state in /data
+# (keeps /home and OS slots intact, reboots automatically)
+sudo shani-reset
+
+# Preview what would be wiped without making changes
+sudo shani-reset --dry-run
+
+# Keep previously downloaded OS images to avoid re-downloading
+sudo shani-reset --keep-downloads</code></pre>
+<p><code>shani-reset</code> wipes the <code>/etc</code> overlay upper layer, the <code>/var</code> overlay, all service state in <code>/data/varlib</code> and <code>/data/varspool</code>, and all boot markers — then reboots. User accounts are part of the <code>/etc</code> overlay and will be gone after reset; the desktop setup wizard runs on next login to create a new account. Your files in <code>/home</code> are untouched unless you pass <code>--home</code>.</p>
+<p>---</p>
+<h2>systemd Services</h2>
+<p><code>systemctl</code> works exactly as you would expect on any Linux distribution. Service state (enabled/disabled) persists via the overlay.</p>
+<pre><code class="language-bash"># Enable and start a service
+sudo systemctl enable --now sshd
+sudo systemctl enable --now nginx
+
+# Disable a service
+sudo systemctl disable sshd
+
+# Start/stop/restart
+sudo systemctl start sshd
+sudo systemctl stop sshd
+sudo systemctl restart sshd
+
+# Reload config without restart (for services that support it)
+sudo systemctl reload nginx
+
+# Check status
+systemctl status sshd
+
+# View logs for a service
+journalctl -u sshd -f
+journalctl -u sshd --since today
+
+# List all enabled services
+systemctl list-unit-files --state=enabled
+
+# List all failed services
+systemctl --failed</code></pre>
+<p>Service enablement (<code>systemctl enable</code>) creates symlinks in <code>/etc/systemd/system/</code>. These go into the overlay upper layer and persist across OS updates.</p>
+<h3>User Services</h3>
+<p>Per-user services run in your user session and do not require root:</p>
+<pre><code class="language-bash"># Enable a user service
+systemctl --user enable --now my-service.service
+
+# Check user service status
+systemctl --user status my-service.service
+
+# View user service logs
+journalctl --user -u my-service.service -f
+
+# List enabled user services
+systemctl --user list-unit-files --state=enabled</code></pre>
+<p>User service unit files can be placed in <code>~/.config/systemd/user/</code>.</p>
+<p>---</p>
+<h2>Creating Custom Service Units</h2>
+<p>Place custom <code>.service</code> files in <code>/etc/systemd/system/</code> (they go into the overlay):</p>
+<pre><code class="language-bash"># Create a custom service
+sudo nano /etc/systemd/system/myapp.service</code></pre>
+<p>Example unit for a simple application:</p>
+<pre><code class="language-ini">[Unit]
+Description=My Application
+After=network.target
+
+[Service]
+Type=simple
+User=username
+WorkingDirectory=/home/username/myapp
+ExecStart=/home/username/myapp/start.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+<pre><code class="language-bash"># Reload systemd to see the new unit
+sudo systemctl daemon-reload
+
+# Enable and start
+sudo systemctl enable --now myapp.service</code></pre>
+<p>---</p>
+<h2>Network Configuration</h2>
+<p>NetworkManager handles all network configuration. Your Wi-Fi passwords, VPN profiles, and static IP configurations are stored in <code>/data/varlib/NetworkManager</code> (bind-mounted to <code>/var/lib/NetworkManager</code>) — they persist across all updates and rollbacks.</p>
+<pre><code class="language-bash"># List connections
+nmcli connection show
+
+# Add a Wi-Fi connection
+nmcli device wifi connect &quot;SSID&quot; password &quot;password&quot;
+
+# Add a static IP connection
+nmcli connection add type ethernet con-name &quot;static-eth&quot; \
+  ipv4.method manual ipv4.addresses &quot;192.168.1.100/24&quot; \
+  ipv4.gateway &quot;192.168.1.1&quot; ipv4.dns &quot;8.8.8.8&quot;
+
+# Modify a connection
+nmcli connection modify &quot;My Connection&quot; ipv4.dns &quot;1.1.1.1,8.8.8.8&quot;
+
+# Delete a connection
+nmcli connection delete &quot;My Connection&quot;
+
+# Check current network status
+nmcli device status</code></pre>
+<p>---</p>
+<h2>Kernel Parameters (sysctl)</h2>
+<p><code>sysctl</code> settings are configured via files in <code>/etc/sysctl.d/</code>. Changes go into the overlay and persist:</p>
+<pre><code class="language-bash"># Check a current value
+sysctl vm.swappiness
+
+# Apply a setting immediately (lost on reboot unless also in file)
+sudo sysctl -w vm.swappiness=10
+
+# Make it permanent
+echo &quot;vm.swappiness=10&quot; | sudo tee /etc/sysctl.d/99-custom.conf
+sudo sysctl --system   # apply all sysctl.d files immediately</code></pre>
+<p>Common customisations:</p>
+<pre><code class="language-bash"># In /etc/sysctl.d/99-custom.conf
+
+# Lower swappiness (use swap less aggressively)
+vm.swappiness=10
+
+# Increase inotify watches (for IDEs, webpack, etc.)
+fs.inotify.max_user_watches=524288
+
+# Increase open file limit
+fs.file-max=2097152
+
+# Disable IPv6 if not needed
+net.ipv6.conf.all.disable_ipv6=1</code></pre>
+<p>---</p>
+<h2>Hostname and DNS</h2>
+<pre><code class="language-bash"># Set hostname
+sudo hostnamectl set-hostname myhostname
+
+# View full status
+hostnamectl status
+
+# Check /etc/hosts
+cat /etc/hosts
+# Edit as needed
+sudo nano /etc/hosts</code></pre>
+<p>Hostname changes persist via the overlay. Your machine is reachable as <code>hostname.local</code> on the local network via Avahi (mDNS), which is active by default.</p>
+<p>---</p>
+<h2>Environment Variables</h2>
+<p>System-wide environment variables are set in <code>/etc/environment</code>:</p>
+<pre><code class="language-bash">sudo nano /etc/environment
+
+# Example contents
+EDITOR=vim
+VISUAL=vim
+JAVA_HOME=/home/user/.nix-profile/lib/jvm/java-21</code></pre>
+<p>For shell-specific variables (Zsh, Bash), use <code>~/.zshrc</code> or <code>~/.profile</code> — these are in your home directory and are always writable.</p>
+<p>---</p>
+<h2>Reviewing All Changes Before an Update</h2>
+<p>Before applying an OS update, you can see exactly what configuration changes you have made relative to the OS defaults:</p>
+<pre><code class="language-bash"># All customised /etc files
+find /data/overlay/etc/upper/ -type f -printf &quot;%P\n&quot; | sort
+
+# What systemd services you have enabled
+systemctl list-unit-files --state=enabled | grep -v &quot;systemd\|dbus\|getty&quot;
+
+# What's in your user systemd directory
+ls ~/.config/systemd/user/</code></pre>
+<p>This is useful for auditing your configuration before a major update and for documenting what you would need to reconfigure if you ever reinstalled from scratch.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-updates">Updates on Shani OS</a> — update and rollback reference</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions answered</li>
+<li><a href="https://docs.shani.dev/doc/updates/config">docs.shani.dev — System Configuration</a> — full reference</li>
+<li><a href="https://docs.shani.dev/doc/arch/overlay">docs.shani.dev — Overlay Filesystem</a> — OverlayFS technical details</li>
+<li><a href="https://blog.shani.dev/post/shani-os-architecture-deep-dive">The Architecture Behind Shani OS</a> — how /etc stays writable</li>
+<li><a href="https://blog.shani.dev/post/shani-os-networking-guide">Networking on Shani OS</a> — full networking configuration</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

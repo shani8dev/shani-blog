@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="shani-health is the CLI tool for checking the health of a running Shani OS system — filesystem integrity, slot state, subvolume sizes, service status, and more. Introduced in the 2026.04.15 release.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"shani-health — System Health Monitoring for Shani OS","description":"shani-health is the CLI tool for checking the health of a running Shani OS system — filesystem integrity, slot state, subvolume sizes, service status, and more. Introduced in the 2026.04.15 release.","url":"https://blog.shani.dev/post/shani-health-reference","datePublished":"2026-05-12T00:00:00.000Z","dateModified":"2026-05-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"shani-health — System Health Monitoring for Shani OS","description":"shani-health is the CLI tool for checking the health of a running Shani OS system — filesystem integrity, slot state, subvolume sizes, service status, and more. Introduced in the 2026.04.15 release.","url":"https://blog.shani.dev/post/shani-health-reference","datePublished":"2026-05-12T00:00:00.000Z","dateModified":"2026-05-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,177 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">shani-health — System Health Monitoring for Shani OS</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-12 · 5 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p><code>shani-health</code> is the system health CLI introduced in Shani OS 2026.04.15. It provides a single command for checking the state of the Shani OS-specific components of a running system: slot integrity, Btrfs subvolume health, storage usage, and core service status. It complements <code>shani-deploy --storage-info</code>, which reports compressed disk usage, by adding live system health data.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/updates/system">docs.shani.dev — System Updates</a>.</p>
+<p>---</p>
+<h2>Basic Usage</h2>
+<pre><code class="language-bash"># Run a full health check
+shani-health
+
+# Check a specific component
+shani-health --slots
+shani-health --storage
+shani-health --services
+shani-health --filesystem
+
+# Output in JSON (for scripts and monitoring)
+shani-health --json
+
+# Verbose output
+shani-health -v
+
+# Exit with non-zero status if any check fails (for scripting/CI)
+shani-health --strict</code></pre>
+<p>---</p>
+<h2>What shani-health Checks</h2>
+<h3>Slot State</h3>
+<pre><code class="language-bash">shani-health --slots</code></pre>
+<p>Reports:</p>
+<ul>
+<li><strong>Active slot</strong> — which subvolume (<code>@blue</code> or <code>@green</code>) is currently booted</li>
+<li><strong>Candidate slot</strong> — the standby slot and its state (ready, updating, failed, empty)</li>
+<li><strong>Current slot file</strong> — whether <code>/data/current-slot</code> matches the booted subvolume</li>
+<li><strong>Boot markers</strong> — presence and age of <code>boot-ok</code>, <code>boot_failure</code>, <code>boot_hard_failure</code></li>
+<li><strong>Pending reboot</strong> — whether <code>/run/shanios/reboot-needed</code> is set</li>
+<li><strong>Slot versions</strong> — OS version in each slot (read from the slot's <code>/etc/shani-version</code>)</li>
+<li><strong>UKI signatures</strong> — whether the signed UKIs on the ESP match the current MOK key</li>
+<li><strong>Backup snapshots</strong> — count and age of backup snapshots for each slot</li>
+</ul>
+<h3>Storage</h3>
+<pre><code class="language-bash">shani-health --storage</code></pre>
+<p>Reports:</p>
+<ul>
+<li><strong>Filesystem free space</strong> — usable space remaining on the Btrfs volume (warns below 10 GB)</li>
+<li><strong>Per-subvolume usage</strong> — actual (uncompressed) and compressed size of each subvolume</li>
+<li><strong>Deduplication savings</strong> — estimated savings from <code>bees</code> deduplication</li>
+<li><strong>Download cache</strong> — size of cached images in <code>/data/downloads/</code></li>
+<li><strong>Backup snapshot size</strong> — total space used by slot backup snapshots</li>
+</ul>
+<p>This is more detailed than <code>shani-deploy --storage-info</code>, which only reports the compressed OS slot sizes.</p>
+<h3>Services</h3>
+<pre><code class="language-bash">shani-health --services</code></pre>
+<p>Checks that core Shani OS system services are running and healthy:</p>
+<ul>
+<li><code>shani-update.timer</code> — user-session update check timer</li>
+<li><code>beesd@.service</code> — background Btrfs deduplication daemon</li>
+<li><code>tailscaled.service</code> — Tailscale (if enrolled)</li>
+<li><code>firewalld.service</code> — firewall (warns if inactive)</li>
+<li><code>nix-daemon.service</code> — Nix daemon (warns if inactive)</li>
+<li><code>podman.socket</code> — Podman socket activation</li>
+</ul>
+<h3>Filesystem</h3>
+<pre><code class="language-bash">shani-health --filesystem</code></pre>
+<p>Checks:</p>
+<ul>
+<li><strong>Btrfs consistency</strong> — runs a lightweight <code>btrfs check --readonly</code> on the root volume</li>
+<li><strong>OverlayFS</strong> — confirms <code>/etc</code> is correctly mounted as OverlayFS</li>
+<li><strong>Bind mounts</strong> — verifies that expected bind mounts (<code>/var/lib/NetworkManager</code>, <code>/var/lib/bluetooth</code>, etc.) are active</li>
+<li><strong>ESP</strong> — confirms the EFI System Partition is mounted and both UKI files are present</li>
+</ul>
+<p>---</p>
+<h2>Reading the Output</h2>
+<p>A passing health check prints a green summary:</p>
+<pre><code>shani-health 1.0
+✓ Slot state       Active: @blue (2026.04.15) | Candidate: @green (2026.04.15) | Clean
+✓ Storage          42.3 GB used / 234 GB free (Btrfs compressed) | No snapshot bloat
+✓ Services         All core services healthy
+✓ Filesystem       OverlayFS, bind mounts, ESP — all OK</code></pre>
+<p>A warning (yellow) indicates a degraded but functional state:</p>
+<pre><code>⚠ Storage          Downloads cache: 4.2 GB — run 'sudo shani-deploy -c' to clean up
+⚠ Services         beesd not running — deduplication paused</code></pre>
+<p>An error (red) requires attention:</p>
+<pre><code>✗ Slot state       boot_failure marker present — last update failed to boot
+                   Run 'sudo shani-deploy -r' to restore the candidate slot
+✗ Filesystem       /etc OverlayFS not mounted — system configuration may be inconsistent</code></pre>
+<p>---</p>
+<h2>Scripting with shani-health</h2>
+<h3>JSON Output</h3>
+<p>For integration with monitoring tools, dashboards, or automated checks:</p>
+<pre><code class="language-bash">shani-health --json</code></pre>
+<p>Output structure:</p>
+<pre><code class="language-json">{
+  &quot;version&quot;: &quot;1.0&quot;,
+  &quot;timestamp&quot;: &quot;2026-05-12T14:32:00Z&quot;,
+  &quot;overall&quot;: &quot;healthy&quot;,
+  &quot;checks&quot;: {
+    &quot;slots&quot;: {
+      &quot;status&quot;: &quot;ok&quot;,
+      &quot;active_slot&quot;: &quot;blue&quot;,
+      &quot;active_version&quot;: &quot;2026.04.15&quot;,
+      &quot;candidate_slot&quot;: &quot;green&quot;,
+      &quot;candidate_version&quot;: &quot;2026.04.15&quot;,
+      &quot;boot_failure&quot;: false,
+      &quot;pending_reboot&quot;: false
+    },
+    &quot;storage&quot;: {
+      &quot;status&quot;: &quot;warning&quot;,
+      &quot;free_gb&quot;: 234.1,
+      &quot;download_cache_gb&quot;: 4.2,
+      &quot;message&quot;: &quot;Download cache is large — run shani-deploy -c&quot;
+    },
+    &quot;services&quot;: { &quot;status&quot;: &quot;ok&quot; },
+    &quot;filesystem&quot;: { &quot;status&quot;: &quot;ok&quot; }
+  }
+}</code></pre>
+<h3>Exit Codes</h3>
+<pre><code>0 — all checks passed (healthy)
+1 — one or more warnings (degraded but functional)
+2 — one or more errors (action required)</code></pre>
+<p>Use <code>--strict</code> to treat warnings as errors (exit code 2).</p>
+<h3>Fleet Health Monitoring</h3>
+<p>For fleet deployments, run <code>shani-health --json --strict</code> on a schedule and forward the output to your monitoring stack:</p>
+<pre><code class="language-bash"># /etc/systemd/system/shani-health-report.service
+[Unit]
+Description=Shani OS Health Report
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'shani-health --json &gt; /var/log/shani-health-$(date +%Y%m%d).json'
+
+# /etc/systemd/system/shani-health-report.timer
+[Unit]
+Description=Daily Shani OS Health Report
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target</code></pre>
+<p>Alternatively, integrate with a Prometheus/Grafana stack by wrapping <code>shani-health --json</code> in a custom exporter, or use <code>shani-health --strict</code> as a Nagios/Zabbix check script — non-zero exit triggers an alert.</p>
+<p>---</p>
+<h2>Relationship to shani-deploy --storage-info</h2>
+<p><code>shani-deploy --storage-info</code> reports Btrfs-compressed sizes of the OS slots specifically. <code>shani-health --storage</code> covers the full picture: all subvolumes, the download cache, backup snapshots, and a low-space warning threshold. Use both for different purposes:</p>
+<pre><code class="language-bash"># Quick storage summary focused on OS slots
+sudo shani-deploy --storage-info
+
+# Full system storage picture
+shani-health --storage
+
+# Everything at once
+shani-health -v</code></pre>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://docs.shani.dev/doc/updates/system">docs.shani.dev — System Updates</a> — full update system reference</li>
+<li><a href="https://blog.shani.dev/post/shani-os-updates">shani-os-updates</a> — shani-deploy and shani-update reference</li>
+<li><a href="https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment">Shani OS for OEMs and IT Fleets</a> — fleet monitoring integration</li>
+<li><a href="https://blog.shani.dev/post/shani-os-2026-04-15-release">2026.04.15 Release Notes</a> — release that introduced shani-health</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

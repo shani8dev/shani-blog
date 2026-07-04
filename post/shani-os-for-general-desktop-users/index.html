@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Shani OS for everyday desktop use — office suite and document compatibility, web browsing, email, video calls, cloud storage, calendar, notes, PDF tools, and everything a student, office worker, or home user needs. Most of it works from first boot.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS for General Desktop Users — Productivity, Office, Web, and Everyday Use","description":"Shani OS for everyday desktop use — office suite and document compatibility, web browsing, email, video calls, cloud storage, calendar, notes, PDF tools, and everything a student, office worker, or home user needs. Most of it works from first boot.","url":"https://blog.shani.dev/post/shani-os-for-general-desktop-users","datePublished":"2026-05-10T00:00:00.000Z","dateModified":"2026-05-10T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS for General Desktop Users — Productivity, Office, Web, and Everyday Use","description":"Shani OS for everyday desktop use — office suite and document compatibility, web browsing, email, video calls, cloud storage, calendar, notes, PDF tools, and everything a student, office worker, or home user needs. Most of it works from first boot.","url":"https://blog.shani.dev/post/shani-os-for-general-desktop-users","datePublished":"2026-05-10T00:00:00.000Z","dateModified":"2026-05-10T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,276 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Shani OS for General Desktop Users — Productivity, Office, Web, and Everyday Use</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-10 · 9 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Not everyone needs a gaming rig or a research cluster. Many people just need a computer that works reliably for daily tasks — writing documents, browsing the web, attending video calls, managing email, storing files, and not breaking when it updates. Shani OS is well-suited to this. The GNOME edition ships with most everyday apps already installed, and the update model means your system never breaks overnight.</p>
+<p>This guide covers the practical everyday stack for home users, students, and office workers — office software, browsers, email, video calls, cloud storage, and the tools that make daily computing straightforward.</p>
+<p>Full reference: <a href="https://docs.shani.dev">docs.shani.dev</a>.</p>
+<p>---</p>
+<h2>What Is Pre-Installed</h2>
+<p>Both GNOME and KDE editions include the following on first boot, with no additional installation needed:</p>
+<ul>
+<li><strong>Vivaldi Browser</strong> — feature-rich Chromium-based browser</li>
+<li><strong>OnlyOffice Desktop Editors</strong> — opens and saves <code>.docx</code>, <code>.xlsx</code>, <code>.pptx</code> natively</li>
+<li><strong>VLC</strong> — plays virtually any video or audio format</li>
+<li><strong>Files (Nautilus / Dolphin)</strong> — file manager</li>
+<li><strong>Calendar</strong> — GNOME Calendar / KDE Kontact</li>
+<li><strong>Image Viewer</strong> — GNOME Loupe / KDE Gwenview</li>
+<li><strong>GNOME Text Editor / Kate</strong> — plain text editing</li>
+<li><strong>Archive Manager</strong> — ZIP, TAR, 7-Zip support</li>
+<li><strong>Warehouse</strong> — Flatpak app manager</li>
+<li><strong>Flatseal</strong> — Flatpak sandbox permissions editor</li>
+</ul>
+<p>---</p>
+<h2>Office Suite</h2>
+<h3>OnlyOffice (Pre-Installed)</h3>
+<p>OnlyOffice Desktop Editors is pre-installed on both editions and handles <code>.docx</code>, <code>.xlsx</code>, and <code>.pptx</code> files with excellent compatibility. It is the recommended choice for anyone who exchanges files with Windows or macOS users, since it preserves formatting, fonts, and comments better than most alternatives.</p>
+<p>OnlyOffice also has a cloud-connected mode — you can connect it to Nextcloud, OnlyOffice Cloud, or Seafile for collaborative editing.</p>
+<h3>LibreOffice</h3>
+<p>LibreOffice is the other major open-source office suite — more mature and with a broader feature set than OnlyOffice, though slightly less polished in <code>.docx</code> round-trip compatibility:</p>
+<pre><code class="language-bash">flatpak install flathub org.libreoffice.LibreOffice</code></pre>
+<p>LibreOffice includes:</p>
+<ul>
+<li><strong>Writer</strong> — word processor (<code>.odt</code>, <code>.docx</code>, <code>.rtf</code>)</li>
+<li><strong>Calc</strong> — spreadsheets (<code>.ods</code>, <code>.xlsx</code>, <code>.csv</code>)</li>
+<li><strong>Impress</strong> — presentations (<code>.odp</code>, <code>.pptx</code>)</li>
+<li><strong>Draw</strong> — diagrams and vector drawing</li>
+<li><strong>Base</strong> — simple database front-end</li>
+<li><strong>Math</strong> — equation editor</li>
+</ul>
+<h3>Microsoft 365 — Browser</h3>
+<p>Microsoft 365 (Word, Excel, PowerPoint, Outlook, Teams) works fully in Vivaldi and Firefox via the browser:</p>
+<ul>
+<li>Word Online: <code>office.com</code></li>
+<li>Excel Online: <code>office.com</code></li>
+<li>Outlook: <code>outlook.com</code> or <code>outlook.office365.com</code></li>
+<li>Teams: <code>teams.microsoft.com</code></li>
+</ul>
+<p>Teams also has a PWA (Progressive Web App) that installs to your app launcher from the browser for a more desktop-like experience.</p>
+<h3>Google Workspace — Browser</h3>
+<p>Google Docs, Sheets, Slides, and Gmail all work identically in Vivaldi and Firefox. No setup required — open the browser and sign in.</p>
+<p>---</p>
+<h2>Web Browsers</h2>
+<p>Vivaldi comes pre-installed. Additional browser options:</p>
+<pre><code class="language-bash"># Firefox
+flatpak install flathub org.mozilla.firefox
+
+# Brave (privacy-focused Chromium)
+flatpak install flathub com.brave.Browser
+
+# Chromium (open-source base)
+flatpak install flathub org.chromium.Chromium
+
+# Tor Browser (anonymity)
+flatpak install flathub com.github.micahflee.torbrowser-launcher</code></pre>
+<h3>Browser Sync</h3>
+<p>Vivaldi and Firefox both support account-based sync (bookmarks, history, passwords, open tabs) across devices. Log in with your account in the browser — no additional setup.</p>
+<p>For password management, <strong>Bitwarden</strong> is available as a browser extension and a standalone app:</p>
+<pre><code class="language-bash">flatpak install flathub com.bitwarden.desktop</code></pre>
+<p>---</p>
+<h2>Email</h2>
+<h3>Thunderbird</h3>
+<p>Mozilla Thunderbird is the recommended desktop email client — it supports IMAP/POP3, Microsoft Exchange (via DavMail or TB's native EWS support), CalDAV/CardDAV for calendar and contacts sync, and PGP encryption:</p>
+<pre><code class="language-bash">flatpak install flathub org.mozilla.Thunderbird</code></pre>
+<p>Thunderbird works with Gmail, Outlook, Yahoo, Fastmail, ProtonMail (via Bridge), and any standard IMAP/SMTP provider. Add your email account via Account Settings → Add Mail Account — it auto-configures the server settings for major providers.</p>
+<h3>GNOME Evolution</h3>
+<p>Evolution is the full GNOME personal information manager — email, calendar, contacts, and tasks in one app. It has native Microsoft Exchange support:</p>
+<pre><code class="language-bash">flatpak install flathub org.gnome.Evolution</code></pre>
+<h3>Geary</h3>
+<p>Geary is a lightweight, clean email client suited for users who just need email without the full Thunderbird feature set:</p>
+<pre><code class="language-bash">flatpak install flathub org.gnome.Geary</code></pre>
+<p>---</p>
+<h2>Video Calling</h2>
+<h3>Browser-Based Video Calls (Recommended)</h3>
+<p>Google Meet, Zoom (web), Microsoft Teams, Jitsi Meet, and WhatsApp Web all work in Vivaldi and Firefox. For most users this is the simplest approach — no app to install.</p>
+<h3>Zoom Desktop App</h3>
+<pre><code class="language-bash">flatpak install flathub us.zoom.Zoom</code></pre>
+<p>Grant microphone and camera permissions via Flatseal (pre-installed) if the app does not detect them automatically.</p>
+<h3>Microsoft Teams</h3>
+<pre><code class="language-bash"># Teams PWA via browser (recommended)
+# Open teams.microsoft.com → install as app when prompted
+
+# Or native desktop app
+flatpak install flathub com.microsoft.Teams</code></pre>
+<h3>Signal, WhatsApp, Telegram</h3>
+<pre><code class="language-bash"># Signal Desktop
+flatpak install flathub org.signal.Signal
+
+# Telegram Desktop
+flatpak install flathub org.telegram.desktop
+
+# WhatsApp via browser: web.whatsapp.com
+# Or via unofficial desktop client:
+flatpak install flathub io.github.mimbrero.WhatsAppDesktop</code></pre>
+<p>---</p>
+<h2>Cloud Storage</h2>
+<h3>Nextcloud</h3>
+<p>Nextcloud is the recommended self-hosted or cloud storage solution — it provides file sync, calendar, contacts, video calls, and notes in one open-source platform:</p>
+<pre><code class="language-bash">flatpak install flathub com.nextcloud.desktopclient.nextcloud</code></pre>
+<p>The Nextcloud desktop client syncs a local folder to your Nextcloud server (or a hosted Nextcloud account). Calendar and contacts sync via CalDAV/CardDAV, configured in Thunderbird or GNOME Calendar.</p>
+<h3>Google Drive</h3>
+<pre><code class="language-bash"># Rclone (pre-installed) — mount Google Drive as a local directory
+rclone config   # follow prompts to add Google Drive
+rclone mount gdrive: ~/GoogleDrive --daemon
+
+# Or via Gnome Online Accounts (GNOME) — Settings → Online Accounts → Google
+# This integrates Google Drive into Nautilus file manager</code></pre>
+<p><strong>GNOME Online Accounts</strong> (Settings → Online Accounts) integrates Google Drive, Nextcloud, Microsoft 365, and other cloud accounts directly into GNOME Files (Nautilus) without any third-party app.</p>
+<h3>OneDrive</h3>
+<pre><code class="language-bash"># rclone for OneDrive
+rclone config   # add OneDrive
+
+# Or via GNOME Online Accounts → Microsoft account</code></pre>
+<h3>Dropbox</h3>
+<pre><code class="language-bash">flatpak install flathub com.dropbox.Client</code></pre>
+<p>---</p>
+<h2>Calendar and Tasks</h2>
+<p><strong>GNOME Calendar</strong> is pre-installed on the GNOME edition and connects to CalDAV accounts (Google Calendar, Nextcloud, iCloud) via GNOME Online Accounts.</p>
+<p><strong>GNOME Tasks</strong> (for to-do lists) syncs with GNOME Online Accounts:</p>
+<pre><code class="language-bash">flatpak install flathub org.gnome.Tasks</code></pre>
+<p><strong>KOrganizer</strong> on KDE Plasma covers calendar, tasks, and contacts with Exchange and Google integration.</p>
+<p>For standalone task management:</p>
+<pre><code class="language-bash"># Planner — elegant project and task manager
+flatpak install flathub io.github.alainm23.planner
+
+# Todoist (if you use Todoist)
+flatpak install flathub com.todoist.Todoist</code></pre>
+<p>---</p>
+<h2>Notes</h2>
+<pre><code class="language-bash"># GNOME Notes (Sticky Notes)
+flatpak install flathub org.gnome.Notes
+
+# Obsidian — markdown-based knowledge management
+flatpak install flathub md.obsidian.Obsidian
+
+# Joplin — encrypted notes with sync (Nextcloud, Dropbox, OneDrive)
+flatpak install flathub net.cozic.joplin_desktop
+
+# Standard Notes — end-to-end encrypted notes
+flatpak install flathub org.standardnotes.standardnotes</code></pre>
+<p>---</p>
+<h2>PDF Tools</h2>
+<h3>Viewing PDFs</h3>
+<p><strong>GNOME:</strong> Evince (Document Viewer) is pre-installed and handles PDFs, EPUB, and comic book formats.</p>
+<p><strong>KDE:</strong> Okular is pre-installed and handles PDFs with annotation support.</p>
+<h3>PDF Editing and Annotation</h3>
+<pre><code class="language-bash"># Okular — PDF annotation (highlight, notes, stamps)
+# Pre-installed on KDE; available on GNOME:
+flatpak install flathub org.kde.okular
+
+# Xournal++ — full PDF annotation, form filling, handwriting
+flatpak install flathub com.github.xournalpp.xournalpp
+
+# LibreOffice Draw — edit PDF content (open PDF in LibreOffice Draw)
+flatpak install flathub org.libreoffice.LibreOffice</code></pre>
+<h3>PDF Conversion and Processing</h3>
+<pre><code class="language-bash"># Convert images to PDF
+convert image1.jpg image2.jpg output.pdf   # ImageMagick (nix-env -i imagemagick)
+
+# Merge PDFs
+pdfunite doc1.pdf doc2.pdf merged.pdf      # poppler-utils
+
+# Extract pages
+pdfseparate input.pdf page-%d.pdf
+
+# Word/LibreOffice to PDF
+libreoffice --headless --convert-to pdf document.docx
+
+# Or via Nix
+nix-env -i poppler_utils</code></pre>
+<p>---</p>
+<h2>Media Playback</h2>
+<p><strong>VLC</strong> is pre-installed and handles virtually every video and audio format, including MKV, MP4, AVI, WebM, FLAC, MP3, and streaming URLs.</p>
+<pre><code class="language-bash"># Play a stream
+vlc https://stream.url/
+
+# Play with specific audio track
+vlc --audio-track 1 video.mkv</code></pre>
+<p>For music, additional players:</p>
+<pre><code class="language-bash"># Amberol — clean, simple music player
+flatpak install flathub io.bassi.Amberol
+
+# Rhythmbox — library-based music player (GNOME)
+flatpak install flathub org.gnome.Rhythmbox3
+
+# Elisa — KDE music player
+flatpak install flathub org.kde.elisa
+
+# Spotify
+flatpak install flathub com.spotify.Client
+
+# YouTube Music via browser (music.youtube.com) or
+flatpak install flathub th.angry.PhotoMosh   # YT Music PWA</code></pre>
+<h3>Streaming Services</h3>
+<p>Netflix, YouTube, Disney+, Amazon Prime Video, and JioSaavn all work in Vivaldi and Firefox. For Netflix and Disney+ HD/4K, Widevine DRM is included in Vivaldi. Firefox requires installing the Widevine CDM:</p>
+<ul>
+<li>In Firefox: Settings → Digital Rights Management (DRM) Content → ensure it is enabled</li>
+<li>Netflix will then play at standard definition to HD depending on your subscription</li>
+</ul>
+<p>---</p>
+<h2>File Management and Cloud</h2>
+<p><strong>Files (Nautilus / Dolphin)</strong> is the desktop file manager and handles local files, remote servers via SFTP, Samba shares (Windows network shares), and cloud accounts via GNOME Online Accounts.</p>
+<pre><code class="language-bash"># Connect to a Windows network share (Samba) from the file manager:
+# GNOME Files: Ctrl+L → smb://server/share
+# KDE Dolphin: address bar → smb://server/share
+
+# Or mount via terminal
+sudo mount -t cifs //192.168.1.100/share ~/mnt/share \
+    -o username=user,password=pass</code></pre>
+<p>---</p>
+<h2>System Utilities</h2>
+<h3>Archive Manager</h3>
+<p><strong>GNOME Archive Manager (file-roller)</strong> is pre-installed and handles ZIP, TAR, 7-Zip, RAR, and most archive formats. Double-click an archive to extract it.</p>
+<pre><code class="language-bash"># Command-line archiving
+zip -r archive.zip folder/
+tar -czf archive.tar.gz folder/
+7z a archive.7z folder/     # nix-env -i p7zip</code></pre>
+<h3>Calculator</h3>
+<p><strong>GNOME Calculator</strong> is pre-installed with basic, scientific, programmer, and unit converter modes. KDE ships <strong>KCalc</strong>.</p>
+<h3>System Monitor</h3>
+<p><strong>GNOME System Monitor</strong> shows running processes, CPU, memory, and network graphs. For terminal monitoring:</p>
+<pre><code class="language-bash">htop    # interactive process viewer (pre-installed)
+btop    # rich terminal resource monitor
+nix-env -i btop  # if not present</code></pre>
+<p>---</p>
+<h2>Setting Up Your Printer</h2>
+<p>Most modern printers work without driver installation on Shani OS. Plug in your printer via USB or connect it to your Wi-Fi network — it should appear in Settings → Printers automatically.</p>
+<p>For detailed printer setup, including HP, Epson, Brother, and Canon drivers: <a href="https://blog.shani.dev/post/shani-os-printing-and-scanning">Printing and Scanning on Shani OS</a>.</p>
+<p>---</p>
+<h2>Keeping Your System Updated</h2>
+<p><code>shani-update</code> checks for OS updates automatically and shows a desktop notification when one is ready. When you're ready, run <code>sudo shani-deploy</code> and reboot. If anything feels wrong after the reboot, <code>sudo shani-deploy -r</code> instantly restores the previous OS version — your personal files are never affected either way.</p>
+<p>Flatpak apps update automatically every 12 hours. Warehouse (pre-installed) lets you manage updates manually.</p>
+<p>For the full update workflow, channels, and rollback reference: <a href="https://blog.shani.dev/post/shani-os-updates">Updates on Shani OS</a>.</p>
+<p>---</p>
+<h2>Summary: Everyday App Recommendations</h2>
+<p>| Task | Recommended app | Install | |---|---|---| | Office suite | OnlyOffice (pre-installed) or LibreOffice | pre-installed / <code>flatpak install flathub org.libreoffice.LibreOffice</code> | | Web browser | Vivaldi (pre-installed) | pre-installed | | Email | Thunderbird | <code>flatpak install flathub org.mozilla.Thunderbird</code> | | Video calls | Browser (Meet/Teams/Zoom web) or Zoom app | browser / <code>flatpak install flathub us.zoom.Zoom</code> | | Cloud storage | GNOME Online Accounts + Nextcloud | built-in + <code>flatpak install flathub com.nextcloud.desktopclient.nextcloud</code> | | Notes | Obsidian or Joplin | <code>flatpak install flathub md.obsidian.Obsidian</code> | | PDF tools | Okular or Xournal++ | pre-installed (KDE) / Flathub | | Messaging | Telegram + Signal | <code>flatpak install flathub org.telegram.desktop</code> | | Music | Spotify or Amberol | <code>flatpak install flathub com.spotify.Client</code> | | Video | VLC (pre-installed) | pre-installed | | Password manager | Bitwarden | <code>flatpak install flathub com.bitwarden.desktop</code> |</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-getting-started">Getting Started with Shani OS</a> — installation and first boot</li>
+<li><a href="https://blog.shani.dev/post/shani-os-first-week">Your First Week with Shani OS</a> — day-by-day setup guide</li>
+<li><a href="https://blog.shani.dev/post/migrating-to-shani-os">Migrating to Shani OS</a> — coming from Ubuntu, Fedora, or Arch</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions answered</li>
+<li><a href="https://blog.shani.dev/post/shani-os-updates">Updates on Shani OS</a> — update and rollback reference</li>
+<li><a href="https://blog.shani.dev/post/shani-os-kde-connect">KDE Connect on Shani OS</a> — phone + desktop integration</li>
+<li><a href="https://blog.shani.dev/post/shani-os-printing-and-scanning">Printing and Scanning on Shani OS</a> — printer setup</li>
+<li><a href="https://blog.shani.dev/post/shani-os-audio-pipewire">Audio on Shani OS</a> — speakers, headphones, Bluetooth audio</li>
+<li><a href="https://blog.shani.dev/post/shani-os-bluetooth">Bluetooth on Shani OS</a> — wireless devices</li>
+<li><a href="https://docs.shani.dev">docs.shani.dev</a> — full technical documentation</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

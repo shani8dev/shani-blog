@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="gen-efi is the tool that builds and signs Unified Kernel Images, manages MOK keys for Secure Boot, and enrolls LUKS keys into TPM2. This is the complete reference for every gen-efi operation and the Secure Boot chain on Shani OS.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"gen-efi and Secure Boot on Shani OS — UKI Generation, MOK Enrollment, and TPM2","description":"gen-efi is the tool that builds and signs Unified Kernel Images, manages MOK keys for Secure Boot, and enrolls LUKS keys into TPM2. This is the complete reference for every gen-efi operation and the Secure Boot chain on Shani OS.","url":"https://blog.shani.dev/post/gen-efi-and-secure-boot","datePublished":"2026-04-30T00:00:00.000Z","dateModified":"2026-04-30T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"gen-efi and Secure Boot on Shani OS — UKI Generation, MOK Enrollment, and TPM2","description":"gen-efi is the tool that builds and signs Unified Kernel Images, manages MOK keys for Secure Boot, and enrolls LUKS keys into TPM2. This is the complete reference for every gen-efi operation and the Secure Boot chain on Shani OS.","url":"https://blog.shani.dev/post/gen-efi-and-secure-boot","datePublished":"2026-04-30T00:00:00.000Z","dateModified":"2026-04-30T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,218 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Engineering</span>
+        <h1 class="post-title">gen-efi and Secure Boot on Shani OS — UKI Generation, MOK Enrollment, and TPM2</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-30 · 8 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p><code>gen-efi</code> is the tool Shani OS uses to build Unified Kernel Images (UKIs), manage MOK (Machine Owner Key) Secure Boot keys, and enroll LUKS2 decryption keys into the TPM2 chip. It runs automatically as part of every <code>shani-deploy</code> update cycle and is also available for manual use.</p>
+<p>Understanding <code>gen-efi</code> is not required for everyday use — <code>shani-deploy</code> calls it automatically. This guide is for users who want to understand the boot security chain, manually re-enroll Secure Boot or TPM2 after firmware changes, or diagnose boot issues.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/security/secure-boot">docs.shani.dev — Secure Boot</a> and <a href="https://docs.shani.dev/doc/security/gen-efi">docs.shani.dev — gen-efi</a>.</p>
+<p>---</p>
+<h2>What is a Unified Kernel Image (UKI)?</h2>
+<p>A UKI is a single EFI binary that bundles:</p>
+<ul>
+<li>The Linux kernel</li>
+<li>The initramfs</li>
+<li>The kernel command line (including root device, LUKS UUID, LSM list, swap offset)</li>
+</ul>
+<p>Because all three are packaged together and the whole file is signed with the MOK key, nothing can be changed at boot time without invalidating the signature. This is stronger than a traditionally signed kernel — even the kernel command line is immutable once the UKI is signed.</p>
+<p>Shani OS maintains two UKIs, one per slot:</p>
+<ul>
+<li><code>/boot/efi/EFI/shanios/shanios-blue.efi</code></li>
+<li><code>/boot/efi/EFI/shanios/shanios-green.efi</code></li>
+</ul>
+<p>Both are signed with the same MOK key. <code>gen-efi configure</code> regenerates them during every <code>shani-deploy</code> update and on manual request.</p>
+<p>---</p>
+<h2>The Secure Boot Chain</h2>
+<pre><code>UEFI Firmware
+  └─ verifies BOOTX64.EFI (Shim, signed by Microsoft CA)
+       └─ Shim verifies systemd-boot (grubx64.efi, signed by MOK)
+            └─ systemd-boot verifies and loads the UKI (shanios-blue.efi, signed by MOK)
+                 └─ UKI contains: kernel + initramfs + cmdline (all signed together)</code></pre>
+<p>The MOK (Machine Owner Key) is a keypair generated on your machine during installation:</p>
+<ul>
+<li>Private key: <code>/etc/secureboot/keys/MOK.key</code> (never leaves the device)</li>
+<li>Certificate: <code>/etc/secureboot/keys/MOK.crt</code></li>
+<li>DER-encoded public key: <code>/etc/secureboot/keys/MOK.der</code> (also copied to <code>/boot/efi/EFI/BOOT/MOK.der</code> for MokManager enrollment)</li>
+</ul>
+<p>If the MOK keypair is missing when <code>gen-efi</code> runs, it automatically generates a fresh 2048-bit RSA keypair, re-signs all existing EFI binaries on the ESP, and stages MOK enrollment. If <code>MOK.key</code> and <code>MOK.crt</code> exist but are a mismatched keypair, <code>gen-efi</code> detects this before attempting to sign and regenerates the full pair rather than failing with an opaque OpenSSL error deep inside dracut.</p>
+<p>---</p>
+<h2>gen-efi Quick Reference</h2>
+<pre><code class="language-bash"># Generate UKI for a specific slot (must match the currently booted slot when run directly)
+sudo gen-efi configure blue
+sudo gen-efi configure green
+
+# Enroll MOK key into UEFI firmware (re-signs EFI binaries, stages mokutil enrollment)
+sudo gen-efi enroll-mok
+
+# Clean up stale MOK keys from previous installations
+sudo gen-efi cleanup-mok
+
+# Enroll LUKS key into TPM2 (for passwordless disk unlock)
+sudo gen-efi enroll-tpm2
+
+# Remove stale TPM2 LUKS keyslots after re-enrollment
+sudo gen-efi cleanup-tpm2</code></pre>
+<blockquote><p><strong>Important:</strong> <code>gen-efi configure</code> enforces that the target slot matches the currently booted slot when run directly on the live system. Running it for the inactive slot is only permitted inside a chroot, which <code>shani-deploy</code> does automatically. This prevents a common mistake: generating a UKI for <code>@green</code> while booted into <code>@blue</code> would embed <code>@blue</code>'s kernel in <code>@green</code>'s boot entry.</p></blockquote>
+<p>---</p>
+<h2>Generating UKIs</h2>
+<p><code>gen-efi configure &lt;slot&gt;</code> rebuilds the UKI for a slot by:</p>
+<ol>
+<li>Validating that <code>&lt;slot&gt;</code> matches the currently booted subvolume (unless running inside a chroot)</li>
+<li>Ensuring the MOK keypair exists — generating a new one if missing, and validating that <code>MOK.key</code> and <code>MOK.crt</code> are a matching keypair before attempting to sign anything</li>
+<li>Mounting the ESP at <code>/boot/efi</code> temporarily if not already mounted</li>
+<li>Updating shim (<code>BOOTX64.EFI</code>) and systemd-boot (<code>grubx64.efi</code>) on the ESP if the source binaries in <code>/usr</code> are newer than what's on the ESP</li>
+<li>Reading the current kernel version from <code>/usr/lib/modules/</code></li>
+<li>Detecting the LUKS UUID from the live mapper device, with a fallback to the existing <code>/etc/crypttab</code> entry for chroot environments where the device path is not accessible</li>
+<li>Updating <code>/etc/crypttab</code> and the dracut crypt config (<code>/etc/dracut.conf.d/99-crypt-key.conf</code>) to keep them consistent</li>
+<li>Generating the complete kernel command line — including <code>rootflags=subvol=@&lt;slot&gt;</code>, <code>rd.luks.*</code> parameters, <code>rd.vconsole.keymap=</code> from <code>/etc/vconsole.conf</code>, and <code>resume=</code>/<code>resume_offset=</code> from the Btrfs swapfile if present — and writing it atomically to <code>/etc/kernel/install_cmdline_&lt;slot&gt;</code></li>
+<li>Running <code>dracut --force --uefi</code> to build the UKI</li>
+<li>Signing the binary with <code>sbsign</code> and verifying it with <code>sbverify</code></li>
+<li>Staging MOK enrollment automatically if the current key is not yet enrolled in firmware (silent when already enrolled)</li>
+</ol>
+<pre><code class="language-bash"># Rebuild the UKI for the currently booted slot
+sudo gen-efi configure blue   # if booted into @blue
+sudo gen-efi configure green  # if booted into @green
+
+# Verify signatures
+sbverify --cert /etc/secureboot/keys/MOK.crt /boot/efi/EFI/shanios/shanios-blue.efi
+sbverify --cert /etc/secureboot/keys/MOK.crt /boot/efi/EFI/shanios/shanios-green.efi</code></pre>
+<p>When would you manually run <code>gen-efi configure</code>?</p>
+<ul>
+<li>After enabling or changing full-disk encryption</li>
+<li>When troubleshooting a boot issue caused by a stale or corrupt UKI</li>
+<li>After a LUKS UUID change (e.g. re-encryption)</li>
+<li>When <code>shani-deploy</code> calls it automatically via chroot during a normal update</li>
+</ul>
+<p>---</p>
+<h2>Secure Boot: MOK Enrollment</h2>
+<p>After installation, Secure Boot is disabled (you disabled it before installing per the pre-installation checklist). To re-enable it, you need to enroll your MOK key into the UEFI firmware.</p>
+<h3>Method 1: From the Live USB (Recommended)</h3>
+<p>On the first boot from the Shani OS USB, MokManager (<code>mmx64.efi</code>) launches automatically and offers to enroll a key from disk:</p>
+<ol>
+<li>Select "Enroll key from disk"</li>
+<li>Navigate to the EFI partition and select <code>EFI/BOOT/MOK.der</code></li>
+<li>Confirm enrollment</li>
+<li>Reboot and enable Secure Boot in BIOS</li>
+</ol>
+<h3>Method 2: From the Installed System</h3>
+<p>If you missed the MokManager prompt:</p>
+<pre><code class="language-bash"># Re-signs all EFI binaries, copies MOK.der to ESP, stages enrollment via mokutil
+sudo gen-efi enroll-mok
+
+# Reboot — MokManager appears automatically
+# Confirm with password: shanios
+sudo reboot</code></pre>
+<p><code>enroll-mok</code> must run on the live booted system — it talks to real UEFI firmware via <code>mokutil</code> and cannot run inside a chroot. After MokManager completes, enable Secure Boot in BIOS.</p>
+<pre><code class="language-bash"># After confirming the new key is enrolled, remove stale keys from previous installations
+sudo gen-efi cleanup-mok
+
+# Verify the key is enrolled
+mokutil --list-enrolled | grep -i shani
+mokutil --sb-state</code></pre>
+<p><code>cleanup-mok</code> compares the fingerprint of each enrolled key against the current <code>MOK.der</code>. Keys that do not match are staged for deletion via <code>mokutil --delete</code>, confirmed in MokManager on the next reboot. Run it only after confirming the new key is enrolled.</p>
+<p>---</p>
+<h2>TPM2 Auto-Unlock</h2>
+<p>TPM2 auto-unlock seals your LUKS decryption key into the TPM2 chip. The PCR policy is chosen automatically:</p>
+<ul>
+<li><strong>Secure Boot enabled:</strong> PCR 0 + PCR 7 — firmware measurements and Secure Boot state (UEFI db/dbx/pk)</li>
+<li><strong>Secure Boot disabled:</strong> PCR 0 only — firmware measurements only (weaker: an attacker with physical access could replace the bootloader)</li>
+</ul>
+<p>The disk unlocks silently on boot when PCR values match. Your LUKS passphrase always remains valid as a fallback.</p>
+<p>During enrollment, <code>gen-efi enroll-tpm2</code> also checks the LUKS KDF and warns if it is <code>pbkdf2</code> instead of <code>argon2id</code> — <code>pbkdf2</code> is orders of magnitude weaker against GPU brute-force attacks. You can convert with <code>cryptsetup luksConvertKey --pbkdf argon2id &lt;device&gt;</code>.</p>
+<h3>Setup</h3>
+<pre><code class="language-bash"># Enroll LUKS key into TPM2 (one-time setup after fresh install)
+# You will be prompted for your LUKS passphrase
+# You can also opt in to a TPM2 PIN for a second factor
+sudo gen-efi enroll-tpm2
+
+# Reboot and confirm silent unlock
+sudo reboot</code></pre>
+<h3>After Firmware Updates</h3>
+<p>If <code>fwupdmgr update</code> updated your BIOS or platform firmware, PCR 0 changes. The TPM will not release the key with the old binding, so you will be prompted for your LUKS passphrase on the next boot. This is expected.</p>
+<pre><code class="language-bash"># After booting with passphrase, clean up the stale TPM2 slot
+sudo gen-efi cleanup-tpm2
+
+# Re-enroll with the current PCR values
+sudo gen-efi enroll-tpm2</code></pre>
+<p><code>cleanup-tpm2</code> collects all TPM2-type keyslots from the LUKS header, keeps the highest-numbered (most recently written), and wipes the rest using <code>systemd-cryptenroll --wipe-slot</code>. It prompts for your LUKS passphrase to authorise each removal.</p>
+<h3>After Secure Boot Changes</h3>
+<p>When you change Secure Boot settings (enable, disable, or change enrolled keys), PCR 7 changes. Re-enroll:</p>
+<pre><code class="language-bash">sudo gen-efi cleanup-tpm2
+sudo gen-efi enroll-tpm2</code></pre>
+<h3>Verifying TPM2 State</h3>
+<pre><code class="language-bash"># List LUKS keyslots and tokens including TPM2 entries
+sudo cryptsetup luksDump /dev/nvme0n1p2 | grep -A 5 &quot;Token&quot;
+
+# Confirm TPM2 enrollment
+sudo cryptsetup luksDump /dev/nvme0n1p2 | grep systemd-tpm2
+
+# List available TPM2 devices
+sudo systemd-cryptenroll --tpm2-device=list</code></pre>
+<p>---</p>
+<h2>Inspecting the Kernel Command Line</h2>
+<p>The kernel command line is embedded in the UKI at build time. <code>gen-efi</code> always regenerates it from live system state — it never reuses a cached file. The generated line is stored at <code>/etc/kernel/install_cmdline_&lt;slot&gt;</code> (overwritten on every run). To read the cmdline embedded in an existing UKI:</p>
+<pre><code class="language-bash"># Extract and display the command line from a UKI
+sudo objcopy -O binary --only-section=.cmdline \
+    /boot/efi/EFI/shanios/shanios-blue.efi /dev/stdout | strings
+
+# Or use ukify (if available)
+sudo ukify inspect /boot/efi/EFI/shanios/shanios-blue.efi</code></pre>
+<p>The generated command line looks like:</p>
+<pre><code>quiet splash systemd.volatile=state ro lsm=landlock,lockdown,yama,integrity,apparmor,bpf
+rootfstype=btrfs rootflags=subvol=@blue,ro,noatime,compress=zstd,space_cache=v2,autodefrag
+rd.luks.uuid=&lt;uuid&gt; rd.luks.name=&lt;uuid&gt;=shani_root rd.luks.options=&lt;uuid&gt;=tpm2-device=auto
+root=/dev/mapper/shani_root rd.vconsole.keymap=us
+resume=UUID=&lt;uuid&gt; resume_offset=&lt;offset&gt;</code></pre>
+<p>Parameters are added or omitted based on system state: <code>rd.luks.*</code> only on encrypted systems, <code>rd.vconsole.keymap=</code> only if <code>/etc/vconsole.conf</code> defines a keymap, <code>resume=</code> only if <code>/swap/swapfile</code> exists.</p>
+<p>---</p>
+<h2>Troubleshooting</h2>
+<h3>MOK.key and MOK.crt Do Not Match</h3>
+<p><code>gen-efi</code> detects keypair mismatches before attempting to sign anything and regenerates the full pair automatically. After regeneration, run <code>enroll-mok</code> to stage enrollment of the new key, then reboot to confirm in MokManager.</p>
+<h3>UKI Signature Verification Fails</h3>
+<pre><code class="language-bash"># Verify the UKI against the local MOK cert
+sbverify --cert /etc/secureboot/keys/MOK.crt /boot/efi/EFI/shanios/shanios-blue.efi
+
+# If it fails, rebuild the UKI for the current slot
+sudo gen-efi configure blue
+
+# If the MOK key changed, re-enroll it
+sudo gen-efi enroll-mok</code></pre>
+<h3>Secure Boot Rejects the Kernel After Update</h3>
+<pre><code class="language-bash"># Check signature on the new slot's UKI
+sbverify --cert /etc/secureboot/keys/MOK.crt /boot/efi/EFI/shanios/shanios-green.efi
+
+# Regenerate if needed (run from the currently booted slot)
+sudo gen-efi configure blue
+
+# Confirm the MOK key is enrolled
+mokutil --list-enrolled | grep -i shani</code></pre>
+<h3>TPM2 Fails After Secure Boot Change</h3>
+<p>When you change Secure Boot settings, PCR 7 changes. Re-enroll:</p>
+<pre><code class="language-bash">sudo gen-efi cleanup-tpm2
+sudo gen-efi enroll-tpm2</code></pre>
+<p>Full boot and security troubleshooting: <a href="https://docs.shani.dev/doc/troubleshootingboot">docs.shani.dev — Boot Issues</a> and <a href="https://docs.shani.dev/doc/security/luks">docs.shani.dev — Encryption Issues</a>.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions answered</li>
+<li><a href="https://docs.shani.dev/doc/security/secure-boot">docs.shani.dev — Secure Boot</a> — full Secure Boot reference</li>
+<li><a href="https://docs.shani.dev/doc/security/gen-efi">docs.shani.dev — gen-efi Reference</a> — complete gen-efi documentation</li>
+<li><a href="https://docs.shani.dev/doc/security/tpm2">docs.shani.dev — TPM2 Enrollment</a> — TPM2 setup guide</li>
+<li><a href="https://blog.shani.dev/post/shani-os-security-deep-dive">Security Without Configuration</a> — security model overview</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

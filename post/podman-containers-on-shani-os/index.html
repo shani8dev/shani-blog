@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="How to use Podman on Shani OS for rootless containers, Docker Compose workflows, and containerised services — with the Pods GUI, persistent storage in @containers, and full compatibility with the Docker ecosystem.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Podman and Containers on Shani OS — Rootless, Docker-Compatible, Ready at Boot","description":"How to use Podman on Shani OS for rootless containers, Docker Compose workflows, and containerised services — with the Pods GUI, persistent storage in @containers, and full compatibility with the Docker ecosystem.","url":"https://blog.shani.dev/post/podman-containers-on-shani-os","datePublished":"2026-04-21T00:00:00.000Z","dateModified":"2026-04-21T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Podman and Containers on Shani OS — Rootless, Docker-Compatible, Ready at Boot","description":"How to use Podman on Shani OS for rootless containers, Docker Compose workflows, and containerised services — with the Pods GUI, persistent storage in @containers, and full compatibility with the Docker ecosystem.","url":"https://blog.shani.dev/post/podman-containers-on-shani-os","datePublished":"2026-04-21T00:00:00.000Z","dateModified":"2026-04-21T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,260 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Podman and Containers on Shani OS — Rootless, Docker-Compatible, Ready at Boot</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-21 · 8 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Podman is a container engine that is fully compatible with Docker's CLI and image ecosystem but does not require a root-privileged daemon. On Shani OS, <code>podman.socket</code> is enabled at first boot — containers are ready to run immediately without any setup.</p>
+<p>Because Shani OS's root filesystem is read-only, Podman is the natural home for any service or database that needs to run persistently: databases, development servers, web services, self-hosted tools. Containers live in the <code>@containers</code> Btrfs subvolume, completely independent of the OS, surviving every update and rollback untouched.</p>
+<p>The <strong>Pods</strong> app (pre-installed on both editions) gives you a graphical interface for managing containers, images, volumes, and networks. The <code>podman-docker</code> drop-in package (pre-installed) means existing <code>docker</code> commands work as-is.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/software/containers">docs.shani.dev — Containers</a>.</p>
+<p>---</p>
+<h2>Why Rootless Containers Matter</h2>
+<p>The key difference between Podman and Docker's traditional setup: Podman runs containers as your normal user by default. No root daemon listening on a socket. No <code>sudo docker</code>. No potential for a container breakout to compromise the host as root.</p>
+<p>On an immutable OS, this fits naturally. Your running containers do not need root to exist. If a container is compromised, the blast radius is limited to your user session — not the entire system.</p>
+<p>For operations that need elevated access (binding to ports below 1024, accessing hardware devices), Podman supports rootful mode as well.</p>
+<p>---</p>
+<h2>Basic Usage</h2>
+<p>Podman's CLI is identical to Docker's for all common operations:</p>
+<pre><code class="language-bash"># Pull an image
+podman pull nginx
+podman pull postgres:16
+podman pull redis:latest
+
+# Run a container
+podman run -d --name webserver -p 8080:80 nginx
+
+# List running containers
+podman ps
+
+# List all containers (including stopped)
+podman ps -a
+
+# View logs
+podman logs webserver
+podman logs -f webserver   # follow
+
+# Stop and remove
+podman stop webserver
+podman rm webserver
+
+# Execute a command in a running container
+podman exec -it webserver bash
+
+# View images
+podman images
+
+# Remove an image
+podman rmi nginx</code></pre>
+<p>---</p>
+<h2>Using the docker Drop-In</h2>
+<p>The <code>podman-docker</code> package is pre-installed. It provides a <code>/usr/bin/docker</code> wrapper that calls Podman. Existing scripts and tools that call <code>docker</code> work without modification:</p>
+<pre><code class="language-bash">docker run -d nginx
+docker ps
+docker compose up -d    # podman-compose handles this</code></pre>
+<p><code>DOCKER_HOST</code> and Docker socket emulation are also available for tools that use the Docker API directly:</p>
+<pre><code class="language-bash"># Enable the Podman socket for Docker API compatibility
+systemctl --user start podman.socket
+
+# Set DOCKER_HOST for tools that need it
+export DOCKER_HOST=unix:///run/user/$UID/podman/podman.sock</code></pre>
+<p>---</p>
+<h2>Common Services</h2>
+<h3>PostgreSQL</h3>
+<pre><code class="language-bash">podman volume create postgres-data
+
+podman run -d \
+  --name postgres \
+  -e POSTGRES_PASSWORD=secret \
+  -e POSTGRES_DB=mydb \
+  -v postgres-data:/var/lib/postgresql/data \
+  -p 127.0.0.1:5432:5432 \
+  postgres:16
+
+# Connect with psql
+podman exec -it postgres psql -U postgres -d mydb
+
+# Auto-start on login (systemd user service)
+podman generate systemd --name postgres --new --files
+mkdir -p ~/.config/systemd/user
+mv container-postgres.service ~/.config/systemd/user/
+systemctl --user enable --now container-postgres.service</code></pre>
+<h3>Redis</h3>
+<pre><code class="language-bash">podman run -d \
+  --name redis \
+  -p 127.0.0.1:6379:6379 \
+  redis:7-alpine redis-server --appendonly yes
+
+# Test it
+podman exec -it redis redis-cli ping</code></pre>
+<h3>A Self-Hosted Service (e.g. Gitea)</h3>
+<pre><code class="language-bash">podman volume create gitea-data
+
+podman run -d \
+  --name gitea \
+  -p 127.0.0.1:3000:3000 \
+  -p 127.0.0.1:2222:22 \
+  -v gitea-data:/data \
+  gitea/gitea:latest
+
+# Access at http://localhost:3000</code></pre>
+<p>For the full catalogue of self-hosted services you can run with Podman — media, AI, home automation, security, productivity, databases, mail, VPNs, and more — see <a href="https://blog.shani.dev/post/shani-os-home-server">Shani OS as a Home Server</a> and the self-hosting wiki at <a href="https://docs.shani.dev/servers">docs.shani.dev/servers</a>.</p>
+<p>---</p>
+<h2>Docker Compose Workflows</h2>
+<p><code>podman-compose</code> is pre-installed and handles standard <code>docker-compose.yml</code> files:</p>
+<pre><code class="language-bash"># Use an existing Docker Compose file
+podman-compose up -d
+podman-compose down
+podman-compose logs -f
+
+# Or use the docker compose drop-in
+docker compose up -d</code></pre>
+<p>Example <code>docker-compose.yml</code> for a typical web stack:</p>
+<pre><code class="language-yaml">version: '3.8'
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - &quot;8080:80&quot;
+    volumes:
+      - ./html:/usr/share/nginx/html
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: appdb
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  cache:
+    image: redis:7-alpine
+
+volumes:
+  db-data:</code></pre>
+<pre><code class="language-bash">podman-compose up -d
+podman-compose ps</code></pre>
+<p>---</p>
+<h2>Persistent Storage with Volumes</h2>
+<p>Podman volumes are stored in <code>~/.local/share/containers/storage/volumes/</code> (rootless) and survive container removal:</p>
+<pre><code class="language-bash"># Create a named volume
+podman volume create mydata
+
+# Inspect it
+podman volume inspect mydata
+
+# Use it in a container
+podman run -v mydata:/app/data myimage
+
+# List all volumes
+podman volume ls
+
+# Remove a volume
+podman volume rm mydata
+
+# Remove all unused volumes
+podman volume prune</code></pre>
+<p>Bind mounts also work for sharing specific host directories:</p>
+<pre><code class="language-bash"># Mount a host directory
+podman run -v ~/projects/myapp:/app -p 3000:3000 node:22 node server.js</code></pre>
+<p>---</p>
+<h2>Auto-Starting Containers at Login</h2>
+<p>Podman integrates with systemd's user session for per-user auto-start. Generate a systemd unit from a running container:</p>
+<pre><code class="language-bash"># Generate systemd unit for a container
+podman generate systemd --name mycontainer --new --files
+
+# Move to user systemd directory
+mkdir -p ~/.config/systemd/user
+mv container-mycontainer.service ~/.config/systemd/user/
+
+# Enable and start
+systemctl --user enable --now container-mycontainer.service
+
+# Check status
+systemctl --user status container-mycontainer.service</code></pre>
+<p>The <code>--new</code> flag means the container is created fresh each time the service starts (from the image), rather than restarting a stopped container. Remove <code>--new</code> to restart an existing named container instead.</p>
+<p>For system-wide auto-start (all users), use the root Podman socket:</p>
+<pre><code class="language-bash">sudo podman run ...
+sudo podman generate systemd --name mycontainer --new --files
+sudo mv container-mycontainer.service /etc/systemd/system/
+sudo systemctl enable --now container-mycontainer.service</code></pre>
+<p>---</p>
+<h2>Building Container Images</h2>
+<p><code>buildah</code> is pre-installed alongside Podman for building OCI images without a daemon. <code>skopeo</code> is also pre-installed for inspecting and copying images between registries without pulling them. <code>catatonit</code> serves as the init process inside containers (PID 1 reaping). Networking uses <code>netavark</code> + <code>aardvark-dns</code> — Podman's modern network stack replacing the older CNI plugins.</p>
+<pre><code class="language-bash"># Build from a Dockerfile
+podman build -t myapp:latest .
+# or with buildah directly
+buildah build -t myapp:latest .
+
+# Multi-stage build
+podman build --target production -t myapp:prod .
+
+# Push to a registry
+podman login registry.example.com
+podman push myapp:latest registry.example.com/myapp:latest</code></pre>
+<pre><code class="language-bash"># Inspect an image without pulling
+skopeo inspect docker://nginx:latest
+
+# Copy an image between registries
+skopeo copy docker://docker.io/nginx:latest docker://myregistry.example.com/nginx:latest</code></pre>
+<p>---</p>
+<h2>The Pods GUI</h2>
+<p>Pods is pre-installed on both editions. Open it from your application launcher.</p>
+<p>Pods shows you:</p>
+<ul>
+<li>All running and stopped containers with their status</li>
+<li>Image library with size information</li>
+<li>Volume management</li>
+<li>Per-container logs, stats, and terminal access</li>
+<li>Start, stop, pause, and remove containers with a click</li>
+<li>Pull new images from any registry</li>
+</ul>
+<p>For most container management tasks, Pods removes the need to open a terminal.</p>
+<p>---</p>
+<h2>Podman vs Docker: What Changes</h2>
+<p>If you are migrating from Docker workflows:</p>
+<p>| Docker | Podman | |---|---| | <code>docker run</code> | <code>podman run</code> (identical syntax) | | <code>docker compose up</code> | <code>podman-compose up</code> or <code>docker compose up</code> | | <code>docker build</code> | <code>podman build</code> or <code>buildah build</code> | | Daemon required | No daemon — socket activated | | Root by default | Rootless by default | | <code>/var/run/docker.sock</code> | <code>/run/user/$UID/podman/podman.sock</code> | | <code>docker.io</code> default registry | <code>docker.io</code> default registry |</p>
+<p>The main workflow difference is that Podman does not keep a persistent daemon. Containers start as direct child processes of your shell or systemd. For persistent services, use systemd user units (see above).</p>
+<p>---</p>
+<h2>Storage Efficiency</h2>
+<p>Container images and layers live in <code>@containers</code>. Podman uses content-addressed storage, so layers shared between images are stored only once. Btrfs zstd compression and the <code>bees</code> deduplication daemon apply at the block level on top of Podman's own layer sharing.</p>
+<p>To see disk usage:</p>
+<pre><code class="language-bash"># Podman's view
+podman system df
+
+# Btrfs compressed view
+sudo compsize /var/lib/containers
+
+# Clean up everything unused
+podman system prune -af --volumes</code></pre>
+<p>---</p>
+<h2>Podman vs the Full Container and App Ecosystem</h2>
+<p>Podman is the right tool for OCI containers — services, databases, and development workflows that need an isolated runtime rather than a full distro environment. For GUI apps use Flatpak; for CLI tools use Nix; for a full mutable distro shell use Distrobox (which runs on top of Podman); for full system containers use LXD or systemd-nspawn; for full hardware isolation use a VM.</p>
+<p><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> has the complete decision guide with a flowchart and comparison table.</p>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://docs.shani.dev/doc/software/containers">docs.shani.dev — Containers</a> — full Podman and container reference</li>
+<li><a href="https://blog.shani.dev/post/shani-os-home-server">Shani OS as a Home Server</a> — what to self-host and how to access it remotely</li>
+<li><a href="https://docs.shani.dev/servers">docs.shani.dev/servers</a> — self-hosting wiki with ready-to-run commands for every service</li>
+<li><a href="https://docs.shani.dev/doc/software/distrobox">docs.shani.dev — Distrobox</a> — mutable dev containers with full distro package managers</li>
+<li><a href="https://blog.shani.dev/post/distrobox-on-shani-os">Distrobox on Shani OS</a> — using apt, pacman, yay inside Shani OS</li>
+<li><a href="https://blog.shani.dev/post/lxc-lxd-on-shani-os">LXC and LXD on Shani OS</a> — full system containers</li>
+<li><a href="https://blog.shani.dev/post/systemd-nspawn-on-shani-os">systemd-nspawn on Shani OS</a> — lightweight system containers</li>
+<li><a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a> — full VMs with hardware isolation</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

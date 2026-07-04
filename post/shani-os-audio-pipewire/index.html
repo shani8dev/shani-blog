@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Shani OS uses PipeWire 1.4.x as its audio stack — simultaneously compatible with ALSA, PulseAudio, and JACK. This guide covers everyday audio management, Bluetooth codec selection, fixing common issues, and setting up low-latency professional audio workflows.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Audio on Shani OS — PipeWire, WirePlumber, JACK, and Professional Audio","description":"Shani OS uses PipeWire 1.4.x as its audio stack — simultaneously compatible with ALSA, PulseAudio, and JACK. This guide covers everyday audio management, Bluetooth codec selection, fixing common issues, and setting up low-latency professional audio workflows.","url":"https://blog.shani.dev/post/shani-os-audio-pipewire","datePublished":"2026-05-05T00:00:00.000Z","dateModified":"2026-05-05T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Audio on Shani OS — PipeWire, WirePlumber, JACK, and Professional Audio","description":"Shani OS uses PipeWire 1.4.x as its audio stack — simultaneously compatible with ALSA, PulseAudio, and JACK. This guide covers everyday audio management, Bluetooth codec selection, fixing common issues, and setting up low-latency professional audio workflows.","url":"https://blog.shani.dev/post/shani-os-audio-pipewire","datePublished":"2026-05-05T00:00:00.000Z","dateModified":"2026-05-05T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,206 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Audio on Shani OS — PipeWire, WirePlumber, JACK, and Professional Audio</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-05 · 8 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>PipeWire is the audio and video routing daemon on Shani OS. It replaces PulseAudio for desktop audio while simultaneously providing JACK-compatible low-latency audio for professional workflows — using the same daemon. ALSA applications, PulseAudio applications, JACK applications, and video capture all work through PipeWire without any configuration.</p>
+<p>WirePlumber is the session manager that sits on top of PipeWire — it makes routing decisions: which microphone goes to which app, which speaker gets output from which process, how Bluetooth devices connect, and how JACK clients are managed.</p>
+<p>Full reference: <a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a>.</p>
+<p>---</p>
+<h2>Everyday Audio Management</h2>
+<h3>Checking Audio Status</h3>
+<pre><code class="language-bash"># Overall PipeWire status
+systemctl --user status pipewire pipewire-pulse wireplumber
+
+# List all audio sinks (output devices)
+pactl list sinks short
+
+# List all audio sources (input devices)
+pactl list sources short
+
+# Detailed sink info (sample rate, codec, etc.)
+pactl list sinks
+
+# WirePlumber device view
+wpctl status</code></pre>
+<h3>Setting Default Output and Input</h3>
+<pre><code class="language-bash"># Set default sink (output) by name
+pactl set-default-sink alsa_output.pci-0000_00_1f.3.analog-stereo
+
+# Set default source (input) by name
+pactl set-default-source alsa_input.pci-0000_00_1f.3.analog-stereo
+
+# Using wpctl (simpler)
+wpctl status                    # get device IDs
+wpctl set-default 50            # set default sink to device 50
+wpctl set-default 60            # set default source to device 60</code></pre>
+<p><strong>GNOME:</strong> click the volume icon in the top bar → select output/input device</p>
+<p><strong>KDE:</strong> click the volume icon in the system tray → select output/input</p>
+<h3>Volume Control</h3>
+<pre><code class="language-bash"># Set volume (0–150%, above 100% applies digital amplification)
+wpctl set-volume @DEFAULT_AUDIO_SINK@ 80%
+wpctl set-volume @DEFAULT_AUDIO_SINK@ 100%
+
+# Mute/unmute
+wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 1    # mute mic
+wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 0    # unmute mic
+
+# Per-application volume
+pactl list sink-inputs short       # get sink-input index
+pactl set-sink-input-volume 42 70% # set volume for specific app</code></pre>
+<p>---</p>
+<h2>Restarting the Audio Stack</h2>
+<p>If audio stops working or becomes glitchy:</p>
+<pre><code class="language-bash"># Restart all PipeWire components
+systemctl --user restart pipewire pipewire-pulse wireplumber
+
+# Or restart just WirePlumber (routing decisions) without dropping audio
+systemctl --user restart wireplumber</code></pre>
+<p>This takes about one second and restores audio without a reboot.</p>
+<p>---</p>
+<h2>Sample Rate and Bit Depth</h2>
+<p>PipeWire automatically negotiates the best sample rate for your hardware. To check and configure:</p>
+<pre><code class="language-bash"># Check current sample rate
+pw-cli info all | grep -i &quot;rate\|format&quot;
+
+# Or via pactl
+pactl list sinks | grep -i &quot;sample spec\|format&quot;</code></pre>
+<p>To set a fixed sample rate (useful for professional audio or when you need exactly 192 kHz):</p>
+<pre><code class="language-bash"># Create user PipeWire config directory
+mkdir -p ~/.config/pipewire
+
+# Copy default config
+cp /usr/share/pipewire/pipewire.conf ~/.config/pipewire/
+
+# Edit and set default sample rate
+nano ~/.config/pipewire/pipewire.conf
+# Find and modify:
+# default.clock.rate = 48000    # change to 44100, 96000, 192000, etc.
+# default.clock.quantum = 1024  # buffer size (lower = lower latency)
+
+# Restart
+systemctl --user restart pipewire wireplumber</code></pre>
+<p>---</p>
+<h2>JACK-Compatible Low-Latency Audio</h2>
+<p>PipeWire includes a JACK server emulation layer (<code>pipewire-jack</code>), pre-installed on Shani OS. JACK applications work without any separate JACK daemon:</p>
+<pre><code class="language-bash"># Verify JACK compatibility
+jack_lsp              # list JACK ports (works via pipewire-jack)
+jack_connect ...      # connect JACK ports
+
+# Check JACK latency
+jack_latency
+
+# Run a JACK application (e.g. Ardour, Carla)
+# These apps connect to PipeWire's JACK interface automatically</code></pre>
+<p>For professional audio with Ardour, Carla, or other DAW software:</p>
+<pre><code class="language-bash"># Install Ardour via Flatpak
+flatpak install flathub org.ardour.Ardour
+
+# Install Carla (plugin host)
+flatpak install flathub studio.kx.carla</code></pre>
+<p>Both connect to PipeWire's JACK interface automatically.</p>
+<h3>Lowering Latency for Professional Audio</h3>
+<p>For recording or live processing, lower the buffer size:</p>
+<pre><code class="language-bash"># In ~/.config/pipewire/pipewire.conf
+# default.clock.quantum = 256    # ~5ms at 48kHz
+# default.clock.quantum = 128    # ~2.7ms at 48kHz
+# default.clock.min-quantum = 64 # allow minimum 64 samples
+
+# Restart
+systemctl --user restart pipewire wireplumber</code></pre>
+<p>Users in the <code>realtime</code> group (all Shani OS users are added automatically) can use real-time scheduling, which is required for stable low-latency audio:</p>
+<pre><code class="language-bash"># Verify realtime group membership
+groups | grep realtime
+
+# HPET and RTC are accessible for the realtime group
+ls -la /dev/hpet /dev/rtc0</code></pre>
+<p>---</p>
+<h2>Bluetooth Audio Codecs</h2>
+<p>PipeWire handles Bluetooth audio. Codec selection and management:</p>
+<pre><code class="language-bash"># List Bluetooth audio profiles for a device
+pactl list cards | grep -A 30 &quot;bluez_card&quot;
+
+# Switch to LDAC (best quality)
+pactl set-card-profile bluez_card.XX_XX_XX_XX_XX_XX a2dp-sink-ldac
+
+# Switch to AAC
+pactl set-card-profile bluez_card.XX_XX_XX_XX_XX_XX a2dp-sink-aac
+
+# Switch to headset profile (for calls with microphone)
+pactl set-card-profile bluez_card.XX_XX_XX_XX_XX_XX headset-head-unit-msbc
+
+# Check what is active
+pactl list cards | grep &quot;Active Profile&quot;</code></pre>
+<p>Supported codecs: SBC, AAC, aptX, aptX HD, LDAC (990 kbps), LC3 (Bluetooth LE Audio). The best available codec is negotiated automatically.</p>
+<p>---</p>
+<h2>EasyEffects — System-Wide Audio Processing</h2>
+<p>EasyEffects is not pre-installed but is available on Flathub. It provides system-wide audio processing (equaliser, compressor, limiter, reverb, noise cancellation) for all applications:</p>
+<pre><code class="language-bash">flatpak install flathub com.github.wwmm.easyeffects</code></pre>
+<p>EasyEffects integrates with PipeWire and processes audio from any source or to any sink, including microphone noise cancellation for video calls.</p>
+<p>---</p>
+<h2>Audio Over HDMI / DisplayPort</h2>
+<p>HDMI and DisplayPort audio appears as a separate audio output device. Switch to it in the volume control or:</p>
+<pre><code class="language-bash"># List outputs including HDMI
+pactl list sinks short | grep -i hdmi
+
+# Set HDMI as default
+pactl set-default-sink alsa_output.pci-0000_01_00.1.hdmi-stereo</code></pre>
+<p>---</p>
+<h2>Intel DSP Audio (SOF Firmware)</h2>
+<p>Some Intel laptops (ThinkPads, HP laptops from 2019 onwards) use Intel Sound Open Firmware for their audio DSP. <code>sof-firmware</code> is pre-installed on Shani OS. If audio is not working on a newer Intel laptop:</p>
+<pre><code class="language-bash"># Check if SOF firmware is loading
+dmesg | grep -i &quot;sof\|sound open&quot;
+
+# Check available sound cards
+cat /proc/asound/cards
+
+# Check WirePlumber for device detection
+wpctl status
+journalctl --user -u wireplumber -n 50</code></pre>
+<p>Full audio troubleshooting: <a href="https://docs.shani.dev/doc/troubleshooting">docs.shani.dev — Audio Issues</a>.</p>
+<p>---</p>
+<h2>Troubleshooting</h2>
+<h3>No Audio at Boot</h3>
+<pre><code class="language-bash">systemctl --user restart pipewire pipewire-pulse wireplumber
+pactl list sinks short     # verify sinks exist</code></pre>
+<h3>Audio Works But Sounds Distorted</h3>
+<pre><code class="language-bash"># Check sample rate mismatch
+pactl list sinks | grep &quot;Sample Spec&quot;
+# If showing unusual format, reset PipeWire config
+rm ~/.config/pipewire/pipewire.conf 2&gt;/dev/null
+systemctl --user restart pipewire wireplumber</code></pre>
+<h3>Microphone Not Working in Flatpak Apps</h3>
+<p>Flatpak apps need explicit microphone permission:</p>
+<pre><code class="language-bash"># Grant microphone to a specific app
+flatpak override --user --device=all com.example.App
+# Or use Flatseal (pre-installed) for graphical permission management</code></pre>
+<h3>No Sound from Specific Application</h3>
+<pre><code class="language-bash"># Check if the app is sending audio
+pactl list sink-inputs     # shows playing apps
+
+# If the app is missing, check if it's muted in the volume mixer
+pavucontrol &amp;              # install via flatpak if needed</code></pre>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — audio troubleshooting</li>
+<li><a href="https://pipewire.pages.freedesktop.org/pipewire/">PipeWire documentation</a></li>
+<li><a href="https://blog.shani.dev/post/shani-os-bluetooth">Bluetooth on Shani OS</a> — Bluetooth audio codec guide</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a></li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->

@@ -30,7 +30,7 @@
   <meta name="twitter:description" id="tw-desc"  content="An honest technical comparison of immutable Linux distributions. Where Shani OS wins, where others genuinely win, and how to pick the right one for your situation. Btrfs send/receive vs OSTree vs OCI images, gaming focus, enterprise needs, and declarative vs imperative philosophy.">
   <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS vs Fedora Silverblue, Bazzite, SteamOS, and NixOS — An Honest Comparison","description":"An honest technical comparison of immutable Linux distributions. Where Shani OS wins, where others genuinely win, and how to pick the right one for your situation. Btrfs send/receive vs OSTree vs OCI images, gaming focus, enterprise needs, and declarative vs imperative philosophy.","url":"https://blog.shani.dev/post/shani-os-vs-alternatives","datePublished":"2026-05-08T00:00:00.000Z","dateModified":"2026-05-08T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS vs Fedora Silverblue, Bazzite, SteamOS, and NixOS — An Honest Comparison","description":"An honest technical comparison of immutable Linux distributions. Where Shani OS wins, where others genuinely win, and how to pick the right one for your situation. Btrfs send/receive vs OSTree vs OCI images, gaming focus, enterprise needs, and declarative vs imperative philosophy.","url":"https://blog.shani.dev/post/shani-os-vs-alternatives","datePublished":"2026-05-08T00:00:00.000Z","dateModified":"2026-05-08T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -192,7 +192,7 @@
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
   <main id="main-content">
     <!-- INDEX VIEW -->
-    <section id="view-index">
+    <section id="view-index" style="display:none">
       <header class="hero container">
         <div class="hero__grid">
           <!-- Populated by Renderer.renderHero() -->
@@ -210,9 +210,133 @@
     </section>
 
     <!-- POST VIEW -->
-    <section id="view-post" class="container" style="display:none" aria-label="Post">
+    <section id="view-post" class="container" aria-label="Post">
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
-      <article id="post-article"></article>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Engineering</span>
+        <h1 class="post-title">Shani OS vs Fedora Silverblue, Bazzite, SteamOS, and NixOS — An Honest Comparison</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-08 · 9 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Immutable Linux is a genuine category now, not a niche experiment. Fedora Silverblue, Bazzite, SteamOS, Vanilla OS, and NixOS have all taken different approaches to the same core problem: OS updates that are reliable, reversible, and do not accumulate cruft.</p>
+<p>This post compares Shani OS to the most significant alternatives honestly — including where the others genuinely win. There is no single "best immutable distro" for all situations. The right choice depends on your hardware, workflow, and how much configuration complexity you are willing to accept.</p>
+<p>---</p>
+<h2>The Core Technical Difference: Update Mechanisms</h2>
+<p>The biggest architectural divergence is <em>how</em> each system applies OS updates.</p>
+<h3>Shani OS — Btrfs Send/Receive</h3>
+<p><code>shani-deploy</code> downloads a complete OS image as a Btrfs send stream, verifies it (SHA256 + GPG), and pipes it into <code>btrfs receive</code> on the inactive slot. The result is a byte-for-byte reconstruction of exactly the subvolume that passed build QA.</p>
+<p><strong>Advantages:</strong> What was signed is what gets written — there is no reassembly or layer application that could introduce divergence. The OS image is a single verified artifact. Rollback switches Btrfs subvolumes — there is no reconstruction involved, it is a pointer change.</p>
+<p><strong>Trade-off:</strong> Full image downloads (~2–3 GB per update). No incremental patching.</p>
+<h3>Fedora Silverblue / Bazzite — OSTree + rpm-ostree</h3>
+<p>OSTree stores the OS as a content-addressed tree of files. Updates are commits in this tree. rpm-ostree can layer additional packages on top of the base commit.</p>
+<p><strong>Advantages:</strong> Incremental updates (only changed files download). Package layering allows some customisation of the OS image without a full rebuild. Mature technology backed by Red Hat.</p>
+<p><strong>Trade-off:</strong> Layered packages add complexity and can cause the "works on base Silverblue but not on my layered system" problem. The base system is Fedora's 6-month release cycle — less current than Arch. Rollback is to a previous OSTree commit, which may need a reboot even for the rollback.</p>
+<h3>SteamOS 3 — Full Image Swap (A/B Partitions)</h3>
+<p>SteamOS uses a flat A/B partition swap — a complete partition image is written, very similar in concept to Shani OS but using flat partitions rather than Btrfs subvolumes.</p>
+<p><strong>Advantages:</strong> Extremely clean — no layer management, no OSTree complexity. Valve's integration with Steam hardware is excellent.</p>
+<p><strong>Trade-off:</strong> Not designed for general PC hardware. NVIDIA is not officially supported. Valve controls the update pipeline — you cannot point it at a private update server. Not suitable for enterprise or OEM deployment on arbitrary hardware.</p>
+<h3>Vanilla OS 2 — OCI Image Swap</h3>
+<p>Vanilla OS uses OCI (container) images for the OS root, managed by ABRoot. The OS is an OCI image that transacts between two root partitions.</p>
+<p><strong>Advantages:</strong> Familiar tooling for those who work with containers. FsGuard integrity checking at boot.</p>
+<p><strong>Trade-off:</strong> The tooling (ABRoot, APX, VSO) is newer and less battle-tested than the alternatives. Based on Debian Sid (near-rolling), which is a less common base.</p>
+<h3>NixOS — Nix Generations</h3>
+<p>NixOS does not swap OS images at all — it builds the OS declaratively from a Nix configuration and switches between "generations" (complete system configurations).</p>
+<p><strong>Advantages:</strong> Extraordinary reproducibility. The same <code>configuration.nix</code> produces the same system on any NixOS installation. Multiple generations coexist. Roll back to any previous generation.</p>
+<p><strong>Trade-off:</strong> The learning curve is significant. Nix's language is unlike anything else in the Linux ecosystem. Many things that work trivially on other distros require explicit Nix configuration. Not beginner-friendly.</p>
+<p>---</p>
+<h2>Gaming: Bazzite and SteamOS Win for Steam Deck</h2>
+<p>For gaming on a <strong>Steam Deck</strong>, SteamOS is the obvious choice — it is designed specifically for that hardware, Valve tests against it, and the gaming mode is purpose-built.</p>
+<p>For gaming on a <strong>general PC</strong> (particularly with NVIDIA), Bazzite is the strongest competitor to Shani OS. It ships a gaming stack on top of Fedora Atomic, has a passionate gaming community, and has very good out-of-the-box experience.</p>
+<p><strong>Shani OS advantages for gaming:</strong></p>
+<ul>
+<li>Arch Linux base means more current drivers and packages than Fedora's 6-month cycle</li>
+<li>Full image verification (SHA256 + GPG) end-to-end</li>
+<li>NVIDIA works at first boot on both editions</li>
+<li>Zero telemetry — no Steam hardware survey type data from the OS</li>
+<li>Indian hardware commonly sold in India tends to work better tested against Arch than Fedora</li>
+</ul>
+<p><strong>Bazzite advantages for gaming:</strong></p>
+<ul>
+<li>Larger gaming community with more gaming-specific documentation</li>
+<li>Steam Gaming Mode (Gamescope session) is more polished</li>
+<li>More gaming-focused ujust scripts for common setup tasks</li>
+<li>Strong HDR support</li>
+</ul>
+<p><strong>For most PC gamers in India:</strong> Shani OS KDE edition is the right choice. For users who primarily care about Gamescope/Gaming Mode or are deeply embedded in the Bazzite community, Bazzite is a legitimate alternative.</p>
+<p>---</p>
+<h2>Enterprise and OEM: Shani OS Has No Real Competition</h2>
+<p>Among the options above, only Shani OS is designed with OEM and enterprise deployment as a core use case:</p>
+<ul>
+<li>GPG-signed images with public key on keyservers (independently auditable)</li>
+<li>Plymouth BGRT brand logo from UEFI firmware</li>
+<li>OEM first-boot wizard</li>
+<li>Private update channel (in development)</li>
+<li>Zero telemetry (verifiable by reading the source)</li>
+<li>Indian language support as a first-class feature — critical for government, public sector, and educational deployments in India</li>
+</ul>
+<p>NixOS with NixOps or deploy-rs can achieve reproducible fleet deployments, but the complexity of the Nix language makes it impractical for most IT teams.</p>
+<p>Fedora Silverblue does not have OEM tooling. Bazzite is consumer-gaming focused. SteamOS is Valve-controlled.</p>
+<p>---</p>
+<h2>Declarative vs Imperative</h2>
+<p><strong>NixOS</strong> takes the fully declarative approach: describe your system in <code>configuration.nix</code>, run <code>nixos-rebuild switch</code>, and the system matches the description. Every setting, every package, every service is in code.</p>
+<p><strong>Shani OS</strong> takes the imperative approach: install, configure with normal Linux tools, update atomically. Your configuration lives in the <code>/etc</code> overlay and your home directory — not in a declarative specification.</p>
+<p>Which is better depends on what you value:</p>
+<ul>
+<li><strong>Declarative (NixOS):</strong> If you want to describe your system as code, check it into git, reproduce it exactly on new hardware, and never have drift — NixOS is unmatched. The payoff is worth the steep learning curve for the right workflows.</li>
+<li><strong>Imperative (Shani OS):</strong> If you want a reliable OS that works like Linux always has (edit config files, enable services) but with atomic updates and instant rollback — Shani OS. No new language to learn, no mental model shift for existing Linux knowledge.</li>
+</ul>
+<p>Many users end up with a hybrid: Shani OS as the host (imperative, familiar) with Nix (pre-installed) for reproducible development environments.</p>
+<p>---</p>
+<h2>Summary Decision Guide</h2>
+<p><strong>Choose Shani OS if:</strong></p>
+<ul>
+<li>You want a rolling-release Arch base with reliable atomic updates</li>
+<li>You are on any x86 hardware including NVIDIA</li>
+<li>You want zero telemetry, verifiable by source code</li>
+<li>You are in India or need Indian language support as a first-class feature</li>
+<li>You are an enterprise, OEM, or IT team deploying a fleet</li>
+<li>You want familiar Linux configuration (edit /etc, systemctl, etc.) — not a new paradigm</li>
+<li>You want a complete pre-configured experience without post-install setup</li>
+</ul>
+<p><strong>Choose Bazzite if:</strong></p>
+<ul>
+<li>You prioritise the gaming community and Gamescope/Gaming Mode</li>
+<li>You prefer Fedora's ecosystem and stability over Arch's freshness</li>
+<li>HDR support with AMD is your top priority</li>
+</ul>
+<p><strong>Choose SteamOS if:</strong></p>
+<ul>
+<li>You are using a Steam Deck</li>
+<li>You want the most polished handheld gaming experience</li>
+</ul>
+<p><strong>Choose NixOS if:</strong></p>
+<ul>
+<li>You want fully declarative, reproducible system configuration</li>
+<li>You are willing to invest significant time learning the Nix ecosystem</li>
+<li>Reproducibility across machines is worth more than simplicity of configuration</li>
+</ul>
+<p><strong>Choose Fedora Silverblue if:</strong></p>
+<ul>
+<li>You want Fedora's ecosystem with atomic updates</li>
+<li>You do not need gaming focus or enterprise deployment</li>
+<li>You want rpm-ostree package layering</li>
+</ul>
+<p>---</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions answered</li>
+<li><a href="https://blog.shani.dev/post/shani-os-first-week">Your First Week with Shani OS</a> — day-by-day setup guide</li>
+<li><a href="https://shani.dev#compare">shani.dev — Compare section</a> — full comparison table</li>
+<li><a href="https://blog.shani.dev/post/why-os-updates-should-never-break">Why Your OS Update Should Never Break Your Computer</a> — the philosophy behind Shani OS's design</li>
+<li><a href="https://blog.shani.dev/post/shani-os-architecture-deep-dive">The Architecture Behind Shani OS</a> — Btrfs send/receive deep dive</li>
+<li><a href="https://t.me/shani8dev">Telegram community</a> — ask questions before you decide</li>
+</ul>
+<p>---</p>
+<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+      </article>
     </section>
 
     <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->
