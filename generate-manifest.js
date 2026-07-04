@@ -57,6 +57,11 @@ function getConfig(key, fallback) {
   return m ? m[1] : fallback;
 }
 
+function getConfigNum(key, fallback) {
+  const m = configRaw.match(new RegExp(key + ":\\s*(-?\\d+(?:\\.\\d+)?)"));
+  return m ? Number(m[1]) : fallback;
+}
+
 // ── Config values (all sourced from config-shani.js) ─────────────
 const BLOG_URL        = getConfig('BLOG_URL',        'https://blog.shani.dev');
 const SITE_TITLE      = getConfig('SITE_TITLE',      'Blog');
@@ -75,6 +80,7 @@ const TWITTER_HANDLE  = getConfig('TWITTER_HANDLE',  '');
 const PUBLISHER_NAME  = getConfig('PUBLISHER_NAME',  SITE_TITLE);
 const PUBLISHER_LOGO  = getConfig('PUBLISHER_LOGO',  FAVICON_URL);
 const STORAGE_PREFIX  = getConfig('STORAGE_PREFIX',  'shani');
+const PAYWALL_PREVIEW_BLOCKS = getConfigNum('PAYWALL_PREVIEW_BLOCKS', 12);
 
 // ── SITEMAP_STATIC_URLS — parsed from the CONFIG array literal ───
 // Falls back to a sensible default if parsing fails.
@@ -126,6 +132,82 @@ function escXml(s) {
 // escXml doubles as HTML attribute escaper for the stubs
 const escHtml = escXml;
 
+// ── Markdown → HTML (for prerendered stub content) ─────────────────
+// Prefer the real `marked` package (same renderer family the client uses)
+// if it's installed; otherwise fall back to a small dependency-free
+// converter. script.js still hydrates/replaces #post-article on the
+// client with the fully interactive render (Prism, KaTeX, TOC, likes,
+// comments, etc.) — this just needs to be real, crawlable text.
+let marked = null;
+try { marked = require('marked'); } catch { /* not installed — fallback used */ }
+
+function mdToHtmlFallback(md) {
+  const blocks = [];
+  let src = String(md || '').replace(/\r\n/g, '\n');
+
+  src = src.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    const idx = blocks.push(
+      `<pre><code${lang ? ` class="language-${escXml(lang)}"` : ''}>${escXml(code.replace(/\n$/, ''))}</code></pre>`
+    ) - 1;
+    return `\u0000BLOCK${idx}\u0000`;
+  });
+
+  const inline = s => s
+    .replace(/`([^`]+)`/g, (_, c) => `<code>${escXml(c)}</code>`)
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, u) => `<a href="${escXml(u)}">${t}</a>`);
+
+  const lines = src.split('\n');
+  const out = [];
+  let para = [];
+  let list = null;
+
+  const flushPara = () => { if (para.length) { out.push(`<p>${inline(para.join(' ').trim())}</p>`); para = []; } };
+  const flushList = () => { if (list) { out.push(`</${list}>`); list = null; } };
+
+  for (const line of lines) {
+    if (/^\u0000BLOCK\d+\u0000$/.test(line.trim())) { flushPara(); flushList(); out.push(line.trim()); continue; }
+    const h = line.match(/^(#{1,6})\s+(.*)$/);
+    if (h) { flushPara(); flushList(); const lvl = h[1].length; out.push(`<h${lvl}>${inline(h[2].trim())}</h${lvl}>`); continue; }
+    const ul = line.match(/^\s*[-*+]\s+(.*)$/);
+    const ol = line.match(/^\s*\d+\.\s+(.*)$/);
+    if (ul || ol) {
+      flushPara();
+      const tag = ul ? 'ul' : 'ol';
+      if (list !== tag) { flushList(); out.push(`<${tag}>`); list = tag; }
+      out.push(`<li>${inline((ul || ol)[1].trim())}</li>`);
+      continue;
+    }
+    const bq = line.match(/^\s*>\s?(.*)$/);
+    if (bq) { flushPara(); flushList(); out.push(`<blockquote><p>${inline(bq[1].trim())}</p></blockquote>`); continue; }
+    if (!line.trim()) { flushPara(); flushList(); continue; }
+    para.push(line.trim());
+  }
+  flushPara(); flushList();
+
+  let html = out.join('\n');
+  blocks.forEach((b, i) => { html = html.replace(`\u0000BLOCK${i}\u0000`, b); });
+  return html;
+}
+
+function mdToHtml(md) {
+  if (marked) {
+    try { return typeof marked.parse === 'function' ? marked.parse(md || '') : marked(md || ''); }
+    catch { /* fall through to the built-in converter */ }
+  }
+  return mdToHtmlFallback(md);
+}
+
+// Mirrors the client's paywall gating (renderPost() in script.js): non-
+// members only ever see the first PAYWALL_PREVIEW_BLOCKS blocks. The stub
+// must show the SAME preview a real anonymous visitor gets — never more —
+// or crawlers would index content that's supposed to be gated.
+function paywallPreviewMarkdown(body, maxBlocks) {
+  const blocks = String(body || '').split(/\n{2,}/).filter(b => b.trim());
+  return blocks.slice(0, maxBlocks).join('\n\n');
+}
+
 // ── Post stub builder ─────────────────────────────────────────────
 // Generates a real HTML file at post/<slug>/index.html so GitHub Pages
 // returns HTTP 200 for every post URL.
@@ -163,7 +245,27 @@ function buildStub(post) {
       logo:    { '@type': 'ImageObject', url: PUBLISHER_LOGO },
     },
     ...(image ? { image } : {}),
+    ...(post.paywalled ? { isAccessibleForFree: 'False' } : { isAccessibleForFree: 'True' }),
   });
+
+  // ── Prerendered article content ────────────────────────────────
+  // Paywalled posts get exactly the same preview a real anonymous
+  // visitor would see client-side — never the full body.
+  const sourceMd  = post.paywalled ? paywallPreviewMarkdown(post.body, PAYWALL_PREVIEW_BLOCKS) : (post.body || '');
+  const bodyHtml  = mdToHtml(sourceMd);
+  const dateDisp  = post.date ? escHtml(post.date) : '';
+  const articleHtml = `
+      <header class="post-header">
+        <span class="post-tag">${escHtml(post.tag || 'Post')}</span>
+        <h1 class="post-title">${title}</h1>
+        <div class="post-meta">
+          <span class="meta-info">${authorName ? authorName + ' · ' : ''}${dateDisp}${post.readTime ? ' · ' + escHtml(post.readTime) : ''}${post.paywalled ? ' · <span class="members-badge"><i class="fa-solid fa-star"></i> Members</span>' : ''}</span>
+        </div>
+      </header>
+      <div class="post-body">${bodyHtml}</div>
+      ${post.paywalled ? `<div class="paywall-gate"><div class="paywall-card">
+        <p>This post is for members. <a href="/membership">Become a member</a> to read the rest.</p>
+      </div></div>` : ''}`;
 
   // Read the root index.html once and cache it
   if (!buildStub._indexHtml) {
@@ -236,14 +338,37 @@ function buildStub(post) {
         'Ensure index.html contains the PRIMARY SEO comment block and PERFORMANCE comment.'
       );
     }
-    return patched;
+    html = patched;
+  } else {
+    // Splice: keep everything before START_SENTINEL, inject SEO block, then
+    // keep everything from END_SENTINEL onward (preserving the PERFORMANCE section).
+    html = html.slice(0, startIdx) +
+           SEO_INJECTION.trimStart() + '\n\n  ' +
+           html.slice(endIdx);
   }
 
-  // Splice: keep everything before START_SENTINEL, inject SEO block, then
-  // keep everything from END_SENTINEL onward (preserving the PERFORMANCE section).
-  html = html.slice(0, startIdx) +
-         SEO_INJECTION.trimStart() + '\n\n  ' +
-         html.slice(endIdx);
+  // ── Prerender the article body + fix initial view visibility ────
+  // Without this, every post stub ships the same empty #post-article,
+  // which is the thin/duplicate-content pattern that keeps crawlers
+  // from bothering to index individual post URLs. script.js still
+  // fully re-renders #post-article and re-toggles views on load, so
+  // this only affects what's visible before/without JS execution.
+  const ARTICLE_PLACEHOLDER = '<article id="post-article"></article>';
+  if (html.includes(ARTICLE_PLACEHOLDER)) {
+    html = html.replace(ARTICLE_PLACEHOLDER, `<article id="post-article">${articleHtml}</article>`);
+  } else {
+    console.warn(`  ⚠  buildStub: #post-article placeholder not found for "${post.slug}" — stub will ship with empty article content.`);
+  }
+
+  const VIEW_INDEX_OPEN = '<section id="view-index">';
+  if (html.includes(VIEW_INDEX_OPEN)) {
+    html = html.replace(VIEW_INDEX_OPEN, '<section id="view-index" style="display:none">');
+  }
+
+  const VIEW_POST_OPEN = '<section id="view-post" class="container" style="display:none" aria-label="Post">';
+  if (html.includes(VIEW_POST_OPEN)) {
+    html = html.replace(VIEW_POST_OPEN, '<section id="view-post" class="container" aria-label="Post">');
+  }
 
   return html;
 }
@@ -387,7 +512,7 @@ function build() {
       lang:            fm.lang             || '',
       noindex:         fm.noindex          === 'true',
       toc:             fm.toc              || '',
-      // body intentionally omitted — the SPA fetches .md on-demand
+      body,            // kept in-memory only for stub rendering — stripped before manifest.json is written
     });
 
     console.log(`  ${isPaywalled ? '[members]' : '[free]   '} ${slug}`);
@@ -416,7 +541,7 @@ function build() {
   // Sort newest first (same as GitHub Actions output)
   publishedPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  fs.writeFileSync(OUT_PATH, JSON.stringify(publishedPosts, null, 2));
+  fs.writeFileSync(OUT_PATH, JSON.stringify(publishedPosts.map(({ body, ...rest }) => rest), null, 2));
   console.log(`\n  ✓ Written ${publishedPosts.length} post(s) to posts/manifest.json`);
 
   // ── Generate sitemap.xml ────────────────────────────────────────
