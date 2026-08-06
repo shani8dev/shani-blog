@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
 
   <!-- ═══ PRIMARY SEO — values overwritten by Renderer.applyBranding() ══════ -->
-  <title>Blog</title>
-  <meta name="description" id="meta-desc" content="">
-  <meta name="keywords"    id="meta-keywords" content="">
-  <meta name="author"      content="Blog">
+  <!-- Defaults below are the REAL site identity (not generic placeholders) so
+       crawlers / social scrapers / slow-JS visitors see something correct even
+       before applyBranding() runs or if it fails to run at all. -->
+  <title>Shanios Blog</title>
+  <meta name="description" id="meta-desc" content="Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.">
+  <meta name="keywords"    id="meta-keywords" content="Shanios, immutable Linux, atomic updates, rollback, open source OS, Arch Linux, Btrfs, zero telemetry, shani.dev">
+  <meta name="author"      content="Shrinivas Kumbhar">
   <meta name="robots"      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-  <link rel="canonical"    id="canonical-url" href="">
+  <link rel="canonical"    id="canonical-url" href="https://blog.shani.dev/">
   <script>
     // Prevent Google from indexing 404-redirect URLs like /?p=/post/...
     if (location.search.includes('p=')) {
@@ -21,13 +24,13 @@
   </script>
 
   <!-- ═══ OPEN GRAPH ═══════════════════════════════════════════════════════ -->
-  <meta property="og:site_name" id="og-site-name" content="Blog">
-  <meta property="og:title"     id="og-title"     content="">
-  <meta property="og:description" id="og-desc"    content="">
+  <meta property="og:site_name" id="og-site-name" content="Shanios Blog">
+  <meta property="og:title"     id="og-title"     content="Shanios Blog">
+  <meta property="og:description" id="og-desc"    content="Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.">
   <meta property="og:type"      id="og-type"      content="website">
-  <meta property="og:url"       id="og-url"       content="">
-  <meta property="og:image"     id="og-image"     content="">
-  <meta property="og:image:alt" id="og-image-alt" content="Blog logo">
+  <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/">
+  <meta property="og:image"     id="og-image"     content="https://shani.dev/assets/images/logo.svg">
+  <meta property="og:image:alt" id="og-image-alt" content="Shanios Blog logo">
   <meta property="og:locale"    content="en_US">
   <!-- article:* — populated by applyBranding() / renderPost() for post views -->
   <meta property="article:author"         id="og-article-author"  content="">
@@ -37,10 +40,10 @@
 
   <!-- ═══ TWITTER / X CARD ════════════════════════════════════════════════ -->
   <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:site"        id="tw-site"  content="">
-  <meta name="twitter:title"       id="tw-title" content="">
-  <meta name="twitter:description" id="tw-desc"  content="">
-  <meta name="twitter:image"       id="tw-image" content="">
+  <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
+  <meta name="twitter:title"       id="tw-title" content="Shanios Blog">
+  <meta name="twitter:description" id="tw-desc"  content="Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.">
+  <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
 
   <!-- ═══ STRUCTURED DATA — rewritten by applyBranding() / renderPost() ══ -->
   <script type="application/ld+json" id="ld-blogs">{}</script>
@@ -56,7 +59,7 @@
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 
   <!-- ═══ FAVICON — src overwritten by applyBranding() ═════════════════════ -->
-  <link rel="icon" id="favicon" type="image/svg+xml" href="">
+  <link rel="icon" id="favicon" type="image/svg+xml" href="https://shani.dev/assets/images/logo.svg">
 
   <!-- ═══ PWA / Web App ════════════════════════════════════════════════════ -->
   <link rel="manifest" href="/manifest.json">
@@ -89,10 +92,14 @@
     (function () {
       // PREFIX is read from CONFIG if available; falls back to 'blogs' for the
       // very first paint (CONFIG loads after this inline script).
-      var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
-      var t = localStorage.getItem(pfx + '_theme') ||
-              (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', t);
+      try {
+        var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
+        var t = localStorage.getItem(pfx + '_theme') ||
+                (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
     })();
   </script>
 
@@ -105,36 +112,41 @@
   <link rel="stylesheet" id="prism-theme"
         href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
 
-  <!-- KaTeX — math rendering (synchronous, must load before script.js) -->
+  <!-- KaTeX — math rendering -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" defer></script>
 
   <!-- Markdown Parser & Sanitizer -->
-  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script>
 
   <!-- Prism.js Core + Languages -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hcl.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-nginx.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <!-- All non-critical CDN libs are now `defer`red (were previously blocking
+       HTML parsing) — same pattern already used on docs.shani.dev. `defer`
+       scripts execute in source order right before DOMContentLoaded, so
+       load order relative to each other and to config-shani.js/script.js
+       (also at end of body) is preserved. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hcl.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-nginx.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js" defer></script>
   <!-- Java / Spring Boot / Kotlin / Groovy / XML / Properties -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-groovy.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-gradle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-properties.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-groovy.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-gradle.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-properties.min.js" defer></script>
 </head>
 <body>
   <noscript>
@@ -274,5 +286,12 @@
     })();
   </script>
   <script src="/script.js"></script>
+
+  <!-- ═══ Service worker — offline shell + stale-while-revalidate posts ═══ -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function (e) { console.error('SW failed:', e); });
+    }
+  </script>
 </body>
 </html>

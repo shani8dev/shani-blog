@@ -33,13 +33,21 @@
     })();
   </script>
 
-  <!-- Apply saved theme before redirect fires to prevent any flash -->
+  <!-- Apply saved theme before redirect fires to prevent any flash.
+       Wrapped in try/catch — localStorage can throw in Safari private
+       browsing or with storage blocked by an extension; without the guard
+       an exception here means data-theme never gets set before the
+       redirect, causing a one-frame flash of the wrong theme. -->
   <script>
     (function () {
-      var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
-      var t = localStorage.getItem(pfx + '_theme') ||
-              (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', t);
+      try {
+        var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
+        var t = localStorage.getItem(pfx + '_theme') ||
+                (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
     })();
   </script>
 </head>
