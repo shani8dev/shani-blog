@@ -11,6 +11,14 @@
   <meta name="author"      content="Blog">
   <meta name="robots"      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical"    id="canonical-url" href="">
+  <script>
+    // Prevent Google from indexing 404-redirect URLs like /?p=/post/...
+    if (location.search.includes('p=')) {
+      var m = document.createElement('meta');
+      m.name = 'robots'; m.content = 'noindex';
+      document.head.appendChild(m);
+    }
+  </script>
 
   <!-- ═══ OPEN GRAPH ═══════════════════════════════════════════════════════ -->
   <meta property="og:site_name" id="og-site-name" content="Blog">

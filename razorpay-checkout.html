@@ -47,13 +47,23 @@
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script>
     const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim();
-    
+
+    const btn    = document.getElementById('checkout-btn');
+    const status = document.getElementById('checkout-status');
+
+    if (typeof CONFIG === 'undefined') {
+      document.getElementById('checkout-title').textContent = 'Unable to Load Checkout';
+      document.getElementById('checkout-desc').textContent = '';
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Configuration Failed to Load';
+      status.textContent = 'Please refresh the page, or disable any ad-blocker / script blocker and try again.';
+      status.className = 'status-msg error';
+      throw new Error('[razorpay-checkout] No CONFIG found. config-shani.js failed to load.');
+    }
+
     document.getElementById('checkout-title').textContent = CONFIG.MEMBERSHIP_HEADING;
     document.getElementById('checkout-desc').textContent = CONFIG.MEMBERSHIP_DESCRIPTION;
-    
-    const btn = document.getElementById('checkout-btn');
-    const status = document.getElementById('checkout-status');
-    
+
     btn.innerHTML = `<i class="fa-solid fa-star"></i> ${CONFIG.MEMBERSHIP_CTA} — ${CONFIG.MEMBERSHIP_PRICE}`;
     btn.disabled = false;
 

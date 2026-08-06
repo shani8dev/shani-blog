@@ -14,6 +14,12 @@
   ════════════════════════════════════════════════════════════════════ -->
   <script>
     (function () {
+      var ua = navigator.userAgent || '';
+      var isBot = /bot|crawler|spider|googlebot|bingbot|yandex|baidu|facebookexternalhit|twitterbot|linkedinbot|slackbot/i.test(ua);
+
+      // NEVER redirect search/social bots — let them see the real 404
+      if (isBot) return;
+
       var l = window.location;
       var path   = l.pathname;
       var search = l.search ? l.search.slice(1) : '';
