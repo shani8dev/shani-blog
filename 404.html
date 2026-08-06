@@ -15,7 +15,10 @@
   <script>
     (function () {
       var ua = navigator.userAgent || '';
-      var isBot = /bot|crawler|spider|googlebot|bingbot|yandex|baidu|facebookexternalhit|twitterbot|linkedinbot|slackbot/i.test(ua);
+      // FIX G (ported from docs.shani.dev): broader bot regex catches
+      // Google-InspectionTool and other Google crawlers whose UA doesn't
+      // contain the literal string "googlebot".
+      var isBot = /bot|crawler|spider|google|bingbot|yandex|baidu|facebookexternalhit|twitterbot|linkedinbot|slackbot/i.test(ua);
 
       // NEVER redirect search/social bots — let them see the real 404
       if (isBot) return;

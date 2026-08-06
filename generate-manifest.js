@@ -199,6 +199,16 @@ function mdToHtml(md) {
   return mdToHtmlFallback(md);
 }
 
+// Strip a leading "# Title" line from the body if it duplicates the post's
+// title (which the stub already renders in <h1 class="post-title">) —
+// otherwise every stub ships two H1s, which hurts SEO/structure.
+function stripDuplicateLeadingH1(body, title) {
+  const m = String(body || '').match(/^\s*#\s+(.+?)\s*\n([\s\S]*)$/);
+  if (!m) return body;
+  const norm = s => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+  return norm(m[1]) === norm(title || '') ? m[2] : body;
+}
+
 // Mirrors the client's paywall gating (renderPost() in script.js): non-
 // members only ever see the first PAYWALL_PREVIEW_BLOCKS blocks. The stub
 // must show the SAME preview a real anonymous visitor gets — never more —
@@ -221,14 +231,17 @@ function paywallPreviewMarkdown(body, maxBlocks) {
 // it tries to querySelector elements that don't exist and silently fails,
 // resulting in a blank page for real users.
 function buildStub(post) {
-  const url           = `${BLOG_URL}/post/${post.slug}`;
+  // Trailing slash matches the actual stub location (post/<slug>/index.html).
+  // GitHub Pages 301-redirects a directory URL requested WITHOUT the slash,
+  // so every URL we hand to crawlers/feeds should already be the final one.
+  const url           = `${BLOG_URL}/post/${post.slug}/`;
   const title         = escHtml(post.title);
   const desc          = escHtml(post.excerpt || SITE_DESC);
   const image         = escHtml(post.og_image || post.cover || OG_IMAGE);
   const authorName    = escHtml(post.author || AUTHOR);
   const datePublished = post.date    ? new Date(post.date    + 'T00:00:00').toISOString() : '';
   const dateModified  = post.updated ? new Date(post.updated + 'T00:00:00').toISOString() : datePublished;
-  const robots        = post.noindex ? 'noindex' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+  const robots        = (post.noindex || post.draft) ? 'noindex' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
 
   const ldJson = JSON.stringify({
     '@context':     'https://schema.org',
@@ -251,7 +264,10 @@ function buildStub(post) {
   // ── Prerendered article content ────────────────────────────────
   // Paywalled posts get exactly the same preview a real anonymous
   // visitor would see client-side — never the full body.
-  const sourceMd  = post.paywalled ? paywallPreviewMarkdown(post.body, PAYWALL_PREVIEW_BLOCKS) : (post.body || '');
+  const sourceMd  = stripDuplicateLeadingH1(
+    post.paywalled ? paywallPreviewMarkdown(post.body, PAYWALL_PREVIEW_BLOCKS) : (post.body || ''),
+    post.title
+  );
   const bodyHtml  = mdToHtml(sourceMd);
   const dateDisp  = post.date ? escHtml(post.date) : '';
   const articleHtml = `
@@ -551,7 +567,7 @@ function build() {
     changefreq: u.changefreq,
   }));
   const postUrls = publishedPosts.filter(p => !p.noindex).map(p => ({
-    loc:        `${BLOG_URL}/post/${p.slug}`,
+    loc:        `${BLOG_URL}/post/${p.slug}/`,
     lastmod:    p.updated || p.date,
     priority:   '0.8',
     changefreq: 'monthly',
@@ -577,8 +593,8 @@ function build() {
   const rssItems = publishedPosts.filter(p => !p.noindex).slice(0, 50).map(p => [
     '    <item>',
     `      <title>${escXml(p.title)}</title>`,
-    `      <link>${BLOG_URL}/post/${p.slug}</link>`,
-    `      <guid isPermaLink="true">${BLOG_URL}/post/${p.slug}</guid>`,
+    `      <link>${BLOG_URL}/post/${p.slug}/</link>`,
+    `      <guid isPermaLink="true">${BLOG_URL}/post/${p.slug}/</guid>`,
     `      <description>${escXml(p.excerpt)}</description>`,
     `      <pubDate>${new Date(p.date + 'T00:00:00').toUTCString()}</pubDate>`,
     p.updated ? `      <lastBuildDate>${new Date(p.updated + 'T00:00:00').toUTCString()}</lastBuildDate>` : null,
@@ -626,10 +642,14 @@ function build() {
   // The SPA (script.js) still hydrates the page for real users.
   fs.mkdirSync(POST_DIR, { recursive: true });
 
+  // Stubs are written for EVERY parsed post, including drafts — drafts get
+  // robots:noindex (see buildStub) and are excluded from manifest.json,
+  // sitemap.xml, and feed.xml above, but this lets you open
+  // post/<slug>/ locally to preview a draft before it's published.
   const liveSlugs = new Set();
   let stubsWritten = 0;
 
-  for (const post of publishedPosts) {
+  for (const post of posts) {
     if (!post.slug) continue;
     liveSlugs.add(post.slug);
     const dir  = path.join(POST_DIR, post.slug);
