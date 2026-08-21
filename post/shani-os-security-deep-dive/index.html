@@ -262,9 +262,9 @@
   → Shim (verifies systemd-boot via MOK)
     → systemd-boot (verifies the UKI via MOK)
       → Unified Kernel Image (kernel + initramfs + cmdline)</code></pre>
-<p>Every element in the chain is verified before the next one executes. The MOK (Machine Owner Key) is generated during installation and enrolled into the UEFI firmware. Every UKI that <code>gen-efi</code> generates is signed with this key. An attacker who modifies the kernel or bootloader will produce a binary that fails Secure Boot verification before the system starts.</p>
+<p>Every element in the chain is verified before the next one executes. The MOK (Machine Owner Key) is baked into the system image at build time — every machine installed from the same signed ISO shares the same key — and enrolled into the UEFI firmware during first boot. Every UKI that <code>gen-efi</code> generates is signed with this key. An attacker who modifies the kernel or bootloader will produce a binary that fails Secure Boot verification before the system starts.</p>
 <p>The bootloader editor is disabled. The kernel command line is embedded in the UKI at build time and cannot be modified from the boot menu. This prevents the attack of adding <code>init=/bin/bash</code> or <code>single</code> to the kernel cmdline to bypass authentication.</p>
-<p>For Secure Boot enrollment and MOK management: <a href="https://docs.shani.dev/doc/secure-boot">docs.shani.dev — Secure Boot</a>.</p>
+<p>For Secure Boot enrollment and MOK management: <a href="https://docs.shani.dev/doc/security/secure-boot">docs.shani.dev — Secure Boot</a>.</p>
 <p>---</p>
 <h2>Signed OS Images</h2>
 <p>Every Shani OS release is SHA256 checksummed and GPG signed with key <code>7B927BFFD4A9EAAA8B666B77DE217F3DA8014792</code>. The key is on public keyservers at <code>keys.openpgp.org</code>.</p>

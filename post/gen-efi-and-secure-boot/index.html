@@ -254,7 +254,7 @@
        └─ Shim verifies systemd-boot (grubx64.efi, signed by MOK)
             └─ systemd-boot verifies and loads the UKI (shanios-blue.efi, signed by MOK)
                  └─ UKI contains: kernel + initramfs + cmdline (all signed together)</code></pre>
-<p>The MOK (Machine Owner Key) is a keypair generated on your machine during installation:</p>
+<p>The MOK (Machine Owner Key) is a keypair baked into the system image at build time — every machine installed from the same signed ISO shares the same key. The installer just verifies the keypair and re-signs with it; a fresh keypair is only generated on the spot as a fallback, if keys are missing or invalid:</p>
 <ul>
 <li>Private key: <code>/etc/secureboot/keys/MOK.key</code> (never leaves the device)</li>
 <li>Certificate: <code>/etc/secureboot/keys/MOK.crt</code></li>

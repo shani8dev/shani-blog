@@ -81,11 +81,11 @@ UEFI Firmware (verifies Shim via Microsoft CA)
       → Unified Kernel Image (kernel + initramfs + cmdline)
 ```
 
-Every element in the chain is verified before the next one executes. The MOK (Machine Owner Key) is generated during installation and enrolled into the UEFI firmware. Every UKI that `gen-efi` generates is signed with this key. An attacker who modifies the kernel or bootloader will produce a binary that fails Secure Boot verification before the system starts.
+Every element in the chain is verified before the next one executes. The MOK (Machine Owner Key) is baked into the system image at build time — every machine installed from the same signed ISO shares the same key — and enrolled into the UEFI firmware during first boot. Every UKI that `gen-efi` generates is signed with this key. An attacker who modifies the kernel or bootloader will produce a binary that fails Secure Boot verification before the system starts.
 
 The bootloader editor is disabled. The kernel command line is embedded in the UKI at build time and cannot be modified from the boot menu. This prevents the attack of adding `init=/bin/bash` or `single` to the kernel cmdline to bypass authentication.
 
-For Secure Boot enrollment and MOK management: [docs.shani.dev — Secure Boot](https://docs.shani.dev/doc/secure-boot).
+For Secure Boot enrollment and MOK management: [docs.shani.dev — Secure Boot](https://docs.shani.dev/doc/security/secure-boot).
 
 ---
 

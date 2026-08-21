@@ -355,7 +355,7 @@ btrfs property set -f -ts @green ro true</code></pre>
 <p>---</p>
 <h2>Storage Efficiency</h2>
 <p>The dual-slot architecture sounds expensive on disk, but is not in practice. Btrfs Copy-on-Write shares unchanged data blocks between <code>@blue</code> and <code>@green</code>. Only changed files consume additional space — typically around 18% overhead compared to a single-image system.</p>
-<p>On top of that, <code>bees</code> (the background deduplication daemon) continuously deduplicates shared content across all subvolumes. <code>shani-deploy --storage-info</code> and <code>sudo compsize /</code> show accurate compressed and deduplicated sizes.</p>
+<p>On top of that, <code>bees</code> (the background deduplication daemon) continuously deduplicates shared content across all subvolumes. <code>shani-health --storage-info</code> and <code>sudo compsize /</code> show accurate compressed and deduplicated sizes.</p>
 <p>Btrfs zstd compression, applied to all subvolumes except VM disk images and swap, typically reduces the OS image footprint by 30–50%.</p>
 <p>---</p>
 <h2>Practical Outcomes</h2>

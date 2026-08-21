@@ -51,7 +51,7 @@ UEFI Firmware
                  └─ UKI contains: kernel + initramfs + cmdline (all signed together)
 ```
 
-The MOK (Machine Owner Key) is a keypair generated on your machine during installation:
+The MOK (Machine Owner Key) is a keypair baked into the system image at build time — every machine installed from the same signed ISO shares the same key. The installer just verifies the keypair and re-signs with it; a fresh keypair is only generated on the spot as a fallback, if keys are missing or invalid:
 - Private key: `/etc/secureboot/keys/MOK.key` (never leaves the device)
 - Certificate: `/etc/secureboot/keys/MOK.crt`
 - DER-encoded public key: `/etc/secureboot/keys/MOK.der` (also copied to `/boot/efi/EFI/BOOT/MOK.der` for MokManager enrollment)

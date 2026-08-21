@@ -222,7 +222,7 @@ For the migration guide mapping every traditional Linux workflow to its Shani OS
 
 The dual-slot architecture sounds expensive on disk, but is not in practice. Btrfs Copy-on-Write shares unchanged data blocks between `@blue` and `@green`. Only changed files consume additional space — typically around 18% overhead compared to a single-image system.
 
-On top of that, `bees` (the background deduplication daemon) continuously deduplicates shared content across all subvolumes. `shani-deploy --storage-info` and `sudo compsize /` show accurate compressed and deduplicated sizes.
+On top of that, `bees` (the background deduplication daemon) continuously deduplicates shared content across all subvolumes. `shani-health --storage-info` and `sudo compsize /` show accurate compressed and deduplicated sizes.
 
 Btrfs zstd compression, applied to all subvolumes except VM disk images and swap, typically reduces the OS image footprint by 30–50%.
 

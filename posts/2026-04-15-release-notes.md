@@ -57,7 +57,7 @@ Several reliability issues in the update and rollback pipeline have been resolve
 - Interrupted downloads now resume correctly via `aria2c` rather than restarting from zero
 - The boot-count verification step — which confirms a new slot booted successfully before committing it as default — is more robust against edge-case timing
 - `--rollback` path handles the case where the inactive slot has no prior snapshot more gracefully
-- `shani-deploy --storage-info` now reports accurate compressed sizes using `compsize`
+- `shani-health --storage-info` now reports accurate compressed sizes using `compsize`
 - `shani-update` background notification service (user-level systemd service) now more reliably detects new images and sends desktop notifications
 
 ### shani-health
