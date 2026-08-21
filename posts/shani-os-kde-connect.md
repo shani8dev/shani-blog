@@ -129,14 +129,14 @@ Also check the KDE Connect app on your phone is not blocked by Android's battery
 ### Pairing Fails
 
 ```bash
-# Restart KDE Connect daemon
-systemctl --user restart kdeconnectd    # KDE
-# or
-systemctl --user restart gsconnect      # GNOME
-
-# Check daemon status
+# KDE: restart the daemon
+systemctl --user restart kdeconnectd
 systemctl --user status kdeconnectd
 journalctl --user -u kdeconnectd -n 30
+
+# GNOME: GSConnect has no separate daemon or systemd unit — it runs inside
+# GNOME Shell itself. Toggle it off and on in Extension Manager, or log out
+# and back in (Wayland) / press Alt+F2, type 'r', Enter (X11) to restart Shell.
 ```
 
 ### Connection Drops Frequently
