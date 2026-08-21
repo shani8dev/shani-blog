@@ -155,7 +155,7 @@ The KDE Plasma edition ships the GNOME system tools (Warehouse, Flatseal, Pods, 
 
 **Gaming:** Steam, Heroic Games Launcher (Epic/GOG/Amazon), Lutris, RetroArch, Bottles (Windows apps), GOverlay (MangoHud configurator), Oversteer (racing wheel configuration), AntiMicroX (gamepad mapper), OpenRGB (RGB lighting), Piper (gaming mouse configuration)
 
-**KDE Apps:** Okular (documents), Gwenview (images), Elisa (music), Haruna (video), Kate (text editor), KolourPaint, Kompare (diff tool), Kamoso (camera), KRDC (remote desktop), ISO Image Writer, KGet, KTorrent, KCalc, Skanlite (scanner)
+**KDE Apps:** Okular (documents), Gwenview (images), Elisa (music), Haruna (video), Kate (text editor), KolourPaint, Kamoso (camera), KRDC (remote desktop), ISO Image Writer, KGet, KTorrent, KCalc, Skanlite (scanner)
 
 **Games:** KPatience, Knights (chess), KBlocks, KSnakeDuel, KMahjongg, Kapman, KSudoku
 

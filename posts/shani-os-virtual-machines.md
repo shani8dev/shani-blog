@@ -17,7 +17,7 @@ readTime: '9 min'
 series: 'Shani OS Guides'
 ---
 
-QEMU/KVM on Shani OS runs VMs with near-native performance. The virtualisation stack is delivered via Flatpak on both editions: the KDE Plasma edition ships `org.virt_manager.virt-manager` and `org.virt_manager.virt_manager.Extension.Qemu` pre-installed; the GNOME edition ships GNOME Boxes (`org.gnome.Boxes`) pre-installed as a Flatpak. OVMF (UEFI for VMs), VirtIO drivers, Spice, and looking-glass are available via Flatpak on both. There is no system QEMU package — all VM tooling runs through the Flatpak stack, which bundles its own QEMU.
+QEMU/KVM on Shani OS runs VMs with near-native performance. `shani-core` installs a full system libvirt + QEMU stack (`qemu-base`, `libvirt`) on every edition, with `libvirtd`, `virtlogd`, and their sockets enabled from first boot — this is what actually executes and manages VMs. The GUI front-end differs by edition and is delivered via Flatpak: the KDE Plasma edition ships `org.virt_manager.virt-manager` and `org.virt_manager.virt_manager.Extension.Qemu` pre-installed; the GNOME edition ships GNOME Boxes (`org.gnome.Boxes`) pre-installed as a Flatpak. OVMF (UEFI for VMs), VirtIO drivers, Spice, and looking-glass are available via Flatpak on both.
 
 VM disk images live in the `@libvirt` and `@qemu` Btrfs subvolumes, which use the `nodatacow` mount option — CoW is disabled for VM disks to avoid write amplification and improve I/O performance. These subvolumes are completely independent of the OS slots; your VMs survive every OS update and rollback untouched.
 
