@@ -5,13 +5,13 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Fri, 21 Aug 2026 05:10:20 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 21 Aug 2026 05:38:19 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>shani-health — System Health Monitoring for Shani OS</title>
       <link>https://blog.shani.dev/post/shani-health-reference/</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-health-reference/</guid>
-      <description>shani-health is the CLI tool for checking the health of a running Shani OS system — filesystem integrity, slot state, subvolume sizes, service status, and more. Introduced in the 2026.04.15 release.</description>
+      <description>shani-health is the CLI tool for checking the health of a running Shani OS system — boot state, security posture, storage, network, hardware, and a deep integrity check with machine-readable output. Introduced in the 2026.04.15 release.</description>
       <pubDate>Mon, 11 May 2026 18:30:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>

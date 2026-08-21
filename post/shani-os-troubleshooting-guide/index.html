@@ -512,7 +512,7 @@ shani-health
 shani-health -v
 
 # Storage summary
-sudo shani-deploy --storage-info</code></pre>
+shani-health -s</code></pre>
 <p>---</p>
 <h2>Getting More Help</h2>
 <p>If the problem isn't covered here, the Telegram community is the fastest path to a solution:</p>
@@ -523,7 +523,7 @@ sudo shani-deploy --storage-info</code></pre>
 <pre><code class="language-bash"># Useful diagnostic info to share
 cat /etc/shani-version
 cat /data/current-slot
-shani-health --json
+shani-health --verify --json
 journalctl -b 0 -p err --no-pager | tail -30</code></pre>
 <p>---</p>
 <blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>

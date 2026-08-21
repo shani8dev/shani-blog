@@ -254,7 +254,7 @@
     ├── @machines      ← /var/lib/machines (systemd-nspawn)
     ├── @lxc / @lxd    ← LXC and LXD containers
     └── @swap          ← /swap (nodatacow — required for swapfile)</code></pre>
-<p>Image integrity is underpinned by <code>ostree</code> and <code>composefs</code>, which verify the OS subvolume contents. <code>squashfuse</code> enables read-only squashfs mounts where needed during the boot and recovery sequence.</p>
+<p>Image integrity doesn't rely on ostree, composefs, or squashfs — Shani OS isn't layered or image-composed at the filesystem level. Each release is a full Btrfs send-stream, SHA256-checksummed and GPG-signed against the project's key. <code>shani-deploy</code> downloads and verifies both before doing anything else, then pipes the verified stream straight into <code>btrfs receive</code> on the inactive slot. If verification fails, nothing is written — the running system is untouched either way.</p>
 <p>Only <code>@blue</code> and <code>@green</code> are OS images. Every other subvolume holds data that is independent of which OS slot is running. This is the core guarantee: <strong>an OS update or rollback touches exactly two subvolumes and nothing else</strong>. Your home directory, your Flatpak apps, your Snap packages, your Nix packages, your containers, and your configuration all survive every update unchanged.</p>
 <p>---</p>
 <h2>The Two Slots</h2>
@@ -303,7 +303,7 @@ x-systemd.requires-mounts-for=/data 0 0</code></pre>
 # GPG signature verified against known public key</code></pre>
 <p>Nothing is written to the OS subvolumes until both the checksum and signature verify. A corrupted or tampered image never touches your system. If the download is interrupted, it resumes from where it stopped.</p>
 <h3>2. Snapshot the Inactive Slot</h3>
-<pre><code class="language-bash">btrfs subvolume snapshot @green @green.$(date +%Y%m%d-%H%M%S)</code></pre>
+<pre><code class="language-bash">btrfs subvolume snapshot @green @green_backup_$(date +%Y%m%d%H%M%S)</code></pre>
 <p>This snapshot is created before any changes to the inactive slot. If the update partially writes and something goes wrong, this snapshot is your recovery point.</p>
 <h3>3. Extract the New Image</h3>
 <pre><code class="language-bash"># Decompress and receive the btrfs send stream into a temp workspace

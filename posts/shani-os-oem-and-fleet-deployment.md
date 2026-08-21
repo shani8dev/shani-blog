@@ -58,17 +58,15 @@ flatpak install myorg com.myorg.InternalApp
 
 ### Image Signing
 
-Every Shani OS release is signed with key `7B927BFFD4A9EAAA8B666B77DE217F3DA8014792`. For organisations deploying a custom build, the signing key is configurable in `shani-deploy`. Machines enrolled with your key only accept images signed by your key — a tampered or unofficial image fails verification before it is written.
+Every Shani OS release is signed with key `7B927BFFD4A9EAAA8B666B77DE217F3DA8014792`, and `shani-deploy` hardcodes that fingerprint (plus the CDN endpoint it downloads from) as `readonly` constants — there's no config file or flag that repoints a stock `shani-deploy` at a different signing key or mirror for its ongoing updates. An OEM that needs its own signing key does it at the **image-build layer** instead: the Packer AMI pipeline (see [shani-install-media](https://github.com/shani8dev/shani-install-media)) accepts a build-time variable to bake in your own key when producing a custom image. Redirecting an *already-deployed* fleet's update pipeline to a private key or mirror means forking `shani-deploy` and rebuilding the image with the patched constants — not a runtime setting.
 
 ---
 
 ## Fleet Update Management
 
-### Centralised Update Delivery
+### Centralised Update Delivery — What Is (and Isn't) Configurable
 
-Shani OS update images are served via HTTPS from a CDN. For fleet deployments, you can:
-
-**Mirror the update CDN internally.** Point machines at your internal mirror by configuring the update URL in `shani-deploy`'s configuration. Updates are downloaded from your network, not the public CDN. This controls bandwidth and allows offline or air-gapped deployments.
+Shani OS update images are served over HTTPS from Cloudflare R2, with automatic SourceForge-mirror discovery as a fallback, and every image is GPG-verified against the fixed key above. For air-gapped or bandwidth-controlled fleets, the practical options today are downloading once with `shani-deploy --download-only` and distributing the verified image manually, or forking `shani-deploy` to point at your own mirror and shipping that build to the fleet instead of the stock tool. A fully self-hosted private update CDN that works with an unmodified `shani-deploy` isn't an existing feature.
 
 ### Staged Rollouts
 

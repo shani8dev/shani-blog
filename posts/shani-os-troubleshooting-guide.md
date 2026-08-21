@@ -463,7 +463,7 @@ shani-health
 shani-health -v
 
 # Storage summary
-sudo shani-deploy --storage-info
+shani-health -s
 ```
 
 ---
@@ -479,7 +479,7 @@ Before posting, collect:
 # Useful diagnostic info to share
 cat /etc/shani-version
 cat /data/current-slot
-shani-health --json
+shani-health --verify --json
 journalctl -b 0 -p err --no-pager | tail -30
 ```
 

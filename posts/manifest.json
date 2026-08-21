@@ -2,7 +2,7 @@
   {
     "slug": "shani-health-reference",
     "title": "shani-health — System Health Monitoring for Shani OS",
-    "excerpt": "shani-health is the CLI tool for checking the health of a running Shani OS system — filesystem integrity, slot state, subvolume sizes, service status, and more. Introduced in the 2026.04.15 release.",
+    "excerpt": "shani-health is the CLI tool for checking the health of a running Shani OS system — boot state, security posture, storage, network, hardware, and a deep integrity check with machine-readable output. Introduced in the 2026.04.15 release.",
     "date": "2026-05-12",
     "updated": "",
     "tag": "Guide",

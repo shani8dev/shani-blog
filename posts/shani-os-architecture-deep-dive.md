@@ -44,7 +44,7 @@ Shani OS's entire persistence model is built on Btrfs subvolumes. There are two 
     └── @swap          ← /swap (nodatacow — required for swapfile)
 ```
 
-Image integrity is underpinned by `ostree` and `composefs`, which verify the OS subvolume contents. `squashfuse` enables read-only squashfs mounts where needed during the boot and recovery sequence.
+Image integrity doesn't rely on ostree, composefs, or squashfs — Shani OS isn't layered or image-composed at the filesystem level. Each release is a full Btrfs send-stream, SHA256-checksummed and GPG-signed against the project's key. `shani-deploy` downloads and verifies both before doing anything else, then pipes the verified stream straight into `btrfs receive` on the inactive slot. If verification fails, nothing is written — the running system is untouched either way.
 
 Only `@blue` and `@green` are OS images. Every other subvolume holds data that is independent of which OS slot is running. This is the core guarantee: **an OS update or rollback touches exactly two subvolumes and nothing else**. Your home directory, your Flatpak apps, your Snap packages, your Nix packages, your containers, and your configuration all survive every update unchanged.
 
@@ -130,7 +130,7 @@ Nothing is written to the OS subvolumes until both the checksum and signature ve
 ### 2. Snapshot the Inactive Slot
 
 ```bash
-btrfs subvolume snapshot @green @green.$(date +%Y%m%d-%H%M%S)
+btrfs subvolume snapshot @green @green_backup_$(date +%Y%m%d%H%M%S)
 ```
 
 This snapshot is created before any changes to the inactive slot. If the update partially writes and something goes wrong, this snapshot is your recovery point.
