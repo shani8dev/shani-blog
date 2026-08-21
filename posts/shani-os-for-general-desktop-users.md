@@ -398,7 +398,7 @@ nix-env -i btop  # if not present
 
 Most modern printers work without driver installation on Shani OS. Plug in your printer via USB or connect it to your Wi-Fi network — it should appear in Settings → Printers automatically.
 
-For detailed printer setup, including HP, Epson, Brother, and Canon drivers: [Printing and Scanning on Shani OS](https://blog.shani.dev/post/shani-os-printing-and-scanning).
+For detailed printer setup, including HP, Brother, and Canon drivers (Epson needs a manual AUR install — it's not pre-installed): [Printing and Scanning on Shani OS](https://blog.shani.dev/post/shani-os-printing-and-scanning).
 
 ---
 

@@ -5,7 +5,7 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India</description>
     <language>en-IN</language>
-    <lastBuildDate>Fri, 21 Aug 2026 06:25:49 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 21 Aug 2026 07:38:14 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>shani-health — System Health Monitoring for Shani OS</title>
@@ -299,7 +299,7 @@
       <title>Printing and Scanning on Shani OS — CUPS, Driverless Printing, and SANE</title>
       <link>https://blog.shani.dev/post/shani-os-printing-and-scanning/</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-printing-and-scanning/</guid>
-      <description>How printing and scanning work on Shani OS — driverless IPP-over-USB and network discovery, CUPS configuration, manufacturer-specific drivers for HP, Epson, Brother, Canon, and scanner setup via SANE and sane-airscan.</description>
+      <description>How printing and scanning work on Shani OS — driverless IPP-over-USB and network discovery, CUPS configuration, manufacturer-specific drivers for HP, Brother, Canon, and scanner setup via SANE and sane-airscan.</description>
       <pubDate>Fri, 24 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>

@@ -129,8 +129,9 @@ flatpak install flathub org.gnome.Tasks
 Most modern printers (post-2016, Wi-Fi or USB) work automatically. Open Settings → Printers. Your printer should appear. If it doesn't:
 
 1. For HP printers: run `hp-setup` in a terminal
-2. For Epson/Brother/Canon: check Settings → Printers → Add → your model should be in the list
-3. Full guide: [Printing and Scanning on Shani OS](https://blog.shani.dev/post/shani-os-printing-and-scanning)
+2. For Brother/Canon: check Settings → Printers → Add → your model should be in the list
+3. For Epson: driverless IPP Everywhere models (most since ~2016) work the same way; older models need a manual AUR driver install — see the full guide
+4. Full guide: [Printing and Scanning on Shani OS](https://blog.shani.dev/post/shani-os-printing-and-scanning)
 
 ### Pair Your Bluetooth Devices
 

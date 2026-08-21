@@ -400,6 +400,15 @@ ddcutil getvcp 12
 ddcutil capabilities</code></pre>
 <p>This works on most external monitors and some laptop panels. Useful for users with photosensitivity or specific contrast requirements.</p>
 <p>---</p>
+<h2>Input Methods (IBus)</h2>
+<p><code>shani-accessibility</code> also includes IBus and several input engines for scripts that need composition rather than a simple keymap:</p>
+<p>| Engine | Language / Script | |--------|-------------------| | <code>ibus-typing-booster</code> | Predictive typing / autocomplete for any language | | <code>ibus-libpinyin</code> | Chinese (Pinyin) | | <code>ibus-anthy</code> | Japanese | | <code>ibus-hangul</code> | Korean | | <code>ibus-unikey</code> | Vietnamese |</p>
+<p><strong>GNOME:</strong> Settings → Keyboard → Input Sources → Add an Input Source. <strong>KDE Plasma:</strong> System Settings → Input Devices → Virtual Keyboard, or Regional Settings → Input Method.</p>
+<pre><code class="language-bash"># Check IBus is running and list available engines
+ibus-daemon --version
+ibus list-engine</code></pre>
+<p>Indian-language script rendering (Devanagari, Tamil, Bengali, and others) is handled separately through pre-configured Noto fonts and fontconfig rules rather than an IBus engine — see <a href="https://blog.shani.dev/post/shani-os-indian-language-support">Indian Language Support on Shani OS</a>.</p>
+<p>---</p>
 <h2>Accessibility on the Login Screen</h2>
 <p><code>espeakup</code> connects espeak-ng to the console speech bridge — this means speech is available at the TTY login prompt before the graphical desktop loads. This is particularly useful for headless or fallback access.</p>
 <p>GDM (GNOME's login manager) and SDDM (KDE's login manager) both support Orca at the graphical login screen — Orca auto-starts when the login screen detects an accessibility request.</p>

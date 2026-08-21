@@ -898,7 +898,7 @@
   {
     "slug": "shani-os-printing-and-scanning",
     "title": "Printing and Scanning on Shani OS — CUPS, Driverless Printing, and SANE",
-    "excerpt": "How printing and scanning work on Shani OS — driverless IPP-over-USB and network discovery, CUPS configuration, manufacturer-specific drivers for HP, Epson, Brother, Canon, and scanner setup via SANE and sane-airscan.",
+    "excerpt": "How printing and scanning work on Shani OS — driverless IPP-over-USB and network discovery, CUPS configuration, manufacturer-specific drivers for HP, Brother, Canon, and scanner setup via SANE and sane-airscan.",
     "date": "2026-04-24",
     "updated": "",
     "tag": "Guide",

@@ -3,7 +3,7 @@ slug: shani-os-printing-and-scanning
 title: 'Printing and Scanning on Shani OS — CUPS, Driverless Printing, and SANE'
 date: '2026-04-24'
 tag: 'Guide'
-excerpt: 'How printing and scanning work on Shani OS — driverless IPP-over-USB and network discovery, CUPS configuration, manufacturer-specific drivers for HP, Epson, Brother, Canon, and scanner setup via SANE and sane-airscan.'
+excerpt: 'How printing and scanning work on Shani OS — driverless IPP-over-USB and network discovery, CUPS configuration, manufacturer-specific drivers for HP, Brother, Canon, and scanner setup via SANE and sane-airscan.'
 cover: ''
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
@@ -16,11 +16,11 @@ readTime: '6 min'
 series: 'Shani OS Guides'
 ---
 
-Shani OS ships a comprehensive printing and scanning stack that handles most modern hardware without any driver installation. The CUPS print system, `ipp-usb` for driverless USB printing, `sane-airscan` for driverless network scanning, and manufacturer-specific drivers for HP, Epson, Brother, and Canon are all pre-installed.
+Shani OS ships a comprehensive printing and scanning stack that handles most modern hardware without any driver installation. The CUPS print system, `ipp-usb` for driverless USB printing, `sane-airscan` for driverless network scanning, and manufacturer-specific drivers for HP, Brother, and Canon are all pre-installed.
 
 Printer and scanner configuration persists across every OS update and rollback via bind mounts from `@data` — you set up your printer once and it stays set up forever.
 
-Full reference: [docs.shani.dev — Printing & Scanning](https://docs.shani.dev/doc/troubleshooting).
+Full reference: [docs.shani.dev — Printing & Scanning](https://docs.shani.dev/doc/system/printing).
 
 ---
 
@@ -38,7 +38,6 @@ systemctl status ipp-usb
 journalctl -u ipp-usb -n 20
 
 # List detected ipp-usb devices
-ippusbxd --list   # if available
 ls /dev/usb/
 ```
 
@@ -69,7 +68,7 @@ Both interfaces show discovered printers. Select one, confirm the settings, and 
 
 ## Manufacturer-Specific Drivers
 
-For older printers or printers that need a proprietary driver, the following are pre-installed:
+For older printers or printers that need a proprietary driver, HP, Brother, and Canon coverage is pre-installed (Epson is the exception — see below):
 
 ### HP Printers (hplip-minimal)
 
@@ -89,12 +88,16 @@ hp-info
 
 For full HP functionality including ink levels and alignment, `hp-setup` handles most HP LaserJet and DeskJet models.
 
-### Epson Printers (epson-inkjet-printer-escpr2)
+### Epson Printers
 
-Epson's ESC/P-R2 driver covers most modern Epson inkjet printers. The driver is pre-installed — connect your printer and it should be detected.
+Epson's proprietary drivers (`epson-inkjet-printer-escpr`/`escpr2`) are **not pre-installed** on Shani OS, and aren't in the official Arch repos or the Shanios repo — they're AUR-only. Most Epson printers made since ~2016 support driverless IPP Everywhere and work fine via the discovery methods above without any driver at all. For an older Epson printer that isn't detected driverlessly, you'll need to build the AUR package yourself (using `makepkg` directly, or an AUR helper like `paru`/`yay` if you've installed one — neither ships by default):
 
 ```bash
-# Check if Epson driver is loaded
+git clone https://aur.archlinux.org/epson-inkjet-printer-escpr2.git
+cd epson-inkjet-printer-escpr2
+makepkg -si
+
+# After installing, check it's available
 lpinfo -m | grep -i epson
 ```
 
@@ -268,7 +271,7 @@ sudo scanimage -L
 groups | grep scanner
 ```
 
-Full troubleshooting reference: [docs.shani.dev — Printing & Scanning](https://docs.shani.dev/doc/troubleshooting).
+Full troubleshooting reference: [docs.shani.dev — Printing & Scanning](https://docs.shani.dev/doc/system/printing).
 
 ---
 
@@ -285,7 +288,7 @@ You configure your printer once. OS updates and rollbacks leave your printer con
 ## Resources
 
 - [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
-- [docs.shani.dev — Printing & Scanning](https://docs.shani.dev/doc/troubleshooting) — troubleshooting reference
+- [docs.shani.dev — Printing & Scanning](https://docs.shani.dev/doc/system/printing) — troubleshooting reference
 - [CUPS documentation](https://www.cups.org/documentation.html)
 - [Telegram community](https://t.me/shani8dev)
 

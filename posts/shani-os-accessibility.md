@@ -258,6 +258,31 @@ This works on most external monitors and some laptop panels. Useful for users wi
 
 ---
 
+## Input Methods (IBus)
+
+`shani-accessibility` also includes IBus and several input engines for scripts that need composition rather than a simple keymap:
+
+| Engine | Language / Script |
+|--------|-------------------|
+| `ibus-typing-booster` | Predictive typing / autocomplete for any language |
+| `ibus-libpinyin` | Chinese (Pinyin) |
+| `ibus-anthy` | Japanese |
+| `ibus-hangul` | Korean |
+| `ibus-unikey` | Vietnamese |
+
+**GNOME:** Settings → Keyboard → Input Sources → Add an Input Source.
+**KDE Plasma:** System Settings → Input Devices → Virtual Keyboard, or Regional Settings → Input Method.
+
+```bash
+# Check IBus is running and list available engines
+ibus-daemon --version
+ibus list-engine
+```
+
+Indian-language script rendering (Devanagari, Tamil, Bengali, and others) is handled separately through pre-configured Noto fonts and fontconfig rules rather than an IBus engine — see [Indian Language Support on Shani OS](https://blog.shani.dev/post/shani-os-indian-language-support).
+
+---
+
 ## Accessibility on the Login Screen
 
 `espeakup` connects espeak-ng to the console speech bridge — this means speech is available at the TTY login prompt before the graphical desktop loads. This is particularly useful for headless or fallback access.
