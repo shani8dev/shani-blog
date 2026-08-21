@@ -27,7 +27,7 @@ Shani OS **2026.04.15** is now available — two refreshed ISO images, a fixed U
 > 🧱 **Base:** Arch Linux (rolling) with a read-only root filesystem
 > 🔁 **Update model:** Atomic blue/green updates via `shani-deploy`
 
-New to Shani OS? Start with [Why Your OS Update Should Never Break Your Computer](/post/why-your-os-update-should-never-break-your-computer) for context on the design philosophy, then [The Architecture Behind Shani OS](/post/shani-os-architecture-deep-dive) for the technical detail. For everyday usage and use-case guidance, see [Shani OS for Everyone](/post/shani-os-for-everyone). Full documentation lives at [wiki.shani.dev](https://wiki.shani.dev).
+New to Shani OS? Start with [Why Your OS Update Should Never Break Your Computer](/post/why-your-os-update-should-never-break-your-computer) for context on the design philosophy, then [The Architecture Behind Shani OS](/post/shani-os-architecture-deep-dive) for the technical detail. For everyday usage and use-case guidance, see [Shani OS for Everyone](/post/shani-os-for-everyone). Full documentation lives at [docs.shani.dev](https://docs.shani.dev).
 
 ---
 
@@ -38,7 +38,7 @@ New to Shani OS? Start with [Why Your OS Update Should Never Break Your Computer
 | 🟢 GNOME Edition | ~5.4 GB | Work, study, Windows/macOS switchers, OEM deployments |
 | 🔵 KDE Plasma Edition | ~7.6 GB | Gaming, power users — full gaming stack pre-installed |
 
-Both ISOs are SHA256 checksummed and GPG signed with key `7B927BFFD4A9EAAA8B666B77DE217F3DA8014792`. See the [installation instructions at wiki.shani.dev](https://wiki.shani.dev#installation) for the full verification walkthrough.
+Both ISOs are SHA256 checksummed and GPG signed with key `7B927BFFD4A9EAAA8B666B77DE217F3DA8014792`. See the [installation instructions at docs.shani.dev](https://docs.shani.dev/doc/install/steps/) for the full verification walkthrough.
 
 ---
 
@@ -245,7 +245,7 @@ cat /data/current-slot
 
 ## Documentation & Community
 
-- [wiki.shani.dev](https://docs.shani.dev) — full technical documentation
+- [docs.shani.dev](https://docs.shani.dev) — full technical documentation
 - [shani.dev](https://shani.dev) — download, overview, and feature details
 - [github.com/shani8dev](https://github.com/shani8dev) — source code
 - [Telegram community](https://t.me/shani8dev)
@@ -258,7 +258,7 @@ cat /data/current-slot
 - [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates) — shani-deploy and shani-update reference
 - [shani-health Reference](https://blog.shani.dev/post/shani-health-reference) — system health monitoring CLI
 - [Getting Started with Shani OS](https://blog.shani.dev/post/shani-os-getting-started) — installation guide
-- [wiki.shani.dev](https://docs.shani.dev) — full technical documentation
+- [docs.shani.dev](https://docs.shani.dev) — full technical documentation
 - [Telegram community](https://t.me/shani8dev)
 ---
 

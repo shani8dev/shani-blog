@@ -124,7 +124,7 @@ const CONFIG = {
     { label: 'GitHub',   icon: 'fa-brands fa-github',  url: 'https://github.com/shani8dev' },
     { label: 'LinkedIn', icon: 'fa-brands fa-linkedin', url: 'https://www.linkedin.com/in/Shrinivasvkumbhar/' },
     { label: 'Shanios',  icon: 'fa-brands fa-linux',    url: 'https://shani.dev' },
-    { label: 'Wiki',     icon: 'fa-solid fa-book-open', url: 'https://wiki.shani.dev' },
+    { label: 'Docs',     icon: 'fa-solid fa-book-open', url: 'https://docs.shani.dev' },
   ],
 
   // ── Locale ────────────────────────────────────────────────────
