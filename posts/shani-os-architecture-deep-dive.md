@@ -232,7 +232,7 @@ Btrfs zstd compression, applied to all subvolumes except VM disk images and swap
 
 All of this machinery produces a simple end state: updates never break a running system, rollback is always available in one command, and the security posture is strong by default.
 
-The [2026.04.15 release](https://blog.shani.dev/post/shani-os-2026-04-15-release) is the current stable image. Full documentation: [docs.shani.dev](https://docs.shani.dev).
+The [2026.05.18 release](https://shani.dev/#download) is the current stable image. Full documentation: [docs.shani.dev](https://docs.shani.dev).
 
 [Download Shani OS at shani.dev →](https://shani.dev)
 

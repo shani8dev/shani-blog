@@ -53,21 +53,21 @@ Full pre-installation checklist: [docs.shani.dev — Pre-Installation](https://d
 
 Download from [shani.dev](https://shani.dev) or directly:
 
-- **GNOME Edition**: [Download ISO](https://sourceforge.net/projects/shanios/files/gnome/20260401/signed_shanios-gnome-2026.04.15-x86_64.iso/download)
-- **KDE Plasma Edition**: [Download ISO](https://sourceforge.net/projects/shanios/files/plasma/20260401/signed_shanios-plasma-2026.04.15-x86_64.iso/download)
+- **GNOME Edition**: [Download ISO](https://sourceforge.net/projects/shanios/files/gnome/20260518/signed_shanios-gnome-2026.05.18-x86_64.iso/download)
+- **KDE Plasma Edition**: [Download ISO](https://sourceforge.net/projects/shanios/files/plasma/20260518/signed_shanios-plasma-2026.05.18-x86_64.iso/download)
 
 Always verify before writing. Place the `.iso`, `.sha256`, and `.asc` files in the same directory, then:
 
 ```bash
 # Verify checksum
-sha256sum -c signed_shanios-gnome-2026.04.15-x86_64.iso.sha256
+sha256sum -c signed_shanios-gnome-2026.05.18-x86_64.iso.sha256
 
 # Import signing key (once)
 gpg --keyserver keys.openpgp.org --recv-keys 7B927BFFD4A9EAAA8B666B77DE217F3DA8014792
 
 # Verify signature
-gpg --verify signed_shanios-gnome-2026.04.15-x86_64.iso.asc \
-    signed_shanios-gnome-2026.04.15-x86_64.iso
+gpg --verify signed_shanios-gnome-2026.05.18-x86_64.iso.asc \
+    signed_shanios-gnome-2026.05.18-x86_64.iso
 ```
 
 Both should report OK / Good signature. If not, re-download.
@@ -86,7 +86,7 @@ Both should report OK / Good signature. If not, re-download.
 lsblk
 
 # Write (replace /dev/sdX with your USB device — double-check this!)
-sudo dd bs=4M if=signed_shanios-gnome-2026.04.15-x86_64.iso \
+sudo dd bs=4M if=signed_shanios-gnome-2026.05.18-x86_64.iso \
     of=/dev/sdX status=progress oflag=sync
 ```
 

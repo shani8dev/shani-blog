@@ -318,10 +318,8 @@ sudo firewall-cmd --reload</code></pre>
 <p>Full guide: <a href="https://docs.shani.dev/doc/networking/firewalld">docs.shani.dev — Firewall (firewalld)</a>.</p>
 <p>---</p>
 <h2>Fail2ban — Brute-Force Protection</h2>
-<p>fail2ban monitors log files for repeated authentication failures and temporarily bans offending IPs via firewalld. <strong>Not enabled by default</strong> — enable it on any machine running public-facing services.</p>
-<pre><code class="language-bash">sudo systemctl enable --now fail2ban
-
-# Overall status — all active jails and ban counts
+<p>fail2ban monitors log files for repeated authentication failures and temporarily bans offending IPs via firewalld. <strong>Active from first boot</strong> — no setup needed to get baseline protection.</p>
+<pre><code class="language-bash"># Overall status — all active jails and ban counts
 sudo fail2ban-client status
 
 # SSH jail status

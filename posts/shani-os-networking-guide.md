@@ -128,11 +128,9 @@ Full guide: [docs.shani.dev — Firewall (firewalld)](https://docs.shani.dev/doc
 
 ## Fail2ban — Brute-Force Protection
 
-fail2ban monitors log files for repeated authentication failures and temporarily bans offending IPs via firewalld. **Not enabled by default** — enable it on any machine running public-facing services.
+fail2ban monitors log files for repeated authentication failures and temporarily bans offending IPs via firewalld. **Active from first boot** — no setup needed to get baseline protection.
 
 ```bash
-sudo systemctl enable --now fail2ban
-
 # Overall status — all active jails and ban counts
 sudo fail2ban-client status
 

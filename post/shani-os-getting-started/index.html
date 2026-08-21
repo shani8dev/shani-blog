@@ -260,19 +260,19 @@
 <h2>Download and Verify</h2>
 <p>Download from <a href="https://shani.dev">shani.dev</a> or directly:</p>
 <ul>
-<li><strong>GNOME Edition</strong>: <a href="https://sourceforge.net/projects/shanios/files/gnome/20260401/signed_shanios-gnome-2026.04.15-x86_64.iso/download">Download ISO</a></li>
-<li><strong>KDE Plasma Edition</strong>: <a href="https://sourceforge.net/projects/shanios/files/plasma/20260401/signed_shanios-plasma-2026.04.15-x86_64.iso/download">Download ISO</a></li>
+<li><strong>GNOME Edition</strong>: <a href="https://sourceforge.net/projects/shanios/files/gnome/20260518/signed_shanios-gnome-2026.05.18-x86_64.iso/download">Download ISO</a></li>
+<li><strong>KDE Plasma Edition</strong>: <a href="https://sourceforge.net/projects/shanios/files/plasma/20260518/signed_shanios-plasma-2026.05.18-x86_64.iso/download">Download ISO</a></li>
 </ul>
 <p>Always verify before writing. Place the <code>.iso</code>, <code>.sha256</code>, and <code>.asc</code> files in the same directory, then:</p>
 <pre><code class="language-bash"># Verify checksum
-sha256sum -c signed_shanios-gnome-2026.04.15-x86_64.iso.sha256
+sha256sum -c signed_shanios-gnome-2026.05.18-x86_64.iso.sha256
 
 # Import signing key (once)
 gpg --keyserver keys.openpgp.org --recv-keys 7B927BFFD4A9EAAA8B666B77DE217F3DA8014792
 
 # Verify signature
-gpg --verify signed_shanios-gnome-2026.04.15-x86_64.iso.asc \
-    signed_shanios-gnome-2026.04.15-x86_64.iso</code></pre>
+gpg --verify signed_shanios-gnome-2026.05.18-x86_64.iso.asc \
+    signed_shanios-gnome-2026.05.18-x86_64.iso</code></pre>
 <p>Both should report OK / Good signature. If not, re-download.</p>
 <p>---</p>
 <h2>Write to USB</h2>
@@ -283,7 +283,7 @@ gpg --verify signed_shanios-gnome-2026.04.15-x86_64.iso.asc \
 lsblk
 
 # Write (replace /dev/sdX with your USB device — double-check this!)
-sudo dd bs=4M if=signed_shanios-gnome-2026.04.15-x86_64.iso \
+sudo dd bs=4M if=signed_shanios-gnome-2026.05.18-x86_64.iso \
     of=/dev/sdX status=progress oflag=sync</code></pre>
 <blockquote><p><strong>Do not use Ventoy.</strong> Ventoy's ISO mounting method conflicts with the Shani OS bootloader.</p></blockquote>
 <p>---</p>
