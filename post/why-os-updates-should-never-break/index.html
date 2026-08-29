@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev data:; connect-src 'self' https://api.github.com">
 
   <title>Why Your OS Update Should Never Break Your Computer — And How Shani OS Fixes This — Shanios Blog</title>
   <meta name="description" id="meta-desc" content="Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.">
@@ -15,23 +16,23 @@
   <meta property="og:title"     id="og-title"     content="Why Your OS Update Should Never Break Your Computer — And How Shani OS Fixes This">
   <meta property="og:description" id="og-desc"    content="Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.">
   <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/why-os-updates-should-never-break/">
-  <meta property="og:image"     id="og-image"     content="https://shani.dev/assets/images/logo.svg">
+  <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/why-os-updates-should-never-break.webp">
   <meta property="og:image:alt" id="og-image-alt" content="Why Your OS Update Should Never Break Your Computer — And How Shani OS Fixes This">
   <meta property="og:locale"    content="en_US">
-  <meta property="article:published_time" id="og-article-pubtime" content="2026-04-10T00:00:00.000Z">
-  <meta property="article:modified_time"  id="og-article-modtime" content="2026-04-10T00:00:00.000Z">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-04-09T18:30:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-04-09T18:30:00.000Z">
   <meta property="article:author"         id="og-article-author"  content="Shrinivas Vishnu Kumbhar">
-  <meta property="article:section"        id="og-article-section" content="Engineering">
+  <meta property="article:section"        id="og-article-section" content="Deep Dive">
   
 
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
   <meta name="twitter:title"       id="tw-title" content="Why Your OS Update Should Never Break Your Computer — And How Shani OS Fixes This">
   <meta name="twitter:description" id="tw-desc"  content="Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.">
-  <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
+  <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/why-os-updates-should-never-break.webp">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Why Your OS Update Should Never Break Your Computer — And How Shani OS Fixes This","description":"Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.","url":"https://blog.shani.dev/post/why-os-updates-should-never-break/","datePublished":"2026-04-10T00:00:00.000Z","dateModified":"2026-04-10T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
-  <script type="application/ld+json" id="ld-org">{}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Why Your OS Update Should Never Break Your Computer — And How Shani OS Fixes This","description":"Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.","url":"https://blog.shani.dev/post/why-os-updates-should-never-break/","datePublished":"2026-04-09T18:30:00.000Z","dateModified":"2026-04-09T18:30:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/why-os-updates-should-never-break.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
   <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
@@ -199,6 +200,7 @@
   <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+  <div id="reading-bar" role="progressbar" aria-label="Reading progress" aria-hidden="true"></div>
   <main id="main-content">
     <!-- INDEX VIEW -->
     <section id="view-index" style="display:none">
@@ -223,7 +225,7 @@
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
       <article id="post-article">
       <header class="post-header">
-        <span class="post-tag">Engineering</span>
+        <span class="post-tag">Deep Dive</span>
         <h1 class="post-title">Why Your OS Update Should Never Break Your Computer — And How Shani OS Fixes This</h1>
         <div class="post-meta">
           <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-10 · 7 min</span>
@@ -232,15 +234,15 @@
       <div class="post-body"><p>Every system administrator knows a rule that desktop operating systems have ignored for decades: <strong>you never touch the running system</strong>.</p>
 <p>When a server needs updating, you prepare the new version on a standby copy. You verify it. You test it. Then — and only then — you switch over. If something goes wrong, you switch back. The running server was never at risk.</p>
 <p>Your laptop has never worked this way. Until Shani OS.</p>
-<p>---</p>
-<h2>The Problem Is Architectural, Not Accidental</h2>
+<hr>
+<h2 id="the-problem-is-architectural-not-accidental">The Problem Is Architectural, Not Accidental</h2>
 <p>When Windows Update bricks a machine, it is not a bug in the usual sense. It is the predictable result of an architecture that modifies the live operating system while you are running it. Patches are applied on top of patches. Libraries are replaced mid-session. Drivers are updated while the kernel is using them.</p>
 <p>Linux distributions have largely inherited the same approach. <code>apt upgrade</code>, <code>pacman -Syu</code>, <code>dnf update</code> — all of them write directly into the running root filesystem. On a well-maintained system with careful package maintainers, this is usually fine. Usually.</p>
 <p>The problem surfaces at the edges: a kernel update that needs a reboot you postponed, a driver that conflicts with a library version updated independently, a dependency chain that resolves differently on your specific combination of installed packages. These are not exotic failure modes. They are Tuesday.</p>
 <p>The result is a class of problems with no good solution in the traditional model: the OS is in an indeterminate state, and the only reliable fix is to reinstall.</p>
-<blockquote><p>This is exactly the failure mode Shani OS was designed to make structurally impossible — not harder to hit, not easier to recover from, but impossible by architecture.</p></blockquote>
-<p>---</p>
-<h2>What the Blue-Green Model Actually Means</h2>
+<blockquote>This is exactly the failure mode Shani OS was designed to make structurally impossible — not harder to hit, not easier to recover from, but impossible by architecture.</blockquote>
+<hr>
+<h2 id="what-the-blue-green-model-actually-means">What the Blue-Green Model Actually Means</h2>
 <p>Shani OS keeps two complete, bootable copies of the operating system on disk at all times. They live in Btrfs subvolumes called <code>@blue</code> and <code>@green</code>. You boot from one. Updates are prepared on the other. The running copy is never touched.</p>
 <p>Here is what happens when you run <code>sudo shani-deploy</code>:</p>
 <ol>
@@ -255,51 +257,51 @@
 <p>If power is cut mid-update, your running system is intact. If the new copy boots but does not work for you: <code>sudo shani-deploy -r</code>. One command. One reboot. You are back.</p>
 <p>If the new copy cannot boot at all: systemd-boot's boot-counting mechanism detects the failure after three attempts and reverts automatically. You may not even notice.</p>
 <p>The active slot is tracked in <code>/data/current-slot</code>. <code>shani-update</code> runs automatically via a systemd timer — 15 minutes after boot and every 2 hours thereafter — and detects whether the last boot was a fallback, whether a staged update is waiting for a reboot, or whether a new version is available — prompting appropriately for each case. For full details on the update pipeline: <a href="/post/shani-os-architecture-deep-dive#the-update-pipeline-in-full">The Architecture Behind Shani OS</a>.</p>
-<p>---</p>
-<h2>The Read-Only Root</h2>
+<hr>
+<h2 id="the-read-only-root">The Read-Only Root</h2>
 <p>The blue-green model handles updates. The immutable root handles everything else.</p>
 <p>The Shani OS root filesystem is mounted read-only at runtime. Not "root can write to it" — actually, physically read-only, enforced by the kernel at the VFS layer. A process running as root cannot modify core system files during a live session. The system that passed build-time verification is the system that runs, byte for byte, until the next deliberate update.</p>
 <p>This has a practical security consequence: malware that gains root access cannot write a persistent backdoor to <code>/usr/bin</code> or any other system path. Persistence requires compromising the update pipeline — bypassing GPG signature verification. That is a much harder target than overwriting a binary.</p>
 <p>Your configuration still works. <code>/etc</code> is an OverlayFS mount — your changes live in a writable overlay stored in the <code>@data</code> subvolume, on top of the read-only base. When you run <code>systemctl enable</code>, that change persists across every update and rollback. Your network config, SSH keys, and custom services all survive, stored separately from the OS images themselves.</p>
 <p>For a complete explanation of the OverlayFS setup, see <a href="/post/shani-os-architecture-deep-dive#how-etc-stays-writable">The Architecture Behind Shani OS</a>.</p>
-<p>---</p>
-<h2>Why Btrfs, and Why Send Streams</h2>
+<hr>
+<h2 id="why-btrfs-and-why-send-streams">Why Btrfs, and Why Send Streams</h2>
 <p>Most immutable Linux distributions use OSTree (Fedora Silverblue, Bazzite) or OCI container images (Vanilla OS) as their update mechanism. These are good approaches. Shani OS makes a different choice: native Btrfs send streams.</p>
 <p>When <code>shani-deploy</code> applies an update, it pipes the verified image directly into <code>btrfs receive</code>. The result is an exact reconstitution of the subvolume that passed build-time QA — not a reconstruction from packages, not a layer applied on top of a previous state, but the exact filesystem that was signed and shipped. What was verified is what gets written.</p>
 <p>Btrfs also gives Shani OS continuous block-level deduplication via <code>bees</code>, which runs as a background daemon. Content shared between <code>@blue</code> and <code>@green</code> is stored on disk exactly once. The dual-image architecture costs far less than double the space — in practice around 18% overhead — and Btrfs zstd compression typically cuts the OS image size by 30–50% on top of that.</p>
-<p>---</p>
-<h2>Security as Architecture, Not Configuration</h2>
+<hr>
+<h2 id="security-as-architecture-not-configuration">Security as Architecture, Not Configuration</h2>
 <p>Security in most operating systems is a layer applied on top of the system. You install antivirus. You configure a firewall. You enable a security module. Shani OS inverts this.</p>
 <p>Six Linux Security Modules run simultaneously from first boot: AppArmor, Landlock, Lockdown, Yama, Integrity (IMA/EVM), and BPF LSM. Most Linux distributions enable one or two. The combination means an attacker who escapes one layer faces restrictions from the remaining five.</p>
 <p>Full-disk encryption with LUKS2 and argon2id key derivation is available at install time. TPM2 auto-unlock seals the LUKS key to the hardware state — the PCR policy is chosen automatically based on Secure Boot state (PCR 0+7 with Secure Boot enabled, PCR 0 only without). The disk unlocks automatically on your own machine and is locked against physical removal. Secure Boot verifies the bootloader and kernel before the system starts. Intel ME kernel modules are blacklisted by default.</p>
 <p>None of this requires post-install configuration. It is on by default, or available with a single step at install.</p>
-<blockquote><p>If you install Shani OS on a laptop, enable LUKS2 encryption during setup and run <code>sudo gen-efi enroll-tpm2</code> on first boot. You get full-disk encryption that unlocks automatically on your own hardware — no passphrase at every boot.</p></blockquote>
+<blockquote>If you install Shani OS on a laptop, enable LUKS2 encryption during setup and run <code>sudo gen-efi enroll-tpm2</code> on first boot. You get full-disk encryption that unlocks automatically on your own hardware — no passphrase at every boot.</blockquote>
 <p>For setup instructions: <a href="https://docs.shani.dev/doc/security/tpm2">docs.shani.dev — TPM2 Enrollment</a>. For the full security model: <a href="/post/shani-os-security-deep-dive">Security Without Configuration</a>.</p>
-<p>---</p>
-<h2>What Zero Telemetry Actually Means</h2>
+<hr>
+<h2 id="what-zero-telemetry-actually-means">What Zero Telemetry Actually Means</h2>
 <p>"Zero telemetry" appears on many marketing pages. Shani OS is specific about what it means — and it is verifiable.</p>
 <p>No background services report hardware, software usage, or system behaviour to any server. No identifiers are generated or transmitted. The update tool connects to download servers to fetch images — it sends only what any standard HTTP download requires, nothing more.</p>
 <p>The entire codebase is public on <a href="https://github.com/shani8dev">github.com/shani8dev</a>. Every script that runs on your machine is readable. You can verify the full chain yourself, end to end, without trusting any claim in this post.</p>
-<p>---</p>
-<h2>Installing Software on an Immutable OS</h2>
+<hr>
+<h2 id="installing-software-on-an-immutable-os">Installing Software on an Immutable OS</h2>
 <p>The most common question when first encountering an immutable OS: if the root filesystem is read-only, how do I install anything?</p>
 <p>Software belongs in one of several persistent layers outside the OS — each in its own Btrfs subvolume, surviving every update and rollback. GUI apps go through Flatpak (Flathub has thousands; the Warehouse app manages them graphically). CLI tools and dev runtimes go through Nix (pre-installed, 100,000+ packages). Anything requiring <code>apt</code>, <code>pacman</code>, or <code>yay</code> runs in Distrobox. Services and databases run in Podman. Windows apps run through Bottles/Wine or a VM.</p>
 <p>For the full decision guide — what to use for each category, with the comparison table and decision flowchart — see <a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a>.</p>
-<p>---</p>
-<h2>The Practical Shape of a Day</h2>
+<hr>
+<h2 id="the-practical-shape-of-a-day">The Practical Shape of a Day</h2>
 <p>A Shani OS system in daily use is quiet. <code>shani-update</code> runs automatically via a systemd timer — 15 minutes after boot and every 2 hours thereafter — and shows a notification when a new OS image is ready. When you are ready, you run <code>sudo shani-deploy</code>, which takes a few minutes. You reboot when convenient. If anything feels off, <code>sudo shani-deploy -r</code> rolls back with one command and one reboot.</p>
 <p>Your apps — Flatpaks, Snaps, Nix packages, containers — live in their own subvolumes, completely independent of the OS. They update on their own schedules. <code>flatpak update</code> updates your apps. <code>shani-deploy</code> updates the OS. Neither affects the other.</p>
 <p>The worst case is: reboot to undo it. That is a level of reliability that, until recently, was only available to server infrastructure. It runs on your laptop now.</p>
-<p>---</p>
-<h2>Getting Started</h2>
-<p>Shani OS ships two editions: GNOME for a clean, focused desktop suitable for work and switchers; KDE Plasma for power users and gaming, with Steam, Proton, Heroic, MangoHud, and a kernel tuned for low-latency gaming — all pre-installed.</p>
-<p>Both are free. Both are open source. Both require no account.</p>
+<hr>
+<h2 id="getting-started">Getting Started</h2>
+<p>Shani OS ships two desktop editions today: GNOME for a clean, focused desktop suitable for work and switchers, and KDE Plasma for power users and gaming, with Steam, Proton, Heroic, MangoHud, and a kernel tuned for low-latency gaming — all pre-installed. A third edition (COSMIC) plus a headless server profile are on the way.</p>
+<p>Every edition is free, open source, and requires no account.</p>
 <p><strong>System requirements:</strong> UEFI firmware, 64-bit x86 CPU, 4 GB RAM (8 GB recommended), 32 GB storage. NVIDIA, AMD, and Intel graphics all work at first boot.</p>
 <p>Full documentation at <a href="https://docs.shani.dev">docs.shani.dev</a>. For a deeper look at every subvolume and the boot sequence: <a href="/post/shani-os-architecture-deep-dive">The Architecture Behind Shani OS</a>. For use-case specific guidance: <a href="/post/shani-os-for-everyone">Shani OS for Everyone</a>.</p>
 <p><a href="https://shani.dev">Download Shani OS at shani.dev →</a></p>
-<p>---</p>
-<p>---</p>
-<h2>Resources</h2>
+<hr>
+<hr>
+<h2 id="resources">Resources</h2>
 <ul>
 <li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
 <li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — common questions answered</li>
@@ -309,8 +311,8 @@
 <li><a href="https://blog.shani.dev/post/shani-os-getting-started">Getting Started with Shani OS</a> — installation and first boot</li>
 <li><a href="https://docs.shani.dev">docs.shani.dev</a> — full documentation</li>
 </ul>
-<p>---</p>
-<blockquote><p>Your OS update should never break your computer. On Shani OS, it structurally cannot.</p></blockquote></div>
+<hr>
+<blockquote>Your OS update should never break your computer. On Shani OS, it structurally cannot.</blockquote></div>
       </article>
     </section>
 

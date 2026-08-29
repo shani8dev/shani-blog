@@ -2,9 +2,9 @@
 slug: nix-on-shani-os
 title: 'Nix on Shani OS — The Best Package Manager for an Immutable System'
 date: '2026-04-09'
-tag: 'Guide'
+tag: 'Ecosystem'
 excerpt: 'Why Nix and immutable Linux are a natural match, how to set it up on Shani OS in five minutes, and practical workflows for developers, researchers, and power users.'
-cover: ''
+cover: /assets/images/blog/nix-on-shani-os.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,7 +13,7 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '8 min'
-series: 'Shani OS Guides'
+series: 'Shani OS Ecosystem'
 ---
 
 Nix and immutable Linux were made for each other. Nix's core property — packages are identified by a cryptographic hash of everything that went into building them, stored in an append-only content-addressed store, never modified in place — is exactly what an immutable OS wants in a package manager. Nothing in `/nix/store` is ever overwritten. Multiple versions of the same package coexist without conflict. A package installed yesterday is still there, byte for byte, regardless of what else you install or remove.
@@ -33,7 +33,7 @@ nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
 nix-channel --update
 ```
 
-That is it. After this, `nix-env -i <package>` installs any package from [Nixpkgs](https://search.nixos.org/packages) — currently over 100,000 packages.
+That is it. After this, `nix-env -iA nixpkgs.<package>` installs any package from [Nixpkgs](https://search.nixos.org/packages) — currently over 100,000 packages.
 
 ---
 
@@ -48,15 +48,15 @@ nix-env -iA nixpkgs.nodejs_22
 nix-env -iA nixpkgs.rustup
 nix-env -iA nixpkgs.python312
 
-# Install by name (less precise, installs first match)
-nix-env -i ripgrep
-nix-env -i fd
-nix-env -i bat
-nix-env -i htop
-nix-env -i gh       # GitHub CLI
+# Install by attribute path (more precise)
+nix-env -iA nixpkgs.ripgrep
+nix-env -iA nixpkgs.fd
+nix-env -iA nixpkgs.bat
+nix-env -iA nixpkgs.htop
+nix-env -iA nixpkgs.gh       # GitHub CLI
 
 # Install multiple at once
-nix-env -i ripgrep fd bat eza fzf
+nix-env -iA nixpkgs.ripgrep nixpkgs.fd nixpkgs.bat nixpkgs.eza nixpkgs.fzf
 ```
 
 Installed packages are added to `~/.nix-profile/bin` which is on your `$PATH`. They are available immediately after installation in a new shell.

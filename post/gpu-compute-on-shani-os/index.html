@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev data:; connect-src 'self' https://api.github.com">
 
   <title>GPU Compute on Shani OS — NVIDIA CUDA, AMD ROCm, and Intel oneAPI — Shanios Blog</title>
   <meta name="description" id="meta-desc" content="How to run GPU compute workloads on Shani OS — setting up AMD ROCm with PyTorch and TensorFlow via Distrobox, NVIDIA CUDA via Distrobox, Intel oneAPI, HIP for cross-vendor portability, and Nix for pure ML environments. Works for ML, simulation, data science, and scientific computing.">
@@ -15,11 +16,11 @@
   <meta property="og:title"     id="og-title"     content="GPU Compute on Shani OS — NVIDIA CUDA, AMD ROCm, and Intel oneAPI">
   <meta property="og:description" id="og-desc"    content="How to run GPU compute workloads on Shani OS — setting up AMD ROCm with PyTorch and TensorFlow via Distrobox, NVIDIA CUDA via Distrobox, Intel oneAPI, HIP for cross-vendor portability, and Nix for pure ML environments. Works for ML, simulation, data science, and scientific computing.">
   <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/gpu-compute-on-shani-os/">
-  <meta property="og:image"     id="og-image"     content="https://shani.dev/assets/images/logo.svg">
+  <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/gpu-compute-on-shani-os.webp">
   <meta property="og:image:alt" id="og-image-alt" content="GPU Compute on Shani OS — NVIDIA CUDA, AMD ROCm, and Intel oneAPI">
   <meta property="og:locale"    content="en_US">
-  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-07T00:00:00.000Z">
-  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-07T00:00:00.000Z">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-06T18:30:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-06T18:30:00.000Z">
   <meta property="article:author"         id="og-article-author"  content="Shrinivas Vishnu Kumbhar">
   <meta property="article:section"        id="og-article-section" content="Guide">
   
@@ -28,10 +29,10 @@
   <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
   <meta name="twitter:title"       id="tw-title" content="GPU Compute on Shani OS — NVIDIA CUDA, AMD ROCm, and Intel oneAPI">
   <meta name="twitter:description" id="tw-desc"  content="How to run GPU compute workloads on Shani OS — setting up AMD ROCm with PyTorch and TensorFlow via Distrobox, NVIDIA CUDA via Distrobox, Intel oneAPI, HIP for cross-vendor portability, and Nix for pure ML environments. Works for ML, simulation, data science, and scientific computing.">
-  <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
+  <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/gpu-compute-on-shani-os.webp">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"GPU Compute on Shani OS — NVIDIA CUDA, AMD ROCm, and Intel oneAPI","description":"How to run GPU compute workloads on Shani OS — setting up AMD ROCm with PyTorch and TensorFlow via Distrobox, NVIDIA CUDA via Distrobox, Intel oneAPI, HIP for cross-vendor portability, and Nix for pure ML environments. Works for ML, simulation, data science, and scientific computing.","url":"https://blog.shani.dev/post/gpu-compute-on-shani-os/","datePublished":"2026-05-07T00:00:00.000Z","dateModified":"2026-05-07T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
-  <script type="application/ld+json" id="ld-org">{}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"GPU Compute on Shani OS — NVIDIA CUDA, AMD ROCm, and Intel oneAPI","description":"How to run GPU compute workloads on Shani OS — setting up AMD ROCm with PyTorch and TensorFlow via Distrobox, NVIDIA CUDA via Distrobox, Intel oneAPI, HIP for cross-vendor portability, and Nix for pure ML environments. Works for ML, simulation, data science, and scientific computing.","url":"https://blog.shani.dev/post/gpu-compute-on-shani-os/","datePublished":"2026-05-06T18:30:00.000Z","dateModified":"2026-05-06T18:30:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/gpu-compute-on-shani-os.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
   <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
@@ -199,6 +200,7 @@
   <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+  <div id="reading-bar" role="progressbar" aria-label="Reading progress" aria-hidden="true"></div>
   <main id="main-content">
     <!-- INDEX VIEW -->
     <section id="view-index" style="display:none">
@@ -233,16 +235,16 @@
 <p>This post covers how to set up and use GPU compute — from verifying hardware, to running PyTorch or TensorFlow, to writing portable GPU code that runs on any vendor.</p>
 <p>For GPU passthrough to VMs (dedicating a GPU to a Windows VM for gaming or isolated ML), see <a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a>. For using GPU compute inside Apptainer containers for HPC clusters, see <a href="https://blog.shani.dev/post/apptainer-on-shani-os">Apptainer on Shani OS</a>.</p>
 <p>Full reference: <a href="https://docs.shani.dev/doc/software/containers">docs.shani.dev — Containers</a>.</p>
-<p>---</p>
-<h2>What Ships on the Host</h2>
+<hr>
+<h2 id="what-ships-on-the-host">What Ships on the Host</h2>
 <p>Shani OS includes GPU drivers, not compute toolchains. Here is what is pre-installed:</p>
-<p>| Vendor | What's included on the host | |---|---| | AMD | <code>vulkan-radeon</code> (Mesa RADV), <code>AMDGPU</code> kernel driver | | NVIDIA | <code>nvidia-open</code>, <code>nvidia-utils</code>, <code>nvidia-prime</code>, <code>libva-nvidia-driver</code> | | Intel | <code>vulkan-intel</code>, <code>libva-intel-driver</code>, <code>intel-media-driver</code>, <code>vpl-gpu-rt</code> | | All | <code>mesa</code>, <code>vulkan-mesa-layers</code>, <code>libvdpau-va-gl</code> |</p>
+<table><thead><tr><th>Vendor</th><th>What's included on the host</th></tr></thead><tbody><tr><td>AMD</td><td><code>vulkan-radeon</code> (Mesa RADV), <code>AMDGPU</code> kernel driver</td></tr><tr><td>NVIDIA</td><td><code>nvidia-open</code>, <code>nvidia-utils</code>, <code>nvidia-prime</code>, <code>libva-nvidia-driver</code></td></tr><tr><td>Intel</td><td><code>vulkan-intel</code>, <code>libva-intel-driver</code>, <code>intel-media-driver</code>, <code>vpl-gpu-rt</code></td></tr><tr><td>All</td><td><code>mesa</code>, <code>vulkan-mesa-layers</code>, <code>libvdpau-va-gl</code></td></tr></tbody></table>
 <p>For compute workloads (ML training, GPGPU, scientific simulation), you need the vendor compute stack — ROCm for AMD, CUDA libraries for NVIDIA, oneAPI for Intel. These live inside Distrobox containers, not on the host.</p>
-<p>---</p>
-<h2>Choosing Your GPU Compute Stack</h2>
-<p>| GPU | Driver (host) | Compute API | Recommended path | |---|---|---|---| | NVIDIA (RTX / Tesla / H-series) | <code>nvidia-open</code> | CUDA | Distrobox with <code>nvidia/cuda</code> image | | AMD (RX 6000 / RX 7000 / Instinct) | <code>vulkan-radeon</code> / AMDGPU | ROCm / HIP | Distrobox with <code>rocm/dev-ubuntu</code> image | | Intel (Arc, Xe, integrated) | <code>vulkan-intel</code> | oneAPI / SYCL | Distrobox with <code>intel/oneapi-basekit</code> | | Any (portability) | any above | OpenCL | Available in all three vendor images |</p>
-<p>---</p>
-<h2>Verify Your GPU</h2>
+<hr>
+<h2 id="choosing-your-gpu-compute-stack">Choosing Your GPU Compute Stack</h2>
+<table><thead><tr><th>GPU</th><th>Driver (host)</th><th>Compute API</th><th>Recommended path</th></tr></thead><tbody><tr><td>NVIDIA (RTX / Tesla / H-series)</td><td><code>nvidia-open</code></td><td>CUDA</td><td>Distrobox with <code>nvidia/cuda</code> image</td></tr><tr><td>AMD (RX 6000 / RX 7000 / Instinct)</td><td><code>vulkan-radeon</code> / AMDGPU</td><td>ROCm / HIP</td><td>Distrobox with <code>rocm/dev-ubuntu</code> image</td></tr><tr><td>Intel (Arc, Xe, integrated)</td><td><code>vulkan-intel</code></td><td>oneAPI / SYCL</td><td>Distrobox with <code>intel/oneapi-basekit</code></td></tr><tr><td>Any (portability)</td><td>any above</td><td>OpenCL</td><td>Available in all three vendor images</td></tr></tbody></table>
+<hr>
+<h2 id="verify-your-gpu">Verify Your GPU</h2>
 <p>Before setting up a compute container, confirm your GPU is visible to the host.</p>
 <pre><code class="language-bash"># All vendors — check kernel-detected GPUs
 lspci | grep -E &quot;VGA|3D|Display&quot;
@@ -256,8 +258,8 @@ ls /dev/dri/
 
 # Intel — check device nodes
 ls /dev/dri/</code></pre>
-<p>---</p>
-<h2>AMD ROCm via Distrobox</h2>
+<hr>
+<h2 id="amd-rocm-via-distrobox">AMD ROCm via Distrobox</h2>
 <p>ROCm is AMD's open-source GPU compute stack — the equivalent of CUDA for AMD hardware. The host has the AMDGPU kernel driver and Vulkan driver installed; the ROCm userspace compute libraries live inside a Distrobox container.</p>
 <pre><code class="language-bash"># Create a ROCm-capable container using AMD's official image
 distrobox create --name rocm-dev \
@@ -280,7 +282,7 @@ python3 -c &quot;import torch; print(torch.cuda.is_available()); print(torch.cud
 pip install tensorflow-rocm</code></pre>
 <p>The <code>--device=/dev/kfd --device=/dev/dri</code> flags give the container access to the GPU compute and render devices from the host. The <code>--group-add video --group-add render</code> flags ensure the container user has the right group permissions.</p>
 <p>The container lives in the <code>@containers</code> Btrfs subvolume and survives every OS update. Your entire ROCm ML environment is independent of the host OS.</p>
-<h3>ROCm Environment Variables</h3>
+<h3 id="rocm-environment-variables">ROCm Environment Variables</h3>
 <pre><code class="language-bash"># Target a specific GPU by index (multi-GPU systems)
 export ROCR_VISIBLE_DEVICES=0
 
@@ -289,15 +291,15 @@ export HSA_OVERRIDE_GFX_VERSION=11.0.0
 
 # Enable HIP kernel timing / verbose logging
 export AMD_LOG_LEVEL=3</code></pre>
-<h3>ROCm via Apptainer (HPC clusters)</h3>
+<h3 id="rocm-via-apptainer-hpc-clusters">ROCm via Apptainer (HPC clusters)</h3>
 <p>If you are running workloads on a cluster, Apptainer's <code>--rocm</code> flag injects the host ROCm runtime into the container automatically:</p>
 <pre><code class="language-bash">apptainer exec --rocm rocm_pytorch.sif python3 train.py
 
 # Build a ROCm-capable SIF from AMD's Docker image
 apptainer build --fakeroot rocm_pytorch.sif docker://rocm/pytorch:latest</code></pre>
 <p>See <a href="https://blog.shani.dev/post/apptainer-on-shani-os">Apptainer on Shani OS</a> for full cluster workflow details.</p>
-<p>---</p>
-<h2>NVIDIA CUDA via Distrobox</h2>
+<hr>
+<h2 id="nvidia-cuda-via-distrobox">NVIDIA CUDA via Distrobox</h2>
 <p>The host has <code>nvidia-open</code> and <code>nvidia-utils</code> installed. The CUDA development toolchain (nvcc, cuDNN, etc.) lives inside a Distrobox container using NVIDIA's official CUDA base images.</p>
 <pre><code class="language-bash"># Verify the host driver is working
 nvidia-smi
@@ -320,11 +322,11 @@ pip install tensorflow transformers datasets accelerate wandb
 
 # Verify GPU access
 python3 -c &quot;import torch; print(torch.cuda.device_count(), torch.cuda.get_device_name(0))&quot;</code></pre>
-<h3>CUDA via Apptainer</h3>
+<h3 id="cuda-via-apptainer">CUDA via Apptainer</h3>
 <pre><code class="language-bash">apptainer exec --nv pytorch_latest.sif python3 train.py</code></pre>
 <p>With <code>--nv</code>, Apptainer injects the host NVIDIA runtime into the container — no driver bundling required in the SIF image.</p>
-<p>---</p>
-<h2>Intel oneAPI via Distrobox</h2>
+<hr>
+<h2 id="intel-oneapi-via-distrobox">Intel oneAPI via Distrobox</h2>
 <p>Intel Arc discrete GPUs and Intel integrated graphics (Xe architecture) support GPU compute via Intel's oneAPI toolkit. The host has <code>vulkan-intel</code> and the Intel media drivers; oneAPI itself runs in a container.</p>
 <pre><code class="language-bash"># Create an Intel compute container
 distrobox create --name intel-dev \
@@ -338,8 +340,8 @@ sycl-ls
 
 # Run a SYCL sample
 cd /opt/intel/oneapi/samples &amp;&amp; icpx -fsycl vector_add.cpp -o vector_add &amp;&amp; ./vector_add</code></pre>
-<p>---</p>
-<h2>HIP — Write Once, Run on AMD and NVIDIA</h2>
+<hr>
+<h2 id="hip-write-once-run-on-amd-and-nvidia">HIP — Write Once, Run on AMD and NVIDIA</h2>
 <p>ROCm's HIP layer provides a CUDA-compatible programming model that compiles for both AMD and NVIDIA hardware. If you are writing new GPU code or porting existing CUDA code, HIP gives you cross-vendor portability.</p>
 <pre><code class="language-bash"># Inside your ROCm Distrobox container:
 
@@ -351,8 +353,8 @@ hipcc my_kernel.hip.cpp -o my_kernel
 
 # The same source compiles for NVIDIA with nvcc after hipify</code></pre>
 <p>HIP code uses <code>hip::</code> namespaces and <code>hipMalloc</code>/<code>hipMemcpy</code> APIs which map directly to the underlying vendor runtime at compile time.</p>
-<p>---</p>
-<h2>PyTorch / JAX / TensorFlow via Nix</h2>
+<hr>
+<h2 id="pytorch-jax-tensorflow-via-nix">PyTorch / JAX / TensorFlow via Nix</h2>
 <p>For pure-Nix ML workflows without containers — useful for quick CPU-based experimentation or when you want everything managed declaratively. Note that GPU-accelerated Nix ML paths require matching the Nix-packaged ROCm or CUDA version against your hardware and host driver, which is more involved than the Distrobox approach. For most GPU work, Distrobox containers are more reliable.</p>
 <pre><code class="language-bash"># NVIDIA path — uses pre-built CPU binaries (GPU requires matching CUDA version)
 nix-shell -p python311 python311Packages.torch-bin
@@ -373,8 +375,8 @@ pkgs.mkShell {
 <pre><code class="language-bash">nix-shell  # enter the environment
 jupyter lab</code></pre>
 <p>For GPU-accelerated Nix environments, the Distrobox container approach using vendor images is recommended — it handles library versioning against the installed driver automatically.</p>
-<p>---</p>
-<h2>Jupyter with GPU Access</h2>
+<hr>
+<h2 id="jupyter-with-gpu-access">Jupyter with GPU Access</h2>
 <p><strong>Via Distrobox (recommended for GPU-accelerated notebooks):</strong></p>
 <pre><code class="language-bash"># CUDA notebooks
 distrobox enter cuda-dev
@@ -391,8 +393,8 @@ jupyter lab --ip=0.0.0.0 --no-browser</code></pre>
 jupyter lab</code></pre>
 <p><strong>Via Flatpak:</strong></p>
 <pre><code class="language-bash">flatpak install flathub org.jupyter.JupyterLab</code></pre>
-<p>---</p>
-<h2>Monitoring GPU Utilisation</h2>
+<hr>
+<h2 id="monitoring-gpu-utilisation">Monitoring GPU Utilisation</h2>
 <pre><code class="language-bash"># AMD — requires entering the ROCm container, or using host kernel tools
 radeontop                   # real-time AMD GPU stats (host)
 # rocm-smi is available inside the rocm-dev Distrobox container
@@ -406,8 +408,8 @@ sudo intel_gpu_top          # Intel GPU utilisation (host)
 
 # MangoHud (gaming + compute) — overlays GPU stats on screen
 MANGOHUD=1 python3 train.py</code></pre>
-<p>---</p>
-<h2>Resources</h2>
+<hr>
+<h2 id="resources">Resources</h2>
 <ul>
 <li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
 <li><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> — what to use for each type of software</li>
@@ -419,8 +421,8 @@ MANGOHUD=1 python3 train.py</code></pre>
 <li><a href="https://rocm.docs.amd.com/projects/HIP/en/latest/porting_guide.html">HIP porting guide</a> — migrating CUDA code to HIP/ROCm</li>
 <li><a href="https://t.me/shani8dev">Telegram community</a></li>
 </ul>
-<p>---</p>
-<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+<hr>
+<blockquote><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></blockquote></div>
       </article>
     </section>
 

@@ -4,7 +4,7 @@ title: 'Bluetooth on Shani OS — Headphones, Controllers, File Transfer, and Pa
 date: '2026-04-25'
 tag: 'Guide'
 excerpt: 'Bluetooth on Shani OS works at first boot for audio, gaming controllers, keyboards, mice, file transfer, and tethering. Paired devices persist across every OS update and rollback. Here is everything you need to know.'
-cover: ''
+cover: /assets/images/blog/shani-os-bluetooth.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -41,7 +41,7 @@ Full reference: [docs.shani.dev — Bluetooth](https://docs.shani.dev/doc/troubl
 
 GNOME Settings → Bluetooth → enable Bluetooth → put your device in pairing mode → click the device name → confirm the pairing code if prompted.
 
-Bluedevil widget (GNOME): click the Bluetooth icon in the top bar.
+GNOME: click the Bluetooth icon in the top bar (system tray).
 
 ### KDE Plasma
 

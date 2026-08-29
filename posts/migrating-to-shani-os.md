@@ -2,9 +2,9 @@
 slug: migrating-to-shani-os
 title: 'Migrating to Shani OS from Ubuntu, Fedora, or Arch — A Practical Guide'
 date: '2026-04-19'
-tag: 'Guide'
+tag: 'Migration'
 excerpt: 'A workflow-by-workflow migration guide for users coming from traditional mutable Linux distributions. Every pacman, apt, and dnf habit has a clean equivalent on Shani OS — here is the full map.'
-cover: ''
+cover: /assets/images/blog/migrating-to-shani-os.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,8 +13,8 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 keywords: 'shani os, migrate linux, ubuntu to shani, fedora to shani, arch linux migration, nix, distrobox'
-readTime: '9 min'
-series: 'Shani OS Guides'
+readTime: '10 min'
+series: 'Shani OS Migration'
 ---
 
 The most common question from experienced Linux users considering Shani OS is: "I know how to manage a system with pacman/apt/dnf. What do I actually do differently here?"

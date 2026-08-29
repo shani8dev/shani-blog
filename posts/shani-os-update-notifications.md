@@ -2,9 +2,9 @@
 slug: shani-os-update-notifications
 title: 'shani-update — The Shani OS Update Manager'
 date: '2026-05-11'
-tag: 'Guide'
-excerpt: 'shani-update is the user-facing update manager for Shani OS. It runs automatically via a systemd user timer and at login, detects boot failures, checks for staged updates awaiting a reboot, identifies newly deployed slots, and checks for new OS images — all with GUI dialogs, automatic terminal detection, and a deferred-reminder system.'
-cover: ''
+tag: 'Reference'
+excerpt: 'shani-update is the user-facing update manager for Shani OS. It runs automatically via a systemd user timer and at login, detects boot failures, checks for...'
+cover: /assets/images/blog/shani-os-update-notifications.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,7 +13,7 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '6 min'
-series: 'Shani OS Guides'
+series: 'Shani OS Reference'
 ---
 
 > **Note:** This post has been superseded by [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates), which merges `shani-update` and `shani-deploy` into a single reference. The content below remains accurate.

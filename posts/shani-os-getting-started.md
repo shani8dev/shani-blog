@@ -4,9 +4,14 @@ title: 'Getting Started with Shani OS — From Download to Daily Use'
 date: '2026-04-11'
 tag: 'Guide'
 excerpt: 'A complete walkthrough: download, verify, install, and configure Shani OS from scratch — including Flatpak apps, Nix packages, Distrobox containers, and TPM2 encryption setup.'
-cover: ''
+cover: /assets/images/blog/shani-os-getting-started.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
+author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
+author_initials: 'SK'
+author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
+author_github: 'https://github.com/shrinivasvkumbhar'
+author_website: 'https://shani.dev'
 readTime: '12 min'
 series: 'Shani OS Guides'
 ---
@@ -17,11 +22,13 @@ This guide walks through the complete process of getting Shani OS running — fr
 
 ## Choosing Your Edition
 
-There are two editions. Both are free, open source, and include the same underlying architecture.
+There are two desktop editions shipping today, with a third (COSMIC) announced. All are free, open source, and include the same underlying architecture.
 
 **GNOME Edition** (~5.4 GB) is the right choice for most people — Windows and macOS switchers, office work, students, and OEM deployments. Clean, focused interface. All essential apps pre-installed including Vivaldi Browser and OnlyOffice.
 
 **KDE Plasma Edition** (~7.6 GB) is the right choice for gamers and power users. The complete gaming stack (Steam, Proton, Heroic Games Launcher, Lutris, MangoHud) is pre-installed and configured. Fully customisable desktop. Full KDE productivity suite including Okular, Kate, and Gwenview. virt-manager for virtual machines.
+
+**COSMIC Edition** (announced) targets keyboard-driven users who want System76's Rust-built desktop: tiling-first workflow, COSMIC Terminal/Files/Settings, MissionCenter for system monitoring, and the same core app set (Vivaldi, OnlyOffice, Warehouse, Flatseal, Pods, BoxBuddy). It arrives via the same signed-image pipeline.
 
 If you are unsure: start with GNOME. You can always install KDE apps on GNOME or switch later.
 
@@ -53,8 +60,8 @@ Full pre-installation checklist: [docs.shani.dev — Pre-Installation](https://d
 
 Download from [shani.dev](https://shani.dev) or directly:
 
-- **GNOME Edition**: [Download ISO](https://sourceforge.net/projects/shanios/files/gnome/20260518/signed_shanios-gnome-2026.05.18-x86_64.iso/download)
-- **KDE Plasma Edition**: [Download ISO](https://sourceforge.net/projects/shanios/files/plasma/20260518/signed_shanios-plasma-2026.05.18-x86_64.iso/download)
+- **GNOME Edition**: [Download ISO](https://downloads.shani.dev/gnome/20260518/signed_shanios-gnome-2026.05.18-x86_64.iso)
+- **KDE Plasma Edition**: [Download ISO](https://downloads.shani.dev/plasma/20260518/signed_shanios-plasma-2026.05.18-x86_64.iso)
 
 Always verify before writing. Place the `.iso`, `.sha256`, and `.asc` files in the same directory, then:
 
@@ -137,7 +144,7 @@ nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
 nix-channel --update
 ```
 
-After this, `nix-env -i <package>` works for any package in Nixpkgs. Installed packages live in `@nix` and survive every OS update. Full guide: [docs.shani.dev — Nix Package Manager](https://docs.shani.dev/doc/software/nix).
+After this, `nix-env -iA nixpkgs.<package>` works for any package in Nixpkgs. Installed packages live in `@nix` and survive every OS update. Full guide: [docs.shani.dev — Nix Package Manager](https://docs.shani.dev/doc/software/nix).
 
 ### 2. Enroll TPM2 for encryption (if you enabled LUKS2)
 
@@ -206,7 +213,7 @@ Firewall rules are already configured. Hardware acceleration works on Intel and 
 
 ## Installing Developer Tools
 
-For a full mutable Linux environment, Distrobox creates a container with any distro's package manager intact. BoxBuddy (pre-installed on both editions) gives you a GUI for managing Distrobox containers:
+For a full mutable Linux environment, Distrobox creates a container with any distro's package manager intact. BoxBuddy (pre-installed on every edition) gives you a GUI for managing Distrobox containers:
 
 ```bash
 # Create an Arch Linux container (full pacman + AUR)
@@ -223,10 +230,10 @@ The container's home directory is your home directory. Binaries exported from th
 For CLI tools that do not need a full container, Nix covers most cases:
 
 ```bash
-nix-env -i nodejs rustup python312 ripgrep fd bat htop
+nix-env -iA nixpkgs.nodejs_22 nixpkgs.rustup nixpkgs.python312 nixpkgs.ripgrep nixpkgs.fd nixpkgs.bat nixpkgs.htop
 ```
 
-For containerised databases and services, Podman works with standard Docker commands. Pods (pre-installed on both editions) gives you a graphical interface for managing Podman containers:
+For containerised databases and services, Podman works with standard Docker commands. Pods (pre-installed on every edition) gives you a graphical interface for managing Podman containers:
 
 ```bash
 podman run -d -p 5432:5432 -e POSTGRES_PASSWORD=secret postgres
@@ -255,7 +262,7 @@ waydroid app install myapp.apk
 
 ## Managing Flatpak Permissions
 
-Flatseal is pre-installed on both editions and lets you manage sandbox permissions for any Flatpak app without using the terminal. Open it from your app launcher to grant or restrict filesystem access, network permissions, device access, and more.
+Flatseal is pre-installed on every edition and lets you manage sandbox permissions for any Flatpak app without using the terminal. Open it from your app launcher to grant or restrict filesystem access, network permissions, device access, and more.
 
 If an app cannot access a file you expect it to, open Flatseal, find the app, and check its filesystem permissions. Many apps default to sandbox-only access and need you to explicitly grant access to your home folder or specific directories.
 

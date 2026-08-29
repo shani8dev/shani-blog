@@ -4,7 +4,7 @@ title: 'System Configuration on Shani OS — /etc, Services, and What Persists'
 date: '2026-05-06'
 tag: 'Guide'
 excerpt: 'The /etc OverlayFS on Shani OS means all your configuration changes persist normally across every OS update and rollback. This guide covers editing config files, managing systemd services, enabling services, kernel parameters, and inspecting what you have customised.'
-cover: ''
+cover: /assets/images/blog/shani-os-system-configuration.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'

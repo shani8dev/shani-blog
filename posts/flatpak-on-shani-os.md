@@ -2,9 +2,9 @@
 slug: flatpak-on-shani-os
 title: 'Flatpak on Shani OS — Your Complete App Management Guide'
 date: '2026-04-17'
-tag: 'Guide'
+tag: 'Ecosystem'
 excerpt: 'How Flatpak works on Shani OS, what apps are pre-installed, how to install more from Flathub, manage permissions with Flatseal, and why sandboxing is the right model for an immutable system.'
-cover: ''
+cover: /assets/images/blog/flatpak-on-shani-os.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,7 +13,7 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '8 min'
-series: 'Shani OS Guides'
+series: 'Shani OS Ecosystem'
 ---
 
 Flatpak is how you install and run GUI applications on Shani OS. Because the OS root is read-only, traditional package managers like `pacman` cannot add software to the base system — and they should not, since that software would be overwritten the next time `shani-deploy` updates the OS image. Flatpak solves this by storing applications in the `@flatpak` Btrfs subvolume, completely independent of the OS. Your apps survive every OS update and rollback untouched.
@@ -59,7 +59,7 @@ Both editions ship with these apps pre-installed and ready at first boot:
 
 ## Installing Apps from Flathub
 
-Flathub is the main Flatpak app repository and is pre-configured on both editions. Browse it at [flathub.org](https://flathub.org) or install directly from the terminal:
+Flathub is the main Flatpak app repository and is pre-configured on every edition. Browse it at [flathub.org](https://flathub.org) or install directly from the terminal:
 
 ```bash
 # Install by app ID (most precise)
@@ -238,6 +238,7 @@ For organisations deploying Shani OS at scale, a private Flatpak repository is t
 Flatpak is the primary recommendation for GUI desktop applications — it has the largest catalogue (Flathub), the best sandboxing, and auto-updates. For CLI tools, Nix is the right layer. For apps not on Flathub, Snap is the pre-configured fallback. For Windows apps, Bottles/Wine. For anything requiring a full distro environment, Distrobox. None of these conflict — each lives in its own Btrfs subvolume.
 
 [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) has the complete decision flowchart and comparison table for every ecosystem on Shani OS.
+
 ## Resources
 
 - [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong

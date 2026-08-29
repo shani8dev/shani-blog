@@ -2,9 +2,9 @@
 slug: shani-os-faq
 title: 'Shani OS FAQ — Frequently Asked Questions'
 date: '2026-05-12'
-tag: 'Guide'
+tag: 'Reference'
 excerpt: 'Answers to the most common questions about Shani OS: software installation, what happens to your files after rollback, hardware compatibility, dual boot, gaming, security, and the immutable model in plain terms.'
-cover: ''
+cover: /assets/images/blog/shani-os-faq.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,7 +13,7 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '8 min'
-series: 'Shani OS Guides'
+series: 'Shani OS Reference'
 ---
 
 Questions that come up repeatedly across the Telegram community and documentation, answered in one place.
@@ -165,7 +165,7 @@ Yes. Heroic Games Launcher handles Epic Games Store and GOG. Lutris handles ever
 
 **Does NVIDIA work for gaming?**
 
-Yes, on both editions. NVIDIA drivers (`nvidia-open`) are pre-installed and configured. On Optimus laptops, `prime-run` and `nvidia-prime` handle GPU selection.
+Yes, on every edition. NVIDIA drivers (`nvidia-open`) are pre-installed and configured. On Optimus laptops, `prime-run` and `nvidia-prime` handle GPU selection.
 
 ---
 

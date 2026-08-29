@@ -4,7 +4,7 @@ title: 'GPU Compute on Shani OS — NVIDIA CUDA, AMD ROCm, and Intel oneAPI'
 date: '2026-05-07'
 tag: 'Guide'
 excerpt: 'How to run GPU compute workloads on Shani OS — setting up AMD ROCm with PyTorch and TensorFlow via Distrobox, NVIDIA CUDA via Distrobox, Intel oneAPI, HIP for cross-vendor portability, and Nix for pure ML environments. Works for ML, simulation, data science, and scientific computing.'
-cover: ''
+cover: /assets/images/blog/gpu-compute-on-shani-os.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'

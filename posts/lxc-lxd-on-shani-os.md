@@ -2,9 +2,9 @@
 slug: lxc-lxd-on-shani-os
 title: 'LXC and LXD on Shani OS — Full System Containers'
 date: '2026-05-07'
-tag: 'Guide'
+tag: 'Ecosystem'
 excerpt: 'LXC and LXD run full Linux system containers on Shani OS — complete OS environments sharing the host kernel, stored in dedicated @lxc and @lxd Btrfs subvolumes that survive every OS update. Lighter than VMs, more complete than Distrobox.'
-cover: ''
+cover: /assets/images/blog/lxc-lxd-on-shani-os.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,7 +13,7 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '7 min'
-series: 'Shani OS Guides'
+series: 'Shani OS Ecosystem'
 ---
 
 LXC and LXD provide full Linux system containers — they run a complete operating system (init system, services, network stack) inside an isolated environment that shares the host kernel. This sits between application containers (Podman/Docker) and full virtual machines (QEMU/KVM) in terms of isolation and overhead.

@@ -4,7 +4,7 @@ title: 'KDE Connect and GSConnect on Shani OS — Your Phone and Desktop, Togeth
 date: '2026-05-04'
 tag: 'Guide'
 excerpt: 'KDE Connect (KDE edition) and GSConnect (GNOME edition) link your Android phone to your Shani OS desktop — notifications mirrored, files shared, clipboard synced, remote input, SMS from desktop, and media control. Firewall rules are pre-configured.'
-cover: ''
+cover: /assets/images/blog/shani-os-kde-connect.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'

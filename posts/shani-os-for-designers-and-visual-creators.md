@@ -4,7 +4,7 @@ title: 'Shani OS for Designers and Visual Creators — Photo Editing, Vector, UI
 date: '2026-05-10'
 tag: 'Guide'
 excerpt: 'A complete guide for photographers, illustrators, UI/UX designers, 3D artists, and visual creators on Shani OS — GIMP, Inkscape, Krita, Blender, Darktable, RawTherapee, Figma via browser, colour management, display calibration, and tablet support. Everything works at first boot.'
-cover: ''
+cover: /assets/images/blog/shani-os-for-designers-and-visual-creators.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'

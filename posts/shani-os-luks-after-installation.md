@@ -2,9 +2,9 @@
 slug: shani-os-luks-after-installation
 title: 'LUKS2 Encryption on Shani OS — Setup, Management, and Recovery'
 date: '2026-05-09'
-tag: 'Guide'
+tag: 'Reference'
 excerpt: 'Full-disk encryption must be enabled at install time on Shani OS. This guide covers what to do if you missed it, and the complete reference for managing LUKS2 on an already-encrypted system: keyslots, passphrases, keyfiles, header backup, TPM2, and emergency recovery.'
-cover: ''
+cover: /assets/images/blog/shani-os-luks-after-installation.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,7 +13,7 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '8 min'
-series: 'Shani OS Deep Dives'
+series: 'Shani OS Reference'
 ---
 
 Full-disk encryption on Shani OS is a single checkbox in the installer. If you skipped it, the correct path is to reinstall — not to attempt to encrypt an existing installation in place.

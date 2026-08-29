@@ -1,10 +1,10 @@
 ---
 slug: shani-os-android-app-compatibility
-title: 'Android App Compatibility on Shani OS — What Works, What Doesn't, and Workarounds'
+title: "Android App Compatibility on Shani OS — What Works, What Doesn't, and Workarounds"
 date: '2026-05-12'
 tag: 'Guide'
 excerpt: 'Which Android apps work in Waydroid on Shani OS — Indian banking and government apps, streaming services, DRM status, and practical workarounds for apps that are blocked. Includes a tested compatibility list for common Indian apps.'
-cover: ''
+cover: /assets/images/blog/shani-os-android-app-compatibility.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'

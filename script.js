@@ -73,6 +73,11 @@ const LicenseCrypto = {
 // ── Client-side key lookup (no Worker) ───────────────────────────
 // Fetches the public keys.json from jsDelivr CDN or GitHub Pages
 // and validates the entered license key locally. No server needed.
+//
+// The public file contains ONLY SHA-256 hashes of license keys —
+// never the raw keys themselves and never buyer PII. Validation
+// hashes the entered key and compares digests, so reading the file
+// does not reveal any usable key.
 const KeysDB = {
   _cache: null,
   async fetch() {
@@ -82,7 +87,7 @@ const KeysDB = {
     try {
       const res = await window.fetch(url);
       if (!res.ok) return [];
-      this._cache = await res.json(); // array of { key, revoked, expires? }
+      this._cache = await res.json(); // array of { key_hash, revoked, expires? }
       return this._cache;
     } catch {
       return [];
@@ -91,12 +96,13 @@ const KeysDB = {
   async validate(licenseKey) {
     const keys = await this.fetch();
     const normalized = licenseKey.trim().toUpperCase();
-    const entry = keys.find(k => k.key === normalized);
+    const digest = await LicenseCrypto.hash(normalized);
+    const entry = keys.find(k => k.key_hash === digest);
     if (!entry)        return { valid: false, error: 'Key not found.' };
     if (entry.revoked) return { valid: false, error: 'Key has been revoked.' };
     if (entry.expires && new Date(entry.expires) < new Date())
       return { valid: false, error: 'Key has expired.' };
-    return { valid: true, email: entry.email };
+    return { valid: true };
   },
 };
 
@@ -757,7 +763,7 @@ const Renderer = {
         : (_recentDays > 0 && _postAge <= _recentDays
           ? '<span class="freshness-badge freshness-badge--recent">Recent</span>'
           : '');
-      return `<article class="card ${isFeat ? 'featured' : ''}" role="listitem" data-idx="${i}">
+      return `<article class="card ${isFeat ? 'featured' : ''}" role="link" data-idx="${i}">
         <div class="card__visual">
           ${visual}
           <button class="card__copy-link" data-url="${Utils.escapeHtml(`${CONFIG.BLOG_URL}/post/${p.slug}`)}" aria-label="Copy link" title="Copy link"><i class="fa-solid fa-link"></i></button>
@@ -891,7 +897,12 @@ const Renderer = {
 
     // ── Update all meta / SEO for this post ───────────────────────
     const postUrl   = `${CONFIG.BLOG_URL}/post/${post.slug}`;
-    const ogImg     = post.ogImage || post.cover || CONFIG.OG_IMAGE;
+    // og:image/twitter:image must be a fully-qualified absolute URL per spec.
+    // post.cover/ogImage are authored as root-relative paths, so absolutize
+    // against BLOG_URL; leave an already-absolute value untouched.
+    const _rawOgImg = post.ogImage || post.cover || CONFIG.OG_IMAGE;
+    const ogImg     = _rawOgImg && !/^https?:\/\//.test(_rawOgImg)
+      ? `${CONFIG.BLOG_URL}${_rawOgImg}` : _rawOgImg;
     const canonical = post.canonical || postUrl;
     const postLang  = post.lang || CONFIG.LANG || CONFIG.DATE_LOCALE || 'en-US';
     const metaKw    = post.keywords || post.tag;
@@ -1763,7 +1774,7 @@ const Router = {
             const visual = p.cover
               ? `<img src="${Utils.escapeHtml(p.cover)}" alt="${Utils.escapeHtml(p.title)}" class="card__cover-img" loading="lazy">`
               : `<i class="fa-solid fa-file-lines card__icon" aria-hidden="true"></i>`;
-            return `<article class="card" role="listitem" data-idx="${i}">
+            return `<article class="card" role="link" data-idx="${i}">
               <div class="card__visual">${visual}</div>
               <div class="card__content">
                 <span class="card__tag" data-tag="${Utils.escapeHtml(p.tag)}"><i class="${TAG_ICONS[p.tag] || TAG_ICONS.Post}"></i> ${Utils.escapeHtml(p.tag)}</span>
@@ -2106,6 +2117,16 @@ const UI = {
       }
     });
     document.addEventListener('keydown', e => {
+      // '/' focuses search — parity with docs.shani.dev
+      const ae = document.activeElement;
+      if (e.key === '/' && (ae.tagName !== 'INPUT' && ae.tagName !== 'TEXTAREA' && !ae.isContentEditable) &&
+          !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
+        e.preventDefault();
+        searchBar.classList.add('open');
+        searchBar.setAttribute('aria-hidden', 'false');
+        if (input) { input.focus(); input.select(); }
+        return;
+      }
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         const isOpen = searchBar.classList.contains('open');

@@ -4,7 +4,7 @@ title: 'Shani OS for Researchers and HPC — Reproducible Environments from Desk
 date: '2026-04-16'
 tag: 'Guide'
 excerpt: 'How Shani OS makes scientific computing reproducible from the ground up — Apptainer for cluster workloads, Nix for pinned environments, AMD ROCm and NVIDIA CUDA via Distrobox containers, DVC for data versioning, and a GPG-signed host OS that is itself a verifiable artefact.'
-cover: ''
+cover: /assets/images/blog/shani-os-for-researchers-and-hpc.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,7 +13,7 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '12 min'
-series: 'Shani OS Deep Dives'
+series: 'Shani OS Guides'
 ---
 
 Reproducibility is the central challenge of modern scientific computing. You produce a result on your workstation. A collaborator cannot replicate it. A cluster job produces different output six months later because the software environment drifted. A reviewer asks for the exact environment used — and it no longer exists.

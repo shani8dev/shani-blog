@@ -4,7 +4,7 @@ title: 'Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardwar
 date: '2026-05-10'
 tag: 'Guide'
 excerpt: 'Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC, media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.'
-cover: ''
+cover: /assets/images/blog/shani-os-multimedia.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -16,7 +16,7 @@ readTime: '8 min'
 series: 'Shani OS Guides'
 ---
 
-Shani OS ships with the GStreamer and FFmpeg multimedia frameworks, full VA-API/VDPAU hardware video decode, and VLC pre-installed. This means virtually any video or audio format plays at first boot without installing extra codecs — including H.264, H.265/HEVC, VP9, AV1, and more. Hardware-accelerated decode is active on Intel, AMD, and NVIDIA GPUs, keeping CPU usage low during video playback and extending battery life on laptops.
+Shani OS ships with the GStreamer and FFmpeg multimedia frameworks, full VA-API/VDPAU hardware video decode, and the VLC media player. This means virtually any video or audio format plays at first boot without installing extra codecs — including H.264, H.265/HEVC, VP9, AV1, and more. Hardware-accelerated decode is active on Intel, AMD, and NVIDIA GPUs, keeping CPU usage low during video playback and extending battery life on laptops.
 
 This guide covers everyday media playback, streaming services with DRM, media server setup, and managing a home media library.
 
@@ -68,9 +68,9 @@ LIBVA_DRIVER_NAME=nvidia vainfo
 
 ---
 
-## VLC — Pre-Installed
+## VLC
 
-VLC is pre-installed on both editions and handles hardware-accelerated playback automatically:
+VLC handles hardware-accelerated playback automatically:
 
 - Play any `.mkv`, `.mp4`, `.avi`, `.mov`, `.flv`, `.webm`, `.ts`, `.m2ts` file
 - Streaming URLs, RTSP streams, and online video
@@ -84,7 +84,7 @@ VLC uses VA-API for hardware decode when available. Check: Tools → Preferences
 Standard DVD playback requires libdvdcss for decrypting CSS-encrypted discs. Since this library cannot be pre-installed for legal reasons, install it via Nix:
 
 ```bash
-nix-env -i libdvdcss
+nix-env -iA nixpkgs.libdvdcss
 ```
 
 Then restart VLC — it picks up the library automatically.
@@ -102,7 +102,7 @@ MPV is a lightweight but extremely capable video player preferred by power users
 ```bash
 flatpak install flathub io.mpv.Mpv
 # or via Nix:
-nix-env -i mpv
+nix-env -iA nixpkgs.mpv
 ```
 
 MPV uses VA-API hardware decode by default. Common usage:
@@ -284,13 +284,13 @@ Kodi supports VA-API hardware decode and has a 10-foot UI suitable for TV use wi
 
 ```bash
 # castnow — cast local files to Chromecast from the terminal
-nix-env -i castnow
+nix-env -iA nixpkgs.castnow
 
 # Cast a local file
 castnow video.mp4
 
 # Or use mkchromecast for a GUI approach
-nix-env -i mkchromecast
+nix-env -iA nixpkgs.mkchromecast
 mkchromecast
 ```
 
@@ -326,14 +326,14 @@ mpv "https://www.youtube.com/watch?v=..."
 streamlink "https://twitch.tv/channelname" best | mpv -
 
 # Install streamlink
-nix-env -i streamlink
+nix-env -iA nixpkgs.streamlink
 ```
 
 ---
 
 ## Image Viewing and Management
 
-VLP and GNOME Image Viewer (Loupe) come pre-installed. For more features:
+GNOME Image Viewer (Loupe) comes pre-installed. For more features:
 
 ```bash
 # Shotwell — photo import and basic editing (GNOME)
@@ -346,7 +346,7 @@ flatpak install flathub org.kde.digikam
 flatpak install flathub org.gnome.gThumb
 
 # ImageMagick — powerful command-line image manipulation
-nix-env -i imagemagick
+nix-env -iA nixpkgs.imagemagick
 
 # Resize an image
 convert input.jpg -resize 1920x1080 output.jpg

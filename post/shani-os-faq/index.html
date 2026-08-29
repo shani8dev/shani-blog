@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev data:; connect-src 'self' https://api.github.com">
 
   <title>Shani OS FAQ — Frequently Asked Questions — Shanios Blog</title>
   <meta name="description" id="meta-desc" content="Answers to the most common questions about Shani OS: software installation, what happens to your files after rollback, hardware compatibility, dual boot, gaming, security, and the immutable model in plain terms.">
@@ -15,23 +16,23 @@
   <meta property="og:title"     id="og-title"     content="Shani OS FAQ — Frequently Asked Questions">
   <meta property="og:description" id="og-desc"    content="Answers to the most common questions about Shani OS: software installation, what happens to your files after rollback, hardware compatibility, dual boot, gaming, security, and the immutable model in plain terms.">
   <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/shani-os-faq/">
-  <meta property="og:image"     id="og-image"     content="https://shani.dev/assets/images/logo.svg">
+  <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/shani-os-faq.webp">
   <meta property="og:image:alt" id="og-image-alt" content="Shani OS FAQ — Frequently Asked Questions">
   <meta property="og:locale"    content="en_US">
-  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-12T00:00:00.000Z">
-  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-12T00:00:00.000Z">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-11T18:30:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-11T18:30:00.000Z">
   <meta property="article:author"         id="og-article-author"  content="Shrinivas Vishnu Kumbhar">
-  <meta property="article:section"        id="og-article-section" content="Guide">
+  <meta property="article:section"        id="og-article-section" content="Reference">
   
 
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
   <meta name="twitter:title"       id="tw-title" content="Shani OS FAQ — Frequently Asked Questions">
   <meta name="twitter:description" id="tw-desc"  content="Answers to the most common questions about Shani OS: software installation, what happens to your files after rollback, hardware compatibility, dual boot, gaming, security, and the immutable model in plain terms.">
-  <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
+  <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/shani-os-faq.webp">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS FAQ — Frequently Asked Questions","description":"Answers to the most common questions about Shani OS: software installation, what happens to your files after rollback, hardware compatibility, dual boot, gaming, security, and the immutable model in plain terms.","url":"https://blog.shani.dev/post/shani-os-faq/","datePublished":"2026-05-12T00:00:00.000Z","dateModified":"2026-05-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
-  <script type="application/ld+json" id="ld-org">{}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS FAQ — Frequently Asked Questions","description":"Answers to the most common questions about Shani OS: software installation, what happens to your files after rollback, hardware compatibility, dual boot, gaming, security, and the immutable model in plain terms.","url":"https://blog.shani.dev/post/shani-os-faq/","datePublished":"2026-05-11T18:30:00.000Z","dateModified":"2026-05-11T18:30:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-os-faq.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
   <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
@@ -199,6 +200,7 @@
   <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+  <div id="reading-bar" role="progressbar" aria-label="Reading progress" aria-hidden="true"></div>
   <main id="main-content">
     <!-- INDEX VIEW -->
     <section id="view-index" style="display:none">
@@ -223,15 +225,15 @@
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
       <article id="post-article">
       <header class="post-header">
-        <span class="post-tag">Guide</span>
+        <span class="post-tag">Reference</span>
         <h1 class="post-title">Shani OS FAQ — Frequently Asked Questions</h1>
         <div class="post-meta">
           <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-12 · 8 min</span>
         </div>
       </header>
       <div class="post-body"><p>Questions that come up repeatedly across the Telegram community and documentation, answered in one place.</p>
-<p>---</p>
-<h2>Installation & Requirements</h2>
+<hr>
+<h2 id="installation-requirements">Installation & Requirements</h2>
 <p><strong>Does Shani OS require UEFI?</strong></p>
 <p>Yes. Legacy/CSM BIOS boot is not supported. Most PCs made after 2012 have UEFI. Check your BIOS settings — if you see options like Secure Boot and UEFI boot mode, you're fine.</p>
 <p><strong>Does it work on my hardware?</strong></p>
@@ -242,8 +244,8 @@
 <p>It is technically possible but not recommended — Windows may overwrite the bootloader on updates. The cleaner setup is to run Windows in a virtual machine via virt-manager (pre-installed on KDE Plasma). Your Windows install lives in the <code>@libvirt</code> subvolume and is unaffected by OS updates. Guide: <a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a>.</p>
 <p><strong>Can I install it on a VM to try it out?</strong></p>
 <p>Yes. Shani OS includes guest tools for QEMU/KVM, VirtualBox, and VMware and they activate automatically. Give the VM at least 4 GB RAM and 40 GB disk.</p>
-<p>---</p>
-<h2>Updates & Rollback</h2>
+<hr>
+<h2 id="updates-rollback">Updates & Rollback</h2>
 <p><strong>How do updates work?</strong></p>
 <p>Updates are applied atomically. <code>shani-deploy</code> downloads and verifies a new OS image, extracts it to the inactive slot, and sets it as the next-boot default. Your running system is never touched. If the new system has a problem, <code>sudo shani-deploy -r</code> rolls back. Full guide: <a href="https://blog.shani.dev/post/shani-os-updates">shani-os-updates</a>.</p>
 <p><strong>How often do updates come out?</strong></p>
@@ -256,8 +258,8 @@
 <p>Yes. The update is staged in the background — you can continue working normally. Reboot when convenient. <code>shani-update</code> shows a notification when a reboot is ready.</p>
 <p><strong>Can updates happen automatically?</strong></p>
 <p>Yes. See the "Automated Updates" section in <a href="https://blog.shani.dev/post/shani-os-updates">shani-os-updates</a> for systemd timer setup. This is the recommended approach for fleet deployments.</p>
-<p>---</p>
-<h2>Software Installation</h2>
+<hr>
+<h2 id="software-installation">Software Installation</h2>
 <p><strong>Can I use pacman to install packages?</strong></p>
 <p>No — and you don't need to. The OS root is read-only; a <code>pacman -S</code> to the base system would be overwritten by the next OS update anyway. Software belongs in the layers designed for it. See <a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> for the full decision guide.</p>
 <p>The short version: GUI apps → Flatpak. CLI tools → Nix. Anything that needs <code>apt</code>/<code>pacman</code>/<code>yay</code> → Distrobox. Services → Podman.</p>
@@ -277,8 +279,8 @@ sudo dpkg -i some-app.deb
 distrobox-export --app some-app</code></pre>
 <p><strong>Does Homebrew work?</strong></p>
 <p>Yes, identically to macOS. It installs to <code>/home/linuxbrew/.linuxbrew</code>, completely outside the read-only root. Guide: <a href="https://blog.shani.dev/post/homebrew-on-shani-os">Homebrew on Shani OS</a>.</p>
-<p>---</p>
-<h2>File Safety & Data</h2>
+<hr>
+<h2 id="file-safety-data">File Safety & Data</h2>
 <p><strong>Is my data safe during an OS update?</strong></p>
 <p>Yes. <code>shani-deploy</code> only writes to the inactive OS slot (<code>@blue</code> or <code>@green</code>). It never touches <code>@home</code>, <code>@flatpak</code>, <code>@nix</code>, <code>@containers</code>, or any other user data subvolume.</p>
 <p><strong>Does encryption work with the immutable model?</strong></p>
@@ -288,16 +290,16 @@ distrobox-export --app some-app</code></pre>
 flatpak uninstall --unused    # remove unused Flatpak runtimes (can reclaim several GB)
 podman system prune -af       # remove unused container images
 nix-collect-garbage -d        # remove old Nix generations</code></pre>
-<p>---</p>
-<h2>Security</h2>
+<hr>
+<h2 id="security">Security</h2>
 <p><strong>What is "zero telemetry"?</strong></p>
 <p>No background services report hardware, software, or usage data to any server. No identifiers are generated or transmitted. <code>shani-deploy</code> makes outbound HTTP downloads to get update images — nothing more. The full codebase is at <a href="https://github.com/shani8dev">github.com/shani8dev</a> for independent verification.</p>
 <p><strong>Is the immutable root actually secure?</strong></p>
 <p>Yes, in a meaningful way. The OS root is physically read-only at the kernel VFS layer — not a permission, not a policy. Root processes cannot write persistent backdoors to <code>/usr/bin</code> or any other system path. Malware that gains a root session has that session — it does not have persistence across reboots. Combined with six simultaneous Linux Security Modules active from first boot, the security posture is significantly stronger than a traditional mutable Linux system. Full explanation: <a href="https://blog.shani.dev/post/shani-os-security-deep-dive">Security Without Configuration</a>.</p>
 <p><strong>Does Secure Boot actually work?</strong></p>
 <p>Yes. The full Secure Boot chain is: UEFI firmware → Shim (Microsoft-signed) → systemd-boot (MOK-signed) → Unified Kernel Image (MOK-signed, contains kernel + initramfs + cmdline). The bootloader editor is disabled and the kernel cmdline is embedded in the UKI — it cannot be modified from the boot menu. Guide: <a href="https://blog.shani.dev/post/gen-efi-and-secure-boot">gen-efi and Secure Boot</a>.</p>
-<p>---</p>
-<h2>Gaming</h2>
+<hr>
+<h2 id="gaming">Gaming</h2>
 <p><strong>Does Steam work?</strong></p>
 <p>Yes. The KDE Plasma edition ships Steam pre-installed and ready at first boot, with Proton enabled. Most Windows-only games in your Steam library run via Proton. Full guide: <a href="https://blog.shani.dev/post/shani-os-gaming-deep-dive">Gaming on Shani OS</a>.</p>
 <p><strong>Does my existing Steam library survive OS updates?</strong></p>
@@ -305,9 +307,9 @@ nix-collect-garbage -d        # remove old Nix generations</code></pre>
 <p><strong>Can I run non-Steam Windows games?</strong></p>
 <p>Yes. Heroic Games Launcher handles Epic Games Store and GOG. Lutris handles everything else. Bottles handles Windows apps that need more control over the Wine environment. All are pre-installed on the KDE Plasma edition.</p>
 <p><strong>Does NVIDIA work for gaming?</strong></p>
-<p>Yes, on both editions. NVIDIA drivers (<code>nvidia-open</code>) are pre-installed and configured. On Optimus laptops, <code>prime-run</code> and <code>nvidia-prime</code> handle GPU selection.</p>
-<p>---</p>
-<h2>Desktop & Daily Use</h2>
+<p>Yes, on every edition. NVIDIA drivers (<code>nvidia-open</code>) are pre-installed and configured. On Optimus laptops, <code>prime-run</code> and <code>nvidia-prime</code> handle GPU selection.</p>
+<hr>
+<h2 id="desktop-daily-use">Desktop & Daily Use</h2>
 <p><strong>Can I change system settings?</strong></p>
 <p>Yes. <code>/etc</code> is writable via OverlayFS — your configuration changes persist in the <code>@data</code> overlay across every OS update and rollback. Run <code>systemctl enable</code>, edit <code>/etc/ssh/sshd_config</code>, modify <code>/etc/hosts</code> — everything works exactly as on any Linux system.</p>
 <p><strong>Does it work offline?</strong></p>
@@ -316,8 +318,8 @@ nix-collect-garbage -d        # remove old Nix generations</code></pre>
 <p>The GNOME edition ships GNOME and the KDE Plasma edition ships KDE Plasma. Both can have additional desktop environments installed via Flatpak or Distrobox for testing, though running two full DEs on the same system is generally not recommended. Switching editions is done by reinstalling.</p>
 <p><strong>Does it work on a laptop?</strong></p>
 <p>Yes, with specific laptop features well-supported: hibernation configured automatically at install (swapfile sized to RAM, correct offset embedded in UKI), TPM2 auto-unlock for LUKS, <code>power-profiles-daemon</code> for battery/performance profiles, SOF firmware for Intel DSP audio on newer Intel laptops. Guide: <a href="https://blog.shani.dev/post/shani-os-power-management">Power Management on Shani OS</a>.</p>
-<p>---</p>
-<h2>Community & Support</h2>
+<hr>
+<h2 id="community-support">Community & Support</h2>
 <p><strong>Is Shani OS free?</strong></p>
 <p>Yes, fully free and open source. No accounts, no subscriptions, no paid tiers.</p>
 <p><strong>Where do I get help?</strong></p>
@@ -328,8 +330,8 @@ nix-collect-garbage -d        # remove old Nix generations</code></pre>
 </ul>
 <p><strong>Can I contribute?</strong></p>
 <p>Yes. Source code, build scripts, and documentation are all public at <a href="https://github.com/shani8dev">github.com/shani8dev</a>. Pull requests and issue reports are welcome.</p>
-<p>---</p>
-<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+<hr>
+<blockquote><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></blockquote></div>
       </article>
     </section>
 

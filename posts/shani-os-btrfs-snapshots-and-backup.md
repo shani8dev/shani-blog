@@ -4,7 +4,7 @@ title: 'Btrfs Snapshots and Backup on Shani OS — Protecting Your Data the Righ
 date: '2026-04-27'
 tag: 'Guide'
 excerpt: 'How to use Btrfs snapshots for instant point-in-time copies of your home directory, and how to set up real off-device backups with restic and rclone — both pre-installed on Shani OS. Snapshots are not backups. Here is the difference and how to do both.'
-cover: ''
+cover: /assets/images/blog/shani-os-btrfs-snapshots-and-backup.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'

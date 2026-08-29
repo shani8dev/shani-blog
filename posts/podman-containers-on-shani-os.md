@@ -2,9 +2,9 @@
 slug: podman-containers-on-shani-os
 title: 'Podman and Containers on Shani OS — Rootless, Docker-Compatible, Ready at Boot'
 date: '2026-04-21'
-tag: 'Guide'
+tag: 'Ecosystem'
 excerpt: 'How to use Podman on Shani OS for rootless containers, Docker Compose workflows, and containerised services — with the Pods GUI, persistent storage in @containers, and full compatibility with the Docker ecosystem.'
-cover: ''
+cover: /assets/images/blog/podman-containers-on-shani-os.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,14 +13,14 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '8 min'
-series: 'Shani OS Guides'
+series: 'Shani OS Ecosystem'
 ---
 
 Podman is a container engine that is fully compatible with Docker's CLI and image ecosystem but does not require a root-privileged daemon. On Shani OS, `podman.socket` is enabled at first boot — containers are ready to run immediately without any setup.
 
 Because Shani OS's root filesystem is read-only, Podman is the natural home for any service or database that needs to run persistently: databases, development servers, web services, self-hosted tools. Containers live in the `@containers` Btrfs subvolume, completely independent of the OS, surviving every update and rollback untouched.
 
-The **Pods** app (pre-installed on both editions) gives you a graphical interface for managing containers, images, volumes, and networks. The `podman-docker` drop-in package (pre-installed) means existing `docker` commands work as-is.
+The **Pods** app (pre-installed on every edition) gives you a graphical interface for managing containers, images, volumes, and networks. The `podman-docker` drop-in package (pre-installed) means existing `docker` commands work as-is.
 
 Full reference: [docs.shani.dev — Containers](https://docs.shani.dev/doc/software/containers).
 
@@ -296,7 +296,7 @@ skopeo copy docker://docker.io/nginx:latest docker://myregistry.example.com/ngin
 
 ## The Pods GUI
 
-Pods is pre-installed on both editions. Open it from your application launcher.
+Pods is pre-installed on every edition. Open it from your application launcher.
 
 Pods shows you:
 - All running and stopped containers with their status

@@ -4,7 +4,7 @@ title: 'Audio on Shani OS — PipeWire, WirePlumber, JACK, and Professional Audi
 date: '2026-05-05'
 tag: 'Guide'
 excerpt: 'Shani OS uses PipeWire 1.4.x as its audio stack — simultaneously compatible with ALSA, PulseAudio, and JACK. This guide covers everyday audio management, Bluetooth codec selection, fixing common issues, and setting up low-latency professional audio workflows.'
-cover: ''
+cover: /assets/images/blog/shani-os-audio-pipewire.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'

@@ -2,9 +2,9 @@
 slug: shani-deploy-reference
 title: 'shani-deploy Reference — Every Flag, Every Workflow'
 date: '2026-04-26'
-tag: 'Guide'
+tag: 'Reference'
 excerpt: 'The complete reference for shani-deploy — the atomic update and rollback tool at the heart of Shani OS. Every flag, every use case, every edge case covered: update, rollback, dry-run, cleanup, optimize, channel management, and more.'
-cover: ''
+cover: /assets/images/blog/shani-deploy-reference.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,10 +13,11 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '8 min'
-series: 'Shani OS Guides'
+series: 'Shani OS Reference'
 ---
 
 > **Note:** This post has been superseded by [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates), which merges `shani-deploy` and `shani-update` into a single reference. The content below remains accurate.
+
 
 `shani-deploy` is the tool that makes Shani OS's atomic update and rollback model work. It downloads, verifies, and deploys OS images to the inactive Btrfs slot — never touching the running system — and handles rollback, storage cleanup, and deduplication.
 
@@ -34,11 +35,15 @@ sudo shani-deploy -c                     # remove old backups and cached downloa
 sudo shani-deploy -o                     # run on-demand block deduplication
 sudo shani-deploy -t latest              # use latest channel for this run
 sudo shani-deploy -f                     # redeploy even if already current
+sudo shani-deploy --download-only        # fetch and verify the update image, don't deploy it
 sudo shani-deploy -v                     # verbose output
 sudo shani-deploy --set-channel stable   # permanently set the update channel
 sudo shani-deploy --set-channel latest
 sudo shani-deploy --skip-self-update     # skip the self-update check
 sudo shani-deploy --update-genefi        # pull latest gen-efi from upstream for this run
+sudo shani-deploy --verify-existing      # verify current deployment integrity without updating
+sudo shani-deploy --list-backups         # list available rollback backups with timestamps
+sudo shani-deploy --channel-status       # show latest/stable versions available remotely
 ```
 
 ---
@@ -76,16 +81,29 @@ The primary update command. Steps performed in order:
 5. **Space check** — verifies at least 10 GB free on the Btrfs filesystem
 6. **Fetch metadata** — downloads the latest release manifest from the CDN (R2 primary, SourceForge fallback)
 7. **Already current check** — exits cleanly if the active slot is already the latest version (unless `-f` is used), running backup cleanup and download cleanup as maintenance
-8. **Download** — streams the image with resume support; tries `aria2c`, then `wget`, then `curl`
-9. **SHA256 verify** — verifies checksum after download
+8. **Download** — tries a `zsync2` differential fetch first (only if `zsync2` is installed and a previous image is still cached in `/data/downloads/`), falling back to a full download via `aria2c`, then `wget`, then `curl`
+9. **SHA256 verify** — verifies checksum after download, regardless of which download path produced the file
 10. **GPG verify** — verifies signature against the Shani OS GPG key (`7B927BFFD4A9EAAA8B666B77DE217F3DA8014792`)
 11. **Snapshot** — takes a timestamped Btrfs snapshot of the inactive slot before writing
 12. **Extract** — pipes the verified image into `btrfs receive`
 13. **UKI generation** — runs `gen-efi configure <inactive-slot>` inside a chroot of the new slot to build and sign a Unified Kernel Image
 14. **Boot entry update** — updates systemd-boot entries; the new slot becomes next-boot default with `+3-0` boot count tries
 15. **Reboot marker** — writes `/run/shanios/reboot-needed` (tmpfs, auto-cleared on reboot) so `shani-update` can show a restart dialog
+16. **Auto-reboot** — opt-in only; the new slot is ready to boot into immediately, so no reboot happens on its own unless `AUTO_REBOOT=yes` was set (see [Auto-Reboot After Update](#auto-reboot-after-update) below)
 
 Nothing in your running OS is touched at any point. The chroot bind-mounts `data`, `etc`, `var`, and `swap` from the live system so `gen-efi` has access to the MOK keys, vconsole config, and swap offset.
+
+### `sudo shani-deploy --download-only`
+
+Runs the fetch, checksum, and GPG-verify steps (1–10 above) and then exits — the image is cached in `/data/downloads/` but never extracted or deployed. Useful for pre-fetching an update over a metered or slow connection before deploying it later, or for splitting "download" and "deploy" into separate maintenance-window steps.
+
+```bash
+sudo shani-deploy --download-only
+# ... later, once the window opens:
+sudo shani-deploy   # deploys the already-downloaded, already-verified image
+```
+
+Cannot be combined with `-r`, `-c`, `-o`, or `--set-channel`.
 
 ### `sudo shani-deploy -r` (rollback)
 
@@ -121,6 +139,35 @@ Simulates the entire update process without making any changes. Downloads metada
 sudo shani-deploy -d
 # Output shows: current slot, target version, what would be downloaded, what would change
 ```
+
+---
+
+## Auto-Reboot After Update
+
+By default, a successful `sudo shani-deploy` does **not** reboot the machine — the new slot is fully deployed and bootable the moment the script finishes, so the log prints "Please reboot to switch to the updated slot" and leaves the actual reboot up to you, whenever it's convenient.
+
+```bash
+# Opt in to an automatic reboot 60 seconds after deployment
+sudo AUTO_REBOOT=yes shani-deploy
+
+# Change the delay (in seconds)
+sudo AUTO_REBOOT=yes AUTO_REBOOT_DELAY=300 shani-deploy
+
+# Cancel a pending auto-reboot (if AUTO_REBOOT=yes armed one, within the delay window)
+sudo systemctl stop shanios-auto-reboot.timer
+```
+
+When enabled, the timer runs as its own systemd unit outside `shani-deploy`'s process, so it fires even if you close the terminal — it only doesn't fire if you stop it first. Auto-reboot is skipped entirely in `--dry-run`, and does not apply to `-r`/rollback, `-c`/`--cleanup`, `-o`/`--optimize`, or `--download-only`, none of which change the next-boot slot.
+
+---
+
+## Differential Downloads (zsync2)
+
+Every release image ships with a `.zsync` control file alongside it. If `zsync2` is installed and a previous image is still sitting in `/data/downloads/` — normally left there by the last update cycle, since cleanup only ever removes everything *except* the most recent image — `shani-deploy` tries a differential fetch first: only the blocks that changed since that cached image, instead of the full file.
+
+This is purely an optimization, not a shortcut around verification. `zsync2` is an actively developing, upstream-experimental tool, so any hiccup (not installed, no local image to diff against, timeout, bad exit code) falls straight through to the ordinary full download. Whichever path produced the file, it still goes through the same SHA256 and GPG checks afterward — nothing about a differential download is trusted until it passes those, same as a full download.
+
+Nothing to configure here — it only kicks in against R2 (the `.zsync` file's embedded target URL always points there) and only when there's actually something local to diff against.
 
 ---
 
@@ -233,6 +280,14 @@ sudo systemctl enable --now shani-autoupdate.timer
 ```
 
 After the update stages, `shani-deploy` writes `/run/shanios/reboot-needed`. You can check for this marker in your maintenance window logic and schedule the reboot separately.
+
+**Pre-staging the download separately:** if you'd rather fetch and verify the image ahead of the maintenance window (over a slow or metered link, or just to shrink the window itself) instead of a full `shani-deploy` run, use the ready-made timer that ships with `shani-deploy` — disabled by default:
+
+```bash
+sudo systemctl enable --now shani-download-only.timer
+```
+
+It runs `shani-deploy --download-only` 30 minutes after boot and once a day after that (randomized by up to 2 hours), and is a no-op if the current image is already cached and verified. Your maintenance-window `shani-autoupdate.timer` above then deploys an already-downloaded image instead of fetching it live.
 
 ---
 

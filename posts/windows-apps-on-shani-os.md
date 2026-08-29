@@ -4,7 +4,7 @@ title: 'Running Windows Apps on Shani OS — Wine, Bottles, and When to Use a VM
 date: '2026-05-08'
 tag: 'Guide'
 excerpt: 'You do not need Windows to run Windows software on Shani OS. Bottles (pre-installed on the KDE Plasma edition) manages Wine environments for productivity tools, creative software, and legacy apps. Here is how to get any Windows app running, and when a VM is the better answer.'
-cover: ''
+cover: /assets/images/blog/windows-apps-on-shani-os.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -12,7 +12,7 @@ author_initials: 'SK'
 author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
-readTime: '8 min'
+readTime: '10 min'
 series: 'Shani OS Guides'
 ---
 
@@ -123,7 +123,7 @@ For most productivity and business software, **Caffe** or **Wine Staging** works
 
 Microsoft Office itself is not supported well under Wine due to its deep system integration. The recommended alternatives:
 
-- **OnlyOffice Desktop Editors** — pre-installed as a Flatpak on both editions. Opens `.docx`, `.xlsx`, `.pptx` with high compatibility. For most Office workflows, this is the right answer.
+- **OnlyOffice Desktop Editors** — pre-installed as a Flatpak on every edition. Opens `.docx`, `.xlsx`, `.pptx` with high compatibility. For most Office workflows, this is the right answer.
 - **LibreOffice** — available on Flathub. Full office suite with strong `.docx`/`.xlsx` compatibility.
 - **Microsoft 365 in a browser** — the web version of Word, Excel, and PowerPoint works fully in any browser on Shani OS.
 - **Office in a Windows VM** — if you need the full desktop Office experience with macros and COM add-ins, a Windows VM via virt-manager is the most reliable path. See [Virtual Machines on Shani OS](https://blog.shani.dev/post/shani-os-virtual-machines).

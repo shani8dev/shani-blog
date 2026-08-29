@@ -4,7 +4,7 @@ title: 'The Shell Experience on Shani OS — Zsh, Starship, McFly, FZF, and More
 date: '2026-04-22'
 tag: 'Guide'
 excerpt: 'Shani OS ships a fully configured, modern shell environment — Zsh with syntax highlighting and autosuggestions, Starship prompt, McFly neural-network history, FZF fuzzy search, and a complete toolkit of CLI tools. Here is how it all fits together.'
-cover: ''
+cover: /assets/images/blog/shani-os-shell-and-terminal.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -211,6 +211,17 @@ Your shell configuration lives in your home directory:
 ```
 
 All of these are in `@home` — completely independent of the OS. They are never touched by OS updates or rollbacks.
+
+### Where These Come From
+
+New user accounts are populated from `/etc/skel` (the skeleton directory). When `useradd` or the installer creates a home directory, it copies everything from `/etc/skel` into the new user's home. On Shanios, this includes:
+
+- `~/.zshrc` — Zsh config with plugins, aliases, and environment variables
+- `~/.config/starship.toml` — Starship prompt configuration
+- `~/.config/mcfly/` — McFly history config
+- `~/.bashrc_shani` — Shanios-specific Bash additions (sourced by `~/.bashrc`)
+
+If you want to customize the default dotfiles for fleet deployments (e.g., adding company-specific aliases or environment variables), edit the files in `/etc/skel` on your master image — all future user accounts will pick them up automatically. Existing users are not affected.
 
 ### Adding Aliases
 

@@ -2,9 +2,9 @@
 slug: homebrew-on-shani-os
 title: 'Homebrew on Shani OS — For macOS Switchers and Those Who Prefer It'
 date: '2026-04-28'
-tag: 'Guide'
+tag: 'Ecosystem'
 excerpt: 'Homebrew works on Shani OS exactly as it does on macOS — install it once, use brew install for any of the thousands of formulae. A comparison with Nix to help you choose, and how both coexist.'
-cover: ''
+cover: /assets/images/blog/homebrew-on-shani-os.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -12,8 +12,8 @@ author_initials: 'SK'
 author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
-readTime: '5 min'
-series: 'Shani OS Guides'
+readTime: '3 min'
+series: 'Shani OS Ecosystem'
 ---
 
 If you are coming from macOS and `brew install` is muscle memory, you do not need to abandon it on Shani OS. Homebrew installs to `/home/linuxbrew/.linuxbrew` — completely outside the read-only OS root — and works exactly as it does on macOS.
@@ -93,6 +93,7 @@ brew doctor
 Homebrew is a solid choice for macOS switchers who want continuity — it installs to `/home/linuxbrew/.linuxbrew` outside the read-only root and works identically to macOS. For new Shani OS users without a Homebrew habit, Nix is more powerful: it handles multiple versions without conflict and provides reproducible per-project environments via `shell.nix`. Both coexist fine — many macOS switchers run Homebrew initially and migrate specific workflows to Nix over time.
 
 [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) covers all ecosystems including Flatpak, Distrobox, Podman, and VMs.
+
 ## Package Overlap with Nix
 
 Many tools are available in both Homebrew and Nixpkgs. If you have installed the same tool in both, the one earlier in your `$PATH` takes precedence. This is usually fine, but check if you ever see unexpected behaviour:

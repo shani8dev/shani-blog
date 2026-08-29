@@ -4,7 +4,7 @@ title: 'Networking on Shani OS — VPNs, Tailscale, SSH, Caddy, and More'
 date: '2026-04-22'
 tag: 'Guide'
 excerpt: 'A practical guide to every network capability built into Shani OS — from WireGuard and Tailscale mesh VPNs to Caddy reverse proxy, SSH hardening, Cloudflare tunnels, LAN file sharing, brute-force protection, and enterprise services.'
-cover: ''
+cover: /assets/images/blog/shani-os-networking-guide.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud infrastructure engineer, DevOps practitioner, and the creator of Shani OS — an immutable, atomic Linux built for reliability and self-sovereignty.'
@@ -704,17 +704,17 @@ Full guide: [docs.shani.dev — Backup & Recovery](https://docs.shani.dev/doc/sy
 
 Any network service also runs as a rootless Podman container on Shani OS, surviving every OS update untouched. The self-hosting wiki covers ready-to-run commands for:
 
-- **[VPN & Tunnels](https://docs.shani.dev/doc/servers/vpn-tunnels)** — WG-Easy, Headscale + Headplane, Cloudflared, Pangolin, Pritunl, Firezone, Nebula, ZeroTier, NetBird
-- **[Network & DNS](https://docs.shani.dev/doc/servers/networking)** — Pi-hole, AdGuard Home, Nginx Proxy Manager, Traefik, Caddy, Unbound, SearXNG, Homepage dashboard
+- **[VPN & Tunnels](https://docs.shani.dev/doc/networking/wireguard-easy)** — WG-Easy, Headscale + Headplane, Cloudflared, Pangolin, Pritunl, Firezone, Nebula, ZeroTier, NetBird
+- **[Network & DNS](https://docs.shani.dev/doc/networking/pi-hole)** — Pi-hole, AdGuard Home, Nginx Proxy Manager, Traefik, Caddy, Unbound, SearXNG, Homepage dashboard
 - **[Mail Servers](https://docs.shani.dev/doc/servers/mail)** — Mailcow, Mailu, Stalwart, Roundcube, SnappyMail
-- **[Monitoring](https://docs.shani.dev/doc/servers/monitoring)** — Prometheus, Grafana, Loki, Netdata, Uptime Kuma, Gatus, Dozzle
+- **[Monitoring](https://docs.shani.dev/doc/servers/monitoring/prometheus)** — Prometheus, Grafana, Loki, Netdata, Uptime Kuma, Gatus, Dozzle
 
 ---
 
 ## Resources
 
 - [docs.shani.dev — Networking](https://docs.shani.dev/doc/networking) — full networking documentation
-- [docs.shani.dev/servers](https://docs.shani.dev/doc/servers) — self-hosting wiki with ready-to-run Podman commands
+- [docs.shani.dev/servers](https://docs.shani.dev/) — self-hosting wiki with ready-to-run Podman commands
 - [Shani OS as a Home Server](https://blog.shani.dev/post/shani-os-home-server) — self-hosting guide with service catalogue
 - [Podman on Shani OS](https://blog.shani.dev/post/podman-containers-on-shani-os) — rootless containers reference
 - [KDE Connect on Shani OS](https://blog.shani.dev/post/shani-os-kde-connect) — phone + desktop integration

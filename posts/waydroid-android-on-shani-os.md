@@ -4,7 +4,7 @@ title: 'Running Android Apps on Shani OS with Waydroid'
 date: '2026-04-18'
 tag: 'Guide'
 excerpt: 'Waydroid runs a full hardware-accelerated Android stack inside a lightweight container on Shani OS — full Play Store access, ARM app compatibility, and native GPU performance. Here is how to set it up and get the most out of it.'
-cover: ''
+cover: /assets/images/blog/waydroid-android-on-shani-os.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'

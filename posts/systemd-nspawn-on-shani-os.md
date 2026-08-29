@@ -2,9 +2,9 @@
 slug: systemd-nspawn-on-shani-os
 title: 'systemd-nspawn and machinectl on Shani OS — Lightweight System Containers'
 date: '2026-05-07'
-tag: 'Guide'
+tag: 'Ecosystem'
 excerpt: 'systemd-nspawn is the lightest way to run a full Linux system environment on Shani OS — no image management, no daemon, no setup. Containers boot in under a second, live in the @machines Btrfs subvolume, and survive every OS update untouched.'
-cover: ''
+cover: /assets/images/blog/systemd-nspawn-on-shani-os.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,7 +13,7 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '6 min'
-series: 'Shani OS Guides'
+series: 'Shani OS Ecosystem'
 ---
 
 `systemd-nspawn` is a lightweight container mechanism built directly into systemd. It runs a full Linux distribution — complete with an init system and its own namespace — without any daemon, image format, or external tooling. You point it at a directory containing a Linux root filesystem and it boots it. That is the entire setup.

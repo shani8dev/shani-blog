@@ -2,9 +2,9 @@
 slug: distrobox-on-shani-os
 title: 'Distrobox on Shani OS — A Full Mutable Linux Inside an Immutable One'
 date: '2026-04-20'
-tag: 'Guide'
+tag: 'Ecosystem'
 excerpt: 'How to use Distrobox to run any Linux distribution inside Shani OS — full pacman, apt, dnf, AUR helpers, and GUI apps — without touching the immutable host OS. With BoxBuddy for graphical management.'
-cover: ''
+cover: /assets/images/blog/distrobox-on-shani-os.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,7 +13,7 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '9 min'
-series: 'Shani OS Guides'
+series: 'Shani OS Ecosystem'
 ---
 
 Distrobox is the answer to the question every experienced Linux user asks when they encounter an immutable OS: "But what if I need `apt install`, `pacman -S`, or a tool that only exists in the AUR?"

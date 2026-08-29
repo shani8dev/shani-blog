@@ -2,9 +2,9 @@
 slug: shani-os-security-deep-dive
 title: 'Security Without Configuration — How Shani OS Protects You by Default'
 date: '2026-04-14'
-tag: 'Security'
+tag: 'Deep Dive'
 excerpt: 'Six Linux Security Modules running simultaneously, an immutable root that survives root access, TPM2-sealed encryption, and zero telemetry. Here is exactly how each layer works and why it is on by default.'
-cover: ''
+cover: /assets/images/blog/shani-os-security-deep-dive.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -97,6 +97,8 @@ Every Shani OS release is SHA256 checksummed and GPG signed with key `7B927BFFD4
 
 This is not just download verification — it is a continuous chain. The image that was verified at download time is the image that `btrfs receive` writes to the slot. The result is byte-for-byte identical to the subvolume that passed build-time QA and was signed by the Shani OS key.
 
+The signing trust is anchored in the `shani-keyring` package, which ships three files to `/usr/share/pacman/keyrings/`: `shani.gpg` (the public key), `shani-trusted` (trust level), and `shani-revoked` (currently empty). This same key is used across the entire pipeline — image signing, package repository signing, and the `shani-builder` Docker environment all reference the same fingerprint. Key rotation requires updating the keyring files and regenerating checksums in the `shani-pkgbuilds/shani-keyring` PKGBUILD in a single atomic change. See [Keyring & Signing](https://docs.shani.dev/doc/security/keyring) for full details.
+
 ---
 
 ## Intel ME Disabled
@@ -116,7 +118,7 @@ This does not remove ME from the hardware (that is not possible in software), bu
 
 `firewalld` is running from first boot with a default-deny inbound policy. Pre-configured rules are applied at install time for KDE Connect/GSConnect (device pairing, file transfer, notifications) and Waydroid (DNS, packet forwarding). No inbound connections are permitted beyond what is explicitly configured. `fail2ban` runs to ban repeated authentication failures.
 
-All VPN protocols are pre-installed and configurable via the GUI — OpenVPN, WireGuard, L2TP, PPTP, strongSwan/IKEv2, Cisco AnyConnect, SSTP, Fortinet SSL, VPNC. Tailscale (WireGuard-based mesh VPN) is pre-installed with state persisted in `/data/varlib/tailscale` so it survives OS updates. Cloudflare Zero Trust tunnels via `cloudflared` are also pre-installed. Full networking documentation: [docs.shani.dev — Networking](https://docs.shani.dev/doc/servers).
+All VPN protocols are pre-installed and configurable via the GUI — OpenVPN, WireGuard, L2TP, PPTP, strongSwan/IKEv2, Cisco AnyConnect, SSTP, Fortinet SSL, VPNC. Tailscale (WireGuard-based mesh VPN) is pre-installed with state persisted in `/data/varlib/tailscale` so it survives OS updates. Cloudflare Zero Trust tunnels via `cloudflared` are also pre-installed. Full networking documentation: [docs.shani.dev — Networking](https://docs.shani.dev/doc/networking/tailscale).
 
 ---
 

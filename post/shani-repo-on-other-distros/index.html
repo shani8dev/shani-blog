@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev data:; connect-src 'self' https://api.github.com">
+
+  <title>Use Shanios Tools on Any Arch-Based Distro — Shanios Blog</title>
+  <meta name="description" id="meta-desc" content="Shanios builds tools that are useful beyond its own filesystem layout. gen-efi generates Secure Boot UKIs for any Arch system. shani-health …">
+  <meta name="author"      content="Shrinivas Kumbhar">
+  <meta name="robots"      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical"    id="canonical-url" href="https://blog.shani.dev/post/shani-repo-on-other-distros/">
+
+  <meta property="og:site_name" id="og-site-name" content="Shanios Blog">
+  <meta property="og:type"      id="og-type"      content="article">
+  <meta property="og:title"     id="og-title"     content="Use Shanios Tools on Any Arch-Based Distro">
+  <meta property="og:description" id="og-desc"    content="Shanios builds tools that are useful beyond its own filesystem layout. gen-efi generates Secure Boot UKIs for any Arch system. shani-health …">
+  <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/shani-repo-on-other-distros/">
+  <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/shani-repo-on-other-distros.webp">
+  <meta property="og:image:alt" id="og-image-alt" content="Use Shanios Tools on Any Arch-Based Distro">
+  <meta property="og:locale"    content="en_US">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-08-24T18:30:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-08-24T18:30:00.000Z">
+  <meta property="article:author"         id="og-article-author"  content="Shrinivas Kumbhar">
+  <meta property="article:section"        id="og-article-section" content="Guide">
+  
+
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
+  <meta name="twitter:title"       id="tw-title" content="Use Shanios Tools on Any Arch-Based Distro">
+  <meta name="twitter:description" id="tw-desc"  content="Shanios builds tools that are useful beyond its own filesystem layout. gen-efi generates Secure Boot UKIs for any Arch system. shani-health …">
+  <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/shani-repo-on-other-distros.webp">
+
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Use Shanios Tools on Any Arch-Based Distro","description":"Shanios builds tools that are useful beyond its own filesystem layout. gen-efi generates Secure Boot UKIs for any Arch system. shani-health …","url":"https://blog.shani.dev/post/shani-repo-on-other-distros/","datePublished":"2026-08-24T18:30:00.000Z","dateModified":"2026-08-24T18:30:00.000Z","author":{"@type":"Person","name":"Shrinivas Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-repo-on-other-distros.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
+  <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
+
+  <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <!-- ═══ FAVICON — src overwritten by applyBranding() ═════════════════════ -->
+  <link rel="icon" id="favicon" type="image/svg+xml" href="https://shani.dev/assets/images/logo.svg">
+
+  <!-- ═══ PWA / Web App ════════════════════════════════════════════════════ -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" id="pwa-theme-color" content="#161514">
+
+  <!-- ═══ GitHub Pages SPA: restore real URL from 404.html redirect ════════ -->
+  <script>
+    (function () {
+      var qs = new URLSearchParams(location.search);
+      var p  = qs.get('p');
+      if (!p) return;
+      qs.delete('p');
+      var q = qs.get('q') || ''; qs.delete('q');
+      var h = qs.get('h') || ''; qs.delete('h');
+      var url = decodeURIComponent(p);
+      // Rewrite /posts/slug or /posts/slug.md or /posts/slug/ → /post/slug
+      var postsMatch = url.match(/^\/posts\/(.+?)(?:\.md)?\/?(\?.*)?$/);
+      if (postsMatch) url = '/post/' + postsMatch[1];
+      if (q) url += '?' + decodeURIComponent(q);
+      if (h) url += '#' + decodeURIComponent(h);
+      history.replaceState(null, '', url);
+    })();
+  </script>
+
+  <!-- ═══ Theme — applied before CSS to prevent flash ══════════════════════ -->
+  <script>
+    (function () {
+      // PREFIX is read from CONFIG if available; falls back to 'blogs' for the
+      // very first paint (CONFIG loads after this inline script).
+      try {
+        var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
+        var t = localStorage.getItem(pfx + '_theme') ||
+                (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+
+  <!-- ═══ STYLES ═══════════════════════════════════════════════════════════ -->
+  <link rel="stylesheet" href="/brand-shani.css">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Prism.js — code syntax highlighting -->
+  <link rel="stylesheet" id="prism-theme"
+        href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+  <!-- KaTeX — math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" defer></script>
+
+  <!-- Markdown Parser & Sanitizer -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script>
+
+  <!-- Prism.js Core + Languages -->
+  <!-- All non-critical CDN libs are now `defer`red (were previously blocking
+       HTML parsing) — same pattern already used on docs.shani.dev. `defer`
+       scripts execute in source order right before DOMContentLoaded, so
+       load order relative to each other and to config-shani.js/script.js
+       (also at end of body) is preserved. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hcl.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-nginx.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js" defer></script>
+  <!-- Java / Spring Boot / Kotlin / Groovy / XML / Properties -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-groovy.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-gradle.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-properties.min.js" defer></script>
+</head>
+<body>
+  <noscript>
+    <div style="text-align:center;padding:4rem 2rem;font-family:sans-serif">
+      <strong>JavaScript is required to view this blog.</strong>
+    </div>
+  </noscript>
+
+  <!-- Full-page loading overlay — hidden by JS once posts are ready -->
+  <div id="page-loader" aria-hidden="true">
+    <div class="loader__logo">
+      <img id="loader-logo-img" src="" alt="Blog">
+      <span class="logo__sub"></span>
+    </div>
+    <div class="loader__track"><div class="loader__bar"></div></div>
+    <p class="loader__text">Loading posts…</p>
+  </div>
+
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- ═══ HEADER ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div class="auspicious-bar">
+      <a href="#" class="auspicious-text" id="auspicious-link" aria-label="Visit site"></a>
+    </div>
+
+    <div class="header__inner container">
+      <a href="/" class="logo logo--img" id="logo-link" aria-label="Blog home">
+        <img src="" alt="Blog" class="logo__img" height="28" id="logo-img">
+        <span class="logo__sub">blog</span>
+      </a>
+
+      <!-- Desktop nav — items injected by applyBranding() -->
+      <nav class="nav" id="desktop-nav" aria-label="Primary"></nav>
+
+      <div class="header__actions">
+        <button class="btn-icon" id="search-toggle" aria-label="Search (Ctrl+K)">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        <button class="btn-icon" id="theme-btn" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
+        <button class="btn-icon" id="shortcuts-hint" aria-label="Keyboard shortcuts (?)" title="Keyboard shortcuts (?)">
+          <i class="fa-solid fa-keyboard"></i>
+        </button>
+        <button class="btn-icon menu-btn" id="menu-toggle"
+                aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile nav — items injected by applyBranding() -->
+    <nav class="mobile-nav container" id="mobile-nav" aria-hidden="true"></nav>
+  </header>
+
+  <!-- ═══ SEARCH BAR ═══════════════════════════════════════════════════════ -->
+  <div class="search-bar" id="search-bar" aria-hidden="true" role="search">
+    <div class="search-bar__inner container">
+      <i class="fa-solid fa-magnifying-glass search-bar__icon" aria-hidden="true"></i>
+      <input type="search" class="search" id="search-input"
+             placeholder="Search posts…" aria-label="Search posts" autocomplete="off">
+      <button class="btn-icon search-bar__close" id="search-close" aria-label="Close search">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+  <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+  <div id="reading-bar" role="progressbar" aria-label="Reading progress" aria-hidden="true"></div>
+  <main id="main-content">
+    <!-- INDEX VIEW -->
+    <section id="view-index" style="display:none">
+      <header class="hero container">
+        <div class="hero__grid">
+          <!-- Populated by Renderer.renderHero() -->
+        </div>
+      </header>
+
+      <section class="posts container">
+        <div class="section-header">
+          <h2 class="section-header__title" id="section-title">Latest Posts</h2>
+          <div class="section-header__line"></div>
+        </div>
+        <div class="filters__bar" id="tag-bar" role="toolbar" aria-label="Filter by tag"></div>
+        <div class="grid" id="posts-grid" role="list"></div>
+      </section>
+    </section>
+
+    <!-- POST VIEW -->
+    <section id="view-post" class="container" aria-label="Post">
+      <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Use Shanios Tools on Any Arch-Based Distro</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Kumbhar · 2026-08-25 · 4 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Shanios builds tools that are useful beyond its own filesystem layout. <code>gen-efi</code> generates Secure Boot UKIs for any Arch system. <code>shani-health</code> audits any running machine. <code>shani-tools</code> manages Btrfs snapshots and deduplication. These packages live in the <code>[shani]</code> pacman repository — and any Arch-based distro can use them.</p>
+<hr>
+<h2 id="adding-the-repository">Adding the Repository</h2>
+<p>Edit <code>/etc/pacman.conf</code> and add:</p>
+<pre><code class="language-ini">[shani]
+Server = https://repo.shani.dev/$arch</code></pre>
+<h2 id="trusting-the-key">Trusting the Key</h2>
+<p>Packages are signed with the Shanios GPG key. Import and trust it:</p>
+<pre><code class="language-bash">sudo pacman-key --recv-key 7B927BFFD4A9EAAA8B666B77DE217F3DA8014792 --keyserver keys.openpgp.org
+sudo pacman-key --lsign-key 7B927BFFD4A9EAAA8B666B77DE217F3DA8014792</code></pre>
+<h2 id="installing">Installing</h2>
+<pre><code class="language-bash">sudo pacman -S shani-keyring   # required first — provides trust chain
+sudo pacman -S gen-efi          # Secure Boot UKI generation
+sudo pacman -S shani-health     # system diagnostics
+sudo pacman -S shani-tools      # maintenance utilities</code></pre>
+<hr>
+<h2 id="what-each-package-does">What Each Package Does</h2>
+<h3 id="gen-efi"><code>gen-efi</code></h3>
+<p>Generates Unified Kernel Images (UKIs) for UEFI Secure Boot. Works on any Arch-based system with a Btrfs root:</p>
+<pre><code class="language-bash">sudo gen-efi configure    # auto-detect and configure Secure Boot
+sudo gen-efi enroll-mok   # enroll Machine Owner Key</code></pre>
+<p>If your system uses dracut and systemd-boot, <code>gen-efi</code> replaces the manual <code>objcopy</code> + <code>sb-sign</code> workflow with a single command.</p>
+<h3 id="shani-health"><code>shani-health</code></h3>
+<p>Read-only system diagnostics — no side effects, no configuration changes:</p>
+<pre><code class="language-bash">shani-health              # full report
+shani-health --security   # security audit only
+shani-health --boot       # boot chain analysis
+shani-health --verify     # deep integrity check
+shani-health --json       # machine-readable output</code></pre>
+<p>Covers boot slots, Btrfs health, filesystem integrity, firewall status, failed services, kernel logs, and more.</p>
+<h3 id="shani-tools"><code>shani-tools</code></h3>
+<p>System maintenance utilities:</p>
+<ul>
+<li>Btrfs snapshot management</li>
+<li>Transparent deduplication via <code>duperemove</code></li>
+<li>Disk usage analysis</li>
+<li>Snapshot cleanup and rotation</li>
+</ul>
+<h3 id="shani-keyring"><code>shani-keyring</code></h3>
+<p>The signing trust root — required to install any other <code>[shani]</code> package. Ships the GPG key, trust level, and revocation files to <code>/usr/share/pacman/keyrings/</code>.</p>
+<hr>
+<h2 id="what-will-not-work">What Will NOT Work</h2>
+<p>Packages like <code>shani-deploy</code> and <code>shani-core</code> depend on the Shanios filesystem layout (Btrfs blue-green slots, <code>/usr/abin</code> safety wrappers, specific systemd units). They will install on a standard Arch system but will not function correctly.</p>
+<p>The packages that work on any Arch-based distro are: <code>gen-efi</code>, <code>shani-health</code>, <code>shani-tools</code>, <code>shani-keyring</code>, and <code>shim-signed</code>.</p>
+<hr>
+<h2 id="repository-details">Repository Details</h2>
+<ul>
+<li><strong>URL:</strong> <code>https://repo.shani.dev/$arch</code></li>
+<li><strong>Signing:</strong> GPG key <code>7B927BFFD4A9EAAA8B666B77DE217F3DA8014792</code></li>
+<li><strong>Channels:</strong> <code>latest</code> (rolling) and <code>stable</code> (pinned)</li>
+<li><strong>Source:</strong> <a href="https://github.com/shani8dev/shani-repo">github.com/shani8dev/shani-repo</a></li>
+</ul>
+<p>See the <a href="https://docs.shani.dev/doc/software/shani-repo">full documentation</a> for repository structure and enterprise integration.</p>
+<hr>
+<h2 id="resources">Resources</h2>
+<ul>
+<li><a href="https://shani.dev/post/shani-health-reference">shani-health Reference</a> — every flag explained</li>
+<li><a href="https://shani.dev/post/gen-efi-and-secure-boot">gen-efi and Secure Boot</a> — complete UKI setup guide</li>
+<li><a href="https://shani.dev/post/shani-os-btrfs-snapshots-and-backup">Btrfs Snapshots and Backup</a> — snapshot strategy guide</li>
+<li><a href="https://docs.shani.dev/doc/security/keyring">Keyring & Signing</a> — trust model documentation</li>
+<li><a href="https://github.com/shani8dev/shani-repo">shani-repo source</a> — repository hosting</li>
+</ul></div>
+      </article>
+    </section>
+
+    <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->
+    <section id="view-membership" class="container" style="display:none" aria-label="Membership">
+      <!-- script.js writes this section's innerHTML from CONFIG on every /membership visit.
+           Razorpay SDK is lazy-loaded by script.js only when this page is visited. -->
+    </section>
+  </main>
+
+  <!-- ═══ FOOTER ══════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="footer__inner container">
+      <span class="footer__brand" id="footer-name">
+        <img src="" alt="Blog" class="logo__img logo__img--footer" height="20" id="footer-logo-img">
+        <span class="logo__sub"></span>
+      </span>
+      <nav class="footer__links" id="footer-links" aria-label="Social links"></nav>
+      <span class="footer__copy">© <span data-current-year></span></span>
+    </div>
+  </footer>
+
+  <!-- Back-to-top -->
+  <button class="to-top" id="back-top" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <!-- ═══ SCRIPTS — config must come first ═════════════════════════════════ -->
+  <script src="/config-shani.js"></script>
+  <script src="/utils.js"></script>
+  <script>
+    // Inject AdSense library if configured — done here so it loads in parallel
+    // with script.js rather than blocking it. The ad unit itself is inserted
+    // mid-post by script.js after the post body is rendered.
+    (function () {
+      var cfg = (typeof CONFIG !== 'undefined') ? CONFIG : {};
+      if (!cfg.ADSENSE_CLIENT) return;
+      if (document.getElementById('adsense-script')) return;
+      var s = document.createElement('script');
+      s.id = 'adsense-script';
+      s.async = true;
+      s.crossOrigin = 'anonymous';
+      s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + cfg.ADSENSE_CLIENT;
+      document.head.appendChild(s);
+    })();
+  </script>
+  <script src="/script.js"></script>
+
+  <!-- ═══ Service worker — offline shell + stale-while-revalidate posts ═══ -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function (e) { console.error('SW failed:', e); });
+    }
+  </script>
+</body>
+</html>

@@ -350,7 +350,11 @@ const Utils = {
 
       return Utils._restoreShortcodes(raw);
     }
-    return text.replace(/\n/g, '<br>');
+    // CDN failure fallback: plain-text safe — escape everything so no
+    // authored HTML/markdown can execute, then preserve line breaks.
+    return text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/\n/g, '<br>');
   },
 
   readTime: body => {

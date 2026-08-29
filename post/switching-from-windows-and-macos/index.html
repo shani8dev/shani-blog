@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev data:; connect-src 'self' https://api.github.com">
+
+  <title>Leaving Windows or macOS for Shanios: The Complete Switcher's Guide — Shanios Blog</title>
+  <meta name="description" id="meta-desc" content="Every week I hear the same two sentences. From Windows users: &quot;I'm done with updates breaking my machine.&quot; From Mac users: &quot;The hardware is …">
+  <meta name="author"      content="Shrinivas Kumbhar">
+  <meta name="robots"      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical"    id="canonical-url" href="https://blog.shani.dev/post/switching-from-windows-and-macos/">
+
+  <meta property="og:site_name" id="og-site-name" content="Shanios Blog">
+  <meta property="og:type"      id="og-type"      content="article">
+  <meta property="og:title"     id="og-title"     content="Leaving Windows or macOS for Shanios: The Complete Switcher's Guide">
+  <meta property="og:description" id="og-desc"    content="Every week I hear the same two sentences. From Windows users: &quot;I'm done with updates breaking my machine.&quot; From Mac users: &quot;The hardware is …">
+  <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/switching-from-windows-and-macos/">
+  <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/switching-from-windows-and-macos.webp">
+  <meta property="og:image:alt" id="og-image-alt" content="Leaving Windows or macOS for Shanios: The Complete Switcher's Guide">
+  <meta property="og:locale"    content="en_US">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-08-24T18:30:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-08-24T18:30:00.000Z">
+  <meta property="article:author"         id="og-article-author"  content="Shrinivas Kumbhar">
+  <meta property="article:section"        id="og-article-section" content="Guide">
+  
+
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
+  <meta name="twitter:title"       id="tw-title" content="Leaving Windows or macOS for Shanios: The Complete Switcher's Guide">
+  <meta name="twitter:description" id="tw-desc"  content="Every week I hear the same two sentences. From Windows users: &quot;I'm done with updates breaking my machine.&quot; From Mac users: &quot;The hardware is …">
+  <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/switching-from-windows-and-macos.webp">
+
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Leaving Windows or macOS for Shanios: The Complete Switcher's Guide","description":"Every week I hear the same two sentences. From Windows users: \"I'm done with updates breaking my machine.\" From Mac users: \"The hardware is …","url":"https://blog.shani.dev/post/switching-from-windows-and-macos/","datePublished":"2026-08-24T18:30:00.000Z","dateModified":"2026-08-24T18:30:00.000Z","author":{"@type":"Person","name":"Shrinivas Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/switching-from-windows-and-macos.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
+  <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
+
+  <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <!-- ═══ FAVICON — src overwritten by applyBranding() ═════════════════════ -->
+  <link rel="icon" id="favicon" type="image/svg+xml" href="https://shani.dev/assets/images/logo.svg">
+
+  <!-- ═══ PWA / Web App ════════════════════════════════════════════════════ -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" id="pwa-theme-color" content="#161514">
+
+  <!-- ═══ GitHub Pages SPA: restore real URL from 404.html redirect ════════ -->
+  <script>
+    (function () {
+      var qs = new URLSearchParams(location.search);
+      var p  = qs.get('p');
+      if (!p) return;
+      qs.delete('p');
+      var q = qs.get('q') || ''; qs.delete('q');
+      var h = qs.get('h') || ''; qs.delete('h');
+      var url = decodeURIComponent(p);
+      // Rewrite /posts/slug or /posts/slug.md or /posts/slug/ → /post/slug
+      var postsMatch = url.match(/^\/posts\/(.+?)(?:\.md)?\/?(\?.*)?$/);
+      if (postsMatch) url = '/post/' + postsMatch[1];
+      if (q) url += '?' + decodeURIComponent(q);
+      if (h) url += '#' + decodeURIComponent(h);
+      history.replaceState(null, '', url);
+    })();
+  </script>
+
+  <!-- ═══ Theme — applied before CSS to prevent flash ══════════════════════ -->
+  <script>
+    (function () {
+      // PREFIX is read from CONFIG if available; falls back to 'blogs' for the
+      // very first paint (CONFIG loads after this inline script).
+      try {
+        var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
+        var t = localStorage.getItem(pfx + '_theme') ||
+                (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+
+  <!-- ═══ STYLES ═══════════════════════════════════════════════════════════ -->
+  <link rel="stylesheet" href="/brand-shani.css">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Prism.js — code syntax highlighting -->
+  <link rel="stylesheet" id="prism-theme"
+        href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+  <!-- KaTeX — math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" defer></script>
+
+  <!-- Markdown Parser & Sanitizer -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script>
+
+  <!-- Prism.js Core + Languages -->
+  <!-- All non-critical CDN libs are now `defer`red (were previously blocking
+       HTML parsing) — same pattern already used on docs.shani.dev. `defer`
+       scripts execute in source order right before DOMContentLoaded, so
+       load order relative to each other and to config-shani.js/script.js
+       (also at end of body) is preserved. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hcl.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-nginx.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js" defer></script>
+  <!-- Java / Spring Boot / Kotlin / Groovy / XML / Properties -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-groovy.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-gradle.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-properties.min.js" defer></script>
+</head>
+<body>
+  <noscript>
+    <div style="text-align:center;padding:4rem 2rem;font-family:sans-serif">
+      <strong>JavaScript is required to view this blog.</strong>
+    </div>
+  </noscript>
+
+  <!-- Full-page loading overlay — hidden by JS once posts are ready -->
+  <div id="page-loader" aria-hidden="true">
+    <div class="loader__logo">
+      <img id="loader-logo-img" src="" alt="Blog">
+      <span class="logo__sub"></span>
+    </div>
+    <div class="loader__track"><div class="loader__bar"></div></div>
+    <p class="loader__text">Loading posts…</p>
+  </div>
+
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- ═══ HEADER ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div class="auspicious-bar">
+      <a href="#" class="auspicious-text" id="auspicious-link" aria-label="Visit site"></a>
+    </div>
+
+    <div class="header__inner container">
+      <a href="/" class="logo logo--img" id="logo-link" aria-label="Blog home">
+        <img src="" alt="Blog" class="logo__img" height="28" id="logo-img">
+        <span class="logo__sub">blog</span>
+      </a>
+
+      <!-- Desktop nav — items injected by applyBranding() -->
+      <nav class="nav" id="desktop-nav" aria-label="Primary"></nav>
+
+      <div class="header__actions">
+        <button class="btn-icon" id="search-toggle" aria-label="Search (Ctrl+K)">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        <button class="btn-icon" id="theme-btn" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
+        <button class="btn-icon" id="shortcuts-hint" aria-label="Keyboard shortcuts (?)" title="Keyboard shortcuts (?)">
+          <i class="fa-solid fa-keyboard"></i>
+        </button>
+        <button class="btn-icon menu-btn" id="menu-toggle"
+                aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile nav — items injected by applyBranding() -->
+    <nav class="mobile-nav container" id="mobile-nav" aria-hidden="true"></nav>
+  </header>
+
+  <!-- ═══ SEARCH BAR ═══════════════════════════════════════════════════════ -->
+  <div class="search-bar" id="search-bar" aria-hidden="true" role="search">
+    <div class="search-bar__inner container">
+      <i class="fa-solid fa-magnifying-glass search-bar__icon" aria-hidden="true"></i>
+      <input type="search" class="search" id="search-input"
+             placeholder="Search posts…" aria-label="Search posts" autocomplete="off">
+      <button class="btn-icon search-bar__close" id="search-close" aria-label="Close search">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+  <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+  <div id="reading-bar" role="progressbar" aria-label="Reading progress" aria-hidden="true"></div>
+  <main id="main-content">
+    <!-- INDEX VIEW -->
+    <section id="view-index" style="display:none">
+      <header class="hero container">
+        <div class="hero__grid">
+          <!-- Populated by Renderer.renderHero() -->
+        </div>
+      </header>
+
+      <section class="posts container">
+        <div class="section-header">
+          <h2 class="section-header__title" id="section-title">Latest Posts</h2>
+          <div class="section-header__line"></div>
+        </div>
+        <div class="filters__bar" id="tag-bar" role="toolbar" aria-label="Filter by tag"></div>
+        <div class="grid" id="posts-grid" role="list"></div>
+      </section>
+    </section>
+
+    <!-- POST VIEW -->
+    <section id="view-post" class="container" aria-label="Post">
+      <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Guide</span>
+        <h1 class="post-title">Leaving Windows or macOS for Shanios: The Complete Switcher's Guide</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Kumbhar · 2026-08-25 · 7 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Every week I hear the same two sentences. From Windows users: "I'm done with updates breaking my machine." From Mac users: "The hardware is fine, but everything else about the ecosystem is a walled garden." Both are really asking the same question — is Linux finally ready to be a daily operating system for someone who does not want to think about their operating system?</p>
+<p>This guide answers that honestly, from the pre-flight checklist through the first week on Shanios. The full reference version lives in the docs; this post is the reasoning behind it.</p>
+<h2 id="the-pre-flight-checklist">The Pre-Flight Checklist</h2>
+<p>The switch itself takes about 30 minutes. What actually goes wrong for people is data left behind on the old machine — encrypted drives, activation limits, passwords trapped in a browser profile. So before you touch a USB stick:</p>
+<ol>
+<li><strong>Copy your files out first.</strong> Documents, photos, videos — onto a USB drive formatted exFAT or NTFS (both fully readable and writable on Shanios) or into cloud storage. This step matters more than anything else in this post.</li>
+<li><strong>Windows only:</strong> turn off BitLocker or decrypt the drive. A wiped BitLocker volume without its recovery key is gone forever.</li>
+<li><strong>macOS only:</strong> disable FileVault beforehand — and know that Time Machine backups cannot be restored directly on any Linux distro. Bring your <em>files</em>, not the backup container. iPhone photos: download them from iCloud.com or copy them onto a drive on the Mac first.</li>
+<li>Sign in to browser sync so bookmarks and passwords follow you automatically.</li>
+<li>Note your IMAP email settings if they live only in your old mail client.</li>
+<li>Deauthorize iTunes/Adobe activations while the old machine still boots.</li>
+</ol>
+<p>Ten minutes of checklist beats weeks of regret.</p>
+<h2 id="what-you-keep-and-what-you-reinstall">What You Keep, and What You Reinstall</h2>
+<p>Your files come with you — any exFAT or NTFS drive mounts read/write on Shanios. Your fonts come with you (copy them into <code>~/.local/share/fonts</code>). Your browser profile follows via sync. Even Outlook PST archives import cleanly into Thunderbird.</p>
+<p>What does not come with you: the installed programs themselves. That sounds like a loss until you see the translation table below — nearly every program people actually use has a free equivalent, and most of them are one click away on Flathub.</p>
+<h2 id="everything-has-an-equivalent">Everything Has an Equivalent</h2>
+<p>Switchers rarely miss the operating system itself — they miss their habits. Here is the full translation table:</p>
+<table><thead><tr><th>Windows / macOS</th><th>Shanios</th></tr></thead><tbody><tr><td>File Explorer / Finder</td><td>Nautilus (GNOME), Dolphin (KDE Plasma), or COSMIC Files</td></tr><tr><td>Microsoft Store / Mac App Store</td><td>Flathub via Warehouse (pre-installed)</td></tr><tr><td>Control Panel / System Settings</td><td>Your edition's Settings app</td></tr><tr><td>Task Manager / Activity Monitor</td><td>Mission Center (pre-installed) or <code>htop</code></td></tr><tr><td>cmd / PowerShell / Terminal.app</td><td>zsh with the Starship prompt, ready out of the box</td></tr><tr><td>Action Centre / Notification Centre</td><td>Desktop notification centre; update prompts via <code>shani-update</code></td></tr><tr><td><code>.exe</code> installers / <code>.dmg</code> images</td><td>Flatpak first, AppImage next, Bottles for Windows apps</td></tr><tr><td>MS Office</td><td>OnlyOffice — already installed — or LibreOffice</td></tr><tr><td>Photoshop / Illustrator</td><td>GIMP/Krita and Inkscape from Flathub</td></tr><tr><td>Time Machine</td><td>restic, borg, or Deja Dup (GNOME edition)</td></tr><tr><td>iCloud Drive</td><td>Nextcloud/self-hosted, or any cloud in the browser</td></tr><tr><td>Keychain</td><td>KeePassXC, or GNOME Keys with Seahorse/Secrets</td></tr></tbody></table>
+<p>Notice what is <em>not</em> in that table: setup work. Vivaldi and OnlyOffice are pre-installed on every edition, so documents and browsing work on first boot. Thunderbird, LibreOffice, GIMP, Krita, Inkscape, KeePassXC, Discord, Spotify — all one click away on Flathub, which comes pre-configured. Nix ships pre-installed for CLI tools, Homebrew is supported if you know it from macOS, and Bottles runs the occasional Windows program that has no equivalent.</p>
+<h2 id="the-onlyoffice-angle">The OnlyOffice Angle</h2>
+<p>The question every Office user asks first: "But my Word files?" Here is the part I enjoy telling people — <strong>OnlyOffice is already installed</strong>. Not "installable", not "supported": pre-installed on every edition — GNOME and KDE Plasma today, with COSMIC to follow — next to the Vivaldi browser which is also already there.</p>
+<p>Your <code>.docx</code>, <code>.xlsx</code>, and <code>.pptx</code> open from the file manager on day one. For most documents the formatting round-trips cleanly; for edge cases, LibreOffice is one click away on Flathub. The two-week "can I do my actual work?" anxiety usually ends during the first hour.</p>
+<p>Indian-language users get something neither Windows nor macOS does well: IBus input for Devanagari, Bengali, Gujarati, Gurmukhi, Kannada, Malayalam, Oriya, Tamil, and Telugu is pre-configured at install. Add your layout, start typing — no input-method package hunting, no forum archaeology.</p>
+<h2 id="why-immutable-is-ideal-for-switchers">Why Immutable Is Ideal for Switchers</h2>
+<p>Switchers do not break operating systems on purpose — but traditional Linux hands you enough rope. You paste a command from a forum, add an unofficial repository, install a package that conflicts with another one, and three weeks later the machine will not boot. Every veteran Linux user has done this at least once. Newcomers should never have to learn it.</p>
+<p>Shanios removes that entire failure class by design:</p>
+<ul>
+<li>The OS is a read-only, cryptographically verified image. Nothing you install, delete, or misconfigure can modify it.</li>
+<li>Updates are atomic. They either apply completely or not at all. There is no "update interrupted halfway" state.</li>
+<li>If an update ever misbehaves, <code>sudo shani-deploy -r</code> rolls back to the previous complete system in minutes.</li>
+<li>Worst case, <code>shani-reset</code> restores factory state without touching your files.</li>
+</ul>
+<p>For a switcher this means the scariest part of changing operating systems — "what if I break it?" — simply does not apply. Explore freely. The system cannot hold a grudge.</p>
+<p>This is also why Shanios suits shared and family machines. The person who "just clicks things" cannot degrade the system for everyone else, because there is nothing they can click that reaches the OS image.</p>
+<h2 id="dual-boot-honest-advice">Dual-Boot: Honest Advice</h2>
+<p>Dual-booting is supported via the installer's manual partition step, and it is a reasonable safety net. Two caveats, stated plainly: major Windows updates sometimes rewrite the boot order and put Windows first (fixable, but annoying), and most people who keep Windows "just in case" stop booting it within a month. Secure Boot stays enabled either way — no BIOS gymnastics required.</p>
+<p>If you want the safety net without the second OS, take it in a different form: keep your exFAT backup drive untouched for a month, then wipe it happily.</p>
+<h2 id="the-first-week">The First Week</h2>
+<p>Expect different-but-equivalent rather than better-or-worse. The file manager opens files. Mission Center shows what is eating RAM. Warehouse finds software without a single web search for installers. Within days the new names become muscle memory; within a week the interesting question flips — not "can Shanios do X?" but "why did the old OS make X hard?"</p>
+<p>Set up a real backup in week one — restic or borg for encrypted versioned backups, Deja Dup if you chose the GNOME edition. It is the Time Machine habit, kept.</p>
+<p>When something seems off, run <code>shani-health</code> for a diagnosis. When something breaks... it does not.</p>
+<h2 id="what-switchers-ask">What Switchers Ask</h2>
+<p><strong>"Can I still open my old files?"</strong> Yes — documents, photos, videos, PST archives, fonts. Nothing in your home directory cares which OS wrote it.</p>
+<p><strong>"What about that one Windows program I need?"</strong> Bottles (from Flathub) runs Windows applications in isolated Wine environments. For the rare kernel-dependent exception, use a VM.</p>
+<p><strong>"Do I have to learn the terminal?"</strong> No. Everything in this guide is doable from graphical apps. The terminal is there when you want it, and it is a good one — zsh with Starship, pre-configured.</p>
+<p><strong>"Is gaming viable?"</strong> Yes, and it has its own documented stack rather than a footnote here.</p>
+<p><strong>"What if an update goes wrong?"</strong> <code>sudo shani-deploy -r</code> returns the previous system in minutes. In practice, updates simply do not go wrong — they are atomic and verified.</p>
+<h2 id="resources">Resources</h2>
+<ul>
+<li><a href="https://docs.shani.dev/doc/intro/switching-from-windows">Full switching documentation</a> — checklists, install verification, habit tables</li>
+<li><a href="https://blog.shani.dev/post/migrating-to-shani-os">Migrating to Shani OS</a> — coming from Ubuntu, Fedora, or Arch instead</li>
+<li><a href="https://blog.shani.dev/post/shani-os-first-week">Your First Week with Shani OS</a> — day-by-day setup walkthrough</li>
+<li><a href="https://blog.shani.dev/post/shani-os-faq">Shani OS FAQ</a> — rollback, dual-boot, and hardware questions answered</li>
+</ul>
+<p>The switch is 30 minutes of work and ten minutes of checklist. The hard part was deciding to leave; everything after that is a table lookup.</p>
+<p><a href="https://shani.dev">Download Shanios at shani.dev →</a></p></div>
+      </article>
+    </section>
+
+    <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->
+    <section id="view-membership" class="container" style="display:none" aria-label="Membership">
+      <!-- script.js writes this section's innerHTML from CONFIG on every /membership visit.
+           Razorpay SDK is lazy-loaded by script.js only when this page is visited. -->
+    </section>
+  </main>
+
+  <!-- ═══ FOOTER ══════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="footer__inner container">
+      <span class="footer__brand" id="footer-name">
+        <img src="" alt="Blog" class="logo__img logo__img--footer" height="20" id="footer-logo-img">
+        <span class="logo__sub"></span>
+      </span>
+      <nav class="footer__links" id="footer-links" aria-label="Social links"></nav>
+      <span class="footer__copy">© <span data-current-year></span></span>
+    </div>
+  </footer>
+
+  <!-- Back-to-top -->
+  <button class="to-top" id="back-top" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <!-- ═══ SCRIPTS — config must come first ═════════════════════════════════ -->
+  <script src="/config-shani.js"></script>
+  <script src="/utils.js"></script>
+  <script>
+    // Inject AdSense library if configured — done here so it loads in parallel
+    // with script.js rather than blocking it. The ad unit itself is inserted
+    // mid-post by script.js after the post body is rendered.
+    (function () {
+      var cfg = (typeof CONFIG !== 'undefined') ? CONFIG : {};
+      if (!cfg.ADSENSE_CLIENT) return;
+      if (document.getElementById('adsense-script')) return;
+      var s = document.createElement('script');
+      s.id = 'adsense-script';
+      s.async = true;
+      s.crossOrigin = 'anonymous';
+      s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + cfg.ADSENSE_CLIENT;
+      document.head.appendChild(s);
+    })();
+  </script>
+  <script src="/script.js"></script>
+
+  <!-- ═══ Service worker — offline shell + stale-while-revalidate posts ═══ -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function (e) { console.error('SW failed:', e); });
+    }
+  </script>
+</body>
+</html>

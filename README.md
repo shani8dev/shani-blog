@@ -159,11 +159,32 @@ const CONFIG = {
   // Change if running two blogs on the same origin so they don't share state.
   STORAGE_PREFIX: 'shani',
 
-  // ── Monetization — Lemon Squeezy ──────────────────────────────
-  LEMONSQUEEZY_STORE:   'shani8dev',
-  LEMONSQUEEZY_PRODUCT: '',           // numeric product ID; empty = validate against all products
-  MEMBERSHIP_URL:       'https://shani8dev.lemonsqueezy.com',
-  MEMBERSHIP_PRICE:     '₹199 / year',
+  // ── Membership / Paywall ──────────────────────────────────────
+  // [script] Enables the paywall gate on posts marked paywalled: true.
+  //
+  //   MEMBERSHIP_KEYS_URL — public URL to the data/keys.json file served via
+  //     jsDelivr CDN. Keys are validated client-side: no server, no Worker.
+  //     The GitHub Action (issue-license-key.yml) appends new key hashes on
+  //     purchase. The file contains ONLY SHA-256 digests of license keys —
+  //     never raw keys, never buyer PII.
+  //     Format: 'https://cdn.jsdelivr.net/gh/USER/REPO@main/data/keys.json'
+  //
+  //   RAZORPAY_KEY_ID — your live Razorpay key ID (public, safe to commit).
+  //     Find it in: Razorpay Dashboard → Settings → API Keys.
+  //     Leave empty to hide the Razorpay button (membership page will show a
+  //     "contact us" message instead).
+  //
+  //   RAZORPAY_AMOUNT — amount in paise (₹199 = 19900).
+  //
+  //   MEMBERSHIP_URL — link used in the paywall gate inside posts.
+  //     Should point to /membership so readers stay on-site and hit Razorpay.
+  //
+  //   NOTE: Never put secret API keys in this file — it is a public repo.
+  MEMBERSHIP_KEYS_URL: 'https://cdn.jsdelivr.net/gh/shani8dev/shani-blog@main/data/keys.json',
+  RAZORPAY_KEY_ID:     'rzp_live_XXXXXXXXXXXXXXXX', // ← replace with your live Razorpay key ID
+  RAZORPAY_AMOUNT:     19900,   // paise — 19900 = ₹199
+  MEMBERSHIP_URL:      '/membership',
+  MEMBERSHIP_PRICE:    '₹199 / year',
 
   // ── Paywall copy ──────────────────────────────────────────────
   PAYWALL_HEADING:         'Members only',
@@ -249,6 +270,15 @@ const CONFIG = {
     { path: '/?tag=Linux',       priority: '0.6', changefreq: 'weekly' },
     { path: '/?tag=News',        priority: '0.6', changefreq: 'weekly' },
   ],
+
+  // ── Fuse.js fuzzy search ───────────────────────────────────────
+  // [script] Replaces the built-in indexOf search with Fuse.js fuzzy
+  //          matching — handles typos and partial matches automatically.
+  //          Fuse.js is loaded from jsDelivr (already on your CDN allowlist)
+  //          only when the search bar is first opened, so it costs nothing
+  //          on page load.
+  //          Set false to keep the existing simple search.
+  FUZZY_SEARCH_ENABLED: true,
 };
 ```
 
@@ -289,7 +319,7 @@ Content starts here. Full **Markdown** supported.
 | `readTime`         | No       | Auto-calculated at `WORDS_PER_MINUTE` wpm if omitted |
 | `cover`            | No       | Absolute URL to a cover image — used on the card, as the post banner, and as `og:image` / `twitter:image` |
 | `series`           | No       | Posts with the same `series:` value get a numbered series navigation strip |
-| `paywalled`        | No       | `true` to gate behind a Lemon Squeezy license key |
+| `paywalled`        | No       | `true` to gate behind a Razorpay membership |
 | `featured`         | No       | `true` to pin as the hero featured post |
 | `draft`            | No       | `true` to hide the post from all lists and feeds |
 | `pinned`           | No       | `true` to keep the post at the top of the index |
@@ -336,7 +366,7 @@ The GitHub Actions workflow runs automatically, generates the four output files,
 
 ### Authentication
 
-On first open, a login overlay prompts for a **GitHub Personal Access Token (classic)** with `repo` scope (or a fine-grained PAT with Contents read/write on the repo). The token is stored only in `localStorage` under the `STORAGE_PREFIX` key — it is never sent anywhere except `api.github.com`.
+On first open, a login overlay prompts for a **GitHub Personal Access Token (classic)** with `repo` scope (or a fine-grained PAT with Contents read/write on the repo). The token is stored only in `sessionStorage` under the `STORAGE_PREFIX` key — it is never sent anywhere except `api.github.com`. It is cleared on logout and is not persisted across browser sessions.
 
 ### Features
 
@@ -368,6 +398,7 @@ On first open, a login overlay prompts for a **GitHub Personal Access Token (cla
 
 ```bash
 # Generate posts/manifest.json + sitemap.xml + feed.xml + manifest.json
+#          + llms.txt + llms-full.txt + post/<slug>/index.html stubs
 node generate-manifest.js
 
 # Auto-regenerate on every .md save
@@ -426,27 +457,30 @@ Optional: `POSTS_PAT` — only needed if posts live in a **separate private repo
 | `robots.txt` | Allows all crawlers, disallows `404.html`, points to `https://blog.shani.dev/sitemap.xml` |
 | `sitemap.xml` | Auto-generated; submit to Google Search Console for better deep-link indexing |
 | `feed.xml` | RSS 2.0; auto-generated; latest 50 posts |
+| `llms.txt` | Auto-generated; llmstxt.org index of every post as a titled link for AI crawlers |
+| `llms-full.txt` | Auto-generated; full markdown corpus of every post for AI ingestion |
+| `post/<slug>/index.html` | Auto-generated static stub per post — returns HTTP 200 and prerendered SEO/meta so crawlers index each post URL without executing JS |
 
 ---
 
 ## External services
 
-### Lemon Squeezy — membership paywall
+### Razorpay — membership paywall
 
 Mark any post `paywalled: true`. Non-members see the first `PAYWALL_PREVIEW_BLOCKS` (default: 12) content blocks as a faded preview, then a paywall card with a "Get Access" button and a license key input.
 
-The key is validated directly in the browser against Lemon Squeezy's CORS-enabled API — no server or proxy needed. The raw key is never stored; only its SHA-256 hash (via Web Crypto API) is written to `localStorage`. An integrity check on load clears corrupt state (member flag without a hash) automatically.
+The license key is validated directly in the browser against a public JSON of SHA-256 hashes (`MEMBERSHIP_KEYS_URL`) — no server or proxy needed. The raw key is never stored; only its SHA-256 hash (via Web Crypto API) is written to `localStorage`. An integrity check on load clears corrupt state (member flag without a hash) automatically.
 
 **Setup:**
-1. Create an account at [lemonsqueezy.com](https://lemonsqueezy.com)
-2. Create a **License Key** product (e.g. "Shanios Members Pass") and set your price
-3. Copy the checkout URL into `MEMBERSHIP_URL`
-4. Copy your store slug (e.g. `shani8dev` from `shani8dev.lemonsqueezy.com`) into `LEMONSQUEEZY_STORE`
-5. Optionally copy the numeric product ID into `LEMONSQUEEZY_PRODUCT` (leave empty to accept any product in the store)
+1. Create an account at [razorpay.com](https://razorpay.com)
+2. Get your live **Key ID** from Razorpay Dashboard → Settings → API Keys
+3. Set `RAZORPAY_KEY_ID` and `RAZORPAY_AMOUNT` (in paise, e.g. `19900` for ₹199) in `config-shani.js`
+4. Set `MEMBERSHIP_URL` to `/membership` so readers stay on-site and hit Razorpay checkout
+5. Set `MEMBERSHIP_KEYS_URL` to your public `data/keys.json` (served via jsDelivr CDN). The GitHub Action (`issue-license-key.yml`) appends new key hashes on purchase. The file contains ONLY SHA-256 digests — never raw keys, never buyer PII. A companion workflow, `manage-keys.yml`, lets you revoke, reinstate, or look up a license key from the Actions tab (`workflow_dispatch` with `action` + `license_key` inputs); it edits the same `data/keys.json` and shares `issue-license-key.yml`'s concurrency group so the two never race on the file.
 
-The engine calls:
+The engine loads the Razorpay checkout SDK lazily and opens it on the `/membership` page:
 ```
-POST https://api.lemonsqueezy.com/v1/licenses/validate
+https://checkout.razorpay.com/v1/checkout.js
 ```
 
 > **Security note:** Gated HTML is never sent to the browser for non-members — only the preview blocks are rendered. However, the raw `.md` file is publicly readable at its GitHub Pages URL. Do not use the paywall for genuinely sensitive content.
@@ -673,6 +707,7 @@ Unrecognised tags fall back to `fa-solid fa-file-lines`. Add new tags to `TAG_IC
 - **Config-driven** — edit `config-shani.js` once; `applyBranding()` injects all values into the DOM on every page load: title, meta, OG/Twitter cards, JSON-LD, favicon, logo, top bar, nav links, footer links, RSS discovery link, current year
 - **Metadata-only manifest** — `posts/manifest.json` contains no post bodies; bodies are fetched on demand and cached in memory for the session
 - **Auto sitemap + RSS + PWA manifest** — all four output files rebuilt by the GitHub Action on every post push; also generated locally by `generate-manifest.js`
+- **AI-discoverable + crawlable stubs** — `generate-manifest.js` also writes `llms.txt` (a curated post index) and `llms-full.txt` (the full post corpus) for AI crawlers, plus a static `post/<slug>/index.html` stub per post so GitHub Pages returns HTTP 200 and crawlers see prerendered SEO/meta without running JS
 - **Zero-config local dev** — `python3 -m http.server 8080` works out of the box with directory-listing discovery
 - **Localhost-aware** — GitHub Contents API never called on `localhost` / `127.0.0.1` / LAN IPs
 - **History API routing** — real paths (`/`, `/post/slug`, `/bookmarks`); no hash fragments, no full reloads
@@ -686,6 +721,7 @@ Unrecognised tags fall back to `fa-solid fa-file-lines`. Add new tags to `TAG_IC
 - **Dark / light mode** — system preference default, `localStorage` persistence, Prism theme swap on toggle
 - **Reading progress bar** — 2 px accent line fixed to top of viewport on post pages; reading percentage shown in browser tab title
 - **Ctrl+K / Cmd+K search** — client-side; searches title, excerpt, tag, and already-cached bodies only; no fetches triggered; optional term highlighting via `SEARCH_HIGHLIGHT`; `aria-live` result count
+- **Fuse.js fuzzy search** — when `FUZZY_SEARCH_ENABLED` is `true` (default), the search bar uses [Fuse.js](https://fusejs.io) v7 for typo-tolerant, partial-match ranking across `title`, `excerpt`, `tag`, and `author`. Fuse.js is lazy-loaded from jsDelivr the first time the search bar opens, so it adds nothing to initial page load; if it hasn't loaded yet (or the flag is `false`), search falls back to a simple substring match
 - **Series navigation** — numbered strip on posts sharing a `series:` frontmatter key; sorted by date ascending
 - **Related posts** — "Keep reading" section at the bottom of each post (same tag prioritised, then most recent)
 - **Bookmarks** — bookmark icon on every card; `/bookmarks` page; "Recently Viewed" list; all in `localStorage`
@@ -708,7 +744,7 @@ Unrecognised tags fall back to `fa-solid fa-file-lines`. Add new tags to `TAG_IC
 - **Syntax highlighting** — Prism.js: Bash, YAML, JSON, JS, TS, Python, CSS, Go, HCL, Docker, Nginx, SQL
 - **Author bio card** — initials avatar, name, role, bio, LinkedIn/GitHub/Website links; hidden from print
 - **Like button** — heart toggle per post in `localStorage`
-- **Paywall gate** — faded preview (`PAYWALL_PREVIEW_BLOCKS` blocks); adaptive height (short previews shown in full, tall ones capped at 460 px with fade mask); Lemon Squeezy license key validated browser-side; SHA-256 hash stored only
+- **Paywall gate** — faded preview (`PAYWALL_PREVIEW_BLOCKS` blocks); adaptive height (short previews shown in full, tall ones capped at 460 px with fade mask); Razorpay-backed membership; license key validated browser-side against SHA-256 hash database; hash stored only
 - **Ads** — AdSense mid-post (lazy-loaded) or dismissable house ad fallback; hidden for members
 - **Anchor deep-link toast** — toast notification when navigating to an in-page anchor hash
 - **SEO** — OG, Twitter Card, JSON-LD, canonical URLs, keywords meta — all updated on every navigation
@@ -794,4 +830,4 @@ Prism.js theme (`prism-tomorrow` in dark, `prism` in light) is swapped on every 
 
 **Newsletter is fire-and-forget.** The form POSTs with `mode: 'no-cors'`, so the response is opaque. The success message is always shown after submission. Verify actual deliveries in your newsletter provider's dashboard.
 
-**Admin panel requires a GitHub PAT.** `admin.html` uses the GitHub Contents API and needs a Personal Access Token with `repo` scope (classic) or Contents read/write (fine-grained). The token is stored in `localStorage` — do not use `admin.html` on a shared or public device.
+**Admin panel requires a GitHub PAT.** `admin.html` uses the GitHub Contents API and needs a Personal Access Token with `repo` scope (classic) or Contents read/write (fine-grained). The token is stored in `sessionStorage` — do not use `admin.html` on a shared or public device. It is cleared on logout and is not persisted across browser sessions.

@@ -4,7 +4,7 @@ title: 'Indian Language Support on Shani OS — Devanagari, Tamil, Telugu, and M
 date: '2026-05-03'
 tag: 'Guide'
 excerpt: 'Indian language support on Shani OS is designed in from the start — not bolted on. Devanagari, Tamil, Telugu, Kannada, Malayalam, Gujarati, Punjabi, Bengali, and more: correct font rendering, IBus multilingual input, and Indian-English locale all configured at first boot.'
-cover: ''
+cover: /assets/images/blog/shani-os-indian-language-support.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'

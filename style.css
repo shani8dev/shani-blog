@@ -2193,3 +2193,72 @@ RECENTLY VIEWED LIST (in Bookmarks view)
 }
 /* Give the giscus iframe a min-height while it loads */
 .post-comments .giscus { min-height: 120px; }
+
+/* ── Reading progress bar (parity with docs.shani.dev) ───────────── */
+#reading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: var(--color-accent, #ff7f50);
+  z-index: 10001;
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  #reading-bar { transition: none; }
+}
+
+/* ── Static homepage prerender (no-JS / crawler view) ────────────── */
+.home-hero-static { margin: 0 0 2.5rem; }
+.home-hero-static .post-title { margin-bottom: 0.5rem; }
+.post-list-static {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.25rem;
+}
+.post-list-static li {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  background: var(--color-bg-elev, transparent);
+}
+.post-list-static a {
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 1.05rem;
+}
+.post-list-static a:hover { color: var(--color-accent); }
+.post-list-static small { color: var(--color-text-muted); opacity: .75; }
+.post-list-static p {
+  margin: .35rem 0 0;
+  color: var(--color-text-muted);
+  font-size: .92rem;
+  line-height: 1.5;
+}
+
+
+/* ── Mobile hardening ────────────────────────────────────────────── */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+* { -webkit-tap-highlight-color: transparent; }
+img, video, iframe, svg { max-width: 100%; height: auto; }
+
+@media (max-width: 768px) {
+  /* Prerendered tables have no .table-wrap until hydration — make them
+     self-scrolling so they never blow out the viewport on phones. */
+  .post-body table,
+  .table-wrap table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .post-body td, .post-body th { white-space: normal; }
+  #search-input, input[type="search"] { font-size: 16px; } /* iOS zoom guard */
+}@media (max-width: 480px) {
+  .post-body td, .post-body th { font-size: 0.82rem; }
+}

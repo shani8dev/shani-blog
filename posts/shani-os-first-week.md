@@ -4,7 +4,7 @@ title: 'Your First Week with Shani OS — From Install to Fully Set Up'
 date: '2026-05-12'
 tag: 'Guide'
 excerpt: 'A day-by-day walkthrough for new Shani OS users: getting encryption and updates sorted on day one, then systematically setting up email, cloud sync, printing, dev tools, backups, and daily habits through the first week.'
-cover: ''
+cover: /assets/images/blog/shani-os-first-week.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'

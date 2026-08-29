@@ -2,9 +2,9 @@
 slug: shani-os-software-ecosystem
 title: 'The Shani OS Software Ecosystem — What to Use, When, and Why'
 date: '2026-05-12'
-tag: 'Guide'
+tag: 'Reference'
 excerpt: 'One canonical reference for every software installation option on Shani OS: Flatpak, Snap, AppImage, Nix, Distrobox, Podman, LXC/LXD, systemd-nspawn, Apptainer, Homebrew, and VMs. Includes a decision flowchart, full comparison table, and the subvolume each ecosystem lives in.'
-cover: ''
+cover: /assets/images/blog/shani-os-software-ecosystem.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,7 +13,7 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '8 min'
-series: 'Shani OS Guides'
+series: 'Shani OS Reference'
 ---
 
 Shani OS's root filesystem is read-only. You cannot write to `/usr`, `/bin`, or `/lib` at runtime — the OS is a verified, immutable image. So how do you install software?
@@ -142,7 +142,7 @@ Guide: [Snap on Shani OS](https://blog.shani.dev/post/snap-on-shani-os)
 
 ### AppImage — portable / beta apps
 
-AppImages are self-contained executables. Download, `chmod +x`, run. No installation, no system writes. Gear Lever (pre-installed on both editions) integrates them into your launcher and tracks updates.
+AppImages are self-contained executables. Download, `chmod +x`, run. No installation, no system writes. Gear Lever (pre-installed on every edition) integrates them into your launcher and tracks updates.
 
 ```bash
 chmod +x AppName.AppImage

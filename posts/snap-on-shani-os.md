@@ -2,9 +2,9 @@
 slug: snap-on-shani-os
 title: 'Snap on Shani OS — The Optional App Ecosystem'
 date: '2026-05-01'
-tag: 'Guide'
+tag: 'Ecosystem'
 excerpt: 'Snap is pre-configured on Shani OS with its own @snapd Btrfs subvolume. When to use Snap versus Flatpak, how to install from the Snap Store, and how the two ecosystems coexist.'
-cover: ''
+cover: /assets/images/blog/snap-on-shani-os.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -12,8 +12,8 @@ author_initials: 'SK'
 author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
-readTime: '5 min'
-series: 'Shani OS Guides'
+readTime: '3 min'
+series: 'Shani OS Ecosystem'
 ---
 
 Snap is an optional app ecosystem on Shani OS. It is pre-configured — `snapd.socket` is enabled at boot, the `@snapd` Btrfs subvolume stores all Snap data, and snap packages survive every OS update and rollback untouched.
@@ -96,6 +96,7 @@ snap install node --classic
 Flatpak is the primary recommendation for GUI apps — larger catalogue, more granular sandbox permissions via Flatseal, fully open-source end-to-end. Snap is the configured fallback when an app exists only on the Snap Store. Both coexist without conflict, each in its own Btrfs subvolume.
 
 [The Shani OS Software Ecosystem](https://blog.shani.dev/post/shani-os-software-ecosystem) covers the complete decision guide including Nix, Distrobox, AppImage, Podman, and VMs.
+
 ## Storage Efficiency
 
 Snap packages are stored in `/var/lib/snapd/snaps/` as squashfs images — each version of each snap is a separate file. This means upgrading a snap adds a new version file alongside the old one, which is only removed after a few revisions.

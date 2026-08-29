@@ -2,9 +2,9 @@
 slug: shani-os-updates
 title: 'Updates on Shani OS — shani-update, shani-deploy, and the Full Reference'
 date: '2026-05-12'
-tag: 'Guide'
+tag: 'Reference'
 excerpt: 'The complete guide to Shani OS updates: how shani-update detects and surfaces updates automatically, and the full shani-deploy flag reference for every scenario — update, rollback, dry-run, cleanup, channel management, and automated fleet deployments.'
-cover: ''
+cover: /assets/images/blog/shani-os-updates.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -37,6 +37,9 @@ sudo shani-deploy --set-channel stable   # permanently set update channel
 sudo shani-deploy --set-channel latest
 sudo shani-deploy --skip-self-update     # skip self-update check
 sudo shani-deploy --update-genefi        # pull latest gen-efi for this run
+sudo shani-deploy --verify-existing      # verify current deployment integrity without updating
+sudo shani-deploy --list-backups         # list available rollback backups with timestamps
+sudo shani-deploy --channel-status       # show latest/stable versions available remotely
 ```
 
 ---

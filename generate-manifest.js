@@ -40,7 +40,10 @@ const OUT_PATH     = path.join(POSTS_DIR, 'manifest.json');
 const SITEMAP_PATH = path.join(__dirname, 'sitemap.xml');
 const FEED_PATH    = path.join(__dirname, 'feed.xml');
 const PWA_PATH     = path.join(__dirname, 'manifest.json');
-const POST_DIR     = path.join(__dirname, 'post');          // ← stub output dir
+const POST_DIR     = path.join(__dirname, 'post');
+const ARTICLE_PLACEHOLDER = '<article id="post-article"></article>';
+const HOME_MARKER_START = '<!--PRERENDERED-HOME-START-->';
+const HOME_MARKER_END   = '<!--PRERENDERED-HOME-END-->';          // ← stub output dir
 const CONFIG_PATH  = path.join(__dirname, 'config-shani.js');
 const WATCH_MODE   = process.argv.includes('--watch');
 
@@ -53,8 +56,32 @@ const configRaw = fs.existsSync(CONFIG_PATH)
 
 function getConfig(key, fallback) {
   // Matches:  KEY: 'value'  or  KEY: "value"  or  KEY: `value`
-  const m = configRaw.match(new RegExp(key + ":\\s*['\"`]([^'\"`]+)['\"`]"));
-  return m ? m[1] : fallback;
+  // The closing delimiter must be the SAME character as the opening one,
+  // so a value may contain the other quote types (e.g. "team's OS").
+  // A naive [^'"`]+ would truncate at the first quote of any kind.
+  const esc = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const m = configRaw.match(new RegExp(esc + ":\\s*('([^']*)'|\"([^\"]*)\"|`([^`]*)`)"));
+  if (!m) return fallback;
+  return m[2] !== undefined ? m[2] : (m[3] !== undefined ? m[3] : m[4]);
+}
+
+// ── Service-worker cache busting ─────────────────────────────────
+// Rewrites SHELL_CACHE's version suffix in sw.js with today's build stamp.
+// Idempotent: same-day reruns produce the same name; the activate handler
+// deletes any cache whose name no longer matches.
+function bumpServiceWorkerCache(baseName) {
+  const swPath = path.join(__dirname, 'sw.js');
+  if (!fs.existsSync(swPath)) return;
+  let sw = fs.readFileSync(swPath, 'utf8');
+  const m = sw.match(/^const SHELL_CACHE = '([^-]+)-[^']*';$/m);
+  if (!m) {
+    console.warn('⚠  sw.js SHELL_CACHE format unrecognized — not bumping');
+    return;
+  }
+  const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  sw = sw.replace(/^const SHELL_CACHE = '.*';$/m, `const SHELL_CACHE = '${baseName}-${stamp}';`);
+  fs.writeFileSync(swPath, sw);
+  console.log(`✓ sw.js SHELL_CACHE → ${baseName}-${stamp}`);
 }
 
 function getConfigNum(key, fallback) {
@@ -79,6 +106,7 @@ const OG_IMAGE        = getConfig('OG_IMAGE',        '');
 const TWITTER_HANDLE  = getConfig('TWITTER_HANDLE',  '');
 const PUBLISHER_NAME  = getConfig('PUBLISHER_NAME',  SITE_TITLE);
 const PUBLISHER_LOGO  = getConfig('PUBLISHER_LOGO',  FAVICON_URL);
+const PUBLISHER_URL   = getConfig('PUBLISHER_URL',   BLOG_URL);
 const STORAGE_PREFIX  = getConfig('STORAGE_PREFIX',  'shani');
 const PAYWALL_PREVIEW_BLOCKS = getConfigNum('PAYWALL_PREVIEW_BLOCKS', 12);
 
@@ -102,6 +130,50 @@ function parseSitemapStaticUrls() {
 
 const SITEMAP_STATIC_URLS = parseSitemapStaticUrls();
 
+// ── SOCIAL_LINKS — parsed from the CONFIG array literal ──────────
+// Feeds Organization.sameAs so crawlers/Knowledge Graph can associate
+// this site with its real social profiles, without needing client JS
+// to populate it (see the ld-org fix below).
+function parseSocialLinks() {
+  const m = configRaw.match(/SOCIAL_LINKS\s*:\s*\[([\s\S]*?)\]/);
+  if (!m) return [];
+  const urls = [];
+  const urlRe = /url\s*:\s*['"`]([^'"`]*)['"`]/g;
+  let um;
+  while ((um = urlRe.exec(m[1])) !== null) urls.push(um[1]);
+  return urls;
+}
+
+const SOCIAL_LINKS = parseSocialLinks();
+
+// Static Organization schema — same data script.js builds at runtime for
+// ld-org, but baked in at build time so non-JS crawlers see it too.
+const ORG_JSON = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type':    'Organization',
+  name:       PUBLISHER_NAME,
+  url:        PUBLISHER_URL,
+  logo:       PUBLISHER_LOGO,
+  ...(SOCIAL_LINKS.length ? { sameAs: SOCIAL_LINKS } : {}),
+});
+
+// Static Blog schema for the homepage — mirrors what script.js builds
+// into #ld-blogs at runtime, baked in at build time for non-JS crawlers.
+const BLOG_JSON = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type':    'Blog',
+  name:       SITE_TITLE,
+  url:        `${BLOG_URL}/`,
+  description: SITE_DESC,
+  publisher: {
+    '@type': 'Organization',
+    name:    PUBLISHER_NAME,
+    url:     PUBLISHER_URL,
+    logo:    { '@type': 'ImageObject', url: PUBLISHER_LOGO },
+  },
+  inLanguage: LANG,
+});
+
 // ── Helpers ───────────────────────────────────────────────────────
 function readTime(body) {
   const words = body.trim().split(/\s+/).length;
@@ -109,18 +181,25 @@ function readTime(body) {
 }
 
 function autoExcerpt(body, paywalled) {
-  const src = paywalled
+  let src = paywalled
     ? (body.split(/\n\n+/).find(l => l.trim() && !l.startsWith('#')) || body)
     : body;
+  // Drop a leading H1 that just repeats the post title \u2014 already shown
+  // separately as <title>/og:title, so restating it here wastes the
+  // excerpt's ~140-char budget on a redundant repeat.
+  src = src.replace(/^\s+/, '').replace(/^#\s+.+\n+/, '').replace(/^\s+/, '');
   const plain = src
     .replace(/```[\s\S]*?```/g, '')
-    .replace(/`[^`]+`/g, '')
-    .replace(/!?\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
     .replace(/[*_~]{1,3}([^*_~]+)[*_~]{1,3}/g, '$1')
     .replace(/^#{1,6}\s+/gm, '')
     .replace(/^>\s*/gm, '')
     .replace(/^[-*+]\s+/gm, '')
+    .replace(/^(?:-{3,}|\*{3,}|_{3,})$/gm, '')
     .replace(/\n/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim();
   return plain.substring(0, 140) + (plain.length > 140 ? '\u2026' : '');
 }
@@ -145,46 +224,144 @@ function mdToHtmlFallback(md) {
   const blocks = [];
   let src = String(md || '').replace(/\r\n/g, '\n');
 
-  src = src.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
-    const idx = blocks.push(
-      `<pre><code${lang ? ` class="language-${escXml(lang)}"` : ''}>${escXml(code.replace(/\n$/, ''))}</code></pre>`
-    ) - 1;
-    return `\u0000BLOCK${idx}\u0000`;
-  });
 
   const inline = s => s
     .replace(/`([^`]+)`/g, (_, c) => `<code>${escXml(c)}</code>`)
+    .replace(/!\[([^\]]*)\]\(([^)\s]+)[^)]*\)/g, (_, a, u) => `<img src="${escXml(u)}" alt="${escXml(a)}" loading="lazy">`)
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/~~([^~]+)~~/g, '<del>$1</del>')
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, u) => `<a href="${escXml(u)}">${t}</a>`);
 
   const lines = src.split('\n');
+  const slugifyH = t => t.toLowerCase().replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'-');
+  let inQuoteFence = false, qfLang = '', qfBuf = [];
+  const usedIds = new Set();
+  const uniqId = t => { let id = slugifyH(t) || 'section'; let n = id; let k = 2;
+    while (usedIds.has(n)) n = id + '-' + k++; usedIds.add(n); return n; };
+
+  // Blockquoted fences ("> ```bash … > ```"): convert to a quoted code
+  // block before line processing so the fence scanner sees clean fences.
+  src = src.replace(
+    /^> ```([\w-]*)\n([\s\S]*?)^> ```[ \t]*$/gm,
+    (_, lang, body) => {
+      const lines = body.split('\n').map(l => l.replace(/^> ?/, ''));
+      const esc2 = t => t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return `<blockquote><pre><code${lang ? ` class="language-${lang}"` : ''}>${esc2(lines.join('\n').replace(/\n$/,''))}</code></pre></blockquote>`;
+    });
+  let inFence = false, fenceChar = '`', fenceLen = 0, fenceLang = '', fenceBuf = [];
   const out = [];
   let para = [];
-  let list = null;
+  let list = null; // 'ul' | 'ol'
+  let quote = null; // collected blockquote lines
+  let table = null; // { head:[], rows:[][] }
 
-  const flushPara = () => { if (para.length) { out.push(`<p>${inline(para.join(' ').trim())}</p>`); para = []; } };
-  const flushList = () => { if (list) { out.push(`</${list}>`); list = null; } };
+  const flushPara = () => {
+    if (para.length) { out.push(`<p>${inline(para.join(' ').trim())}</p>`); para = []; }
+  };
+  const flushList = () => {
+    if (list) { out.push(`</${list}>`); list = null; }
+  };
+  const flushQuote = () => {
+    if (quote) { out.push(`<blockquote>${inline(quote.join(' ').trim())}</blockquote>`); quote = null; }
+  };
+  const flushTable = () => {
+    if (!table) return;
+    const cell = c => `<td>${inline(c.trim())}</td>`;
+    let h = '<thead><tr>' + table.head.map(c => `<th>${inline(c.trim())}</th>`).join('') + '</tr></thead>';
+    let b = '';
+    for (const row of table.rows) b += '<tr>' + row.map(cell).join('') + '</tr>';
+    out.push(`<table>${h}<tbody>${b}</tbody></table>`);
+    table = null;
+  };
+  const flushAll = () => { flushPara(); flushList(); flushQuote(); flushTable(); };
 
-  for (const line of lines) {
-    if (/^\u0000BLOCK\d+\u0000$/.test(line.trim())) { flushPara(); flushList(); out.push(line.trim()); continue; }
-    const h = line.match(/^(#{1,6})\s+(.*)$/);
-    if (h) { flushPara(); flushList(); const lvl = h[1].length; out.push(`<h${lvl}>${inline(h[2].trim())}</h${lvl}>`); continue; }
-    const ul = line.match(/^\s*[-*+]\s+(.*)$/);
-    const ol = line.match(/^\s*\d+\.\s+(.*)$/);
-    if (ul || ol) {
-      flushPara();
-      const tag = ul ? 'ul' : 'ol';
-      if (list !== tag) { flushList(); out.push(`<${tag}>`); list = tag; }
-      out.push(`<li>${inline((ul || ol)[1].trim())}</li>`);
+  for (let li = 0; li < lines.length; li++) {
+    const line = lines[li];
+
+    // ── Fenced code (CommonMark-style): a fence OPENER may carry an info
+    // string; a CLOSER is backticks/tildes only, ≥ opener length. Lines
+    // inside a fence are always literal — nested ``` examples can never
+    // desync the parser.
+    {
+      const m = line.match(/^(`{3,}|~{3,})(.*)$/);
+      if (inFence) {
+        if (m && m[1][0] === fenceChar && m[1].length >= fenceLen && !m[2].trim()) {
+          const idx = blocks.push(
+            `<pre><code${fenceLang ? ` class="language-${escXml(fenceLang)}"` : ''}>${escXml(fenceBuf.join('\n'))}</code></pre>`
+          ) - 1;
+          flushAll();
+          out.push(`\u0000BLOCK${idx}\u0000`);
+          inFence = false; fenceBuf = [];
+        } else {
+          fenceBuf.push(line);
+        }
+        continue;
+      }
+      if (m && m[2].trim()) { // opener requires info string (or bare ``` handled below)
+        flushAll();
+        inFence = true; fenceChar = m[1][0]; fenceLen = m[1].length;
+        fenceLang = m[2].trim().split(/\s+/)[0]; fenceBuf = [];
+        continue;
+      }
+      if (m && !m[2].trim()) { // bare fence with no info string: treat as opener too
+        flushAll();
+        inFence = true; fenceChar = m[1][0]; fenceLen = m[1].length;
+        fenceLang = ''; fenceBuf = [];
+        continue;
+      }
+    }
+
+    if (/^\u0000BLOCK\d+\u0000$/.test(line.trim())) { flushAll(); out.push(line.trim()); continue; }
+
+    // GFM table: current line has |, next line is a |---|---| separator
+    if (line.includes('|') && li + 1 < lines.length &&
+        /^\s*\|(\s*:?-+:?\s*\|)+\s*$/.test(lines[li + 1]) &&
+        /\|/.test(lines[li + 1])) {
+      flushAll();
+      const splitRow = r => r.trim().replace(/^\||\|$/g, '').split('|');
+      table = { head: splitRow(line), rows: [] };
+      li++; // skip separator
       continue;
     }
+    if (table && line.includes('|')) { table.rows.push(line.trim().replace(/^\||\|$/g, '').split('|')); continue; }
+    flushTable();
+
+    const h = line.match(/^(#{1,6})\s+(.*)$/);
+    if (h) { flushAll(); const lvl = h[1].length; const ht = inline(h[2].trim()); out.push(`<h${lvl} id="${uniqId(h[2].trim())}">${ht}</h${lvl}>`); continue; }
+
+    // Horizontal rule (standalone --- / *** with blank-ish context)
+    if (/^\s*(-{3,}|\*{3,})\s*$/.test(line)) { flushAll(); out.push('<hr>'); continue; }
+
+    const task = line.match(/^\s*[-*+]\s+\[([ xX])\]\s+(.*)$/);
+    const ul = line.match(/^\s*[-*+]\s+(.*)$/);
+    const ol = line.match(/^\s*\d+\.\s+(.*)$/);
+    if (task || ul || ol) {
+      flushPara(); flushQuote();
+      const tag = ol ? 'ol' : 'ul';
+      if (list !== tag) { flushList(); out.push(`<${tag}>`); list = tag; }
+      if (task) {
+        const checked = task[1].toLowerCase() === 'x';
+        out.push(`<li><input type="checkbox" disabled${checked ? ' checked' : ''}> ${inline(task[2].trim())}</li>`);
+      } else {
+        out.push(`<li>${inline((ul || ol)[1].trim())}</li>`);
+      }
+      continue;
+    }
+
     const bq = line.match(/^\s*>\s?(.*)$/);
-    if (bq) { flushPara(); flushList(); out.push(`<blockquote><p>${inline(bq[1].trim())}</p></blockquote>`); continue; }
+    if (bq) {
+      flushPara(); flushList();
+      if (!quote) quote = [];
+      quote.push(bq[1]);
+      continue;
+    }
+    flushQuote();
+
     if (!line.trim()) { flushPara(); flushList(); continue; }
     para.push(line.trim());
   }
-  flushPara(); flushList();
+  flushAll();
 
   let html = out.join('\n');
   blocks.forEach((b, i) => { html = html.replace(`\u0000BLOCK${i}\u0000`, b); });
@@ -237,7 +414,14 @@ function buildStub(post) {
   const url           = `${BLOG_URL}/post/${post.slug}/`;
   const title         = escHtml(post.title);
   const desc          = escHtml(post.excerpt || SITE_DESC);
-  const image         = escHtml(post.og_image || post.cover || OG_IMAGE);
+  // og:image/twitter:image must be a fully-qualified absolute URL per spec —
+  // most social crawlers won't resolve a root-relative path the way a
+  // browser resolves an <img src>. post.cover/og_image are authored as
+  // root-relative paths (e.g. /assets/images/blog/<slug>.webp), so
+  // absolutize them against BLOG_URL; leave an already-absolute value
+  // (http(s)://...) or the OG_IMAGE fallback untouched.
+  const absolutize    = u => u && !/^https?:\/\//.test(u) ? `${BLOG_URL}${u}` : u;
+  const image         = escHtml(absolutize(post.og_image || post.cover) || OG_IMAGE);
   const authorName    = escHtml(post.author || AUTHOR);
   const datePublished = post.date    ? new Date(post.date    + 'T00:00:00').toISOString() : '';
   const dateModified  = post.updated ? new Date(post.updated + 'T00:00:00').toISOString() : datePublished;
@@ -289,7 +473,9 @@ function buildStub(post) {
     if (!fs.existsSync(indexPath)) {
       throw new Error(`buildStub: index.html not found at ${indexPath}`);
     }
-    buildStub._indexHtml = fs.readFileSync(indexPath, 'utf8');
+    // Strip any prerendered-home block so article stubs never inherit it.
+    buildStub._indexHtml = fs.readFileSync(indexPath, 'utf8')
+      .replace(new RegExp(`${HOME_MARKER_START}[\\s\\S]*?${HOME_MARKER_END}`), ARTICLE_PLACEHOLDER);
   }
 
   // Replace only the <head> SEO block in index.html.
@@ -323,7 +509,7 @@ function buildStub(post) {
   <meta name="twitter:image"       id="tw-image" content="${image}">
 
   <script type="application/ld+json" id="ld-blogs">${ldJson}<\/script>
-  <script type="application/ld+json" id="ld-org">{}<\/script>
+  <script type="application/ld+json" id="ld-org">${ORG_JSON}<\/script>
   <link rel="alternate" type="application/rss+xml" title="${escHtml(SITE_TITLE)} RSS Feed" href="/feed.xml">`;
 
   // Replace the entire existing <head> SEO block (from <title> to the last
@@ -369,7 +555,7 @@ function buildStub(post) {
   // from bothering to index individual post URLs. script.js still
   // fully re-renders #post-article and re-toggles views on load, so
   // this only affects what's visible before/without JS execution.
-  const ARTICLE_PLACEHOLDER = '<article id="post-article"></article>';
+  // (ARTICLE_PLACEHOLDER defined at module scope)
   if (html.includes(ARTICLE_PLACEHOLDER)) {
     html = html.replace(ARTICLE_PLACEHOLDER, `<article id="post-article">${articleHtml}</article>`);
   } else {
@@ -635,6 +821,120 @@ function build() {
   };
   fs.writeFileSync(PWA_PATH, JSON.stringify(pwa, null, 2));
   console.log(`  ✓ Written manifest.json (PWA)`);
+
+// ── Static homepage prerender ────────────────────────────────────
+// The root index.html ships with an empty <article id="post-article">
+// placeholder — a thin shell for crawlers hitting /. Inject a real,
+// crawlable post listing between markers so the homepage is fully
+// static (Google/AI see every title+excerpt without executing JS).
+// The SPA still overwrites this node on load, so interactive users
+// get the identical hydrated experience.
+
+function buildStaticHomeHtml() {
+  const posts = publishedPosts;
+  let html = `
+      <section class="home-hero-static">
+        <h1 class="post-title">${escHtml(SITE_TITLE)}</h1>
+        <p>${escHtml(SITE_DESC)}</p>
+      </section>
+      <h2>All Posts (${posts.length})</h2>
+      <ul class="post-list-static">`;
+  for (const p of posts) {
+    const url = `/post/${p.slug}/`;
+    html += `\n        <li>
+          <a href="${url}"><strong>${escHtml(p.title)}</strong></a><br>
+          <small>${escHtml(p.date || '')}${p.tag ? ' · ' + escHtml(p.tag) : ''}</small>
+          <p>${escHtml((p.excerpt || '').slice(0, 200))}</p>
+        </li>`;
+  }
+  html += '\n      </ul>';
+  return html;
+}
+
+function prerenderHome() {
+  const indexPath = path.join(__dirname, 'index.html');
+  let html = fs.readFileSync(indexPath, 'utf8');
+
+  // Idempotent: restore placeholder from any previous injection first.
+  const prev = new RegExp(`${HOME_MARKER_START}[\\s\\S]*?${HOME_MARKER_END}`);
+  if (prev.test(html)) {
+    html = html.replace(prev, ARTICLE_PLACEHOLDER);
+  }
+  if (html.includes(ARTICLE_PLACEHOLDER)) {
+    html = html.replace(
+      ARTICLE_PLACEHOLDER,
+      `${HOME_MARKER_START}${buildStaticHomeHtml()}${HOME_MARKER_END}`
+    );
+  }
+
+  // Bake in the Blog/Organization JSON-LD statically — these two
+  // <script> tags used to ship as empty `{}` placeholders, only ever
+  // filled in by script.js at runtime, so non-JS crawlers saw nothing.
+  html = html.replace(
+    /<script type="application\/ld\+json" id="ld-blogs">.*?<\/script>/s,
+    `<script type="application/ld+json" id="ld-blogs">${BLOG_JSON}</script>`
+  );
+  html = html.replace(
+    /<script type="application\/ld\+json" id="ld-org">.*?<\/script>/s,
+    `<script type="application/ld+json" id="ld-org">${ORG_JSON}</script>`
+  );
+
+  fs.writeFileSync(indexPath, html);
+  console.log('✓ index.html homepage prerendered (static post listing + JSON-LD)');
+}
+
+// ── llms.txt / llms-full.txt (AI discoverability) ────────────────
+// llmstxt.org convention: a curated markdown index AI crawlers can ingest
+// directly (no JS, no HTML boilerplate), plus a full-corpus variant.
+function generateLlmsFiles() {
+  const summary = 'The official blog for Shanios — the immutable Linux OS with atomic blue-green updates, instant rollback, and zero telemetry. Engineering breakdowns, release notes, guides, and stories from the team building India\'s immutable Linux OS.';
+
+  // Index file: site overview + every post as a titled link.
+  const sections = {};
+  for (const p of publishedPosts) {
+    const tag = p.tag || 'Posts';
+    (sections[tag] = sections[tag] || []).push(p);
+  }
+
+  let idx = `# ${SITE_TITLE}\n\n> ${summary}\n\n`;
+  if (OG_IMAGE) idx += `Primary image: ${OG_IMAGE}\n`;
+  idx += `All posts are also available as full-content HTML at ${BLOG_URL}/post/<slug>/ and in the complete corpus at ${BLOG_URL}/llms-full.txt\n`;
+
+  for (const tag of Object.keys(sections).sort()) {
+    idx += `\n## ${tag}\n\n`;
+    for (const p of sections[tag]) {
+      const url = `${BLOG_URL}/post/${p.slug}/`;
+      idx += `- [${p.title}](${url}): ${(p.excerpt || '').replace(/\n+/g, ' ').trim() || 'Blog post'}\n`;
+    }
+  }
+  fs.writeFileSync(path.join(__dirname, 'llms.txt'), idx);
+
+  // Full corpus: every post's complete markdown body.
+  let full = `# ${SITE_TITLE} — Complete Content\n\n> ${summary}\n`;
+  for (const p of publishedPosts) {
+    const url = `${BLOG_URL}/post/${p.slug}/`;
+    full += `\n---\n\n# ${p.title}\n\nURL: ${url}\nPublished: ${p.date || ''}${p.tag ? ` · Tag: ${p.tag}` : ''}\n\n${(p.body || '').trim()}\n`;
+  }
+  fs.writeFileSync(path.join(__dirname, 'llms-full.txt'), full);
+
+  console.log(`✓ llms.txt (${publishedPosts.length} posts indexed)`);
+  console.log(`✓ llms-full.txt (full corpus: ${Math.round(full.length / 1024)} KB)`);
+}
+
+  // ── Service-worker cache busting ─────────────────────────────────
+  // SHELL_CACHE in sw.js is never bumped by the build, so the cache-first
+  // handler can serve stale script.js/style.css indefinitely after a
+  // deploy. Rewrite its version suffix on every generator run (CI runs
+  // this on each deploy) — the SW activate handler then purges the old
+  // cache and returning browsers get a fresh shell.
+  bumpServiceWorkerCache('shaniblog');
+
+  // ── AI discoverability ───────────────────────────────────────────
+  generateLlmsFiles();
+
+  // ── Static homepage prerender (run last) ────────────────────────
+  prerenderHome();
+
 
   // ── Generate post/<slug>/index.html stubs ────────────────────────
   // Each stub is a real file → GitHub Pages returns HTTP 200 for every

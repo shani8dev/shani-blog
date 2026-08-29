@@ -4,7 +4,7 @@ title: 'Shani OS for Video Creators and Content Creators — Editing, Colour, St
 date: '2026-05-10'
 tag: 'Guide'
 excerpt: 'The complete video production stack on Shani OS — DaVinci Resolve, Kdenlive, OpenShot, OBS Studio for streaming and recording, Audacity and Ardour for audio, GPU-accelerated encoding, and everything a YouTuber, podcaster, or video editor needs from first boot.'
-cover: ''
+cover: /assets/images/blog/shani-os-for-video-creators.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -134,10 +134,11 @@ Enable hardware encoding in HandBrake: Preferences → Video → select H.264 (I
 
 ## Screen Recording and Live Streaming — OBS Studio
 
-OBS Studio is pre-installed on neither edition but is the essential tool for any creator who streams or records:
+OBS Studio is pre-installed on every edition and is the essential tool for any creator who streams or records:
 
 ```bash
-flatpak install flathub com.obsproject.obs-studio
+# Pre-installed — no action needed. If missing, install manually:
+flatpak install flathub com.obsproject.Studio
 ```
 
 OBS on Shani OS supports:
@@ -344,7 +345,7 @@ gphoto2 --stdout --capture-movie | ffmpeg -i - -vcodec rawvideo -pix_fmt yuv420p
 
 ```bash
 # Install yt-dlp via Nix
-nix-env -i yt-dlp
+nix-env -iA nixpkgs.yt-dlp
 
 # Download a video at best quality
 yt-dlp "https://youtube.com/watch?v=..."
@@ -393,13 +394,13 @@ Shani OS's earlyoom out-of-memory manager prevents system freezes during memory-
 |---|---|---|
 | Professional video editing + colour | DaVinci Resolve | Distrobox (Ubuntu container) |
 | Everyday video editing | Kdenlive | `flatpak install flathub org.kde.kdenlive` |
-| Screen recording + streaming | OBS Studio | `flatpak install flathub com.obsproject.obs-studio` |
+| Screen recording + streaming | OBS Studio | `flatpak install flathub com.obsproject.Studio` |
 | Audio editing | Audacity | `flatpak install flathub org.audacityteam.Audacity` |
 | Music / audio post | Ardour | `flatpak install flathub org.ardour.Ardour` |
 | Live audio processing | EasyEffects | `flatpak install flathub com.github.wwmm.easyeffects` |
 | Video transcoding | HandBrake | `flatpak install flathub fr.handbrake.ghb` |
 | Format conversion | FFmpeg (pre-installed) | built-in |
-| Video downloading | yt-dlp | `nix-env -i yt-dlp` |
+| Video downloading | yt-dlp | `nix-env -iA nixpkgs.yt-dlp` |
 | Thumbnail design | GIMP / Inkscape | see Designers guide |
 
 ---

@@ -4,7 +4,7 @@ title: 'Virtual Machines on Shani OS — QEMU/KVM, virt-manager, GPU Passthrough
 date: '2026-04-16'
 tag: 'Guide'
 excerpt: 'How to run fast, hardware-accelerated VMs on Shani OS — setting up KVM with virt-manager, running Windows with VirtIO drivers, GPU passthrough for gaming or ML, and why the @libvirt subvolume keeps your VMs safe across every OS update.'
-cover: ''
+cover: /assets/images/blog/shani-os-virtual-machines.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -17,7 +17,16 @@ readTime: '9 min'
 series: 'Shani OS Guides'
 ---
 
-QEMU/KVM on Shani OS runs VMs with near-native performance. `shani-core` installs a full system libvirt + QEMU stack (`qemu-base`, `libvirt`) on every edition, with `libvirtd`, `virtlogd`, and their sockets enabled from first boot — this is what actually executes and manages VMs. The GUI front-end differs by edition and is delivered via Flatpak: the KDE Plasma edition ships `org.virt_manager.virt-manager` and `org.virt_manager.virt_manager.Extension.Qemu` pre-installed; the GNOME edition ships GNOME Boxes (`org.gnome.Boxes`) pre-installed as a Flatpak. OVMF (UEFI for VMs), VirtIO drivers, Spice, and looking-glass are available via Flatpak on both.
+QEMU/KVM on Shani OS runs VMs with near-native performance. `shani-core` installs a full system libvirt + QEMU stack (`qemu-base`, `libvirt`) on every edition — GNOME, KDE Plasma, and COSMIC alike — with `libvirtd`, `virtlogd`, and their sockets enabled from first boot. This is what actually executes and manages VMs; `virsh` connects to it out of the box (`qemu:///system`). The GUI front-end differs by edition and is delivered via Flatpak: KDE Plasma ships `org.virt_manager.virt-manager` (+ QEMU extension) pre-installed; GNOME ships GNOME Boxes (`org.gnome.Boxes`); COSMIC ships neither — install whichever you prefer via Flatpak. OVMF (UEFI for VMs), VirtIO drivers, Spice, and Looking Glass are all available through Flathub on every edition.
+
+Verify your stack before creating anything:
+
+```bash
+ls -l /dev/kvm                                # firmware virtualisation enabled
+systemctl status libvirtd.socket              # daemon socket active
+groups | grep -E 'kvm|libvirt'                # access groups present
+virsh uri && virsh net-list --all             # hypervisor reachable, default NAT network
+```
 
 VM disk images live in the `@libvirt` and `@qemu` Btrfs subvolumes, which use the `nodatacow` mount option — CoW is disabled for VM disks to avoid write amplification and improve I/O performance. These subvolumes are completely independent of the OS slots; your VMs survive every OS update and rollback untouched.
 
@@ -53,7 +62,7 @@ dmesg | grep -i iommu | head -5
 
 ## Setting Up virt-manager
 
-virt-manager is the GUI frontend for libvirt and QEMU/KVM. On the KDE Plasma edition it is pre-installed as a Flatpak. On the GNOME edition, GNOME Boxes is pre-installed instead — see the GNOME Boxes section below. To install virt-manager on the GNOME edition:
+virt-manager is the GUI frontend for libvirt and QEMU/KVM. On the KDE Plasma edition it is pre-installed as a Flatpak. On the GNOME edition, GNOME Boxes is pre-installed instead — see the GNOME Boxes section below. On COSMIC, install whichever manager you prefer. To install virt-manager on GNOME or COSMIC:
 
 ```bash
 flatpak install flathub org.virt_manager.virt-manager
@@ -74,7 +83,7 @@ GNOME Boxes is pre-installed on the GNOME edition as a Flatpak (`org.gnome.Boxes
 
 To create a VM in GNOME Boxes: open Boxes → click **+** → **Create a Virtual Machine** → select your ISO. Boxes configures sensible defaults automatically.
 
-For advanced VM configuration (CPU pinning, GPU passthrough, custom XML), use virt-manager instead — install it via Flatpak:
+For advanced VM configuration (CPU pinning, GPU passthrough, custom XML), use virt-manager instead — install it via Flatpak (GNOME and COSMIC editions):
 
 ```bash
 flatpak install flathub org.virt_manager.virt-manager
@@ -217,10 +226,10 @@ softdep nvidia pre: vfio-pci
 softdep amdgpu pre: vfio-pci
 ```
 
-Add `vfio_pci vfio vfio_iommu_type1` to your initramfs modules and regenerate:
+Add `vfio_pci vfio vfio_iommu_type1` to your initramfs modules config, then regenerate the UKI for the running slot:
 
 ```bash
-sudo gen-efi generate --slot $(cat /data/current-slot)
+sudo gen-efi configure $(cat /data/current-slot)
 ```
 
 After reboot:
@@ -280,7 +289,11 @@ VM disk images are qcow2 files stored in the `@libvirt` subvolume. To back one u
 rsync -avz /var/lib/libvirt/images/vmname.qcow2 /path/to/backup/
 ```
 
-Note: `qemu-img` is bundled inside the virt-manager Flatpak and is not on your system PATH. For image conversion or compression, use the Btrfs snapshot approach below — it is faster, space-efficient, and covers all VMs at once.
+Note: `qemu-img` ships with `qemu-base` on every Shanios install, so image conversion and compression work directly from the terminal:
+
+```bash
+qemu-img convert -O qcow2 vmname.qcow2 vmname-compressed.qcow2 -c
+```
 
 Btrfs snapshots of the `@libvirt` subvolume provide instant, space-efficient backups of all VMs at once:
 
@@ -293,7 +306,7 @@ sudo btrfs subvolume snapshot /var/lib/libvirt /snapshots/libvirt-$(date +%Y%m%d
 
 ## Networking VMs
 
-virt-manager's Flatpak uses QEMU's user-mode networking (slirp) by default — VMs can access the internet and the host can reach the VM via its local IP, but the VM is not directly visible on your LAN.
+The system libvirt daemon (`libvirtd`, socket-activated from first boot) provides a default NAT network: VMs reach the internet through the host, and the host reaches guests by IP, but guests are not directly visible to other machines on your LAN.
 
 To find the VM's IP address, check inside the guest:
 
@@ -304,7 +317,7 @@ ip addr show
 
 For a Windows VM, check Settings → Network or run `ipconfig` in cmd.
 
-For VMs that need to be accessible from other machines on your LAN, a macvtap interface is the practical option without a system libvirt installation. In virt-manager → VM details → NIC → change Source to **macvtap** and mode to **Bridge**.
+For VMs that must be reachable from your LAN, switch the NIC source to a **macvtap** interface in bridge mode: virt-manager → VM details → NIC → Source device: **macvtap**, mode: **Bridge**. Note macvtap prevents host↔guest communication over that interface — keep the default NAT NIC as well if you still need host access.
 
 Full networking guide: [Networking on Shani OS](https://blog.shani.dev/post/shani-os-networking-guide).
 

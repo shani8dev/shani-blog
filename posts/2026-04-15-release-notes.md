@@ -1,12 +1,12 @@
 ---
-slug: shani-os-2026-04-15-release
+slug: 2026-04-15-release-notes
 title: 'Shani OS 2026.04.15 — Release Notes'
 excerpt: 'The April 2026 stable release: fixed UEFI installer, improved shani-deploy reliability, refreshed GNOME 50 and KDE Plasma 6 ISOs, and a full package manifest.'
 date: 2026-04-15
-tag: Release
+tag: 'Release'
 readTime: 8 min
-cover: /assets/images/shani-os-2026.04.15.png
-series: Shani OS Releases
+cover: /assets/images/blog/2026-04-15-release-notes.webp
+series: 'Shani OS Releases'
 author: Shrinivas Vishnu Kumbhar
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS — focused on performance, simplicity, and open infrastructure.'
@@ -17,9 +17,12 @@ author_website: 'https://shani.dev'
 featured: true
 draft: false
 pinned: true
-updated: 2026-04-15
+updated: 2026-08-24
 keywords: 'shani os, immutable linux, arch linux, gnome 50, kde plasma 6, release notes, shani-deploy, btrfs, atomic update, uki'
 ---
+
+> **Note:** A newer release (2026.05.18) is available from [shani.dev/download](https://shani.dev/#download). This post documents the 2026.04.15 release.
+
 
 Shani OS **2026.04.15** is now available — two refreshed ISO images, a fixed UEFI installer, and significantly improved `shani-deploy` reliability across interrupted downloads and edge-case boot sequences.
 
@@ -27,7 +30,7 @@ Shani OS **2026.04.15** is now available — two refreshed ISO images, a fixed U
 > 🧱 **Base:** Arch Linux (rolling) with a read-only root filesystem
 > 🔁 **Update model:** Atomic blue/green updates via `shani-deploy`
 
-New to Shani OS? Start with [Why Your OS Update Should Never Break Your Computer](/post/why-your-os-update-should-never-break-your-computer) for context on the design philosophy, then [The Architecture Behind Shani OS](/post/shani-os-architecture-deep-dive) for the technical detail. For everyday usage and use-case guidance, see [Shani OS for Everyone](/post/shani-os-for-everyone). Full documentation lives at [docs.shani.dev](https://docs.shani.dev).
+New to Shani OS? Start with [Why Your OS Update Should Never Break Your Computer](/post/why-os-updates-should-never-break) for context on the design philosophy, then [The Architecture Behind Shani OS](/post/shani-os-architecture-deep-dive) for the technical detail. For everyday usage and use-case guidance, see [Shani OS for Everyone](/post/shani-os-for-everyone). Full documentation lives at [docs.shani.dev](https://docs.shani.dev).
 
 ---
 
@@ -123,11 +126,32 @@ Shani OS uses a multi-runtime model. Applications run entirely outside the base 
 
 | Package | Version | Role |
 |---|---|---|
-| shani-core | `1.2-13` | Core system integration layer |
-| shani-deploy | `0.0.1-54` | Atomic update and rollback tool |
-| shani-settings | `0.0.5-37` | System configuration helpers |
+| shani-core | `1.2-13` | Core system integration layer (systemd units, group management, base paths) |
+| shani-deploy | `0.0.1-54` | Atomic update and rollback tool with GUI/CLI interface |
+| shani-settings | `0.0.5-37` | Default system configuration (/etc and /usr overlays) |
 | shani-desktop-gnome | `1.2-23` | GNOME edition metapackage |
 | shani-desktop-plasma | `1.0-25` | KDE Plasma edition metapackage |
+| shani-desktop-cosmic | `1.0-1` | COSMIC edition metapackage |
+| shani-keyring | `1.0-5` | pacman signing trust root (GPG key + trust/revocation files) |
+| shani-network | `1.0-12` | NetworkManager, firewalld, fail2ban, VPN stack |
+| shani-tools | `1.1-8` | System maintenance and management utilities |
+| shani-tools-network | `1.0-3` | Headless networking tools (systemd-networkd, cloud-init) |
+| shani-tools-extra | `1.0-2` | Additional system utilities |
+| shani-multimedia | `1.0-6` | Audio/video codecs, GStreamer plugins, PipeWire extras |
+| shani-video | `1.0-4` | Video production packages (OBS, Kdenlive, DaVinci Resolve deps) |
+| shani-video-guest | `1.0-1` | Minimal video playback for VMs and containers |
+| shani-fonts | `1.0-3` | Font configuration and Indian language support |
+| shani-accessibility | `1.0-2` | Orca, espeakup, brltty, IBus input methods |
+| shani-bluetooth | `1.0-4` | BlueZ stack, CUPS printing over Bluetooth |
+| shani-peripherals | `1.0-2` | Input devices, webcam, printer/scanner group management |
+| shani-printer | `1.0-5` | CUPS, printer drivers (HP, Canon, Brother), driverless printing |
+| shani-scanner | `1.0-2` | SANE scanning with sane-airscan |
+| shani-storage | `1.0-3` | Btrfs tools, NFS, Samba, SSHFS |
+| shani-health | `0.0.1-20` | System health, security, and diagnostics reporter |
+| shani-reset | `0.0.1-8` | Factory reset and clean reinstall tool |
+| shani-builder | `1.0-2` | Docker build environment for image/ISO creation |
+| os-installer | `1.0-1` | Graphical installer (libadwaita-based) |
+| os-installer-config | `1.0-1` | Installer configuration and default settings |
 
 ---
 
@@ -137,11 +161,11 @@ Shani OS uses a multi-runtime model. Applications run entirely outside the base 
 
 The GNOME edition ships with a focused set of apps covering everyday computing needs:
 
-**Productivity & Utilities:** Vivaldi Browser, OnlyOffice Desktop Editors, GNOME Text Editor, GNOME Calculator, GNOME Calendar, GNOME Clocks, GNOME Maps, GNOME Contacts, GNOME Notes (Gnote), Papers (PDF viewer), Loupe (image viewer), Snapshot (camera), Simple Scan, Sound Recorder, Font Viewer, Characters, Weather
+**Productivity & Utilities:** Vivaldi Browser, OnlyOffice Desktop Editors, GNOME Text Editor, GNOME Calculator, GNOME Calendar, GNOME Clocks, GNOME Maps, GNOME Contacts, Gnote, Papers (PDF viewer), Loupe (image viewer), Snapshot (camera), Simple Scan, Sound Recorder, Font Viewer, Characters, Weather
 
 **Media:** Decibels (audio player), Showtime (video player)
 
-**System Tools:** Warehouse (Flatpak manager), Flatseal (Flatpak permissions), Pods (Podman GUI), BoxBuddy (Distrobox GUI), Gear Lever (AppImage manager), Impression (USB writer), Extension Manager, Seahorse (key manager), Secrets (password manager), GNOME Boxes (VM management), gSmartControl (disk health)
+**System Tools:** Warehouse (Flatpak manager), Flatseal (Flatpak permissions), Pods (Podman GUI), BoxBuddy (Distrobox GUI), Gear Lever (AppImage manager), Impression (USB writer), Extension Manager, Seahorse (key manager), Secrets (password manager), GNOME Boxes (VM management)
 
 **Connectivity:** GNOME Connections (remote desktop client), Network Displays, Meld (diff tool)
 
@@ -197,8 +221,8 @@ Update flow: download to inactive slot → verify checksum + signature → snaps
 
 ## Download
 
-- **GNOME Edition** (~5.4 GB): [Download from SourceForge](https://sourceforge.net/projects/shanios/files/gnome/20260401/signed_shanios-gnome-2026.04.15-x86_64.iso/download)
-- **KDE Plasma Edition** (~7.6 GB): [Download from SourceForge](https://sourceforge.net/projects/shanios/files/plasma/20260401/signed_shanios-plasma-2026.04.15-x86_64.iso/download)
+- **GNOME Edition** (~5.4 GB): [Download ISO (2026.05.18)](https://downloads.shani.dev/gnome/20260518/signed_shanios-gnome-2026.05.18-x86_64.iso)
+- **KDE Plasma Edition** (~7.6 GB): [Download ISO (2026.05.18)](https://downloads.shani.dev/plasma/20260518/signed_shanios-plasma-2026.05.18-x86_64.iso)
 
 Or visit [shani.dev](https://shani.dev) for links, torrent files, and verification instructions.
 

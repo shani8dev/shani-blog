@@ -2,9 +2,9 @@
 slug: shani-os-gaming-deep-dive
 title: 'Gaming on Shani OS — The Full Stack, Explained'
 date: '2026-04-16'
-tag: 'Gaming'
+tag: 'Guide'
 excerpt: 'Everything pre-installed on the KDE Plasma edition and why it matters: Steam + Proton, MangoHud, GameScope, Ananicy, kernel tuning, NVIDIA setup, peripheral support, and why immutability makes Shani OS the most reliable gaming OS on Linux.'
-cover: ''
+cover: /assets/images/blog/shani-os-gaming-deep-dive.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,7 +13,7 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '10 min'
-series: 'Shani OS Deep Dives'
+series: 'Shani OS Guides'
 ---
 
 The KDE Plasma edition of Shani OS ships a complete, pre-configured gaming stack. Not a collection of packages you need to configure — a stack that works at first boot, tuned for low-latency gaming, with every major launcher ready, NVIDIA drivers configured, and peripherals detected automatically.

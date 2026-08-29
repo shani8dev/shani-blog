@@ -4,7 +4,7 @@ title: 'Shani OS as a Home Server — Self-Host Everything, No Public IP Require
 date: '2026-04-22'
 tag: 'Guide'
 excerpt: 'Turn any PC, mini PC, or old laptop into a home server that replaces your cloud subscriptions. Media streaming, AI models, file sync, home automation, password management, and a full education platform — all accessible from anywhere, with no public IP and no port forwarding.'
-cover: ''
+cover: /assets/images/blog/shani-os-home-server.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud infrastructure engineer, DevOps practitioner, and the creator of Shani OS — an immutable, atomic Linux built for reliability and self-sovereignty.'
@@ -12,7 +12,7 @@ author_initials: 'SK'
 author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
-readTime: '16 min'
+readTime: '18 min'
 series: 'Shani OS Guides'
 ---
 
@@ -144,7 +144,7 @@ podman run -d \
   fosrl/newt:latest
 ```
 
-Full setup: [docs.shani.dev — VPN & Tunnels](https://docs.shani.dev/doc/servers/vpn-tunnels#pangolin).
+Full setup: [docs.shani.dev — VPN & Tunnels](https://docs.shani.dev/doc/networking/pangolin).
 
 ---
 
@@ -211,7 +211,7 @@ The categories below cover the most common use cases. Each links to a wiki page 
 
 **Jellyfin** streams your entire media library to phones, TVs, tablets, and laptops — hardware transcoding, multi-user support, and native apps on every platform. **Immich** handles photos: automatic mobile backup, AI face and object tagging, shared albums, and a Google Photos-rivalling timeline. The **\*Arr stack** (Radarr, Sonarr, Prowlarr, Lidarr) automates acquisition — request a title, it finds, downloads, renames, and drops it into Jellyfin without you lifting a finger. **Navidrome** covers music streaming, **Audiobookshelf** covers audiobooks and podcasts, **Kavita** and **Komga** cover ebooks and manga. **Tdarr** handles automated video transcoding to optimise storage.
 
-### Productivity & Files — [wiki](https://docs.shani.dev/doc/servers/productivity)
+### Productivity & Files — [wiki](https://docs.shani.dev/doc/servers/productivity/file-sync)
 
 **Nextcloud** replaces Dropbox, Google Drive, Google Calendar, and Google Contacts in one deployment — file sync, calendar, contacts, and collaborative document editing via Collabora or OnlyOffice. **Syncthing** is the lighter alternative: pure peer-to-peer sync with no central server. **Paperless-ngx** OCRs, indexes, and tags every document you feed it so you can full-text search every receipt and contract you have ever scanned. Beyond files: **Outline** for team wikis, **BookStack** for structured documentation, **Planka** and **Vikunja** for task management, **Ghost** or **WordPress** for publishing, **Penpot** for design, **n8n** for workflow automation, **Grocy** for household management, and **Monica** for personal CRM.
 
@@ -219,7 +219,7 @@ The categories below cover the most common use cases. Each links to a wiki page 
 
 A mini PC with 16 GB of RAM runs a 7B parameter model at usable speeds — no API key, no usage limits, no data leaving your network. **Ollama** manages models (Llama, Mistral, Phi, Gemma, Qwen, DeepSeek) and serves them via an OpenAI-compatible REST API. **Open WebUI** puts a polished ChatGPT-style interface in front of it, with document RAG, web search via SearXNG, and voice via Whisper. **Tabby** is a self-hosted Copilot replacement that plugs directly into VS Code and JetBrains. **ComfyUI** and **InvokeAI** run Stable Diffusion locally. **Flowise** and **Dify** build production LLM pipelines visually. **Langfuse** gives you full observability over every prompt and completion.
 
-### Security & Identity — [wiki](https://docs.shani.dev/doc/servers/security)
+### Security & Identity — [wiki](https://docs.shani.dev/doc/servers/security/authelia)
 
 **Vaultwarden** is a Bitwarden-compatible password server — every Bitwarden client (mobile, browser, desktop) connects to your own hardware instead of Bitwarden's cloud. **Authelia** gates your entire self-hosted stack behind a single 2FA login page; **Authentik** adds full OIDC/SAML SSO for more complex setups. **Step-CA** is your own internal certificate authority. **Wazuh** provides SIEM and threat detection across all hosts. **Suricata** runs network IDS/IPS inline. **CrowdSec** and **Fail2ban** handle brute-force prevention at the firewall level.
 
@@ -231,7 +231,7 @@ A mini PC with 16 GB of RAM runs a 7B parameter model at usable speeds — no AP
 
 **Matrix/Synapse** (or the lighter **Conduit**) gives you end-to-end encrypted federated chat — your messages stay on your hardware, and you can still reach anyone on matrix.org. **Mattermost** and **Rocket.Chat** cover team chat. **Jitsi Meet** handles video calls. **Ntfy** and **Gotify** send push notifications from any script or cron job to your phone with a single `curl`. For community platforms: **Discourse** for forums, **Mastodon** for microblogging, **Lemmy** for link aggregation, **PeerTube** for video hosting.
 
-### Databases — [wiki](https://docs.shani.dev/doc/servers/databases)
+### Databases — [wiki](https://docs.shani.dev/doc/servers/databases/postgresql)
 
 Every database runs rootless via Podman with ports bound to `127.0.0.1` by default — nothing reaches your network unless you explicitly proxy it. Relational: **PostgreSQL**, **MariaDB**. Caching: **Redis**, **Valkey**, **Dragonfly**. Document: **MongoDB**, **FerretDB**. Message queues: **Kafka**, **Redpanda**, **RabbitMQ**, **NATS**. Graph: **Neo4j**. Time-series: **TimescaleDB**, **InfluxDB**. Search: **MeiliSearch**, **Typesense**, **Elasticsearch**, **OpenSearch**. Vector: **Qdrant**, **Weaviate**. Analytical: **ClickHouse**, **DuckDB**.
 
@@ -267,7 +267,7 @@ Your databases already live on the server — your analytics stack runs next to 
 
 Self-hosting email requires a static IP, correct DNS (MX, SPF, DKIM, DMARC), and an ISP or VPS that allows port 25. **Mailcow** bundles the full stack (Postfix, Dovecot, Rspamd, SOGo, ClamAV). **Stalwart** is a modern single-binary alternative with native JMAP. Beyond servers: **listmonk** for newsletters, **SimpleLogin** and **addy.io** for email aliasing, **Postal** for transactional sending with delivery analytics and bounce handling.
 
-### Kubernetes & Container Orchestration — [wiki](https://docs.shani.dev/doc/servers/kubernetes)
+### Kubernetes & Container Orchestration — [wiki](https://docs.shani.dev/doc/servers/kubernetes/overview)
 
 When a single Podman host is not enough, Shani OS supports every major Kubernetes distribution. **k3s** is the fastest path to a working cluster — a single binary, a single command, and you have a fully conformant CNCF Kubernetes node running on your hardware. **k0s** is even more minimal. **MicroK8s** installs via Snap and adds capabilities (Istio, Knative, GPU support) with a one-line addon command. **minikube** and **kind** are the right tools for local development and CI testing. **RKE2** targets hardened production deployments. The wiki covers Helm, ArgoCD, Flux CD, cert-manager, Longhorn storage, Rancher, k9s, and the full in-cluster CI/CD stack (Tekton, Argo Workflows, Kaniko).
 
@@ -275,7 +275,7 @@ When a single Podman host is not enough, Shani OS supports every major Kubernete
 
 For multi-node setups running on old hardware or a small homelab rack. The wiki covers production-grade HA for every major data store: **Patroni + etcd + HAProxy** for PostgreSQL, **Redis Sentinel** and **Valkey Cluster**, **Elasticsearch** and **OpenSearch** 3-node clusters, **Kafka** with KRaft (no ZooKeeper), **Cassandra** and **ScyllaDB**, **MongoDB Replica Set**, **RabbitMQ Cluster**, **VictoriaMetrics Cluster**, and a standalone **etcd** cluster for Kubernetes backing stores. Each entry includes a working compose file, quorum and split-brain explanations, and a troubleshooting section.
 
-### DevOps & Infrastructure — [wiki](https://docs.shani.dev/doc/servers/devops)
+### DevOps & Infrastructure — [wiki](https://docs.shani.dev/doc/servers/devops/other)
 
 Your home server is also a local platform engineering environment. Beyond Gitea and Woodpecker CI (covered under Developer Tools), the DevOps wiki adds **Atlantis** for Terraform pull-request automation, **Skaffold** and **Tilt** for fast local Kubernetes development loops, **Ansible AWX** for playbook execution at scale, **Consul** and **Nomad** for service discovery and workload orchestration, **Nexus Repository** and **Verdaccio** for artifact and npm package management, **Backstage** as an internal developer portal, and a full selection of Infrastructure as Code tools (Terraform, Pulumi, OpenTofu).
 
@@ -337,7 +337,7 @@ sudo shani-deploy -r
 
 No rescue mode, no package manager archaeology, no manual state reconstruction. Full update reference: [Updates on Shani OS](https://blog.shani.dev/post/shani-os-updates).
 
-### Monitoring — [wiki](https://docs.shani.dev/doc/servers/monitoring)
+### Monitoring — [wiki](https://docs.shani.dev/doc/servers/monitoring/prometheus)
 
 **Uptime Kuma** monitors every service and alerts via ntfy, Telegram, or email when something goes down. **Gatus** is the declarative alternative — health checks in YAML, versioned alongside your configs, with a built-in status page. **Grafana + Prometheus + Loki** cover metrics, dashboards, and log aggregation across every container. **Dozzle** shows live logs in the browser. **Beszel** gives you a lightweight multi-host overview.
 
@@ -349,18 +349,18 @@ No rescue mode, no package manager archaeology, no manual state reconstruction. 
 
 ## The Full Self-Hosting Wiki
 
-Every service has a ready-to-run Podman command in the wiki at [docs.shani.dev/doc/servers](https://docs.shani.dev/doc/servers):
+Every service has a ready-to-run Podman command in the wiki at [docs.shani.dev](https://docs.shani.dev/):
 
 | Category | Services |
 |---|---|
 | [Media](https://docs.shani.dev/doc/servers/media) | Jellyfin, Plex, Navidrome, Immich, Jellyseerr, \*Arr stack (Radarr, Sonarr, Lidarr, Prowlarr), qBittorrent, Pinchflat, Kavita, Audiobookshelf, PhotoPrism, Calibre-Web, Readarr, Bazarr, Overseerr, Tdarr, MeTube, Stash, Komga, TubeArchivist, Kometa |
-| [Productivity](https://docs.shani.dev/doc/servers/productivity) | Nextcloud, Syncthing, Filebrowser, Paperless-ngx, Planka, Vikunja, Outline, Mealie, Miniflux, FreshRSS, Stirling PDF, Ghost, WordPress, BookStack, Wiki.js, HedgeDoc, CryptPad, Wallabag, Linkwarden, Monica, Rallly, Kimai, Grocy, Joplin Server, Penpot, Memos, AFFiNE, Hoarder, n8n, Actual Budget |
+| [Productivity](https://docs.shani.dev/doc/servers/productivity/file-sync) | Nextcloud, Syncthing, Filebrowser, Paperless-ngx, Planka, Vikunja, Outline, Mealie, Miniflux, FreshRSS, Stirling PDF, Ghost, WordPress, BookStack, Wiki.js, HedgeDoc, CryptPad, Wallabag, Linkwarden, Monica, Rallly, Kimai, Grocy, Joplin Server, Penpot, Memos, AFFiNE, Hoarder, n8n, Actual Budget |
 | [AI & LLMs](https://docs.shani.dev/doc/servers/ai-llms) | Ollama, Open WebUI, LocalAI, ComfyUI, Automatic1111, InvokeAI, Whisper, Kokoro TTS, Piper TTS, Tabby, AnythingLLM, LiteLLM, Perplexica, Flowise, Langfuse, Open WebUI Pipelines, Dify, Open Interpreter, SearXNG |
-| [Security](https://docs.shani.dev/doc/servers/security) | Vaultwarden, Passbolt, Authelia, Authentik, Keycloak, Zitadel, CrowdSec, Fail2ban, Step-CA, Infisical, OpenBao, Wazuh, Greenbone, Trivy, Teleport, Coraza WAF, SafeLine WAF, Suricata, osquery, OWASP ZAP, Nuclei |
+| [Security](https://docs.shani.dev/doc/servers/security/authelia) | Vaultwarden, Passbolt, Authelia, Authentik, Keycloak, Zitadel, CrowdSec, Fail2ban, Step-CA, Infisical, OpenBao, Wazuh, Greenbone, Trivy, Teleport, Coraza WAF, SafeLine WAF, Suricata, osquery, OWASP ZAP, Nuclei |
 | [Home Automation](https://docs.shani.dev/doc/servers/home-automation) | Home Assistant, Mosquitto, Zigbee2MQTT, ESPHome, Node-RED, Matter Server, Frigate, go2rtc, Double Take, Z-Wave JS UI, Scrypted, AppDaemon, evcc, WLED |
 | [Communication](https://docs.shani.dev/doc/servers/communication) | Matrix/Synapse, Conduit, Mattermost, Rocket.Chat, Zulip, Ntfy, Gotify, Jitsi Meet, Discourse, Mastodon, Lemmy, Pixelfed, PeerTube, Mumble, FreePBX/Asterisk, SimpleX, Chatwoot |
 | [Mail](https://docs.shani.dev/doc/servers/mail) | Mailcow, Mailu, Stalwart, listmonk, SimpleLogin, addy.io, Postal, Roundcube, SnappyMail, SOGo |
-| [Databases](https://docs.shani.dev/doc/servers/databases) | PostgreSQL, MariaDB, Redis, Valkey, KeyDB, Dragonfly, MongoDB, FerretDB, Apache Kafka, Redpanda, RabbitMQ, NATS, Neo4j, Cassandra, ScyllaDB, CockroachDB, TimescaleDB, InfluxDB, MeiliSearch, Typesense, Elasticsearch, OpenSearch, Qdrant, Weaviate, DuckDB, SurrealDB, Litestream, Adminer |
+| [Databases](https://docs.shani.dev/doc/servers/databases/postgresql) | PostgreSQL, MariaDB, Redis, Valkey, KeyDB, Dragonfly, MongoDB, FerretDB, Apache Kafka, Redpanda, RabbitMQ, NATS, Neo4j, Cassandra, ScyllaDB, CockroachDB, TimescaleDB, InfluxDB, MeiliSearch, Typesense, Elasticsearch, OpenSearch, Qdrant, Weaviate, DuckDB, SurrealDB, Litestream, Adminer |
 | [Developer Tools](https://docs.shani.dev/doc/servers/devtools) | Gitea, Forgejo, GitLab CE, Woodpecker CI, code-server, Coder, Nginx, Harbor, Private Registry, Mailpit, Matomo, n8n, Leantime, Twenty CRM, Huly, DocuSeal, SonarQube, act, Plane |
 | [Business Intelligence](https://docs.shani.dev/doc/servers/business-intelligence) | Metabase, Apache Superset, Redash, Evidence.dev, Lightdash, ClickHouse, Plausible, Umami |
 | [Finance](https://docs.shani.dev/doc/servers/finance) | Firefly III, Actual Budget, Ghostfolio, Invoice Ninja, ERPNext Accounting, hledger, Beancount, Kresus, Paisa, Rotki, Bitcoin/LND, Monero Node |
@@ -368,12 +368,12 @@ Every service has a ready-to-run Podman command in the wiki at [docs.shani.dev/d
 | [Education](https://docs.shani.dev/doc/servers/education) | Moodle, Canvas LMS, Open edX, BigBlueButton, Greenlight, ERPNext Education, Gibbon, Chamilo, Kolibri, Overleaf, Anki Sync Server, ITflow, H5P |
 | [Game Servers](https://docs.shani.dev/doc/servers/game-servers) | Minecraft Java, Minecraft Bedrock, Velocity Proxy, Valheim, Terraria, Factorio, Satisfactory, CS2, Pterodactyl, Crafty Controller |
 | [IoT](https://docs.shani.dev/doc/servers/iot) | Mosquitto, EMQX, Telegraf, Node-RED, MQTT Exporter, Prometheus, Alertmanager, InfluxDB, Modbus, OPC-UA, OwnTracks |
-| [VPN & Tunnels](https://docs.shani.dev/doc/servers/vpn-tunnels) | WireGuard, WG-Easy, Tailscale, Headscale, Headplane, Cloudflared, Pangolin, NetBird, Pritunl, Firezone, Nebula, ZeroTier, OpenVPN, Hysteria 2, Gluetun |
-| [Network & DNS](https://docs.shani.dev/doc/servers/networking) | Pi-hole, AdGuard Home, Blocky, Unbound, Technitium, Nginx Proxy Manager, Traefik, HAProxy, SearXNG, LibreNMS, NetBox, Ntopng, OwnTracks |
-| [Monitoring](https://docs.shani.dev/doc/servers/monitoring) | Prometheus, Alertmanager, Grafana, Grafana Alloy, Loki, Netdata, Uptime Kuma, Gatus, Beszel, Dozzle, Healthchecks, Speedtest Tracker, SmokePing, VictoriaMetrics, Grafana Tempo, Zabbix, SigNoz, OpenTelemetry Collector, Checkmk, Karma, Graylog, Changedetection.io |
-| [Kubernetes](https://docs.shani.dev/doc/servers/kubernetes) | k3s, k0s, MicroK8s, minikube, kind, RKE2, kubeadm, Talos Linux, Helm, ArgoCD, Flux CD, Kustomize, cert-manager, Longhorn, Rancher, Lens/OpenLens, k9s, Kubernetes Dashboard, kube-prometheus-stack, Velero, Tekton, Argo Workflows, Kaniko, Argo Rollouts, ingress-nginx, NGINX Gateway Fabric, Sealed Secrets, External Secrets Operator, Goldilocks |
+| [VPN & Tunnels](https://docs.shani.dev/doc/networking/wireguard-easy) | WireGuard, WG-Easy, Tailscale, Headscale, Headplane, Cloudflared, Pangolin, NetBird, Pritunl, Firezone, Nebula, ZeroTier, OpenVPN, Hysteria 2, Gluetun |
+| [Network & DNS](https://docs.shani.dev/doc/networking/pi-hole) | Pi-hole, AdGuard Home, Blocky, Unbound, Technitium, Nginx Proxy Manager, Traefik, HAProxy, SearXNG, LibreNMS, NetBox, Ntopng, OwnTracks |
+| [Monitoring](https://docs.shani.dev/doc/servers/monitoring/prometheus) | Prometheus, Alertmanager, Grafana, Grafana Alloy, Loki, Netdata, Uptime Kuma, Gatus, Beszel, Dozzle, Healthchecks, Speedtest Tracker, SmokePing, VictoriaMetrics, Grafana Tempo, Zabbix, SigNoz, OpenTelemetry Collector, Checkmk, Karma, Graylog, Changedetection.io |
+| [Kubernetes](https://docs.shani.dev/doc/servers/kubernetes/overview) | k3s, k0s, MicroK8s, minikube, kind, RKE2, kubeadm, Talos Linux, Helm, ArgoCD, Flux CD, Kustomize, cert-manager, Longhorn, Rancher, Lens/OpenLens, k9s, Kubernetes Dashboard, kube-prometheus-stack, Velero, Tekton, Argo Workflows, Kaniko, Argo Rollouts, ingress-nginx, NGINX Gateway Fabric, Sealed Secrets, External Secrets Operator, Goldilocks |
 | [Clusters & HA](https://docs.shani.dev/doc/servers/clusters) | Patroni, etcd, HAProxy, Redis Sentinel, Valkey Cluster, Elasticsearch Cluster, OpenSearch Cluster, Kafka (KRaft), Cassandra, ScyllaDB, MongoDB Replica Set, RabbitMQ Cluster, VictoriaMetrics Cluster |
-| [DevOps & Infrastructure](https://docs.shani.dev/doc/servers/devops) | Atlantis, Skaffold, Tilt, Ansible AWX, Consul, Nomad, Nexus Repository, Verdaccio, Backstage, Terraform, Pulumi, OpenTofu, Vault, Boundary, Packer |
+| [DevOps & Infrastructure](https://docs.shani.dev/doc/servers/devops/other) | Atlantis, Skaffold, Tilt, Ansible AWX, Consul, Nomad, Nexus Repository, Verdaccio, Backstage, Terraform, Pulumi, OpenTofu, Vault, Boundary, Packer |
 | [OpenStack & Private Cloud](https://docs.shani.dev/doc/servers/openstack) | MicroStack, DevStack, Kolla-Ansible, OpenStack CLI, Nova, Neutron, Cinder, Glance, Keystone, Horizon, Heat, Octavia, Magnum, Kuryr |
 | [Backups & Sync](https://docs.shani.dev/doc/servers/backups-sync) | Restic, Borgmatic, Duplicati, Rclone, MinIO, Kopia, Garage, Litestream |
 | [Management](https://docs.shani.dev/doc/servers/management) | Portainer, Dockge, Yacht, Komodo, Homepage, Diun, auto-update, systemd integration, cleanup timers |

@@ -96,7 +96,7 @@ const CONFIG = {
   PUBLISHER_LOGO: 'https://shani.dev/assets/images/logo.svg',
   // ── Social / OG ──────────────────────────────────────────────
   // [script] Default OG / Twitter card image (used when post has no cover).
-  OG_IMAGE: 'https://shani.dev/assets/images/logo.svg',
+  OG_IMAGE: 'https://shani.dev/assets/images/gnome-screenshot.jpg',
   // [script] Twitter/X @handle injected into <meta name="twitter:site">.
   TWITTER_HANDLE: '@shani8dev',
   // [script] Footer social link icons.
@@ -147,7 +147,9 @@ const CONFIG = {
   //
   //   MEMBERSHIP_KEYS_URL — public URL to the data/keys.json file served via
   //     jsDelivr CDN. Keys are validated client-side: no server, no Worker.
-  //     The GitHub Action (issue-license-key.yml) appends new keys on purchase.
+  //     The GitHub Action (issue-license-key.yml) appends new key hashes on
+  //     purchase. The file contains ONLY SHA-256 digests of license keys —
+  //     never raw keys, never buyer PII.
   //     Format: 'https://cdn.jsdelivr.net/gh/USER/REPO@main/data/keys.json'
   //
   //   RAZORPAY_KEY_ID — your live Razorpay key ID (public, safe to commit).

@@ -2,9 +2,9 @@
 slug: gen-efi-and-secure-boot
 title: 'gen-efi and Secure Boot on Shani OS — UKI Generation, MOK Enrollment, and TPM2'
 date: '2026-04-30'
-tag: 'Engineering'
+tag: 'Deep Dive'
 excerpt: 'gen-efi is the tool that builds and signs Unified Kernel Images, manages MOK keys for Secure Boot, and enrolls LUKS keys into TPM2. This is the complete reference for every gen-efi operation and the Secure Boot chain on Shani OS.'
-cover: ''
+cover: /assets/images/blog/gen-efi-and-secure-boot.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -78,6 +78,9 @@ sudo gen-efi enroll-tpm2
 
 # Remove stale TPM2 LUKS keyslots after re-enrollment
 sudo gen-efi cleanup-tpm2
+
+# Fully disable TPM2 auto-unlock (wipes all TPM2 slots)
+sudo gen-efi remove-tpm2
 ```
 
 > **Important:** `gen-efi configure` enforces that the target slot matches the currently booted slot when run directly on the live system. Running it for the inactive slot is only permitted inside a chroot, which `shani-deploy` does automatically. This prevents a common mistake: generating a UKI for `@green` while booted into `@blue` would embed `@blue`'s kernel in `@green`'s boot entry.

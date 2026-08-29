@@ -4,7 +4,7 @@ title: 'Power Management on Shani OS — Hibernation, Suspend, Battery Life, and
 date: '2026-04-23'
 tag: 'Guide'
 excerpt: 'Shani OS configures hibernation automatically at install, manages power profiles out of the box, and handles TPM2-sealed LUKS so the disk unlocks silently on your own hardware. Everything a laptop user needs — with nothing to configure.'
-cover: ''
+cover: /assets/images/blog/shani-os-power-management.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -230,7 +230,7 @@ sudo objcopy -O binary --only-section=.cmdline \
 If the resume offset is missing, regenerate the UKI:
 
 ```bash
-sudo gen-efi generate --slot $(cat /data/current-slot)
+sudo gen-efi configure $(cat /data/current-slot)
 ```
 
 ### TPM2 Unlock Fails After OS Update

@@ -2,9 +2,9 @@
 slug: shani-os-troubleshooting-guide
 title: 'Shani OS Troubleshooting Guide — Boot, Updates, Audio, GPU, and More'
 date: '2026-05-12'
-tag: 'Guide'
+tag: 'Reference'
 excerpt: 'The consolidated troubleshooting reference for Shani OS — boot failures and slot recovery, update issues, audio problems, Bluetooth, Flatpak sandbox, NVIDIA detection, TPM2 unlock, Waydroid, and common journalctl commands for diagnosing anything else.'
-cover: ''
+cover: /assets/images/blog/shani-os-troubleshooting-guide.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,7 +13,7 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '10 min'
-series: 'Shani OS Guides'
+series: 'Shani OS Reference'
 ---
 
 This is the consolidated troubleshooting reference for Shani OS. Each section covers a problem category with diagnostic commands and fixes. For deeper reference on a specific subsystem, links to the relevant guide are included throughout.

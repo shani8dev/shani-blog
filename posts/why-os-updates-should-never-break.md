@@ -1,12 +1,17 @@
 ---
 title: 'Why Your OS Update Should Never Break Your Computer — And How Shani OS Fixes This'
-slug: why-your-os-update-should-never-break-your-computer
+slug: why-os-updates-should-never-break
 date: '2026-04-10'
-tag: 'Engineering'
-cover: ''
+tag: 'Deep Dive'
+cover: /assets/images/blog/why-os-updates-should-never-break.webp
 excerpt: 'Every server admin knows: you never update the live system. You update the standby, verify it, then switch. Desktops never got this lesson — until now.'
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
+author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
+author_initials: 'SK'
+author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
+author_github: 'https://github.com/shrinivasvkumbhar'
+author_website: 'https://shani.dev'
 readTime: '7 min'
 series: 'Shani OS Deep Dives'
 ---
@@ -127,9 +132,9 @@ The worst case is: reboot to undo it. That is a level of reliability that, until
 
 ## Getting Started
 
-Shani OS ships two editions: GNOME for a clean, focused desktop suitable for work and switchers; KDE Plasma for power users and gaming, with Steam, Proton, Heroic, MangoHud, and a kernel tuned for low-latency gaming — all pre-installed.
+Shani OS ships two desktop editions today: GNOME for a clean, focused desktop suitable for work and switchers, and KDE Plasma for power users and gaming, with Steam, Proton, Heroic, MangoHud, and a kernel tuned for low-latency gaming — all pre-installed. A third edition (COSMIC) plus a headless server profile are on the way.
 
-Both are free. Both are open source. Both require no account.
+Every edition is free, open source, and requires no account.
 
 **System requirements:** UEFI firmware, 64-bit x86 CPU, 4 GB RAM (8 GB recommended), 32 GB storage. NVIDIA, AMD, and Intel graphics all work at first boot.
 

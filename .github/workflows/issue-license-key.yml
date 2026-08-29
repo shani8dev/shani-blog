@@ -39,16 +39,20 @@
 #    5. Sends the key to the buyer via Resend email API.
 #
 #  VALIDATION (client-side, no server):
-#    • keys.json is committed to the repo and served via jsDelivr CDN.
-#    • script.js fetches it and validates the key locally in the browser.
-#    • No CF Worker /validate endpoint is needed.
+#    • keys.json is committed to the repo and served via jsDelivr CDN,
+#      but it contains ONLY SHA-256 hashes of license keys — never the
+#      raw keys and never buyer PII (email/name are not stored).
+#    • script.js hashes the entered key with Web Crypto SHA-256 and
+#      compares digests locally in the browser. Reading the public file
+#      reveals nothing that unlocks member content.
 #
 #  SECRETS (Settings → Secrets → Actions):
 #    RESEND_API_KEY            — from resend.com (free tier: 3 000 emails/month)
 #    EMAIL_FROM                — verified sender, e.g. keys@shani.dev
 #    BLOG_URL                  — e.g. https://blog.shani.dev
 #    RAZORPAY_WEBHOOK_SECRET   — from Razorpay Dashboard → Webhooks
-#                                (only needed for repository_dispatch mode)
+#                                REQUIRED for repository_dispatch mode:
+#                                dispatches without a valid signature fail
 #    PIPEDREAM_TOKEN           — your GitHub PAT for Pipedream to trigger this
 #                                workflow (only used by Pipedream, not here)
 #
@@ -136,11 +140,12 @@ jobs:
           SIGNATURE: ${{ github.event.client_payload.razorpay_signature }}
           PAYLOAD:   ${{ github.event.client_payload.razorpay_payload }}
         run: |
-          # Skip verification if the relay did not pass signature/payload
-          # (e.g. the relay already verified before calling repository_dispatch)
+          # Fail closed: repository_dispatch MUST carry a verifiable
+          # Razorpay signature. Skipping verification would let any
+          # unauthenticated dispatch mint license keys.
           if [ -z "$SIGNATURE" ] || [ -z "$PAYLOAD" ] || [ -z "$SECRET" ]; then
-            echo "⚠ Skipping HMAC check (signature/payload/secret not supplied by relay)"
-            exit 0
+            echo "✗ Refusing to issue key — repository_dispatch requires razorpay_signature, razorpay_payload and RAZORPAY_WEBHOOK_SECRET to be set"
+            exit 1
           fi
 
           node - <<'NODE'
@@ -233,12 +238,12 @@ jobs:
 
           echo "✓ Key: $KEY  Email: $EMAIL  Order: $ORDER_ID"
 
-      # ── Step 3: Append key to data/keys.json (with deduplication) ─────────
-      - name: Append key to keys.json
+      # ── Step 3: Append key hash to data/keys.json (with deduplication) ────
+      # Only the SHA-256 digest of the key is stored — the raw key exists
+      # solely in the buyer's email. No email/name is persisted.
+      - name: Append key hash to keys.json
         env:
           KEY:       ${{ steps.inputs.outputs.key }}
-          EMAIL:     ${{ steps.inputs.outputs.email }}
-          NAME:      ${{ steps.inputs.outputs.name }}
           ORDER_ID:  ${{ steps.inputs.outputs.order_id }}
           AMOUNT:    ${{ steps.inputs.outputs.amount }}
           ISSUED_AT: ${{ steps.inputs.outputs.issued_at }}
@@ -246,14 +251,16 @@ jobs:
           mkdir -p data
           if [ ! -f data/keys.json ]; then echo '[]' > data/keys.json; fi
 
+          KEY_HASH=$(printf '%s' "$KEY" | sha256sum | cut -d' ' -f1)
+
           # ── Deduplication: skip if this order_id already has a key ─────────
           # Razorpay can fire duplicate webhook events; this prevents issuing
           # two keys for the same payment.
           if [ "$ORDER_ID" != "manual" ]; then
             EXISTING=$(jq -r --arg oid "$ORDER_ID" \
-              '.[] | select(.order_id == $oid) | .key' data/keys.json)
+              '.[] | select(.order_id == $oid) | .key_hash' data/keys.json)
             if [ -n "$EXISTING" ]; then
-              echo "⚠ Order $ORDER_ID already has key ${EXISTING:0:8}… — skipping append"
+              echo "⚠ Order $ORDER_ID already has a key — skipping append"
               # Still send the email below so the buyer gets their key
               # even if the webhook fired twice.
               exit 0
@@ -261,16 +268,12 @@ jobs:
           fi
 
           NEW_ENTRY=$(jq -n \
-            --arg key       "$KEY" \
-            --arg email     "$EMAIL" \
-            --arg name      "$NAME" \
+            --arg key_hash  "$KEY_HASH" \
             --arg order_id  "$ORDER_ID" \
             --arg amount    "$AMOUNT" \
             --arg issued_at "$ISSUED_AT" \
             '{
-              key:       $key,
-              email:     $email,
-              name:      $name,
+              key_hash:  $key_hash,
               order_id:  $order_id,
               amount:    $amount,
               issued_at: $issued_at,
@@ -279,7 +282,7 @@ jobs:
 
           jq --argjson entry "$NEW_ENTRY" '. += [$entry]' data/keys.json > data/keys.tmp
           mv data/keys.tmp data/keys.json
-          echo "✓ Appended key for $EMAIL"
+          echo "✓ Appended hashed key for order $ORDER_ID"
 
       # ── Step 4: Commit updated keys.json ──────────────────────────────────
       - name: Commit keys.json

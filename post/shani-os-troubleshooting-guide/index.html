@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev data:; connect-src 'self' https://api.github.com">
 
   <title>Shani OS Troubleshooting Guide — Boot, Updates, Audio, GPU, and More — Shanios Blog</title>
   <meta name="description" id="meta-desc" content="The consolidated troubleshooting reference for Shani OS — boot failures and slot recovery, update issues, audio problems, Bluetooth, Flatpak sandbox, NVIDIA detection, TPM2 unlock, Waydroid, and common journalctl commands for diagnosing anything else.">
@@ -15,23 +16,23 @@
   <meta property="og:title"     id="og-title"     content="Shani OS Troubleshooting Guide — Boot, Updates, Audio, GPU, and More">
   <meta property="og:description" id="og-desc"    content="The consolidated troubleshooting reference for Shani OS — boot failures and slot recovery, update issues, audio problems, Bluetooth, Flatpak sandbox, NVIDIA detection, TPM2 unlock, Waydroid, and common journalctl commands for diagnosing anything else.">
   <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/shani-os-troubleshooting-guide/">
-  <meta property="og:image"     id="og-image"     content="https://shani.dev/assets/images/logo.svg">
+  <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/shani-os-troubleshooting-guide.webp">
   <meta property="og:image:alt" id="og-image-alt" content="Shani OS Troubleshooting Guide — Boot, Updates, Audio, GPU, and More">
   <meta property="og:locale"    content="en_US">
-  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-12T00:00:00.000Z">
-  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-12T00:00:00.000Z">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-11T18:30:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-11T18:30:00.000Z">
   <meta property="article:author"         id="og-article-author"  content="Shrinivas Vishnu Kumbhar">
-  <meta property="article:section"        id="og-article-section" content="Guide">
+  <meta property="article:section"        id="og-article-section" content="Reference">
   
 
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
   <meta name="twitter:title"       id="tw-title" content="Shani OS Troubleshooting Guide — Boot, Updates, Audio, GPU, and More">
   <meta name="twitter:description" id="tw-desc"  content="The consolidated troubleshooting reference for Shani OS — boot failures and slot recovery, update issues, audio problems, Bluetooth, Flatpak sandbox, NVIDIA detection, TPM2 unlock, Waydroid, and common journalctl commands for diagnosing anything else.">
-  <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
+  <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/shani-os-troubleshooting-guide.webp">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS Troubleshooting Guide — Boot, Updates, Audio, GPU, and More","description":"The consolidated troubleshooting reference for Shani OS — boot failures and slot recovery, update issues, audio problems, Bluetooth, Flatpak sandbox, NVIDIA detection, TPM2 unlock, Waydroid, and common journalctl commands for diagnosing anything else.","url":"https://blog.shani.dev/post/shani-os-troubleshooting-guide/","datePublished":"2026-05-12T00:00:00.000Z","dateModified":"2026-05-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
-  <script type="application/ld+json" id="ld-org">{}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS Troubleshooting Guide — Boot, Updates, Audio, GPU, and More","description":"The consolidated troubleshooting reference for Shani OS — boot failures and slot recovery, update issues, audio problems, Bluetooth, Flatpak sandbox, NVIDIA detection, TPM2 unlock, Waydroid, and common journalctl commands for diagnosing anything else.","url":"https://blog.shani.dev/post/shani-os-troubleshooting-guide/","datePublished":"2026-05-11T18:30:00.000Z","dateModified":"2026-05-11T18:30:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-os-troubleshooting-guide.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
   <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
@@ -199,6 +200,7 @@
   <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+  <div id="reading-bar" role="progressbar" aria-label="Reading progress" aria-hidden="true"></div>
   <main id="main-content">
     <!-- INDEX VIEW -->
     <section id="view-index" style="display:none">
@@ -223,7 +225,7 @@
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
       <article id="post-article">
       <header class="post-header">
-        <span class="post-tag">Guide</span>
+        <span class="post-tag">Reference</span>
         <h1 class="post-title">Shani OS Troubleshooting Guide — Boot, Updates, Audio, GPU, and More</h1>
         <div class="post-meta">
           <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-12 · 10 min</span>
@@ -231,9 +233,9 @@
       </header>
       <div class="post-body"><p>This is the consolidated troubleshooting reference for Shani OS. Each section covers a problem category with diagnostic commands and fixes. For deeper reference on a specific subsystem, links to the relevant guide are included throughout.</p>
 <p>Full reference: <a href="https://docs.shani.dev">docs.shani.dev</a>.</p>
-<p>---</p>
-<h2>Boot Problems</h2>
-<h3>System Won't Boot — Automatic Fallback</h3>
+<hr>
+<h2 id="boot-problems">Boot Problems</h2>
+<h3 id="system-wont-boot-automatic-fallback">System Won't Boot — Automatic Fallback</h3>
 <p>If your system fails to reach the login prompt three times after an update, systemd-boot's boot counting activates and falls back to the previous slot automatically. On the next successful login, <code>shani-update</code> detects the fallback and offers to clean the failed slot.</p>
 <p>To check what happened:</p>
 <pre><code class="language-bash"># Which slot are you actually running?
@@ -250,8 +252,8 @@ journalctl -b 0 -p err --no-pager | head -40</code></pre>
 <p>To restore the failed slot and make it bootable again:</p>
 <pre><code class="language-bash">sudo shani-deploy -r
 sudo reboot</code></pre>
-<p>---</p>
-<h3>Black Screen After Update (GPU / NVIDIA)</h3>
+<hr>
+<h3 id="black-screen-after-update-gpu-nvidia">Black Screen After Update (GPU / NVIDIA)</h3>
 <p>A black screen after a kernel or driver update almost always means the NVIDIA module failed to load, or Secure Boot is rejecting the new UKI.</p>
 <pre><code class="language-bash"># Switch to a TTY (Ctrl+Alt+F2 or F3) and log in
 
@@ -269,8 +271,8 @@ sudo reboot
 <p>If the display manager failed:</p>
 <pre><code class="language-bash">journalctl -u gdm -b 0 -n 50       # GNOME
 journalctl -u sddm -b 0 -n 50      # KDE</code></pre>
-<p>---</p>
-<h3>Drops to Emergency Shell at Boot</h3>
+<hr>
+<h3 id="drops-to-emergency-shell-at-boot">Drops to Emergency Shell at Boot</h3>
 <p>This is usually a filesystem mount failure. The most common cause after updating is a stale <code>/etc/fstab</code> or <code>/etc/crypttab</code> entry.</p>
 <pre><code class="language-bash"># From the emergency shell:
 # Check which mount failed
@@ -287,9 +289,9 @@ blkid | grep crypto_LUKS
 # Fix the entry
 sudo nano /etc/crypttab</code></pre>
 <p>If the issue is in the overlay layer and you can't fix it from the emergency shell, boot the previous slot from the systemd-boot menu, or boot from the live USB.</p>
-<p>---</p>
-<h2>Update Problems</h2>
-<h3>shani-deploy Fails Mid-Download</h3>
+<hr>
+<h2 id="update-problems">Update Problems</h2>
+<h3 id="shani-deploy-fails-mid-download">shani-deploy Fails Mid-Download</h3>
 <p><code>shani-deploy</code> uses <code>aria2c</code> with resume support. If a download is interrupted, re-run the command — it resumes automatically.</p>
 <pre><code class="language-bash"># Simply re-run
 sudo shani-deploy
@@ -297,7 +299,7 @@ sudo shani-deploy
 # If the partial file is corrupted, clean it first
 sudo shani-deploy -c
 sudo shani-deploy</code></pre>
-<h3>"Not enough space" Error</h3>
+<h3 id="not-enough-space-error">"Not enough space" Error</h3>
 <pre><code class="language-bash"># Check actual available space
 df -h /
 sudo btrfs filesystem usage /
@@ -308,15 +310,15 @@ sudo compsize /               # see compressed sizes
 flatpak uninstall --unused    # remove unused Flatpak runtimes
 podman system prune -af       # remove unused container images
 nix-collect-garbage -d        # remove old Nix generations</code></pre>
-<h3>GPG Verification Fails</h3>
+<h3 id="gpg-verification-fails">GPG Verification Fails</h3>
 <pre><code class="language-bash"># Re-import the Shani OS signing key
 gpg --keyserver keys.openpgp.org --recv-keys 7B927BFFD4A9EAAA8B666B77DE217F3DA8014792
 
 # Retry the update
 sudo shani-deploy</code></pre>
-<p>---</p>
-<h2>Audio Problems</h2>
-<h3>No Audio at Boot</h3>
+<hr>
+<h2 id="audio-problems">Audio Problems</h2>
+<h3 id="no-audio-at-boot">No Audio at Boot</h3>
 <pre><code class="language-bash"># Restart the full PipeWire stack
 systemctl --user restart pipewire pipewire-pulse wireplumber
 
@@ -325,7 +327,7 @@ pactl list sinks short
 
 # Check PipeWire status
 systemctl --user status pipewire pipewire-pulse wireplumber</code></pre>
-<h3>Audio Works But Sounds Distorted</h3>
+<h3 id="audio-works-but-sounds-distorted">Audio Works But Sounds Distorted</h3>
 <p>Usually a sample rate mismatch.</p>
 <pre><code class="language-bash"># Check current sample rate
 pactl list sinks | grep &quot;Sample Spec&quot;
@@ -333,13 +335,13 @@ pactl list sinks | grep &quot;Sample Spec&quot;
 # Reset PipeWire config to defaults
 rm ~/.config/pipewire/pipewire.conf 2&gt;/dev/null
 systemctl --user restart pipewire wireplumber</code></pre>
-<h3>Microphone Not Working in Flatpak Apps</h3>
+<h3 id="microphone-not-working-in-flatpak-apps">Microphone Not Working in Flatpak Apps</h3>
 <p>Flatpak apps need explicit microphone permission:</p>
 <pre><code class="language-bash"># Grant permission to a specific app
 flatpak override --user --device=all com.example.App
 
 # Or use Flatseal (pre-installed) for graphical permission management</code></pre>
-<h3>No Audio on New Intel Laptop (SOF)</h3>
+<h3 id="no-audio-on-new-intel-laptop-sof">No Audio on New Intel Laptop (SOF)</h3>
 <pre><code class="language-bash"># Check if SOF firmware loaded
 dmesg | grep -i &quot;sof\|sound open&quot;
 cat /proc/asound/cards
@@ -347,9 +349,9 @@ cat /proc/asound/cards
 # SOF firmware is pre-installed — if it's not loading, check for module errors
 journalctl --user -u wireplumber -n 30</code></pre>
 <p>Full audio guide: <a href="https://blog.shani.dev/post/shani-os-audio-pipewire">Audio on Shani OS</a></p>
-<p>---</p>
-<h2>Bluetooth Problems</h2>
-<h3>Adapter Not Found</h3>
+<hr>
+<h2 id="bluetooth-problems">Bluetooth Problems</h2>
+<h3 id="adapter-not-found">Adapter Not Found</h3>
 <pre><code class="language-bash">hciconfig -a
 rfkill list bluetooth
 
@@ -358,7 +360,7 @@ rfkill unblock bluetooth
 
 # Restart Bluetooth
 sudo systemctl restart bluetooth</code></pre>
-<h3>Device Pairs But Won't Connect</h3>
+<h3 id="device-pairs-but-wont-connect">Device Pairs But Won't Connect</h3>
 <pre><code class="language-bash">bluetoothctl remove XX:XX:XX:XX:XX:XX
 bluetoothctl scan on
 bluetoothctl pair XX:XX:XX:XX:XX:XX
@@ -366,7 +368,7 @@ bluetoothctl trust XX:XX:XX:XX:XX:XX
 
 # Check logs for errors
 journalctl -u bluetooth -n 30</code></pre>
-<h3>Headphones Connected But No Audio</h3>
+<h3 id="headphones-connected-but-no-audio">Headphones Connected But No Audio</h3>
 <pre><code class="language-bash"># Check PipeWire sees the device
 pactl list cards | grep -i bluetooth
 
@@ -376,22 +378,22 @@ systemctl --user restart pipewire pipewire-pulse wireplumber
 # Set as default output
 pactl set-default-sink bluez_output.XX_XX_XX_XX_XX_XX.1</code></pre>
 <p>Full Bluetooth guide: <a href="https://blog.shani.dev/post/shani-os-bluetooth">Bluetooth on Shani OS</a></p>
-<p>---</p>
-<h2>Flatpak / App Problems</h2>
-<h3>App Can't Access Files</h3>
+<hr>
+<h2 id="flatpak-app-problems">Flatpak / App Problems</h2>
+<h3 id="app-cant-access-files">App Can't Access Files</h3>
 <p>Flatpak apps are sandboxed. Open <strong>Flatseal</strong> (pre-installed) → select the app → check filesystem permissions. Common fix: add your home directory or the specific path the app needs.</p>
 <pre><code class="language-bash"># Grant access to home directory
 flatpak override --user --filesystem=home com.example.App
 
 # Grant access to a specific path
 flatpak override --user --filesystem=/home/user/Documents com.example.App</code></pre>
-<h3>App Refuses to Launch (Sandbox Error)</h3>
+<h3 id="app-refuses-to-launch-sandbox-error">App Refuses to Launch (Sandbox Error)</h3>
 <pre><code class="language-bash"># Run from terminal to see the error
 flatpak run com.example.App
 
 # Check for sandbox violations
 flatpak run --log-session-bus com.example.App 2&gt;&amp;1 | grep -i &quot;deny\|error&quot;</code></pre>
-<h3>Flatpak Update Breaks an App</h3>
+<h3 id="flatpak-update-breaks-an-app">Flatpak Update Breaks an App</h3>
 <pre><code class="language-bash"># Pin the app to its current version
 flatpak mask com.example.App
 
@@ -400,26 +402,26 @@ flatpak info com.example.App
 
 # Unpin when the issue is resolved
 flatpak mask --remove com.example.App</code></pre>
-<p>---</p>
-<h2>Encryption / TPM2 Problems</h2>
-<h3>TPM2 Won't Unlock After Firmware Update</h3>
+<hr>
+<h2 id="encryption-tpm2-problems">Encryption / TPM2 Problems</h2>
+<h3 id="tpm2-wont-unlock-after-firmware-update">TPM2 Won't Unlock After Firmware Update</h3>
 <p>PCR 0 changes when firmware is updated. The TPM will not release the key — you'll be prompted for your passphrase. After booting with the passphrase:</p>
 <pre><code class="language-bash">sudo gen-efi cleanup-tpm2
 sudo gen-efi enroll-tpm2</code></pre>
-<h3>TPM2 Won't Unlock After Secure Boot Change</h3>
+<h3 id="tpm2-wont-unlock-after-secure-boot-change">TPM2 Won't Unlock After Secure Boot Change</h3>
 <p>PCR 7 changes when Secure Boot settings change. Same fix:</p>
 <pre><code class="language-bash">sudo gen-efi cleanup-tpm2
 sudo gen-efi enroll-tpm2</code></pre>
-<h3>Forgot LUKS Passphrase</h3>
+<h3 id="forgot-luks-passphrase">Forgot LUKS Passphrase</h3>
 <p>If you have no backup passphrase, no keyfile, and no TPM2 enrollment, the data is <strong>unrecoverable</strong> — this is the intended LUKS2 security guarantee. Boot from the Shani OS USB, reinstall, and restore from backups.</p>
 <p>If you have a backup keyfile:</p>
 <pre><code class="language-bash"># Boot from Shani OS USB
 sudo cryptsetup open /dev/nvme0n1p2 shani_root --key-file /path/to/luks-keyfile
 sudo mount -o subvol=@home /dev/mapper/shani_root /mnt/home</code></pre>
 <p>Full LUKS guide: <a href="https://blog.shani.dev/post/shani-os-luks-after-installation">LUKS2 Encryption on Shani OS</a></p>
-<p>---</p>
-<h2>Waydroid Problems</h2>
-<h3>Waydroid Session Fails to Start</h3>
+<hr>
+<h2 id="waydroid-problems">Waydroid Problems</h2>
+<h3 id="waydroid-session-fails-to-start">Waydroid Session Fails to Start</h3>
 <pre><code class="language-bash"># Check the container service
 systemctl status waydroid-container.service
 journalctl -u waydroid-container.service -n 50
@@ -429,19 +431,19 @@ lsmod | grep binder
 
 # Re-initialise
 sudo waydroid init</code></pre>
-<h3>Play Store Says Device Not Certified</h3>
+<h3 id="play-store-says-device-not-certified">Play Store Says Device Not Certified</h3>
 <p>After installing GApps, Google requires device registration:</p>
 <ol>
 <li>Get your Android ID: <code>adb shell settings get secure android_id</code></li>
 <li>Visit <code>google.com/android/uncertified</code> and register the ID</li>
 <li>Wait 15 minutes, then retry the Play Store</li>
 </ol>
-<h3>App Crashes Immediately (ARM Translation)</h3>
+<h3 id="app-crashes-immediately-arm-translation">App Crashes Immediately (ARM Translation)</h3>
 <p>Most crashes are ARM translation failures. Check if an x86 version of the app exists in the Play Store. If not, the PWA version (web app) is often a practical alternative for common apps.</p>
 <p>Full Waydroid guide: <a href="https://blog.shani.dev/post/waydroid-android-on-shani-os">Waydroid on Shani OS</a></p>
-<p>---</p>
-<h2>Display / GPU Problems</h2>
-<h3>NVIDIA GPU Not Detected</h3>
+<hr>
+<h2 id="display-gpu-problems">Display / GPU Problems</h2>
+<h3 id="nvidia-gpu-not-detected">NVIDIA GPU Not Detected</h3>
 <pre><code class="language-bash"># Check if the driver loaded
 nvidia-smi
 lsmod | grep nvidia
@@ -454,7 +456,7 @@ mokutil --list-enrolled | grep -i shani
 sudo gen-efi enroll-mok
 sudo reboot
 # Accept in MokManager, then enable Secure Boot</code></pre>
-<h3>Hybrid GPU (Optimus) — Wrong GPU Used</h3>
+<h3 id="hybrid-gpu-optimus-wrong-gpu-used">Hybrid GPU (Optimus) — Wrong GPU Used</h3>
 <pre><code class="language-bash"># Force discrete GPU for a specific application
 prime-run application-name
 
@@ -463,9 +465,9 @@ prime-run application-name
 
 # Check which GPU is active
 glxinfo | grep &quot;OpenGL renderer&quot;</code></pre>
-<p>---</p>
-<h2>Network Problems</h2>
-<h3>Wi-Fi Connection Not Remembered After Update</h3>
+<hr>
+<h2 id="network-problems">Network Problems</h2>
+<h3 id="wi-fi-connection-not-remembered-after-update">Wi-Fi Connection Not Remembered After Update</h3>
 <p>Wi-Fi configurations persist in <code>/data/varlib/NetworkManager</code> — they survive updates normally. If they disappeared, check:</p>
 <pre><code class="language-bash">ls /data/varlib/NetworkManager/
 nmcli connection show</code></pre>
@@ -475,12 +477,12 @@ mount | grep NetworkManager
 
 # Restart NetworkManager
 sudo systemctl restart NetworkManager</code></pre>
-<h3>Tailscale Disconnects After Update</h3>
+<h3 id="tailscale-disconnects-after-update">Tailscale Disconnects After Update</h3>
 <p>Tailscale state persists in <code>/data/varlib/tailscale</code> across OS updates. If it disconnects, re-authenticate:</p>
 <pre><code class="language-bash">sudo tailscale up</code></pre>
-<p>---</p>
-<h2>General Diagnostics</h2>
-<h3>Reading the System Journal</h3>
+<hr>
+<h2 id="general-diagnostics">General Diagnostics</h2>
+<h3 id="reading-the-system-journal">Reading the System Journal</h3>
 <pre><code class="language-bash"># All errors from the current boot
 journalctl -b 0 -p err --no-pager
 
@@ -495,7 +497,7 @@ journalctl -u service-name -b 0 -n 100
 
 # Filter by time
 journalctl --since &quot;10 minutes ago&quot;</code></pre>
-<h3>Checking What Changed</h3>
+<h3 id="checking-what-changed">Checking What Changed</h3>
 <pre><code class="language-bash"># What /etc files have you customised?
 find /data/overlay/etc/upper/ -type f | sort
 
@@ -504,7 +506,7 @@ systemctl list-unit-files --state=enabled | grep -v &quot;systemd\|dbus\|getty&q
 
 # What Flatpak overrides are active?
 flatpak override --user --show</code></pre>
-<h3>System Health Summary</h3>
+<h3 id="system-health-summary">System Health Summary</h3>
 <pre><code class="language-bash"># Full health check (introduced in 2026.04.15)
 shani-health
 
@@ -513,8 +515,8 @@ shani-health -v
 
 # Storage summary
 shani-health -s</code></pre>
-<p>---</p>
-<h2>Getting More Help</h2>
+<hr>
+<h2 id="getting-more-help">Getting More Help</h2>
 <p>If the problem isn't covered here, the Telegram community is the fastest path to a solution:</p>
 <ul>
 <li><a href="https://t.me/shani8dev">Telegram community</a> — post your <code>journalctl -b 0 -p err</code> output and describe what you were doing when the problem occurred</li>
@@ -525,8 +527,8 @@ cat /etc/shani-version
 cat /data/current-slot
 shani-health --verify --json
 journalctl -b 0 -p err --no-pager | tail -30</code></pre>
-<p>---</p>
-<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+<hr>
+<blockquote><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></blockquote></div>
       </article>
     </section>
 

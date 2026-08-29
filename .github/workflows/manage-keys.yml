@@ -57,10 +57,12 @@ jobs:
           fi
 
           KEY_UPPER=$(echo "$KEY" | tr '[:lower:]' '[:upper:]')
+          # keys.json stores only SHA-256 digests — never raw keys.
+          KEY_HASH=$(printf '%s' "$KEY_UPPER" | sha256sum | cut -d' ' -f1)
 
           if [ "$ACTION" = "lookup" ]; then
             echo "=== Key entry ==="
-            RESULT=$(jq --arg k "$KEY_UPPER" '.[] | select(.key == $k)' data/keys.json)
+            RESULT=$(jq --arg h "$KEY_HASH" '.[] | select(.key_hash == $h)' data/keys.json)
             if [ -z "$RESULT" ]; then
               echo "✗ Key not found: $KEY_UPPER"
               exit 1
@@ -70,7 +72,7 @@ jobs:
           fi
 
           # ── Check the key actually exists before trying to update it ───────
-          MATCH=$(jq -r --arg k "$KEY_UPPER" '.[] | select(.key == $k) | .key' data/keys.json)
+          MATCH=$(jq -r --arg h "$KEY_HASH" '.[] | select(.key_hash == $h) | .key_hash' data/keys.json)
           if [ -z "$MATCH" ]; then
             echo "✗ Key not found: $KEY_UPPER — nothing updated"
             exit 1
@@ -81,9 +83,9 @@ jobs:
             REVOKED="true"
           fi
 
-          # Update the revoked field for the matching key
-          jq --arg k "$KEY_UPPER" --argjson r "$REVOKED" \
-            'map(if .key == $k then .revoked = $r else . end)' \
+          # Update the revoked field for the matching key hash
+          jq --arg h "$KEY_HASH" --argjson r "$REVOKED" \
+            'map(if .key_hash == $h then .revoked = $r else . end)' \
             data/keys.json > data/keys.tmp
           mv data/keys.tmp data/keys.json
 

@@ -4,7 +4,7 @@ title: 'AppImage on Shani OS — Portable Apps with Gear Lever'
 date: '2026-05-02'
 tag: 'Guide'
 excerpt: 'AppImages are self-contained portable executables that need no installation and work on any Linux system. Gear Lever (pre-installed) integrates them into your desktop launcher, manages updates, and keeps them in persistent storage that survives OS updates.'
-cover: ''
+cover: /assets/images/blog/appimage-on-shani-os.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -12,13 +12,13 @@ author_initials: 'SK'
 author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
-readTime: '5 min'
+readTime: '3 min'
 series: 'Shani OS Guides'
 ---
 
 An AppImage is a self-contained portable executable — every dependency the application needs is bundled inside a single `.AppImage` file. You download it, make it executable, and run it. No package manager, no installation, no modifications to the system.
 
-On Shani OS, this is a natural fit. The OS root is read-only anyway, so AppImages — which never write to system paths — work exactly as intended. **Gear Lever** (pre-installed on both editions) goes further: it integrates AppImages into your application launcher, tracks updates, and stores them in a persistent bind-mount that survives OS updates and rollbacks.
+On Shani OS, this is a natural fit. The OS root is read-only anyway, so AppImages — which never write to system paths — work exactly as intended. **Gear Lever** (pre-installed on every edition) goes further: it integrates AppImages into your application launcher, tracks updates, and stores them in a persistent bind-mount that survives OS updates and rollbacks.
 
 Full reference: [docs.shani.dev — AppImage](https://docs.shani.dev/doc/software/appimage).
 

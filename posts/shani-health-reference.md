@@ -2,9 +2,9 @@
 slug: shani-health-reference
 title: 'shani-health — System Health Monitoring for Shani OS'
 date: '2026-05-12'
-tag: 'Guide'
+tag: 'Reference'
 excerpt: 'shani-health is the CLI tool for checking the health of a running Shani OS system — boot state, security posture, storage, network, hardware, and a deep integrity check with machine-readable output. Introduced in the 2026.04.15 release.'
-cover: ''
+cover: /assets/images/blog/shani-health-reference.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -203,7 +203,7 @@ Every other mode (`--boot`, `--security`, `-s`/`--storage-info`, `--network`, `-
 - [docs.shani.dev — System Updates](https://docs.shani.dev/doc/updates/system) — full update system reference
 - [shani-os-updates](https://blog.shani.dev/post/shani-os-updates) — shani-deploy and shani-update reference
 - [Shani OS for OEMs and IT Fleets](https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment) — fleet monitoring integration
-- [2026.04.15 Release Notes](https://blog.shani.dev/post/shani-os-2026-04-15-release) — release that introduced shani-health
+- [2026.04.15 Release Notes](https://blog.shani.dev/post/2026-04-15-release-notes) — release that introduced shani-health
 - [Telegram community](https://t.me/shani8dev)
 
 ---

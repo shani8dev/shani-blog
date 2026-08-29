@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev data:; connect-src 'self' https://api.github.com">
+
+  <title>Inside the Shanios Build Pipeline: From Package List to Bootable Image — Shanios Blog</title>
+  <meta name="description" id="meta-desc" content="Every Shanios release starts as a list of package names and ends as a GPG-signed, Secure Boot-ready ISO. The build pipeline that bridges tho…">
+  <meta name="author"      content="Shrinivas Kumbhar">
+  <meta name="robots"      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical"    id="canonical-url" href="https://blog.shani.dev/post/shani-os-build-pipeline/">
+
+  <meta property="og:site_name" id="og-site-name" content="Shanios Blog">
+  <meta property="og:type"      id="og-type"      content="article">
+  <meta property="og:title"     id="og-title"     content="Inside the Shanios Build Pipeline: From Package List to Bootable Image">
+  <meta property="og:description" id="og-desc"    content="Every Shanios release starts as a list of package names and ends as a GPG-signed, Secure Boot-ready ISO. The build pipeline that bridges tho…">
+  <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/shani-os-build-pipeline/">
+  <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/shani-os-build-pipeline.webp">
+  <meta property="og:image:alt" id="og-image-alt" content="Inside the Shanios Build Pipeline: From Package List to Bootable Image">
+  <meta property="og:locale"    content="en_US">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-08-24T18:30:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-08-24T18:30:00.000Z">
+  <meta property="article:author"         id="og-article-author"  content="Shrinivas Kumbhar">
+  <meta property="article:section"        id="og-article-section" content="Deep Dive">
+  
+
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
+  <meta name="twitter:title"       id="tw-title" content="Inside the Shanios Build Pipeline: From Package List to Bootable Image">
+  <meta name="twitter:description" id="tw-desc"  content="Every Shanios release starts as a list of package names and ends as a GPG-signed, Secure Boot-ready ISO. The build pipeline that bridges tho…">
+  <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/shani-os-build-pipeline.webp">
+
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Inside the Shanios Build Pipeline: From Package List to Bootable Image","description":"Every Shanios release starts as a list of package names and ends as a GPG-signed, Secure Boot-ready ISO. The build pipeline that bridges tho…","url":"https://blog.shani.dev/post/shani-os-build-pipeline/","datePublished":"2026-08-24T18:30:00.000Z","dateModified":"2026-08-24T18:30:00.000Z","author":{"@type":"Person","name":"Shrinivas Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-os-build-pipeline.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
+  <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
+
+  <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <!-- ═══ FAVICON — src overwritten by applyBranding() ═════════════════════ -->
+  <link rel="icon" id="favicon" type="image/svg+xml" href="https://shani.dev/assets/images/logo.svg">
+
+  <!-- ═══ PWA / Web App ════════════════════════════════════════════════════ -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" id="pwa-theme-color" content="#161514">
+
+  <!-- ═══ GitHub Pages SPA: restore real URL from 404.html redirect ════════ -->
+  <script>
+    (function () {
+      var qs = new URLSearchParams(location.search);
+      var p  = qs.get('p');
+      if (!p) return;
+      qs.delete('p');
+      var q = qs.get('q') || ''; qs.delete('q');
+      var h = qs.get('h') || ''; qs.delete('h');
+      var url = decodeURIComponent(p);
+      // Rewrite /posts/slug or /posts/slug.md or /posts/slug/ → /post/slug
+      var postsMatch = url.match(/^\/posts\/(.+?)(?:\.md)?\/?(\?.*)?$/);
+      if (postsMatch) url = '/post/' + postsMatch[1];
+      if (q) url += '?' + decodeURIComponent(q);
+      if (h) url += '#' + decodeURIComponent(h);
+      history.replaceState(null, '', url);
+    })();
+  </script>
+
+  <!-- ═══ Theme — applied before CSS to prevent flash ══════════════════════ -->
+  <script>
+    (function () {
+      // PREFIX is read from CONFIG if available; falls back to 'blogs' for the
+      // very first paint (CONFIG loads after this inline script).
+      try {
+        var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
+        var t = localStorage.getItem(pfx + '_theme') ||
+                (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+
+  <!-- ═══ STYLES ═══════════════════════════════════════════════════════════ -->
+  <link rel="stylesheet" href="/brand-shani.css">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Prism.js — code syntax highlighting -->
+  <link rel="stylesheet" id="prism-theme"
+        href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+  <!-- KaTeX — math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" defer></script>
+
+  <!-- Markdown Parser & Sanitizer -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script>
+
+  <!-- Prism.js Core + Languages -->
+  <!-- All non-critical CDN libs are now `defer`red (were previously blocking
+       HTML parsing) — same pattern already used on docs.shani.dev. `defer`
+       scripts execute in source order right before DOMContentLoaded, so
+       load order relative to each other and to config-shani.js/script.js
+       (also at end of body) is preserved. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hcl.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-nginx.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js" defer></script>
+  <!-- Java / Spring Boot / Kotlin / Groovy / XML / Properties -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-groovy.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-gradle.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-properties.min.js" defer></script>
+</head>
+<body>
+  <noscript>
+    <div style="text-align:center;padding:4rem 2rem;font-family:sans-serif">
+      <strong>JavaScript is required to view this blog.</strong>
+    </div>
+  </noscript>
+
+  <!-- Full-page loading overlay — hidden by JS once posts are ready -->
+  <div id="page-loader" aria-hidden="true">
+    <div class="loader__logo">
+      <img id="loader-logo-img" src="" alt="Blog">
+      <span class="logo__sub"></span>
+    </div>
+    <div class="loader__track"><div class="loader__bar"></div></div>
+    <p class="loader__text">Loading posts…</p>
+  </div>
+
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- ═══ HEADER ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div class="auspicious-bar">
+      <a href="#" class="auspicious-text" id="auspicious-link" aria-label="Visit site"></a>
+    </div>
+
+    <div class="header__inner container">
+      <a href="/" class="logo logo--img" id="logo-link" aria-label="Blog home">
+        <img src="" alt="Blog" class="logo__img" height="28" id="logo-img">
+        <span class="logo__sub">blog</span>
+      </a>
+
+      <!-- Desktop nav — items injected by applyBranding() -->
+      <nav class="nav" id="desktop-nav" aria-label="Primary"></nav>
+
+      <div class="header__actions">
+        <button class="btn-icon" id="search-toggle" aria-label="Search (Ctrl+K)">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        <button class="btn-icon" id="theme-btn" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
+        <button class="btn-icon" id="shortcuts-hint" aria-label="Keyboard shortcuts (?)" title="Keyboard shortcuts (?)">
+          <i class="fa-solid fa-keyboard"></i>
+        </button>
+        <button class="btn-icon menu-btn" id="menu-toggle"
+                aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile nav — items injected by applyBranding() -->
+    <nav class="mobile-nav container" id="mobile-nav" aria-hidden="true"></nav>
+  </header>
+
+  <!-- ═══ SEARCH BAR ═══════════════════════════════════════════════════════ -->
+  <div class="search-bar" id="search-bar" aria-hidden="true" role="search">
+    <div class="search-bar__inner container">
+      <i class="fa-solid fa-magnifying-glass search-bar__icon" aria-hidden="true"></i>
+      <input type="search" class="search" id="search-input"
+             placeholder="Search posts…" aria-label="Search posts" autocomplete="off">
+      <button class="btn-icon search-bar__close" id="search-close" aria-label="Close search">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+  <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+  <div id="reading-bar" role="progressbar" aria-label="Reading progress" aria-hidden="true"></div>
+  <main id="main-content">
+    <!-- INDEX VIEW -->
+    <section id="view-index" style="display:none">
+      <header class="hero container">
+        <div class="hero__grid">
+          <!-- Populated by Renderer.renderHero() -->
+        </div>
+      </header>
+
+      <section class="posts container">
+        <div class="section-header">
+          <h2 class="section-header__title" id="section-title">Latest Posts</h2>
+          <div class="section-header__line"></div>
+        </div>
+        <div class="filters__bar" id="tag-bar" role="toolbar" aria-label="Filter by tag"></div>
+        <div class="grid" id="posts-grid" role="list"></div>
+      </section>
+    </section>
+
+    <!-- POST VIEW -->
+    <section id="view-post" class="container" aria-label="Post">
+      <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Deep Dive</span>
+        <h1 class="post-title">Inside the Shanios Build Pipeline: From Package List to Bootable Image</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Kumbhar · 2026-08-25 · 10 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Every Shanios release starts as a list of package names and ends as a GPG-signed, Secure Boot-ready ISO. The build pipeline that bridges those two endpoints is fully automated, runs inside a Docker container, and produces reproducible Btrfs images across four desktop profiles. This post walks through how it works.</p>
+<hr>
+<h2 id="the-entry-point">The Entry Point</h2>
+<p>Everything starts with <code>build.sh</code> in the <a href="https://github.com/shani8dev/shani-install-media">shani-install-media</a> repository. It is a dispatcher — it parses a command and profile, then calls the appropriate sub-script:</p>
+<pre><code class="language-bash">./build.sh full -p plasma    # build everything for KDE Plasma
+./build.sh image -p gnome    # just the base image
+./build.sh iso-only -p cosmic # download from R2, build ISO, upload</code></pre>
+<p>The compound commands chain stages together: <code>full</code> runs image → flatpak → snap → iso → repack → release → upload in sequence. <code>iso-only</code> skips local image building entirely and downloads the base image from Cloudflare R2 instead.</p>
+<hr>
+<h2 id="stage-1-the-base-image">Stage 1: The Base Image</h2>
+<p><code>build-base-image.sh</code> is where the real work happens. It:</p>
+<ol>
+<li>Creates a Btrfs subvolume in a chroot directory</li>
+<li>Runs <code>pacstrap</code> with the profile's package list from <code>image_profiles/&lt;profile&gt;/package-list.txt</code></li>
+<li>Applies the shared overlay — base configs, systemd units, environment files</li>
+<li>Runs the profile-specific customization script (e.g., <code>gnome-customization.sh</code> enables GNOME services, installs GNOME Flatpaks)</li>
+<li>Takes a Btrfs snapshot and compresses it with Zstandard</li>
+</ol>
+<p>The output is a <code>.zst</code> file — a Btrfs send-stream that can be received onto any Btrfs filesystem with the exact same byte-level layout.</p>
+<p>Each profile has its own package list:</p>
+<table><thead><tr><th>Profile</th><th>Packages</th><th>Desktop</th></tr></thead><tbody><tr><td><code>gnome</code></td><td>~25 base packages + Flatpaks</td><td>GNOME</td></tr><tr><td><code>plasma</code></td><td>~25 base packages + Flatpaks</td><td>KDE Plasma</td></tr><tr><td><code>cosmic</code></td><td>~25 base packages + Flatpaks</td><td>COSMIC</td></tr><tr><td><code>server</code></td><td>~30 explicit packages</td><td>None (headless)</td></tr></tbody></table>
+<p>The server profile is notably different — it deliberately excludes the desktop metapackages and instead installs <code>shani-tools-network</code> plus cloud-init, systemd-networkd, and container tooling.</p>
+<hr>
+<h2 id="stage-2-flatpak-and-snap-images">Stage 2: Flatpak and Snap Images</h2>
+<p>If <code>flatpak-packages.txt</code> exists for the profile (it does for all desktop editions), <code>build-flatpak-image.sh</code> creates a separate Btrfs subvolume, installs every Flatpak listed, and produces a <code>flatpakfs.zst</code>. Same pattern for snaps via <code>build-snap-image.sh</code>.</p>
+<p>These separate images are bundled into the ISO — they are not part of the base image because Flatpak and Snap runtimes are large and change independently of the base system.</p>
+<hr>
+<h2 id="stage-3-iso-assembly">Stage 3: ISO Assembly</h2>
+<p><code>build-iso.sh</code> runs <code>mkarchiso</code> (the standard Arch Linux ISO builder) with the base image and optional Flatpak/Snap images as source. The <code>--from-r2</code> flag allows building without the base image locally — it downloads from Cloudflare R2, verifies the SHA256 and GPG signature, then feeds it to mkarchiso.</p>
+<hr>
+<h2 id="stage-4-repack-and-sign">Stage 4: Repack and Sign</h2>
+<p><code>repack-iso.sh</code> takes the unsigned ISO and:</p>
+<ol>
+<li>Signs it with <code>sbsign</code> using the Secure Boot key</li>
+<li>Generates <code>.sha256</code> and <code>.asc</code> (GPG signature) files</li>
+<li>Creates a BitTorrent file for peer-assisted distribution</li>
+</ol>
+<p>The output is a <code>signed_&lt;os&gt;-&lt;date&gt;-&lt;profile&gt;.iso</code> ready for distribution.</p>
+<hr>
+<h2 id="stage-5-upload-and-release">Stage 5: Upload and Release</h2>
+<p><code>upload.sh</code> pushes artifacts to two destinations:</p>
+<ul>
+<li><strong>SourceForge</strong> — primary download server, accessed via <code>lftp</code></li>
+<li><strong>Cloudflare R2</strong> — build cache and CDN, accessed via <code>rclone</code></li>
+</ul>
+<p><code>release.sh</code> creates channel manifest files (<code>latest.txt</code> or <code>stable.txt</code>) that <code>shani-deploy</code> reads to determine what's available for update.</p>
+<hr>
+<h2 id="the-docker-environment">The Docker Environment</h2>
+<p>None of this runs on your host machine. The entire pipeline executes inside <code>shrinivasvkumbhar/shani-builder</code> — a privileged Docker container based on <code>archlinux:base-devel</code> that pre-installs <code>pacman</code>, <code>btrfs-progs</code>, <code>zstd</code>, <code>squashfs-tools</code>, <code>archiso</code>, <code>dracut</code>, <code>systemd-ukify</code>, <code>sbsigntools</code>, and the Shanios signing key.</p>
+<p>The container runs as privileged because image assembly requires Btrfs operations, loop mounts, and chroot — all of which need host-level access. The host's source tree is bind-mounted read-only, and output artifacts are written to a cache directory.</p>
+<hr>
+<h2 id="cicd">CI/CD</h2>
+<p>Two GitHub Actions workflows in <a href="https://github.com/shani8dev/shani-builder">shani-builder</a> automate the pipeline:</p>
+<ul>
+<li><strong><code>build-image.yml</code></strong> — triggered on push to <code>main</code> or manual dispatch, builds the OS image</li>
+<li><strong><code>promote-stable.yml</code></strong> — promotes the current <code>latest</code> build to <code>stable</code> after verification</li>
+</ul>
+<p>Both use AWS OIDC for authentication — no long-lived credentials are stored in GitHub secrets for the core build path.</p>
+<hr>
+<h2 id="testing">Testing</h2>
+<p><code>build.sh test</code> provides three test modes:</p>
+<ul>
+<li><code>test disk</code> — creates loop-mounted disks, installs the image, boots it, runs health checks</li>
+<li><code>test bootstrap -p &lt;profile&gt;</code> — installs and configures a profile from scratch</li>
+<li><code>test cycle -p &lt;profile&gt;</code> — full lifecycle: install → update → rollback → verify</li>
+</ul>
+<p>Tests run inside the same Docker container as the build, using <code>systemd-nspawn</code> for boot simulation.</p>
+<hr>
+<h2 id="why-this-matters">Why This Matters</h2>
+<p>The build pipeline is not a side project — it is the mechanism that makes Shanios reproducible. Every release is produced by the same code path, in the same container, with the same package versions. There is no "build it on my machine" step. An OEM can fork the repo, change a package list, and get an identical pipeline producing their custom image.</p>
+<p>If you are building a custom Linux distribution or managing fleet images, the Shanios build pipeline is a reference implementation of how to do atomic, reproducible image builds on top of Arch Linux.</p></div>
+      </article>
+    </section>
+
+    <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->
+    <section id="view-membership" class="container" style="display:none" aria-label="Membership">
+      <!-- script.js writes this section's innerHTML from CONFIG on every /membership visit.
+           Razorpay SDK is lazy-loaded by script.js only when this page is visited. -->
+    </section>
+  </main>
+
+  <!-- ═══ FOOTER ══════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="footer__inner container">
+      <span class="footer__brand" id="footer-name">
+        <img src="" alt="Blog" class="logo__img logo__img--footer" height="20" id="footer-logo-img">
+        <span class="logo__sub"></span>
+      </span>
+      <nav class="footer__links" id="footer-links" aria-label="Social links"></nav>
+      <span class="footer__copy">© <span data-current-year></span></span>
+    </div>
+  </footer>
+
+  <!-- Back-to-top -->
+  <button class="to-top" id="back-top" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <!-- ═══ SCRIPTS — config must come first ═════════════════════════════════ -->
+  <script src="/config-shani.js"></script>
+  <script src="/utils.js"></script>
+  <script>
+    // Inject AdSense library if configured — done here so it loads in parallel
+    // with script.js rather than blocking it. The ad unit itself is inserted
+    // mid-post by script.js after the post body is rendered.
+    (function () {
+      var cfg = (typeof CONFIG !== 'undefined') ? CONFIG : {};
+      if (!cfg.ADSENSE_CLIENT) return;
+      if (document.getElementById('adsense-script')) return;
+      var s = document.createElement('script');
+      s.id = 'adsense-script';
+      s.async = true;
+      s.crossOrigin = 'anonymous';
+      s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + cfg.ADSENSE_CLIENT;
+      document.head.appendChild(s);
+    })();
+  </script>
+  <script src="/script.js"></script>
+
+  <!-- ═══ Service worker — offline shell + stale-while-revalidate posts ═══ -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function (e) { console.error('SW failed:', e); });
+    }
+  </script>
+</body>
+</html>

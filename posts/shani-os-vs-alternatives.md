@@ -2,9 +2,9 @@
 slug: shani-os-vs-alternatives
 title: 'Shani OS vs Fedora Silverblue, Bazzite, SteamOS, and NixOS — An Honest Comparison'
 date: '2026-05-08'
-tag: 'Engineering'
+tag: 'Deep Dive'
 excerpt: 'An honest technical comparison of immutable Linux distributions. Where Shani OS wins, where others genuinely win, and how to pick the right one for your situation. Btrfs send/receive vs OSTree vs OCI images, gaming focus, enterprise needs, and declarative vs imperative philosophy.'
-cover: ''
+cover: /assets/images/blog/shani-os-vs-alternatives.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -77,7 +77,7 @@ For gaming on a **general PC** (particularly with NVIDIA), Bazzite is the strong
 **Shani OS advantages for gaming:**
 - Arch Linux base means more current drivers and packages than Fedora's 6-month cycle
 - Full image verification (SHA256 + GPG) end-to-end
-- NVIDIA works at first boot on both editions
+- NVIDIA works at first boot on every edition
 - Zero telemetry — no Steam hardware survey type data from the OS
 - Indian hardware commonly sold in India tends to work better tested against Arch than Fedora
 

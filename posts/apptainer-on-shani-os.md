@@ -2,9 +2,9 @@
 slug: apptainer-on-shani-os
 title: 'Apptainer (Singularity) on Shani OS — HPC Containers for Workstation and Cluster'
 date: '2026-05-07'
-tag: 'Guide'
+tag: 'Deep Dive'
 excerpt: 'Apptainer is the HPC standard for portable, reproducible containers — pre-installed on Shani OS, no root required, runs the same SIF image on your workstation and on any SLURM/PBS cluster. Build once, run anywhere, with full NVIDIA and AMD ROCm GPU support.'
-cover: ''
+cover: /assets/images/blog/apptainer-on-shani-os.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,7 +13,7 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '8 min'
-series: 'Shani OS Guides'
+series: 'Shani OS Deep Dives'
 ---
 
 Apptainer — formerly Singularity — is the container runtime built for HPC. Where Docker and Podman are designed for services and development workflows, Apptainer is designed for a specific problem: running a portable, self-contained environment on machines you do not control. Clusters. Shared login nodes. HPC systems where you cannot run a root daemon, cannot install packages, and cannot guarantee that the host OS matches your workstation.

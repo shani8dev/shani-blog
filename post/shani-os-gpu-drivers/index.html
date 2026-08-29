@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev data:; connect-src 'self' https://api.github.com">
+
+  <title>NVIDIA, AMD, Intel GPUs on Shanios: How Drivers Work on an Immutable OS — Shanios Blog</title>
+  <meta name="description" id="meta-desc" content="Ask any long-time Linux desktop user about graphics drivers and you will hear war stories: the kernel update that landed before the NVIDIA m…">
+  <meta name="author"      content="Shrinivas Kumbhar">
+  <meta name="robots"      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical"    id="canonical-url" href="https://blog.shani.dev/post/shani-os-gpu-drivers/">
+
+  <meta property="og:site_name" id="og-site-name" content="Shanios Blog">
+  <meta property="og:type"      id="og-type"      content="article">
+  <meta property="og:title"     id="og-title"     content="NVIDIA, AMD, Intel GPUs on Shanios: How Drivers Work on an Immutable OS">
+  <meta property="og:description" id="og-desc"    content="Ask any long-time Linux desktop user about graphics drivers and you will hear war stories: the kernel update that landed before the NVIDIA m…">
+  <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/shani-os-gpu-drivers/">
+  <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/shani-os-gpu-drivers.webp">
+  <meta property="og:image:alt" id="og-image-alt" content="NVIDIA, AMD, Intel GPUs on Shanios: How Drivers Work on an Immutable OS">
+  <meta property="og:locale"    content="en_US">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-08-24T18:30:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-08-24T18:30:00.000Z">
+  <meta property="article:author"         id="og-article-author"  content="Shrinivas Kumbhar">
+  <meta property="article:section"        id="og-article-section" content="Deep Dive">
+  
+
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
+  <meta name="twitter:title"       id="tw-title" content="NVIDIA, AMD, Intel GPUs on Shanios: How Drivers Work on an Immutable OS">
+  <meta name="twitter:description" id="tw-desc"  content="Ask any long-time Linux desktop user about graphics drivers and you will hear war stories: the kernel update that landed before the NVIDIA m…">
+  <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/shani-os-gpu-drivers.webp">
+
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"NVIDIA, AMD, Intel GPUs on Shanios: How Drivers Work on an Immutable OS","description":"Ask any long-time Linux desktop user about graphics drivers and you will hear war stories: the kernel update that landed before the NVIDIA m…","url":"https://blog.shani.dev/post/shani-os-gpu-drivers/","datePublished":"2026-08-24T18:30:00.000Z","dateModified":"2026-08-24T18:30:00.000Z","author":{"@type":"Person","name":"Shrinivas Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-os-gpu-drivers.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
+  <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
+
+  <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <!-- ═══ FAVICON — src overwritten by applyBranding() ═════════════════════ -->
+  <link rel="icon" id="favicon" type="image/svg+xml" href="https://shani.dev/assets/images/logo.svg">
+
+  <!-- ═══ PWA / Web App ════════════════════════════════════════════════════ -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" id="pwa-theme-color" content="#161514">
+
+  <!-- ═══ GitHub Pages SPA: restore real URL from 404.html redirect ════════ -->
+  <script>
+    (function () {
+      var qs = new URLSearchParams(location.search);
+      var p  = qs.get('p');
+      if (!p) return;
+      qs.delete('p');
+      var q = qs.get('q') || ''; qs.delete('q');
+      var h = qs.get('h') || ''; qs.delete('h');
+      var url = decodeURIComponent(p);
+      // Rewrite /posts/slug or /posts/slug.md or /posts/slug/ → /post/slug
+      var postsMatch = url.match(/^\/posts\/(.+?)(?:\.md)?\/?(\?.*)?$/);
+      if (postsMatch) url = '/post/' + postsMatch[1];
+      if (q) url += '?' + decodeURIComponent(q);
+      if (h) url += '#' + decodeURIComponent(h);
+      history.replaceState(null, '', url);
+    })();
+  </script>
+
+  <!-- ═══ Theme — applied before CSS to prevent flash ══════════════════════ -->
+  <script>
+    (function () {
+      // PREFIX is read from CONFIG if available; falls back to 'blogs' for the
+      // very first paint (CONFIG loads after this inline script).
+      try {
+        var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
+        var t = localStorage.getItem(pfx + '_theme') ||
+                (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+
+  <!-- ═══ STYLES ═══════════════════════════════════════════════════════════ -->
+  <link rel="stylesheet" href="/brand-shani.css">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Prism.js — code syntax highlighting -->
+  <link rel="stylesheet" id="prism-theme"
+        href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+  <!-- KaTeX — math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" defer></script>
+
+  <!-- Markdown Parser & Sanitizer -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script>
+
+  <!-- Prism.js Core + Languages -->
+  <!-- All non-critical CDN libs are now `defer`red (were previously blocking
+       HTML parsing) — same pattern already used on docs.shani.dev. `defer`
+       scripts execute in source order right before DOMContentLoaded, so
+       load order relative to each other and to config-shani.js/script.js
+       (also at end of body) is preserved. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hcl.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-nginx.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js" defer></script>
+  <!-- Java / Spring Boot / Kotlin / Groovy / XML / Properties -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-groovy.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-gradle.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-properties.min.js" defer></script>
+</head>
+<body>
+  <noscript>
+    <div style="text-align:center;padding:4rem 2rem;font-family:sans-serif">
+      <strong>JavaScript is required to view this blog.</strong>
+    </div>
+  </noscript>
+
+  <!-- Full-page loading overlay — hidden by JS once posts are ready -->
+  <div id="page-loader" aria-hidden="true">
+    <div class="loader__logo">
+      <img id="loader-logo-img" src="" alt="Blog">
+      <span class="logo__sub"></span>
+    </div>
+    <div class="loader__track"><div class="loader__bar"></div></div>
+    <p class="loader__text">Loading posts…</p>
+  </div>
+
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- ═══ HEADER ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div class="auspicious-bar">
+      <a href="#" class="auspicious-text" id="auspicious-link" aria-label="Visit site"></a>
+    </div>
+
+    <div class="header__inner container">
+      <a href="/" class="logo logo--img" id="logo-link" aria-label="Blog home">
+        <img src="" alt="Blog" class="logo__img" height="28" id="logo-img">
+        <span class="logo__sub">blog</span>
+      </a>
+
+      <!-- Desktop nav — items injected by applyBranding() -->
+      <nav class="nav" id="desktop-nav" aria-label="Primary"></nav>
+
+      <div class="header__actions">
+        <button class="btn-icon" id="search-toggle" aria-label="Search (Ctrl+K)">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        <button class="btn-icon" id="theme-btn" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
+        <button class="btn-icon" id="shortcuts-hint" aria-label="Keyboard shortcuts (?)" title="Keyboard shortcuts (?)">
+          <i class="fa-solid fa-keyboard"></i>
+        </button>
+        <button class="btn-icon menu-btn" id="menu-toggle"
+                aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile nav — items injected by applyBranding() -->
+    <nav class="mobile-nav container" id="mobile-nav" aria-hidden="true"></nav>
+  </header>
+
+  <!-- ═══ SEARCH BAR ═══════════════════════════════════════════════════════ -->
+  <div class="search-bar" id="search-bar" aria-hidden="true" role="search">
+    <div class="search-bar__inner container">
+      <i class="fa-solid fa-magnifying-glass search-bar__icon" aria-hidden="true"></i>
+      <input type="search" class="search" id="search-input"
+             placeholder="Search posts…" aria-label="Search posts" autocomplete="off">
+      <button class="btn-icon search-bar__close" id="search-close" aria-label="Close search">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+  <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+  <div id="reading-bar" role="progressbar" aria-label="Reading progress" aria-hidden="true"></div>
+  <main id="main-content">
+    <!-- INDEX VIEW -->
+    <section id="view-index" style="display:none">
+      <header class="hero container">
+        <div class="hero__grid">
+          <!-- Populated by Renderer.renderHero() -->
+        </div>
+      </header>
+
+      <section class="posts container">
+        <div class="section-header">
+          <h2 class="section-header__title" id="section-title">Latest Posts</h2>
+          <div class="section-header__line"></div>
+        </div>
+        <div class="filters__bar" id="tag-bar" role="toolbar" aria-label="Filter by tag"></div>
+        <div class="grid" id="posts-grid" role="list"></div>
+      </section>
+    </section>
+
+    <!-- POST VIEW -->
+    <section id="view-post" class="container" aria-label="Post">
+      <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Deep Dive</span>
+        <h1 class="post-title">NVIDIA, AMD, Intel GPUs on Shanios: How Drivers Work on an Immutable OS</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Kumbhar · 2026-08-25 · 6 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Ask any long-time Linux desktop user about graphics drivers and you will hear war stories: the kernel update that landed before the NVIDIA module was ready, the DKMS build that silently failed at 2 AM, the <code>.run</code> installer that half-wrote into <code>/usr</code> and left the system unbootable after the next kernel bump.</p>
+<p>On Shanios, those stories cannot happen. Not because we are careful — because the architecture makes them impossible. This post explains how GPU drivers work on an immutable, image-based OS, and why driver anxiety is one of the first things that dies when you switch.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/system/gpu">GPU & Graphics Drivers</a>.</p>
+<hr>
+<h2 id="everything-ships-in-the-signed-image">Everything Ships in the Signed Image</h2>
+<p>Every driver your hardware needs is inside the signed OS image: kernel modules, Mesa userspace, NVIDIA userland, and GPU firmware from <code>linux-firmware</code>. There is no driver installation step. There is nothing to download after setup, no AUR package to babysit, no DKMS hook waiting for your next kernel update.</p>
+<p>The reason this works is simple: a kernel module must match the kernel it loads into, exactly. On a mutable distro, the kernel and the modules are separate packages updated by separate transactions — which is precisely where the classic breakage comes from. On Shanios they are built together, signed together, and deployed together:</p>
+<pre><code class="language-bash"># Kernel + drivers + firmware move as one unit
+sudo shani-deploy
+
+# And roll back as one unit too
+sudo shani-deploy --rollback</code></pre>
+<p>A partial upgrade that leaves your NVIDIA module older than your kernel is not rare on Shanios. It is structurally impossible.</p>
+<h2 id="the-driver-matrix">The Driver Matrix</h2>
+<p>What ships in every image:</p>
+<table><thead><tr><th>Vendor</th><th>Kernel</th><th>Userspace</th></tr></thead><tbody><tr><td>AMD</td><td><code>amdgpu</code></td><td>Mesa 25.x OpenGL, RADV Vulkan, VAAPI/VDPAU</td></tr><tr><td>Intel</td><td><code>i915</code> / <code>xe</code></td><td>Mesa 25.x OpenGL, ANV Vulkan, <code>intel-media-driver</code> (iHD), VAAPI/VDPAU</td></tr><tr><td>NVIDIA</td><td>proprietary open kernel module series</td><td>NVIDIA GLX/Vulkan/EGL userland, VAAPI shim</td></tr><tr><td>VMs / fallback</td><td><code>virtio-gpu</code>, <code>simpledrm</code></td><td>Mesa, llvmpipe software rendering</td></tr></tbody></table>
+<p>Yes — NVIDIA drivers are included out of the box, using the open kernel module flavor, with <code>nvidia-prime</code> and <code>switcheroo-control</code> pre-configured for hybrid laptops. Firmware files ship split by vendor in the same image, so firmware can never drift from the drivers beside it.</p>
+<p>Verify your stack in thirty seconds:</p>
+<pre><code class="language-bash">lspci -k | grep -A3 VGA     # which driver claimed your GPU
+ls -l /dev/dri              # renderD128 present = acceleration active
+nvidia-smi                  # NVIDIA: version, GPU, processes
+journalctl -b | grep -iE 'nvidia|amdgpu|i915' | head</code></pre>
+<h2 id="hybrid-graphics-without-the-ritual">Hybrid Graphics Without the Ritual</h2>
+<p>On a traditional setup, Optimus laptops involve wiki pages, config snippets, and hope. On Shanios it is a prefix:</p>
+<pre><code class="language-bash"># Run anything on the dGPU
+prime-run blender
+
+# Or without prime-run:
+__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia &lt;app&gt;</code></pre>
+<p>GNOME users do not even need the terminal: right-click any app icon and pick <strong>Launch using dedicated GPU</strong> — that is <code>switcheroo-control</code> doing its job. To confirm an app actually used the dGPU, run <code>nvidia-smi</code> while it is open; its process shows up in the list or it did not touch the NVIDIA GPU.</p>
+<p>Wayland is the default session on every edition, and recent NVIDIA open-module drivers handle it well — explicit sync support removed the flicker-and-corruption class of bugs that used to force people back to X11. If something specific misbehaves, an X11 session is still selectable at the login screen, per login, with zero system changes.</p>
+<h2 id="i-need-a-newer-driver-now">"I Need a Newer Driver Now"</h2>
+<p>This is the honest section.</p>
+<p>Drivers arrive through images. When NVIDIA or Mesa release upstream, the new versions reach you with the next <code>shani-deploy</code> — tested against our kernel, signed, atomic. That pipeline takes days-to-weeks, not hours.</p>
+<p>If the image ships a driver older than you need:</p>
+<ol>
+<li>File an issue at <a href="https://github.com/shani8dev">github.com/shani8dev</a>. Requests directly shape what the next image pins.</li>
+<li>Know what will not work: there is no DKMS path and no <code>.run</code> escape hatch, and that is deliberate. Both write outside the image contract, breaking signature verification and rollback guarantees for everyone. A kernel-side driver simply waits for the next image — I would rather tell you that plainly than sell you a workaround that bricks your boot.</li>
+<li>Compute userspace is different: CUDA libraries live fine inside containers today, decoupled from the host driver version entirely. See <a href="https://docs.shani.dev/doc/software/gpu-containers">GPU compute containers</a>.</li>
+</ol>
+<h2 id="rollback-restores-gpu-sanity">Rollback Restores GPU Sanity</h2>
+<p>Last month a tester deployed an image on a hybrid laptop and hit a black screen at boot. On Arch, this begins an evening of chroots. Here, it went like this:</p>
+<pre><code class="language-text">Reboot -&gt; systemd-boot menu -&gt; previous slot -&gt; working desktop</code></pre>
+<p>The previous slot contained the previous kernel <em>and</em> its matching driver pair, untouched. Back at the login screen, <code>shani-deploy --rollback</code> restored everything cleanly. Total downtime: one reboot. No nomodeset incantations — the kernel cmdline is immutable anyway, and the slot system makes it unnecessary.</p>
+<p>That is the whole pitch in one anecdote: your GPU stack is never half-updated, so it never needs rescuing.</p>
+<h2 id="resources">Resources</h2>
+<ul>
+<li><a href="https://docs.shani.dev/doc/system/gpu">GPU & Graphics Drivers — docs</a> — full driver reference, verification commands, troubleshooting table</li>
+<li><a href="https://blog.shani.dev/post/gpu-compute-on-shani-os">GPU Compute on Shani OS</a> — CUDA via Distrobox, ROCm, oneAPI</li>
+<li><a href="https://blog.shani.dev/post/shani-os-gaming-deep-dive">Gaming on Shani OS</a> — Proton, MangoHud, and the pre-installed gaming stack</li>
+<li><a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a> — VFIO GPU passthrough for dedicated VMs</li>
+</ul></div>
+      </article>
+    </section>
+
+    <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->
+    <section id="view-membership" class="container" style="display:none" aria-label="Membership">
+      <!-- script.js writes this section's innerHTML from CONFIG on every /membership visit.
+           Razorpay SDK is lazy-loaded by script.js only when this page is visited. -->
+    </section>
+  </main>
+
+  <!-- ═══ FOOTER ══════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="footer__inner container">
+      <span class="footer__brand" id="footer-name">
+        <img src="" alt="Blog" class="logo__img logo__img--footer" height="20" id="footer-logo-img">
+        <span class="logo__sub"></span>
+      </span>
+      <nav class="footer__links" id="footer-links" aria-label="Social links"></nav>
+      <span class="footer__copy">© <span data-current-year></span></span>
+    </div>
+  </footer>
+
+  <!-- Back-to-top -->
+  <button class="to-top" id="back-top" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <!-- ═══ SCRIPTS — config must come first ═════════════════════════════════ -->
+  <script src="/config-shani.js"></script>
+  <script src="/utils.js"></script>
+  <script>
+    // Inject AdSense library if configured — done here so it loads in parallel
+    // with script.js rather than blocking it. The ad unit itself is inserted
+    // mid-post by script.js after the post body is rendered.
+    (function () {
+      var cfg = (typeof CONFIG !== 'undefined') ? CONFIG : {};
+      if (!cfg.ADSENSE_CLIENT) return;
+      if (document.getElementById('adsense-script')) return;
+      var s = document.createElement('script');
+      s.id = 'adsense-script';
+      s.async = true;
+      s.crossOrigin = 'anonymous';
+      s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + cfg.ADSENSE_CLIENT;
+      document.head.appendChild(s);
+    })();
+  </script>
+  <script src="/script.js"></script>
+
+  <!-- ═══ Service worker — offline shell + stale-while-revalidate posts ═══ -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function (e) { console.error('SW failed:', e); });
+    }
+  </script>
+</body>
+</html>

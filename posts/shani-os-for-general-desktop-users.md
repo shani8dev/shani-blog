@@ -4,7 +4,7 @@ title: 'Shani OS for General Desktop Users — Productivity, Office, Web, and Ev
 date: '2026-05-10'
 tag: 'Guide'
 excerpt: 'Shani OS for everyday desktop use — office suite and document compatibility, web browsing, email, video calls, cloud storage, calendar, notes, PDF tools, and everything a student, office worker, or home user needs. Most of it works from first boot.'
-cover: ''
+cover: /assets/images/blog/shani-os-for-general-desktop-users.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -45,7 +45,7 @@ Both GNOME and KDE editions include the following on first boot, with no additio
 
 ### OnlyOffice (Pre-Installed)
 
-OnlyOffice Desktop Editors is pre-installed on both editions and handles `.docx`, `.xlsx`, and `.pptx` files with excellent compatibility. It is the recommended choice for anyone who exchanges files with Windows or macOS users, since it preserves formatting, fonts, and comments better than most alternatives.
+OnlyOffice Desktop Editors is pre-installed on every edition and handles `.docx`, `.xlsx`, and `.pptx` files with excellent compatibility. It is the recommended choice for anyone who exchanges files with Windows or macOS users, since it preserves formatting, fonts, and comments better than most alternatives.
 
 OnlyOffice also has a cloud-connected mode — you can connect it to Nextcloud, OnlyOffice Cloud, or Seafile for collaborative editing.
 
@@ -161,9 +161,7 @@ Grant microphone and camera permissions via Flatseal (pre-installed) if the app 
 ```bash
 # Teams PWA via browser (recommended)
 # Open teams.microsoft.com → install as app when prompted
-
-# Or native desktop app
-flatpak install flathub com.microsoft.Teams
+# Microsoft discontinued the native Linux desktop client — browser PWA is the supported path
 ```
 
 ### Signal, WhatsApp, Telegram
@@ -176,8 +174,6 @@ flatpak install flathub org.signal.Signal
 flatpak install flathub org.telegram.desktop
 
 # WhatsApp via browser: web.whatsapp.com
-# Or via unofficial desktop client:
-flatpak install flathub io.github.mimbrero.WhatsAppDesktop
 ```
 
 ---
@@ -292,7 +288,7 @@ flatpak install flathub org.libreoffice.LibreOffice
 
 ```bash
 # Convert images to PDF
-convert image1.jpg image2.jpg output.pdf   # ImageMagick (nix-env -i imagemagick)
+convert image1.jpg image2.jpg output.pdf   # ImageMagick (nix-env -iA nixpkgs.imagemagick)
 
 # Merge PDFs
 pdfunite doc1.pdf doc2.pdf merged.pdf      # poppler-utils
@@ -304,14 +300,14 @@ pdfseparate input.pdf page-%d.pdf
 libreoffice --headless --convert-to pdf document.docx
 
 # Or via Nix
-nix-env -i poppler_utils
+nix-env -iA nixpkgs.poppler_utils
 ```
 
 ---
 
 ## Media Playback
 
-**VLC** is pre-installed and handles virtually every video and audio format, including MKV, MP4, AVI, WebM, FLAC, MP3, and streaming URLs.
+**VLC** handles virtually every video and audio format, including MKV, MP4, AVI, WebM, FLAC, MP3, and streaming URLs. Install it from Flathub if not already present: `flatpak install flathub org.videolan.VLC`.
 
 ```bash
 # Play a stream
@@ -336,8 +332,7 @@ flatpak install flathub org.kde.elisa
 # Spotify
 flatpak install flathub com.spotify.Client
 
-# YouTube Music via browser (music.youtube.com) or
-flatpak install flathub th.angry.PhotoMosh   # YT Music PWA
+# YouTube Music via browser: music.youtube.com
 ```
 
 ### Streaming Services
@@ -375,7 +370,7 @@ sudo mount -t cifs //192.168.1.100/share ~/mnt/share \
 # Command-line archiving
 zip -r archive.zip folder/
 tar -czf archive.tar.gz folder/
-7z a archive.7z folder/     # nix-env -i p7zip
+7z a archive.7z folder/     # nix-env -iA nixpkgs.p7zip
 ```
 
 ### Calculator
@@ -389,7 +384,7 @@ tar -czf archive.tar.gz folder/
 ```bash
 htop    # interactive process viewer (pre-installed)
 btop    # rich terminal resource monitor
-nix-env -i btop  # if not present
+nix-env -iA nixpkgs.btop  # if not present
 ```
 
 ---
@@ -425,7 +420,7 @@ For the full update workflow, channels, and rollback reference: [Updates on Shan
 | PDF tools | Okular or Xournal++ | pre-installed (KDE) / Flathub |
 | Messaging | Telegram + Signal | `flatpak install flathub org.telegram.desktop` |
 | Music | Spotify or Amberol | `flatpak install flathub com.spotify.Client` |
-| Video | VLC (pre-installed) | pre-installed |
+| Video | VLC | `flatpak install flathub org.videolan.VLC` |
 | Password manager | Bitwarden | `flatpak install flathub com.bitwarden.desktop` |
 
 ---

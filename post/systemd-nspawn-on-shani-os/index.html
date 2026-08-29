@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev data:; connect-src 'self' https://api.github.com">
 
   <title>systemd-nspawn and machinectl on Shani OS — Lightweight System Containers — Shanios Blog</title>
   <meta name="description" id="meta-desc" content="systemd-nspawn is the lightest way to run a full Linux system environment on Shani OS — no image management, no daemon, no setup. Containers boot in under a second, live in the @machines Btrfs subvolume, and survive every OS update untouched.">
@@ -15,23 +16,23 @@
   <meta property="og:title"     id="og-title"     content="systemd-nspawn and machinectl on Shani OS — Lightweight System Containers">
   <meta property="og:description" id="og-desc"    content="systemd-nspawn is the lightest way to run a full Linux system environment on Shani OS — no image management, no daemon, no setup. Containers boot in under a second, live in the @machines Btrfs subvolume, and survive every OS update untouched.">
   <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/systemd-nspawn-on-shani-os/">
-  <meta property="og:image"     id="og-image"     content="https://shani.dev/assets/images/logo.svg">
+  <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/systemd-nspawn-on-shani-os.webp">
   <meta property="og:image:alt" id="og-image-alt" content="systemd-nspawn and machinectl on Shani OS — Lightweight System Containers">
   <meta property="og:locale"    content="en_US">
-  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-07T00:00:00.000Z">
-  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-07T00:00:00.000Z">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-06T18:30:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-06T18:30:00.000Z">
   <meta property="article:author"         id="og-article-author"  content="Shrinivas Vishnu Kumbhar">
-  <meta property="article:section"        id="og-article-section" content="Guide">
+  <meta property="article:section"        id="og-article-section" content="Ecosystem">
   
 
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
   <meta name="twitter:title"       id="tw-title" content="systemd-nspawn and machinectl on Shani OS — Lightweight System Containers">
   <meta name="twitter:description" id="tw-desc"  content="systemd-nspawn is the lightest way to run a full Linux system environment on Shani OS — no image management, no daemon, no setup. Containers boot in under a second, live in the @machines Btrfs subvolume, and survive every OS update untouched.">
-  <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
+  <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/systemd-nspawn-on-shani-os.webp">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"systemd-nspawn and machinectl on Shani OS — Lightweight System Containers","description":"systemd-nspawn is the lightest way to run a full Linux system environment on Shani OS — no image management, no daemon, no setup. Containers boot in under a second, live in the @machines Btrfs subvolume, and survive every OS update untouched.","url":"https://blog.shani.dev/post/systemd-nspawn-on-shani-os/","datePublished":"2026-05-07T00:00:00.000Z","dateModified":"2026-05-07T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
-  <script type="application/ld+json" id="ld-org">{}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"systemd-nspawn and machinectl on Shani OS — Lightweight System Containers","description":"systemd-nspawn is the lightest way to run a full Linux system environment on Shani OS — no image management, no daemon, no setup. Containers boot in under a second, live in the @machines Btrfs subvolume, and survive every OS update untouched.","url":"https://blog.shani.dev/post/systemd-nspawn-on-shani-os/","datePublished":"2026-05-06T18:30:00.000Z","dateModified":"2026-05-06T18:30:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/systemd-nspawn-on-shani-os.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
   <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
@@ -199,6 +200,7 @@
   <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+  <div id="reading-bar" role="progressbar" aria-label="Reading progress" aria-hidden="true"></div>
   <main id="main-content">
     <!-- INDEX VIEW -->
     <section id="view-index" style="display:none">
@@ -223,7 +225,7 @@
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
       <article id="post-article">
       <header class="post-header">
-        <span class="post-tag">Guide</span>
+        <span class="post-tag">Ecosystem</span>
         <h1 class="post-title">systemd-nspawn and machinectl on Shani OS — Lightweight System Containers</h1>
         <div class="post-meta">
           <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-07 · 6 min</span>
@@ -233,10 +235,10 @@
 <p>On Shani OS, <code>systemd-nspawn</code> is pre-installed with no configuration needed. Container root filesystems live in the <code>@machines</code> Btrfs subvolume at <code>/var/lib/machines</code>, completely independent of the OS slots. They survive every OS update and rollback untouched.</p>
 <p><code>machinectl</code> is the management tool for nspawn containers and other VMs managed by systemd. It handles pulling images, starting and stopping containers, logging in, and lifecycle management.</p>
 <p>Full reference: <a href="https://docs.shani.dev/doc/software/containers">docs.shani.dev — Containers</a>.</p>
-<p>---</p>
-<h2>nspawn vs LXD vs Distrobox vs Podman vs VMs</h2>
+<hr>
+<h2 id="nspawn-vs-lxd-vs-distrobox-vs-podman-vs-vms">nspawn vs LXD vs Distrobox vs Podman vs VMs</h2>
 <p>Choosing the right container or isolation type:</p>
-<p>| | systemd-nspawn | LXD | Distrobox | Podman | QEMU/KVM | |---|---|---|---|---|---| | Purpose | Lightweight system containers | Full system containers | Dev/app containers | OCI app containers | Full VMs | | Daemon required | No | Yes (lxd.socket) | No | No (socket-activated) | Yes | | Image management | Manual / machinectl pull | Built-in | Automatic | Built-in | Manual | | Full init system | Yes | Yes | No | No | Yes | | Startup time | ~1s | ~3s | ~1s | ~0.1s | ~30s | | Networking | Basic (host network or private) | Full bridge + NAT | Host network | Full (netavark) | Full (bridged/NAT) | | Isolation | High | High | Low–medium | Medium | Full |</p>
+<table><thead><tr><th></th><th>systemd-nspawn</th><th>LXD</th><th>Distrobox</th><th>Podman</th><th>QEMU/KVM</th></tr></thead><tbody><tr><td>Purpose</td><td>Lightweight system containers</td><td>Full system containers</td><td>Dev/app containers</td><td>OCI app containers</td><td>Full VMs</td></tr><tr><td>Daemon required</td><td>No</td><td>Yes (lxd.socket)</td><td>No</td><td>No (socket-activated)</td><td>Yes</td></tr><tr><td>Image management</td><td>Manual / machinectl pull</td><td>Built-in</td><td>Automatic</td><td>Built-in</td><td>Manual</td></tr><tr><td>Full init system</td><td>Yes</td><td>Yes</td><td>No</td><td>No</td><td>Yes</td></tr><tr><td>Startup time</td><td>~1s</td><td>~3s</td><td>~1s</td><td>~0.1s</td><td>~30s</td></tr><tr><td>Networking</td><td>Basic (host network or private)</td><td>Full bridge + NAT</td><td>Host network</td><td>Full (netavark)</td><td>Full (bridged/NAT)</td></tr><tr><td>Isolation</td><td>High</td><td>High</td><td>Low–medium</td><td>Medium</td><td>Full</td></tr></tbody></table>
 <p><strong>Use systemd-nspawn when:</strong></p>
 <ul>
 <li>You want a full Linux system environment with minimal overhead</li>
@@ -245,8 +247,8 @@
 <li>You are doing system-level testing, chroots with networking, or service sandboxing</li>
 <li>You do not need LXD's image catalog, snapshot GUI, or port forwarding features</li>
 </ul>
-<p>---</p>
-<h2>Quick Start: Arch Linux Container</h2>
+<hr>
+<h2 id="quick-start-arch-linux-container">Quick Start: Arch Linux Container</h2>
 <pre><code class="language-bash"># Pull an Arch Linux base image
 sudo machinectl pull-tar --verify=no \
   https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-basic.tar.zst \
@@ -264,8 +266,8 @@ machinectl list
 # Stop the container
 sudo machinectl stop archlinux</code></pre>
 <p>The container root lives at <code>/var/lib/machines/archlinux</code> — a plain directory in the <code>@machines</code> subvolume. You can inspect, modify, or back it up directly.</p>
-<p>---</p>
-<h2>Pulling and Creating Container Images</h2>
+<hr>
+<h2 id="pulling-and-creating-container-images">Pulling and Creating Container Images</h2>
 <p><code>machinectl</code> can pull images from three formats:</p>
 <pre><code class="language-bash"># Pull a tar archive (most common for Linux base images)
 sudo machinectl pull-tar --verify=no \
@@ -290,8 +292,8 @@ sudo systemd-nspawn -D /var/lib/machines/debian-stable
 # Arch container via pacstrap (if pacman is available)
 sudo mkdir /var/lib/machines/arch-custom
 sudo pacstrap -c /var/lib/machines/arch-custom base</code></pre>
-<p>---</p>
-<h2>Starting and Managing Containers</h2>
+<hr>
+<h2 id="starting-and-managing-containers">Starting and Managing Containers</h2>
 <pre><code class="language-bash"># Start a container (runs in background as a systemd service)
 sudo machinectl start archlinux
 
@@ -318,8 +320,8 @@ sudo machinectl reboot archlinux
 
 # Forcibly kill
 sudo machinectl kill archlinux</code></pre>
-<p>---</p>
-<h2>Auto-Start at Boot</h2>
+<hr>
+<h2 id="auto-start-at-boot">Auto-Start at Boot</h2>
 <p>Containers managed by <code>machinectl</code> integrate with systemd natively. To start a container at host boot:</p>
 <pre><code class="language-bash"># Enable auto-start
 sudo machinectl enable archlinux
@@ -330,8 +332,8 @@ sudo machinectl disable archlinux</code></pre>
 <pre><code class="language-bash">sudo systemctl status systemd-nspawn@archlinux.service
 sudo systemctl start systemd-nspawn@archlinux.service
 journalctl -u systemd-nspawn@archlinux.service</code></pre>
-<p>---</p>
-<h2>Networking</h2>
+<hr>
+<h2 id="networking">Networking</h2>
 <p>By default, nspawn containers use the host's network namespace — the container shares the host IP and can access the internet directly.</p>
 <p>For isolated networking with its own IP, enable private networking:</p>
 <pre><code class="language-bash"># Start with private networking (systemd creates a veth pair)
@@ -348,8 +350,8 @@ EOF
 sudo machinectl start archlinux</code></pre>
 <p>With private networking, the container gets a <code>ve-archlinux</code> interface on the host and a corresponding <code>host0</code> inside the container. The host can reach the container and vice versa; internet access requires NAT (enable IP forwarding on the host and configure <code>systemd-networkd</code> or <code>nftables</code>).</p>
 <p>For most use cases — testing, builds, development — the default host-network mode is simplest and sufficient.</p>
-<p>---</p>
-<h2>Persistent Storage and Bind Mounts</h2>
+<hr>
+<h2 id="persistent-storage-and-bind-mounts">Persistent Storage and Bind Mounts</h2>
 <pre><code class="language-bash"># Bind a host directory into a container at startup
 sudo systemd-nspawn \
   --bind=/home/$USER/projects:/projects \
@@ -361,8 +363,8 @@ cat &lt;&lt; 'EOF' | sudo tee /etc/systemd/nspawn/archlinux.nspawn
 Bind=/home/username/projects:/projects
 Bind=/home/username/data:/data
 EOF</code></pre>
-<p>---</p>
-<h2>Btrfs Snapshots for Containers</h2>
+<hr>
+<h2 id="btrfs-snapshots-for-containers">Btrfs Snapshots for Containers</h2>
 <p>Because container roots live in the <code>@machines</code> subvolume, they participate in Btrfs snapshotting naturally:</p>
 <pre><code class="language-bash"># Snapshot a container before making changes
 sudo btrfs subvolume snapshot \
@@ -383,9 +385,9 @@ sudo machinectl clone archlinux archlinux-test
 
 # Remove a container image
 sudo machinectl remove archlinux-test</code></pre>
-<p>---</p>
-<h2>Practical Patterns</h2>
-<h3>Isolated Build Environment</h3>
+<hr>
+<h2 id="practical-patterns">Practical Patterns</h2>
+<h3 id="isolated-build-environment">Isolated Build Environment</h3>
 <pre><code class="language-bash">sudo machinectl start archlinux
 sudo machinectl shell archlinux /bin/bash -c &quot;
   pacman -Sy --noconfirm base-devel git
@@ -397,7 +399,7 @@ sudo systemd-nspawn \
   --bind=/home/$USER/myproject:/build \
   -D /var/lib/machines/archlinux \
   su - builder -c &quot;cd /build &amp;&amp; makepkg -s&quot;</code></pre>
-<h3>Testing a System Service</h3>
+<h3 id="testing-a-system-service">Testing a System Service</h3>
 <pre><code class="language-bash">sudo machinectl start archlinux
 sudo machinectl shell archlinux /bin/bash -c &quot;
   pacman -Sy --noconfirm nginx
@@ -405,7 +407,7 @@ sudo machinectl shell archlinux /bin/bash -c &quot;
 &quot;
 sudo machinectl status archlinux
 # Container runs nginx under systemd, fully isolated from host</code></pre>
-<h3>Disposable Test Container</h3>
+<h3 id="disposable-test-container">Disposable Test Container</h3>
 <pre><code class="language-bash"># Clone a base, do what you need, throw it away
 sudo machinectl clone archlinux arch-test
 sudo machinectl start arch-test
@@ -413,12 +415,12 @@ sudo machinectl shell arch-test /bin/bash
 # ... test things ...
 sudo machinectl stop arch-test
 sudo machinectl remove arch-test</code></pre>
-<p>---</p>
-<h2>nspawn vs the Full Ecosystem</h2>
+<hr>
+<h2 id="nspawn-vs-the-full-ecosystem">nspawn vs the Full Ecosystem</h2>
 <p>systemd-nspawn is the lightest path to a full Linux system container — no daemon, no setup, no image format beyond a plain directory. Use it for isolated builds, service sandboxing, and quick system environment tests. For richer operational tooling (image catalog, port forwarding devices, snapshots via GUI), LXD adds a feature layer. For GUI apps, Flatpak. For CLI tools, Nix. For mutable dev environments with home directory sharing, Distrobox. For full hardware isolation, VMs.</p>
 <p><a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a> has the complete decision guide with a flowchart and comparison table.</p>
-<p>---</p>
-<h2>Resources</h2>
+<hr>
+<h2 id="resources">Resources</h2>
 <ul>
 <li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
 <li><a href="https://docs.shani.dev/doc/software/containers">docs.shani.dev — Containers</a> — full container runtime reference</li>
@@ -432,8 +434,8 @@ sudo machinectl remove arch-test</code></pre>
 <li><a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a> — full VMs with hardware isolation</li>
 <li><a href="https://t.me/shani8dev">Telegram community</a></li>
 </ul>
-<p>---</p>
-<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+<hr>
+<blockquote><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></blockquote></div>
       </article>
     </section>
 

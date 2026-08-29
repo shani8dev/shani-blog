@@ -4,7 +4,7 @@ title: 'Printing and Scanning on Shani OS — CUPS, Driverless Printing, and SAN
 date: '2026-04-24'
 tag: 'Guide'
 excerpt: 'How printing and scanning work on Shani OS — driverless IPP-over-USB and network discovery, CUPS configuration, manufacturer-specific drivers for HP, Brother, Canon, and scanner setup via SANE and sane-airscan.'
-cover: ''
+cover: /assets/images/blog/shani-os-printing-and-scanning.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'

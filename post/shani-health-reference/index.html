@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev data:; connect-src 'self' https://api.github.com">
 
   <title>shani-health — System Health Monitoring for Shani OS — Shanios Blog</title>
   <meta name="description" id="meta-desc" content="shani-health is the CLI tool for checking the health of a running Shani OS system — boot state, security posture, storage, network, hardware, and a deep integrity check with machine-readable output. Introduced in the 2026.04.15 release.">
@@ -15,23 +16,23 @@
   <meta property="og:title"     id="og-title"     content="shani-health — System Health Monitoring for Shani OS">
   <meta property="og:description" id="og-desc"    content="shani-health is the CLI tool for checking the health of a running Shani OS system — boot state, security posture, storage, network, hardware, and a deep integrity check with machine-readable output. Introduced in the 2026.04.15 release.">
   <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/shani-health-reference/">
-  <meta property="og:image"     id="og-image"     content="https://shani.dev/assets/images/logo.svg">
+  <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/shani-health-reference.webp">
   <meta property="og:image:alt" id="og-image-alt" content="shani-health — System Health Monitoring for Shani OS">
   <meta property="og:locale"    content="en_US">
-  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-12T00:00:00.000Z">
-  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-12T00:00:00.000Z">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-11T18:30:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-11T18:30:00.000Z">
   <meta property="article:author"         id="og-article-author"  content="Shrinivas Vishnu Kumbhar">
-  <meta property="article:section"        id="og-article-section" content="Guide">
+  <meta property="article:section"        id="og-article-section" content="Reference">
   
 
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
   <meta name="twitter:title"       id="tw-title" content="shani-health — System Health Monitoring for Shani OS">
   <meta name="twitter:description" id="tw-desc"  content="shani-health is the CLI tool for checking the health of a running Shani OS system — boot state, security posture, storage, network, hardware, and a deep integrity check with machine-readable output. Introduced in the 2026.04.15 release.">
-  <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
+  <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/shani-health-reference.webp">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"shani-health — System Health Monitoring for Shani OS","description":"shani-health is the CLI tool for checking the health of a running Shani OS system — boot state, security posture, storage, network, hardware, and a deep integrity check with machine-readable output. Introduced in the 2026.04.15 release.","url":"https://blog.shani.dev/post/shani-health-reference/","datePublished":"2026-05-12T00:00:00.000Z","dateModified":"2026-05-12T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
-  <script type="application/ld+json" id="ld-org">{}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"shani-health — System Health Monitoring for Shani OS","description":"shani-health is the CLI tool for checking the health of a running Shani OS system — boot state, security posture, storage, network, hardware, and a deep integrity check with machine-readable output. Introduced in the 2026.04.15 release.","url":"https://blog.shani.dev/post/shani-health-reference/","datePublished":"2026-05-11T18:30:00.000Z","dateModified":"2026-05-11T18:30:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-health-reference.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
   <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
@@ -199,6 +200,7 @@
   <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+  <div id="reading-bar" role="progressbar" aria-label="Reading progress" aria-hidden="true"></div>
   <main id="main-content">
     <!-- INDEX VIEW -->
     <section id="view-index" style="display:none">
@@ -223,7 +225,7 @@
       <div class="reading-progress" id="reading-bar" aria-hidden="true"></div>
       <article id="post-article">
       <header class="post-header">
-        <span class="post-tag">Guide</span>
+        <span class="post-tag">Reference</span>
         <h1 class="post-title">shani-health — System Health Monitoring for Shani OS</h1>
         <div class="post-meta">
           <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-12 · 5 min</span>
@@ -231,8 +233,8 @@
       </header>
       <div class="post-body"><p><code>shani-health</code> is the system health and diagnostics CLI introduced in Shani OS 2026.04.15 — the standalone, read-mostly companion to <code>shani-deploy</code>. It covers everything about inspecting and hardening a running system: boot/slot state, security posture, storage, network, hardware, and packages.</p>
 <p>Full reference: <a href="https://docs.shani.dev/doc/updates/system">docs.shani.dev — System Updates</a>.</p>
-<p>---</p>
-<h2>Basic Usage</h2>
+<hr>
+<h2 id="basic-usage">Basic Usage</h2>
 <pre><code class="language-bash"># Full system status report (default — same as -i/--info)
 shani-health
 
@@ -252,33 +254,33 @@ shani-health --packages    # flatpak, snap, nix, containers
 
 # Verbose output
 shani-health -v</code></pre>
-<p>---</p>
-<h2>What shani-health Checks</h2>
-<h3>Boot Report</h3>
+<hr>
+<h2 id="what-shani-health-checks">What shani-health Checks</h2>
+<h3 id="boot-report">Boot Report</h3>
 <pre><code class="language-bash">shani-health --boot</code></pre>
 <p>Reports slot state, boot entries, deployment status, and UKI signatures — everything about which slot is active, which is the candidate, and whether the boot chain is consistent.</p>
-<h3>Deep Integrity Check</h3>
+<h3 id="deep-integrity-check">Deep Integrity Check</h3>
 <pre><code class="language-bash">shani-health --verify</code></pre>
 <p>The one mode built for automation: it runs UKI signature checks (<code>sbverify</code> against the current MOK key), a Btrfs scrub of both slots, slot-marker consistency, boot-entry consistency, and immutability checks (root read-only, <code>/etc</code> OverlayFS active, critical subvolumes mounted) — then returns exit code <code>0</code> if everything passed, <code>1</code> if it found any issue. Add <code>--json</code> to also get a structured summary of exactly which check(s) failed — see Scripting below.</p>
-<h3>Security Report</h3>
+<h3 id="security-report">Security Report</h3>
 <pre><code class="language-bash">shani-health --security</code></pre>
 <p>Boot chain, encryption status, active Linux Security Modules, user accounts, and (where relevant) Kerberos state.</p>
-<h3>Storage Analysis</h3>
+<h3 id="storage-analysis">Storage Analysis</h3>
 <pre><code class="language-bash">shani-health -s
 # or: shani-health --storage-info</code></pre>
 <p>Native Btrfs storage analysis — subvolume sizes, compression ratios, snapshot usage. This flag used to also exist on <code>shani-deploy</code>; it now lives only on <code>shani-health</code>.</p>
-<h3>Network, Hardware, and Packages</h3>
+<h3 id="network-hardware-and-packages">Network, Hardware, and Packages</h3>
 <pre><code class="language-bash">shani-health --network      # NetworkManager, DNS, VPN, firewall, SSH, servers
 shani-health --hardware     # CPU, disk, SMART, temperatures, firmware
 shani-health --packages     # Flatpak, Snap, Nix, containers, virtualisation</code></pre>
-<h3>Other Useful Modes</h3>
+<h3 id="other-useful-modes">Other Useful Modes</h3>
 <pre><code class="language-bash">shani-health --history [N]           # last N deploy/rollback events (default 50)
 shani-health --journal [level]       # journal entries (crit/err/warning)
 shani-health --clean-logs [DAYS]     # clean old app logs from /var/log
 shani-health --clear-boot-failure    # clear a stale boot-failure marker
 shani-health --export-logs [DIR]     # bundle logs + state for bug reports</code></pre>
-<p>---</p>
-<h2>Reading the Output</h2>
+<hr>
+<h2 id="reading-the-output">Reading the Output</h2>
 <p>Every check prints to stderr with a colored status marker as it runs — a full report is a scroll of these, grouped by section:</p>
 <pre><code>✓ UKI valid:   @blue
 ✓ UKI valid:   @green
@@ -292,17 +294,17 @@ shani-health --export-logs [DIR]     # bundle logs + state for bug reports</code
 
 Verification passed — no integrity issues</code></pre>
 <p>If something's actually wrong, that line prints in red instead of green, and the exit code goes non-zero — see below.</p>
-<p>---</p>
-<h2>Scripting with shani-health</h2>
+<hr>
+<h2 id="scripting-with-shani-health">Scripting with shani-health</h2>
 <p><code>--verify</code> is the mode built for automation. Everything else is formatted text for a human to read.</p>
-<h3>Exit Codes</h3>
+<h3 id="exit-codes">Exit Codes</h3>
 <pre><code>0 — success / no issues
 1 — fatal error, or (for --verify) integrity issues found</code></pre>
 <pre><code class="language-bash"># Cron-friendly health gate — non-zero exit means alert
 if ! shani-health --verify &gt;/tmp/verify.log 2&gt;&amp;1; then
     mail -s &quot;shani-health --verify FAILED on $(hostname)&quot; ops@example.com &lt; /tmp/verify.log
 fi</code></pre>
-<h3>JSON Output (<code>--verify --json</code> only)</h3>
+<h3 id="json-output---verify---json-only">JSON Output (<code>--verify --json</code> only)</h3>
 <p>For a structured summary of exactly which check(s) failed, add <code>--json</code> — it only has an effect combined with <code>--verify</code>:</p>
 <pre><code class="language-bash">shani-health --verify --json</code></pre>
 <pre><code class="language-json">{
@@ -316,7 +318,7 @@ fi</code></pre>
 }</code></pre>
 <p><code>status</code> is one of <code>pass</code>, <code>warn</code>, or <code>fail</code>. Human-readable output still prints to stderr as usual — only the JSON summary goes to stdout, so piping stdout alone gives you a clean result to parse:</p>
 <pre><code class="language-bash">shani-health --verify --json | jq '.checks[] | select(.status == &quot;fail&quot;)'</code></pre>
-<h3>Fleet Health Monitoring</h3>
+<h3 id="fleet-health-monitoring">Fleet Health Monitoring</h3>
 <p>For fleet deployments, run <code>shani-health --verify</code> on a schedule and alert on the exit code, or capture the JSON summary for a dashboard:</p>
 <pre><code class="language-bash"># /etc/systemd/system/shani-health-verify.service
 [Unit]
@@ -337,17 +339,17 @@ Persistent=true
 [Install]
 WantedBy=timers.target</code></pre>
 <p>Every other mode (<code>--boot</code>, <code>--security</code>, <code>-s</code>/<code>--storage-info</code>, <code>--network</code>, <code>--hardware</code>, <code>--packages</code>) is formatted text only — there's no <code>--json</code> for those today, so pulling structured data out of them means parsing text.</p>
-<p>---</p>
-<h2>Resources</h2>
+<hr>
+<h2 id="resources">Resources</h2>
 <ul>
 <li><a href="https://docs.shani.dev/doc/updates/system">docs.shani.dev — System Updates</a> — full update system reference</li>
 <li><a href="https://blog.shani.dev/post/shani-os-updates">shani-os-updates</a> — shani-deploy and shani-update reference</li>
 <li><a href="https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment">Shani OS for OEMs and IT Fleets</a> — fleet monitoring integration</li>
-<li><a href="https://blog.shani.dev/post/shani-os-2026-04-15-release">2026.04.15 Release Notes</a> — release that introduced shani-health</li>
+<li><a href="https://blog.shani.dev/post/2026-04-15-release-notes">2026.04.15 Release Notes</a> — release that introduced shani-health</li>
 <li><a href="https://t.me/shani8dev">Telegram community</a></li>
 </ul>
-<p>---</p>
-<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+<hr>
+<blockquote><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></blockquote></div>
       </article>
     </section>
 

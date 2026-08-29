@@ -4,7 +4,7 @@ title: 'Shani OS for OEMs and IT Fleets — Deploy Once, Maintain Never'
 date: '2026-04-16'
 tag: 'Enterprise'
 excerpt: 'How Shani OS eliminates per-device drift, enables one-command remote rollback, automates firmware updates, and makes fleet management genuinely simple — whether you are an OEM shipping hardware or an IT team managing hundreds of machines.'
-cover: ''
+cover: /assets/images/blog/shani-os-oem-and-fleet-deployment.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -13,7 +13,7 @@ author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: 'https://github.com/shrinivasvkumbhar'
 author_website: 'https://shani.dev'
 readTime: '9 min'
-series: 'Shani OS Deep Dives'
+series: 'Shani OS Enterprise'
 ---
 
 Managing a fleet of Linux desktops with traditional distributions is a problem of accumulation. Each machine starts identical. Over months, updates apply differently across different hardware. Local configuration changes accumulate. A package on machine A conflicts with a library on machine B. The fleet that was uniform on day one is a collection of unique, unmaintainable snowflakes by year two.

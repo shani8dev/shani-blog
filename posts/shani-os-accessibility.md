@@ -4,7 +4,7 @@ title: 'Accessibility on Shani OS — Screen Reader, Braille, Magnification, and
 date: '2026-04-29'
 tag: 'Guide'
 excerpt: 'Shani OS ships a complete accessibility stack at first boot — Orca screen reader with espeak-ng TTS, braille display support via brltty, display magnification, high-contrast themes, keyboard navigation, and assistive technology infrastructure. Nothing to install.'
-cover: ''
+cover: /assets/images/blog/shani-os-accessibility.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
@@ -295,8 +295,8 @@ GDM (GNOME's login manager) and SDDM (KDE's login manager) both support Orca at 
 
 - [Shani OS Troubleshooting Guide](https://blog.shani.dev/post/shani-os-troubleshooting-guide) — when things go wrong
 - [Shani OS FAQ](https://blog.shani.dev/post/shani-os-faq) — common questions answered
-- GNOME Accessibility: [Settings → Accessibility]
-- KDE Accessibility: [System Settings → Accessibility]
+- GNOME Accessibility: Settings → Accessibility
+- KDE Accessibility: System Settings → Accessibility
 - Orca documentation: [gnome.org/orca](https://help.gnome.org/users/orca/stable/)
 - brltty documentation: [brltty.app](https://brltty.app)
 - [Telegram community](https://t.me/shani8dev) — questions and support

@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev data:; connect-src 'self' https://api.github.com">
 
   <title>Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardware Decoding — Shanios Blog</title>
   <meta name="description" id="meta-desc" content="Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC, media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.">
@@ -15,11 +16,11 @@
   <meta property="og:title"     id="og-title"     content="Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardware Decoding">
   <meta property="og:description" id="og-desc"    content="Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC, media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.">
   <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/shani-os-multimedia/">
-  <meta property="og:image"     id="og-image"     content="https://shani.dev/assets/images/logo.svg">
+  <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/shani-os-multimedia.webp">
   <meta property="og:image:alt" id="og-image-alt" content="Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardware Decoding">
   <meta property="og:locale"    content="en_US">
-  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-10T00:00:00.000Z">
-  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-10T00:00:00.000Z">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-09T18:30:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-09T18:30:00.000Z">
   <meta property="article:author"         id="og-article-author"  content="Shrinivas Vishnu Kumbhar">
   <meta property="article:section"        id="og-article-section" content="Guide">
   
@@ -28,10 +29,10 @@
   <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
   <meta name="twitter:title"       id="tw-title" content="Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardware Decoding">
   <meta name="twitter:description" id="tw-desc"  content="Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC, media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.">
-  <meta name="twitter:image"       id="tw-image" content="https://shani.dev/assets/images/logo.svg">
+  <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/shani-os-multimedia.webp">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardware Decoding","description":"Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC, media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.","url":"https://blog.shani.dev/post/shani-os-multimedia/","datePublished":"2026-05-10T00:00:00.000Z","dateModified":"2026-05-10T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://shani.dev/assets/images/logo.svg","isAccessibleForFree":"True"}</script>
-  <script type="application/ld+json" id="ld-org">{}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardware Decoding","description":"Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC, media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.","url":"https://blog.shani.dev/post/shani-os-multimedia/","datePublished":"2026-05-09T18:30:00.000Z","dateModified":"2026-05-09T18:30:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-os-multimedia.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
   <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
@@ -199,6 +200,7 @@
   <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
   <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+  <div id="reading-bar" role="progressbar" aria-label="Reading progress" aria-hidden="true"></div>
   <main id="main-content">
     <!-- INDEX VIEW -->
     <section id="view-index" style="display:none">
@@ -229,13 +231,13 @@
           <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-10 · 8 min</span>
         </div>
       </header>
-      <div class="post-body"><p>Shani OS ships with the GStreamer and FFmpeg multimedia frameworks, full VA-API/VDPAU hardware video decode, and VLC pre-installed. This means virtually any video or audio format plays at first boot without installing extra codecs — including H.264, H.265/HEVC, VP9, AV1, and more. Hardware-accelerated decode is active on Intel, AMD, and NVIDIA GPUs, keeping CPU usage low during video playback and extending battery life on laptops.</p>
+      <div class="post-body"><p>Shani OS ships with the GStreamer and FFmpeg multimedia frameworks, full VA-API/VDPAU hardware video decode, and the VLC media player. This means virtually any video or audio format plays at first boot without installing extra codecs — including H.264, H.265/HEVC, VP9, AV1, and more. Hardware-accelerated decode is active on Intel, AMD, and NVIDIA GPUs, keeping CPU usage low during video playback and extending battery life on laptops.</p>
 <p>This guide covers everyday media playback, streaming services with DRM, media server setup, and managing a home media library.</p>
-<p>---</p>
-<h2>Hardware Video Decoding</h2>
+<hr>
+<h2 id="hardware-video-decoding">Hardware Video Decoding</h2>
 <p>Hardware video decoding offloads video decode from the CPU to dedicated hardware on your GPU — dramatically reducing power consumption and enabling 4K/8K playback on modest hardware.</p>
-<h3>How It Works on Shani OS</h3>
-<p>| Hardware | API | What it accelerates | |---|---|---| | Intel (8th gen+) | VA-API (i965 / iHD driver) | H.264, H.265, VP9, AV1, JPEG | | AMD (RX 5000+) | VA-API (RADV/Mesa) | H.264, H.265, VP9, AV1 | | NVIDIA | VA-API via <code>libva-nvidia-driver</code> | H.264, H.265, VP9, AV1 | | All vendors | VDPAU (compatibility layer) | H.264, MPEG-2 (legacy) |</p>
+<h3 id="how-it-works-on-shani-os">How It Works on Shani OS</h3>
+<table><thead><tr><th>Hardware</th><th>API</th><th>What it accelerates</th></tr></thead><tbody><tr><td>Intel (8th gen+)</td><td>VA-API (i965 / iHD driver)</td><td>H.264, H.265, VP9, AV1, JPEG</td></tr><tr><td>AMD (RX 5000+)</td><td>VA-API (RADV/Mesa)</td><td>H.264, H.265, VP9, AV1</td></tr><tr><td>NVIDIA</td><td>VA-API via <code>libva-nvidia-driver</code></td><td>H.264, H.265, VP9, AV1</td></tr><tr><td>All vendors</td><td>VDPAU (compatibility layer)</td><td>H.264, MPEG-2 (legacy)</td></tr></tbody></table>
 <p>All three vendor stacks are pre-configured on Shani OS. No manual driver or codec installation is needed.</p>
 <pre><code class="language-bash"># Verify hardware decode is available
 vainfo --display drm --device /dev/dri/renderD128
@@ -246,7 +248,7 @@ vainfo 2&gt;&amp;1 | grep -i &quot;VAProfile&quot;
 # Test hardware decode with FFmpeg
 ffmpeg -hwaccel vaapi -hwaccel_device /dev/dri/renderD128 \
     -i video.mkv -f null -</code></pre>
-<h3>Checking VA-API in Practice</h3>
+<h3 id="checking-va-api-in-practice">Checking VA-API in Practice</h3>
 <pre><code class="language-bash"># Check available DRI devices
 ls /dev/dri/
 
@@ -259,9 +261,9 @@ vainfo
 
 # NVIDIA — libva-nvidia-driver (pre-installed)
 LIBVA_DRIVER_NAME=nvidia vainfo</code></pre>
-<p>---</p>
-<h2>VLC — Pre-Installed</h2>
-<p>VLC is pre-installed on both editions and handles hardware-accelerated playback automatically:</p>
+<hr>
+<h2 id="vlc">VLC</h2>
+<p>VLC handles hardware-accelerated playback automatically:</p>
 <ul>
 <li>Play any <code>.mkv</code>, <code>.mp4</code>, <code>.avi</code>, <code>.mov</code>, <code>.flv</code>, <code>.webm</code>, <code>.ts</code>, <code>.m2ts</code> file</li>
 <li>Streaming URLs, RTSP streams, and online video</li>
@@ -269,18 +271,18 @@ LIBVA_DRIVER_NAME=nvidia vainfo</code></pre>
 <li>DLNA network media browsing</li>
 </ul>
 <p>VLC uses VA-API for hardware decode when available. Check: Tools → Preferences → Input/Codecs → Hardware-accelerated decoding → VA-API via DRM.</p>
-<h3>DVD Playback</h3>
+<h3 id="dvd-playback">DVD Playback</h3>
 <p>Standard DVD playback requires libdvdcss for decrypting CSS-encrypted discs. Since this library cannot be pre-installed for legal reasons, install it via Nix:</p>
-<pre><code class="language-bash">nix-env -i libdvdcss</code></pre>
+<pre><code class="language-bash">nix-env -iA nixpkgs.libdvdcss</code></pre>
 <p>Then restart VLC — it picks up the library automatically.</p>
-<h3>Blu-ray Playback</h3>
+<h3 id="blu-ray-playback">Blu-ray Playback</h3>
 <p>Blu-ray decryption on Linux requires <code>libbluray</code> (handles menus and navigation) and <code>libaacs</code> (handles AACS encryption via a keys database). Install via Nix and configure the keys database — the KEYDB.cfg file from vlc-bluray.whoknowsmy.name covers most commercial Blu-rays.</p>
-<p>---</p>
-<h2>MPV — Lightweight and Scriptable</h2>
+<hr>
+<h2 id="mpv-lightweight-and-scriptable">MPV — Lightweight and Scriptable</h2>
 <p>MPV is a lightweight but extremely capable video player preferred by power users for its hardware decode support, scripting, and shader pipeline:</p>
 <pre><code class="language-bash">flatpak install flathub io.mpv.Mpv
 # or via Nix:
-nix-env -i mpv</code></pre>
+nix-env -iA nixpkgs.mpv</code></pre>
 <p>MPV uses VA-API hardware decode by default. Common usage:</p>
 <pre><code class="language-bash"># Play with hardware decoding (auto-detect)
 mpv --hwdec=auto video.mkv
@@ -299,7 +301,7 @@ mpv --profile=gpu-hq video.mkv
 
 # Screenshot during playback
 # Press 's' during playback</code></pre>
-<h3>MPV Scripts and Shaders</h3>
+<h3 id="mpv-scripts-and-shaders">MPV Scripts and Shaders</h3>
 <p>MPV's Lua scripting API enables a rich extension ecosystem:</p>
 <pre><code class="language-bash"># Install mpv scripts to ~/.config/mpv/scripts/
 
@@ -312,12 +314,12 @@ mpv --profile=gpu-hq video.mkv
 # Anime4K shaders — real-time anime upscaling
 # Download from: https://github.com/bloc97/Anime4K
 # Place in ~/.config/mpv/shaders/</code></pre>
-<p>---</p>
-<h2>Streaming Services and Widevine DRM</h2>
+<hr>
+<h2 id="streaming-services-and-widevine-drm">Streaming Services and Widevine DRM</h2>
 <p>Netflix, Disney+, Amazon Prime Video, YouTube Premium, Spotify, and other DRM-protected streaming services require Widevine — Google's DRM content decryption module.</p>
-<h3>Vivaldi (Pre-Installed)</h3>
+<h3 id="vivaldi-pre-installed">Vivaldi (Pre-Installed)</h3>
 <p>Vivaldi ships with Widevine included. Netflix, Disney+, and Amazon Prime Video work at HD quality immediately in Vivaldi. No setup required.</p>
-<h3>Firefox</h3>
+<h3 id="firefox">Firefox</h3>
 <p>Firefox supports Widevine but needs it enabled:</p>
 <ol>
 <li>Firefox → Settings → General → Digital Rights Management (DRM) Content → ensure "Play DRM-controlled content" is enabled</li>
@@ -326,16 +328,16 @@ mpv --profile=gpu-hq video.mkv
 <pre><code class="language-bash"># Verify Widevine is installed in Firefox
 # About:addons → Plugins → Widevine Content Decryption Module</code></pre>
 <p>Firefox's Widevine implementation currently supports up to 1080p on Netflix (not 4K, which requires the Edge/Chrome implementation).</p>
-<h3>Chromium and Other Browsers</h3>
+<h3 id="chromium-and-other-browsers">Chromium and Other Browsers</h3>
 <p>The open-source Chromium flatpak does not include Widevine by default. Brave browser (Chromium-based) includes Widevine and works identically to Vivaldi for streaming:</p>
 <pre><code class="language-bash">flatpak install flathub com.brave.Browser</code></pre>
-<h3>Streaming Quality Comparison</h3>
-<p>| Service | Vivaldi | Firefox | Brave | Chrome | |---|---|---|---|---| | Netflix | HD (1080p) | HD (1080p) | HD (1080p) | 4K | | Disney+ | HD | HD | HD | HD | | Amazon Prime | 4K | HD | 4K | 4K | | YouTube | 4K (no DRM needed) | 4K | 4K | 4K | | Spotify Web | ✓ | ✓ | ✓ | ✓ |</p>
+<h3 id="streaming-quality-comparison">Streaming Quality Comparison</h3>
+<table><thead><tr><th>Service</th><th>Vivaldi</th><th>Firefox</th><th>Brave</th><th>Chrome</th></tr></thead><tbody><tr><td>Netflix</td><td>HD (1080p)</td><td>HD (1080p)</td><td>HD (1080p)</td><td>4K</td></tr><tr><td>Disney+</td><td>HD</td><td>HD</td><td>HD</td><td>HD</td></tr><tr><td>Amazon Prime</td><td>4K</td><td>HD</td><td>4K</td><td>4K</td></tr><tr><td>YouTube</td><td>4K (no DRM needed)</td><td>4K</td><td>4K</td><td>4K</td></tr><tr><td>Spotify Web</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr></tbody></table>
 <p>For Netflix 4K, the most reliable path is the Android app in Waydroid (see <a href="https://blog.shani.dev/post/waydroid-android-on-shani-os">Waydroid on Shani OS</a>) or a Windows VM.</p>
-<p>---</p>
-<h2>Music Playback</h2>
+<hr>
+<h2 id="music-playback">Music Playback</h2>
 <p>For music players (Amberol, Rhythmbox, Elisa, Lollypop) and streaming clients (Spotify, Spotube, JioSaavn), see <a href="https://blog.shani.dev/post/shani-os-for-general-desktop-users#media-playback">Shani OS for General Desktop Users</a> for the full list. This section covers audio format conversion, which is specific to multimedia workflows.</p>
-<h3>Audio Format Conversion</h3>
+<h3 id="audio-format-conversion">Audio Format Conversion</h3>
 <pre><code class="language-bash"># Convert FLAC to MP3
 ffmpeg -i input.flac -c:a libmp3lame -q:a 2 output.mp3
 
@@ -349,9 +351,9 @@ ffmpeg -i input.wav -c:a flac output.flac
 
 # Normalise audio loudness to -16 LUFS (podcast/streaming standard)
 ffmpeg -i input.mp3 -af loudnorm=I=-16:LRA=11:TP=-1.5 output.mp3</code></pre>
-<p>---</p>
-<h2>Media Server — Jellyfin, Plex, and Kodi</h2>
-<h3>Jellyfin (Recommended — Fully Free and Open-Source)</h3>
+<hr>
+<h2 id="media-server-jellyfin-plex-and-kodi">Media Server — Jellyfin, Plex, and Kodi</h2>
+<h3 id="jellyfin-recommended-fully-free-and-open-source">Jellyfin (Recommended — Fully Free and Open-Source)</h3>
 <p>Jellyfin is a self-hosted media server — it organises your local video, music, and photo library and streams it to any device on your network (smart TVs, phones, tablets, browsers):</p>
 <pre><code class="language-bash"># Run Jellyfin via Podman (pre-installed)
 podman run -d \
@@ -372,7 +374,7 @@ podman generate systemd --new --files --name jellyfin
 mkdir -p ~/.config/systemd/user/
 mv container-jellyfin.service ~/.config/systemd/user/
 systemctl --user enable --now container-jellyfin.service</code></pre>
-<h3>Plex</h3>
+<h3 id="plex">Plex</h3>
 <p>Plex has a free tier with local streaming and a Premium (PlexPass) subscription for additional features:</p>
 <pre><code class="language-bash"># Plex via Flatpak (desktop player)
 flatpak install flathub tv.plex.PlexDesktop
@@ -385,25 +387,25 @@ podman run -d \
   -v ~/plex/config:/config \
   -v ~/media:/data/media:ro \
   plexinc/pms-docker:latest</code></pre>
-<h3>Kodi — Local Playback Media Centre</h3>
+<h3 id="kodi-local-playback-media-centre">Kodi — Local Playback Media Centre</h3>
 <p>Kodi is the classic media centre application for local playback on a TV-connected PC:</p>
 <pre><code class="language-bash">flatpak install flathub tv.kodi.Kodi</code></pre>
 <p>Kodi supports VA-API hardware decode and has a 10-foot UI suitable for TV use with a remote control.</p>
-<p>---</p>
-<h2>Network Streaming and DLNA</h2>
-<h3>Casting to Chromecast and Smart TVs</h3>
+<hr>
+<h2 id="network-streaming-and-dlna">Network Streaming and DLNA</h2>
+<h3 id="casting-to-chromecast-and-smart-tvs">Casting to Chromecast and Smart TVs</h3>
 <pre><code class="language-bash"># castnow — cast local files to Chromecast from the terminal
-nix-env -i castnow
+nix-env -iA nixpkgs.castnow
 
 # Cast a local file
 castnow video.mp4
 
 # Or use mkchromecast for a GUI approach
-nix-env -i mkchromecast
+nix-env -iA nixpkgs.mkchromecast
 mkchromecast</code></pre>
 <p>Gnome Network Displays (for Miracast/WiDi wireless display — requires compatible hardware):</p>
 <pre><code class="language-bash">flatpak install flathub org.gnome.NetworkDisplays</code></pre>
-<h3>DLNA/UPnP</h3>
+<h3 id="dlnaupnp">DLNA/UPnP</h3>
 <p>Shani OS includes <code>gupnp-tools</code> for browsing DLNA servers on your network. For running a DLNA server to stream your local library to smart TVs:</p>
 <pre><code class="language-bash"># MiniDLNA / ReadyMedia via Podman
 podman run -d \
@@ -412,7 +414,7 @@ podman run -d \
   -v ~/media:/media:ro \
   -v ~/minidlna/config:/etc/minidlna \
   vladgh/minidlna:latest</code></pre>
-<h3>Streaming from the Terminal</h3>
+<h3 id="streaming-from-the-terminal">Streaming from the Terminal</h3>
 <p>MPV can play network streams directly:</p>
 <pre><code class="language-bash"># Play a YouTube video (requires yt-dlp)
 mpv &quot;https://www.youtube.com/watch?v=...&quot;
@@ -421,10 +423,10 @@ mpv &quot;https://www.youtube.com/watch?v=...&quot;
 streamlink &quot;https://twitch.tv/channelname&quot; best | mpv -
 
 # Install streamlink
-nix-env -i streamlink</code></pre>
-<p>---</p>
-<h2>Image Viewing and Management</h2>
-<p>VLP and GNOME Image Viewer (Loupe) come pre-installed. For more features:</p>
+nix-env -iA nixpkgs.streamlink</code></pre>
+<hr>
+<h2 id="image-viewing-and-management">Image Viewing and Management</h2>
+<p>GNOME Image Viewer (Loupe) comes pre-installed. For more features:</p>
 <pre><code class="language-bash"># Shotwell — photo import and basic editing (GNOME)
 flatpak install flathub org.gnome.Shotwell
 
@@ -435,7 +437,7 @@ flatpak install flathub org.kde.digikam
 flatpak install flathub org.gnome.gThumb
 
 # ImageMagick — powerful command-line image manipulation
-nix-env -i imagemagick
+nix-env -iA nixpkgs.imagemagick
 
 # Resize an image
 convert input.jpg -resize 1920x1080 output.jpg
@@ -446,8 +448,8 @@ convert input.tiff output.jpg -quality 90
 
 # Create a GIF from images
 convert -delay 10 -loop 0 frame*.png animation.gif</code></pre>
-<p>---</p>
-<h2>E-books and Digital Reading</h2>
+<hr>
+<h2 id="e-books-and-digital-reading">E-books and Digital Reading</h2>
 <pre><code class="language-bash"># Calibre — e-book library management and format conversion
 flatpak install flathub com.calibre_ebook.calibre
 
@@ -457,15 +459,15 @@ flatpak install flathub com.github.johnfactotum.Foliate
 # Komikku — manga and comics reader
 flatpak install flathub info.febvre.Komikku</code></pre>
 <p>Calibre handles format conversion between EPUB, MOBI, AZW3, PDF, and dozens of other formats, and manages your library with metadata, covers, and device sync (Kindle, Kobo).</p>
-<p>---</p>
-<h2>Codec Summary</h2>
+<hr>
+<h2 id="codec-summary">Codec Summary</h2>
 <p>All of the following play without any additional installation on Shani OS:</p>
 <p><strong>Video:</strong> H.264 (AVC), H.265 (HEVC), VP8, VP9, AV1, MPEG-2, MPEG-4, Theora, WMV, FLV, DivX, XviD, ProRes (software), DNxHD/DNxHR</p>
 <p><strong>Audio:</strong> MP3, AAC, FLAC, Opus, Vorbis, WAV, AIFF, AC3, DTS (passthrough), TrueHD (passthrough), WMA</p>
 <p><strong>Containers:</strong> MKV, MP4, MOV, AVI, WebM, TS, M2TS, FLV, 3GP, OGV</p>
 <p><strong>Subtitles:</strong> SRT, SSA/ASS, VTT, SUB, IDX+SUB (DVD)</p>
-<p>---</p>
-<h2>Resources</h2>
+<hr>
+<h2 id="resources">Resources</h2>
 <ul>
 <li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
 <li><a href="https://blog.shani.dev/post/shani-os-audio-pipewire">Audio on Shani OS</a> — PipeWire, audio hardware, Bluetooth audio</li>
@@ -476,8 +478,8 @@ flatpak install flathub info.febvre.Komikku</code></pre>
 <li><a href="https://docs.shani.dev">docs.shani.dev</a> — full documentation</li>
 <li><a href="https://t.me/shani8dev">Telegram community</a></li>
 </ul>
-<p>---</p>
-<blockquote><p><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></p></blockquote></div>
+<hr>
+<blockquote><strong>Built in India</strong> 🇮🇳 · <strong>Immutable</strong> · <strong>Atomic</strong> · <strong>Zero Telemetry</strong></blockquote></div>
       </article>
     </section>
 

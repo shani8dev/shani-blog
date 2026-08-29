@@ -26,6 +26,48 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://blog.shani.dev/post/ai-assisted-development-on-shani-os/</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://blog.shani.dev/post/shani-os-build-pipeline/</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://blog.shani.dev/post/shani-os-cosmic-edition/</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://blog.shani.dev/post/shani-os-development-setup/</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://blog.shani.dev/post/shani-os-gpu-drivers/</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://blog.shani.dev/post/shani-repo-on-other-distros/</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://blog.shani.dev/post/switching-from-windows-and-macos/</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://blog.shani.dev/post/shani-health-reference/</loc>
     <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -303,7 +345,7 @@
   </url>
   <url>
     <loc>https://blog.shani.dev/post/2026-04-15-release-notes/</loc>
-    <lastmod>2026-04-15</lastmod>
+    <lastmod>2026-08-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -315,7 +357,7 @@
   </url>
   <url>
     <loc>https://blog.shani.dev/post/shani-os-for-everyone/</loc>
-    <lastmod>2026-05-12</lastmod>
+    <lastmod>2026-08-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

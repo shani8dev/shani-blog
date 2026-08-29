@@ -2,11 +2,16 @@
 slug: shani-os-architecture-deep-dive
 title: 'The Architecture Behind Shani OS — Subvolumes, Slots, and the Update Pipeline'
 date: '2026-04-12'
-tag: 'Engineering'
+tag: 'Deep Dive'
 excerpt: 'A detailed walkthrough of how Shani OS is structured on disk — every Btrfs subvolume, every mount, every step from image signing to your running desktop.'
-cover: ''
+cover: /assets/images/blog/shani-os-architecture-deep-dive.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
+author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
+author_initials: 'SK'
+author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
+author_github: 'https://github.com/shrinivasvkumbhar'
+author_website: 'https://shani.dev'
 readTime: '10 min'
 series: 'Shani OS Deep Dives'
 ---

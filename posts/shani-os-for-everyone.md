@@ -2,14 +2,19 @@
 slug: shani-os-for-everyone
 title: 'Shani OS for Everyone — Find Your Guide'
 date: '2026-04-13'
-updated: '2026-05-12'
+updated: 2026-08-24
 tag: 'Guide'
 excerpt: 'Shani OS works for Windows and macOS switchers, developers, gamers, and IT administrators. This page points you to the right guide for your situation.'
-cover: ''
+cover: /assets/images/blog/shani-os-for-everyone.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
+author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'
+author_initials: 'SK'
+author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
+author_github: 'https://github.com/shrinivasvkumbhar'
+author_website: 'https://shani.dev'
 readTime: '2 min'
-series: 'Shani OS Deep Dives'
+series: 'Shani OS Guides'
 ---
 
 Shani OS is one operating system. The underlying architecture — atomic blue-green updates, immutable root, instant rollback, zero telemetry — is the same for everyone. What differs is how you use it.
