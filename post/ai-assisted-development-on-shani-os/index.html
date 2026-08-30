@@ -326,7 +326,7 @@ aider --model openai/llama-3.3-70b-versatile</code></pre>
 <ul>
 <li>Single-user: rootless Podman + <code>--security-opt no-new-privileges</code> + gVisor (<code>runsc</code>) for LLM-generated code</li>
 <li>GPU workloads: gVisor (has GPU support) or full VM</li>
-<li>Always snapshot before long autonomous runs: <code>sudo btrfs subvolume snapshot /var/lib/libvirt /snapshots/pre-agent-$(date +%s)</code></li>
+<li>The root filesystem needs no manual protection — it's one of two read-only <code>@blue</code>/<code>@green</code> slots regardless of what an agent does. <code>@home</code> has no automatic snapshot schedule today, so a manual one is the real safety net before a risky run: <code>sudo btrfs subvolume snapshot -r /home /data/snapshots/home/pre-agent-$(date +%s)</code></li>
 </ul>
 <hr>
 <h2 id="python-node-quick-reference-july-2026">Python & Node Quick-Reference (July 2026)</h2>
@@ -336,7 +336,7 @@ aider --model openai/llama-3.3-70b-versatile</code></pre>
 <p>Why does Shanios suit this workflow particularly well?</p>
 <ul>
 <li><strong>Nothing to break</strong>: agents edit files in <code>@home</code>; the root stays read-only. A misbehaving agent literally cannot damage the OS.</li>
-<li><strong>Snapshot before you delegate</strong>: take a Btrfs snapshot before a big autonomous run; revert instantly if the result disappoints.</li>
+<li><strong>Snapshot before you delegate</strong>: <code>@home</code> has no automatic snapshot schedule today, so take a manual Btrfs snapshot yourself before a big autonomous run; revert instantly if the result disappoints.</li>
 <li><strong>State persists safely</strong>: sessions, configs, model weights, MCP configs — all in <code>$HOME</code>, all surviving every update and rollback.</li>
 <li><strong>Privacy by architecture</strong>: zero telemetry plus fully-local Ollama means code can stay on-device end to end.</li>
 </ul>

@@ -206,7 +206,7 @@ Don't run autonomous agents on your bare OS. On Shanios:
 
 - Single-user: rootless Podman + `--security-opt no-new-privileges` + gVisor (`runsc`) for LLM-generated code
 - GPU workloads: gVisor (has GPU support) or full VM
-- Always snapshot before long autonomous runs: `sudo btrfs subvolume snapshot /var/lib/libvirt /snapshots/pre-agent-$(date +%s)`
+- The root filesystem needs no manual protection — it's one of two read-only `@blue`/`@green` slots regardless of what an agent does. `@home` has no automatic snapshot schedule today, so a manual one is the real safety net before a risky run: `sudo btrfs subvolume snapshot -r /home /data/snapshots/home/pre-agent-$(date +%s)`
 
 ---
 
@@ -232,7 +232,7 @@ Don't run autonomous agents on your bare OS. On Shanios:
 Why does Shanios suit this workflow particularly well?
 
 - **Nothing to break**: agents edit files in `@home`; the root stays read-only. A misbehaving agent literally cannot damage the OS.
-- **Snapshot before you delegate**: take a Btrfs snapshot before a big autonomous run; revert instantly if the result disappoints.
+- **Snapshot before you delegate**: `@home` has no automatic snapshot schedule today, so take a manual Btrfs snapshot yourself before a big autonomous run; revert instantly if the result disappoints.
 - **State persists safely**: sessions, configs, model weights, MCP configs — all in `$HOME`, all surviving every update and rollback.
 - **Privacy by architecture**: zero telemetry plus fully-local Ollama means code can stay on-device end to end.
 
