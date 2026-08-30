@@ -213,7 +213,7 @@ Don't run autonomous agents on your bare OS. On Shanios:
 
 - Single-user: rootless Podman + `--security-opt no-new-privileges` + gVisor (`runsc`) for LLM-generated code
 - GPU workloads: gVisor (has GPU support) or full VM
-- The root filesystem needs no manual protection — it's one of two read-only `@blue`/`@green` slots regardless of what an agent does. `@home` has no automatic snapshot schedule today, so a manual one is the real safety net before a risky run: `sudo btrfs subvolume snapshot -r /home /data/snapshots/home/pre-agent-$(date +%s)`
+- The root filesystem needs no manual protection — it's one of two read-only `@blue`/`@green` slots regardless of what an agent does. `@home` has no automatic snapshot schedule out of the box — [set up the recurring systemd timer once](https://docs.shani.dev/doc/system/backup), or take a one-off manual snapshot before a risky run: `sudo btrfs subvolume snapshot -r /home /data/snapshots/home/pre-agent-$(date +%s)`
 
 ---
 

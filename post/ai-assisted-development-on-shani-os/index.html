@@ -326,7 +326,7 @@ aider --model openai/llama-3.3-70b-versatile</code></pre>
 <ul>
 <li>Single-user: rootless Podman + <code>--security-opt no-new-privileges</code> + gVisor (<code>runsc</code>) for LLM-generated code</li>
 <li>GPU workloads: gVisor (has GPU support) or full VM</li>
-<li>The root filesystem needs no manual protection — it's one of two read-only <code>@blue</code>/<code>@green</code> slots regardless of what an agent does. <code>@home</code> has no automatic snapshot schedule today, so a manual one is the real safety net before a risky run: <code>sudo btrfs subvolume snapshot -r /home /data/snapshots/home/pre-agent-$(date +%s)</code></li>
+<li>The root filesystem needs no manual protection — it's one of two read-only <code>@blue</code>/<code>@green</code> slots regardless of what an agent does. <code>@home</code> has no automatic snapshot schedule out of the box — <a href="https://docs.shani.dev/doc/system/backup">set up the recurring systemd timer once</a>, or take a one-off manual snapshot before a risky run: <code>sudo btrfs subvolume snapshot -r /home /data/snapshots/home/pre-agent-$(date +%s)</code></li>
 </ul>
 <hr>
 <h2 id="python-node-quick-reference-july-2026">Python & Node Quick-Reference (July 2026)</h2>
