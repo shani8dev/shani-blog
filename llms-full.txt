@@ -80,7 +80,7 @@ And since virtually every open model lives on Hugging Face, the local stack cons
 
 You can run this entire workflow without paying for tokens:
 
-**OpenCode Zen** — OpenCode's curated gateway ships rotating free models (community and vendor-promo coding models) selectable straight from the model picker. One honest caveat: some free-period models train on collected data, so keep proprietary code on paid or local routes.
+**OpenCode Zen** — OpenCode's curated gateway ships a smaller rotating free tier (around 5 free models at a time out of 90+ total, capped at 100 requests/day) selectable straight from the model picker. One honest caveat: some free-period models train on collected data, so keep proprietary code on paid or local routes.
 
 **Kilo Gateway** — Kilo Code's own equivalent: 40+ free coding models (ByteDance Seed, Grok Code Fast, NVIDIA Nemotron, Arcee Trinity, and others), available with zero config to both signed-in and anonymous users — anonymous use is rate-limited to 200 requests/hour per IP. Same rotation caveat as Zen applies: check the live list before assuming a specific model is still there.
 
