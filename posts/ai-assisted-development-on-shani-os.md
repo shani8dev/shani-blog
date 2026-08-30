@@ -1,6 +1,7 @@
 ---
-title: "AI-Assisted Development on Shanios: OpenCode, DeepSeek, MCP, and Local Models"
+title: "AI-Assisted Development on Shanios: Harnesses, AI Editors, MCP, and Local Models"
 date: 2026-08-25
+updated: 2026-08-30
 author: Shrinivas Kumbhar
 author_bio: Creator of Shanios. Building immutable Linux distributions.
 author_initials: SK
@@ -12,7 +13,7 @@ series: Shani OS Guides
 slug: ai-assisted-development-on-shani-os
 cover: /assets/images/blog/ai-assisted-development-on-shani-os.webp
 category: Guide
-readTime: "8 min"
+readTime: "10 min"
 ---
 
 AI coding tools went from autocomplete to autonomous agents in two years, and 2026's landscape is crowded: Claude Code, Codex CLI, OpenCode, Aider, Gemini CLI, Goose — each a "harness" that reads your repo, plans changes, edits files, and runs commands. Then there's MCP (Model Context Protocol), now the Linux-Foundation-governed standard that wires all of them into GitHub, databases, and browsers. And underneath everything, local models via Ollama mean your code never has to leave the machine.
@@ -25,12 +26,14 @@ The good news for Shanios users: every one of these tools is userland software. 
 
 | Harness | Why people pick it |
 |---|---|
-| **Claude Code** | Most polished agent loop; plan mode; sub-agents |
+| **Claude Code** | Most polished agent loop; plan mode; sub-agents; rated most-loved harness in JetBrains' April 2026 developer survey |
 | **Codex CLI** | Fast (Rust); open source; custom providers via TOML |
 | **OpenCode** | MIT-licensed; most provider choice (75+); clean TUI; great with local models |
 | **aider** | Git-native — commits every change, so history stays reviewable and revertible |
 | **Gemini CLI** | Generous free tier; Google ecosystem; Plan Mode |
 | **Goose** | Block's open-source agent; multi-provider |
+| **Kilo CLI** | Terminal sibling of the Kilo Code editor extension (below), itself forked from OpenCode — same MCP marketplace and 400+-model routing in a terminal shell |
+| **Pi** | The deliberate anti-bloat pick — ships the model just four tools (read/write/edit/bash) and a sub-1,000-token system prompt; MIT, embeddable as an SDK |
 
 Install example — OpenCode lands in your home directory and survives everything:
 
@@ -39,6 +42,8 @@ curl -fsSL https://opencode.ai/install | bash
 ```
 
 The ecosystem's collective wisdom applies here: the harness shapes workflow, but the model decides output quality. Pick ergonomics first, then route to whatever backend fits your budget.
+
+**Where the market actually stands (2026):** GitHub Copilot leads on raw share (~40%, Microsoft/enterprise-bundling driven), but Claude Code — despite being newer — already carries more workplace adoption than Cursor and was rated the single most-loved tool in JetBrains' most recent developer survey. Cursor remains the fastest-growing, at 5M+ active users. The honest takeaway from the data: most developers don't pick one and stop — the average professional now runs 2.3 AI coding tools side by side, routing routine work to whichever is cheapest and hard problems to whichever is best that week.
 
 ---
 
@@ -93,6 +98,21 @@ Set expectations honestly: free tiers throttle mid-task and never include fronti
 
 ---
 
+## AI-Native Editors: Cursor, Devin Desktop, Zed, and Kilo Code
+
+Terminal harnesses aren't the only style in 2026 — a parallel track of AI-native editors builds the agent into the IDE itself:
+
+| Editor | What it is | Linux install |
+|---|---|---|
+| **Cursor** | VS Code fork with the deepest first-party agent integration; free tier up to a $200/mo Max tier | AppImage (needs `libfuse2` on fresh Ubuntu) |
+| **Devin Desktop** (formerly Windsurf) | Cognition acquired and rebranded Windsurf in June 2026 after the OpenAI-acquisition deal collapsed and Google licensed its founders; Pro is now $20/mo flat, replacing per-message token-credit billing | AppImage — prefer a distro `.deb`/`.rpm` where offered for auto-updates |
+| **Zed** | Rust-based, GPU-accelerated editor; its Agent Panel speaks the open Agent Client Protocol (ACP), so it can drive Claude, GPT, Gemini, local Ollama models, *or* an external CLI like Claude Code/Codex/OpenCode from inside one chat panel, including multiple parallel agents | Native binary; ships its own edit-prediction model (Zeta2) |
+| **Kilo Code** | VS Code/JetBrains extension, Apache-2.0, forked from the Cline→Roo Code lineage (Roo Code itself was archived in May 2026); MCP server marketplace, 400+ models via BYOK, free-vs-paid via a credit "Kilo Pass" | Marketplace on VS Code; **Open VSX** for VSCodium and other non-Microsoft builds |
+
+Cursor and Devin Desktop both ship as Linux AppImages rather than distro packages, which fits Shanios' philosophy exactly: an AppImage runs from anywhere in `@home` without touching the immutable root. Kilo Code, being a plain extension, just inherits whatever sandbox your editor already runs in — including a Flatpak VS Code/VSCodium install, where it's distributed via Open VSX.
+
+---
+
 ## MCP: Give Your Agent Hands
 
 MCP solved the N×M integration problem — one protocol, any client, any tool. Since its Linux Foundation handover, adoption exploded: thousands of public servers, official first-party integrations from GitHub, Stripe, Linear, Cloudflare, and Notion.
@@ -130,17 +150,15 @@ Or skip the tooling entirely — today's harnesses review diffs on request with 
 
 ---
 
-## Three More Shifts Worth Knowing
+## Four More Shifts Worth Knowing
+
+**Context engineering** — 2026's named successor to "prompt engineering," specifically for agentic coding. The discipline isn't the prompt anymore, it's the whole information environment an agent sees: which files, which rules, which history, which tools. The converged practical rule — a clean, small context with a weaker model consistently beats a cluttered, huge context with a stronger one. Teams doing this well structure their context files as short bullet rules plus explicit `## Preferred` / `## Avoid` blocks with real code samples, and stamp them with freshness metadata (`last_updated`, `owner`, `scope`) so an agent can judge whether a rule still applies.
 
 **AGENTS.md** — the open standard for telling every agent about your project: build commands, conventions, no-gos. One file at the repo root, read natively by Claude Code, Codex, OpenCode, Cursor, and Copilot alike. Governed under the Linux Foundation; 60k+ repos already ship one.
 
 **Spec-driven development** — the industry's correction to vibe coding. GitHub's Spec Kit (Specify → Plan → Tasks → Implement) and AWS Kiro formalize it, but Markdown discipline is enough: requirements.md → design.md → numbered agent-sized tasks.md, then implement one task per prompt.
 
 **Async cloud agents** — Copilot coding agent (assign an issue, get a draft PR), Google Jules (free daily task tier), Codex cloud, Cursor cloud agents. Delegate routine tickets to a cloud VM while your local harness handles design work. They open ordinary PRs, so Shanios needs nothing special on the receiving end — review the diff, not the summary.
-
----
-
-## And since virtually every open model lives on Hugging Face, the local stack consumes it directly — Ollama pulls GGUF repos straight from the Hub (`ollama pull hf.co/...`), llama.cpp loads them at launch with `-hf`, vLLM serves any repo ID, and weights cache to `~/.cache/huggingface` under `@home`. Their Inference Providers add yet another OpenAI-compatible free tier to the stack.
 
 ---
 
@@ -226,3 +244,4 @@ Full command-level detail: [AI-Assisted Development](https://docs.shani.dev/doc/
 - [Podman Containers](https://shani.dev/post/podman-containers-on-shani-os) — container fundamentals
 - [Distrobox](https://shani.dev/post/distrobox-on-shani-os) — running Node-based CLIs
 - [OpenCode](https://opencode.ai) · [Aider](https://aider.chat) · [MCP](https://modelcontextprotocol.io)
+- [Kilo Code](https://kilo.ai) · [Pi](https://github.com/earendil-works/pi) · [Cursor](https://cursor.com) · [Devin Desktop](https://devin.ai) · [Zed](https://zed.dev)

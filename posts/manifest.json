@@ -1,12 +1,12 @@
 [
   {
     "slug": "ai-assisted-development-on-shani-os",
-    "title": "AI-Assisted Development on Shanios: OpenCode, DeepSeek, MCP, and Local Models",
+    "title": "AI-Assisted Development on Shanios: Harnesses, AI Editors, MCP, and Local Models",
     "excerpt": "AI coding tools went from autocomplete to autonomous agents in two years, and 2026's landscape is crowded: Claude Code, Codex CLI, OpenCode,…",
     "date": "2026-08-25",
-    "updated": "",
+    "updated": "2026-08-30",
     "tag": "Guide",
-    "readTime": "8 min",
+    "readTime": "10 min",
     "paywalled": false,
     "cover": "/assets/images/blog/ai-assisted-development-on-shani-os.webp",
     "series": "Shani OS Guides",

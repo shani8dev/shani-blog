@@ -5,14 +5,15 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.</description>
     <language>en-IN</language>
-    <lastBuildDate>Sat, 29 Aug 2026 07:05:59 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 30 Aug 2026 19:25:04 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
-      <title>AI-Assisted Development on Shanios: OpenCode, DeepSeek, MCP, and Local Models</title>
+      <title>AI-Assisted Development on Shanios: Harnesses, AI Editors, MCP, and Local Models</title>
       <link>https://blog.shani.dev/post/ai-assisted-development-on-shani-os/</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/ai-assisted-development-on-shani-os/</guid>
       <description>AI coding tools went from autocomplete to autonomous agents in two years, and 2026's landscape is crowded: Claude Code, Codex CLI, OpenCode,…</description>
       <pubDate>Mon, 24 Aug 2026 18:30:00 GMT</pubDate>
+      <lastBuildDate>Sat, 29 Aug 2026 18:30:00 GMT</lastBuildDate>
       <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
