@@ -13,7 +13,7 @@ series: Shani OS Guides
 slug: ai-assisted-development-on-shani-os
 cover: /assets/images/blog/ai-assisted-development-on-shani-os.webp
 category: Guide
-readTime: "10 min"
+readTime: "11 min"
 ---
 
 AI coding tools went from autocomplete to autonomous agents in two years, and 2026's landscape is crowded: Claude Code, Codex CLI, OpenCode, Aider, Gemini CLI, Goose — each a "harness" that reads your repo, plans changes, edits files, and runs commands. Then there's MCP (Model Context Protocol), now the Linux-Foundation-governed standard that wires all of them into GitHub, databases, and browsers. And underneath everything, local models via Ollama mean your code never has to leave the machine.
@@ -34,6 +34,8 @@ The good news for Shanios users: every one of these tools is userland software. 
 | **Goose** | Block's open-source agent; multi-provider |
 | **Kilo CLI** | Terminal sibling of the Kilo Code editor extension (below), itself forked from OpenCode — same MCP marketplace and 400+-model routing in a terminal shell |
 | **Pi** | The deliberate anti-bloat pick — ships the model just four tools (read/write/edit/bash) and a sub-1,000-token system prompt; MIT, embeddable as an SDK |
+| **OpenHands** | MIT, 80k+ GitHub stars — self-hosted, runs sandboxed in a container; note its dedicated CLI is no longer actively maintained, so follow the project's current official run instructions rather than an old tutorial's |
+| **Amp** | Sourcegraph's harness (CLI + VS Code extension) — pay-as-you-go with zero markup over provider pricing, free tier with no hard token cap |
 
 Install example — OpenCode lands in your home directory and survives everything:
 
@@ -43,7 +45,9 @@ curl -fsSL https://opencode.ai/install | bash
 
 The ecosystem's collective wisdom applies here: the harness shapes workflow, but the model decides output quality. Pick ergonomics first, then route to whatever backend fits your budget.
 
-**Where the market actually stands (2026):** GitHub Copilot leads on raw share (~40%, Microsoft/enterprise-bundling driven), but Claude Code — despite being newer — already carries more workplace adoption than Cursor and was rated the single most-loved tool in JetBrains' most recent developer survey. Cursor remains the fastest-growing, at 5M+ active users. The honest takeaway from the data: most developers don't pick one and stop — the average professional now runs 2.3 AI coding tools side by side, routing routine work to whichever is cheapest and hard problems to whichever is best that week.
+**Where the market actually stands (2026):** GitHub Copilot leads on raw share (~40%, Microsoft/enterprise-bundling driven), but Claude Code — despite being newer — already carries more workplace adoption than Cursor and was rated the single most-loved tool in JetBrains' most recent developer survey. Cursor remains the fastest-growing, at 5M+ active users. By raw GitHub stars, OpenCode is the most-starred open harness (~199k), with OpenHands, Gemini CLI, and Codex CLI clustered in the same tier. The honest takeaway from the data: most developers don't pick one and stop — the average professional now runs 2.3 AI coding tools side by side, routing routine work to whichever is cheapest and hard problems to whichever is best that week.
+
+**Not a harness, but worth knowing:** [Warp](https://warp.dev) is an AI-native terminal (full native Linux support since 2024, client dual-licensed MIT/AGPLv3 as of 2026) whose "Oz" feature can launch and drive Claude Code, Codex CLI, or Warp's own agent from one place — a way to manage several harnesses without switching windows, rather than a harness itself.
 
 ---
 
@@ -98,7 +102,7 @@ Set expectations honestly: free tiers throttle mid-task and never include fronti
 
 ---
 
-## AI-Native Editors: Cursor, Devin Desktop, Zed, and Kilo Code
+## AI-Native Editors and Agent-First Extensions
 
 Terminal harnesses aren't the only style in 2026 — a parallel track of AI-native editors builds the agent into the IDE itself:
 
@@ -108,6 +112,7 @@ Terminal harnesses aren't the only style in 2026 — a parallel track of AI-nati
 | **Devin Desktop** (formerly Windsurf) | Cognition acquired and rebranded Windsurf in June 2026 after the OpenAI-acquisition deal collapsed and Google licensed its founders; Pro is now $20/mo flat, replacing per-message token-credit billing | AppImage — prefer a distro `.deb`/`.rpm` where offered for auto-updates |
 | **Zed** | Rust-based, GPU-accelerated editor; its Agent Panel speaks the open Agent Client Protocol (ACP), so it can drive Claude, GPT, Gemini, local Ollama models, *or* an external CLI like Claude Code/Codex/OpenCode from inside one chat panel, including multiple parallel agents | Native binary; ships its own edit-prediction model (Zeta2) |
 | **Kilo Code** | VS Code/JetBrains extension, Apache-2.0, forked from the Cline→Roo Code lineage (Roo Code itself was archived in May 2026); MCP server marketplace, 400+ models via BYOK, free-vs-paid via a credit "Kilo Pass" | Marketplace on VS Code; **Open VSX** for VSCodium and other non-Microsoft builds |
+| **JetBrains Junie** | JetBrains' own first-party agent (GA June 2026), distinct from Continue/Cody; ships a standalone CLI too, for terminal/CI use | Plugin across the whole JetBrains lineup — all Flathub-installable on Shanios; priced into JetBrains AI Pro/Ultimate |
 
 Cursor and Devin Desktop both ship as Linux AppImages rather than distro packages, which fits Shanios' philosophy exactly: an AppImage runs from anywhere in `@home` without touching the immutable root. Kilo Code, being a plain extension, just inherits whatever sandbox your editor already runs in — including a Flatpak VS Code/VSCodium install, where it's distributed via Open VSX.
 
@@ -245,3 +250,4 @@ Full command-level detail: [AI-Assisted Development](https://docs.shani.dev/doc/
 - [Distrobox](https://shani.dev/post/distrobox-on-shani-os) — running Node-based CLIs
 - [OpenCode](https://opencode.ai) · [Aider](https://aider.chat) · [MCP](https://modelcontextprotocol.io)
 - [Kilo Code](https://kilo.ai) · [Pi](https://github.com/earendil-works/pi) · [Cursor](https://cursor.com) · [Devin Desktop](https://devin.ai) · [Zed](https://zed.dev)
+- [OpenHands](https://docs.all-hands.dev) · [Amp](https://ampcode.com) · [JetBrains Junie](https://www.jetbrains.com/junie) · [Warp](https://warp.dev)
