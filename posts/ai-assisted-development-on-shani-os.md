@@ -13,7 +13,7 @@ series: Shani OS Guides
 slug: ai-assisted-development-on-shani-os
 cover: /assets/images/blog/ai-assisted-development-on-shani-os.webp
 category: Guide
-readTime: "11 min"
+readTime: "12 min"
 ---
 
 AI coding tools went from autocomplete to autonomous agents in two years, and 2026's landscape is crowded: Claude Code, Codex CLI, OpenCode, Aider, Gemini CLI, Goose — each a "harness" that reads your repo, plans changes, edits files, and runs commands. Then there's MCP (Model Context Protocol), now the Linux-Foundation-governed standard that wires all of them into GitHub, databases, and browsers. And underneath everything, local models via Ollama mean your code never has to leave the machine.
@@ -36,6 +36,7 @@ The good news for Shanios users: every one of these tools is userland software. 
 | **Pi** | The deliberate anti-bloat pick — ships the model just four tools (read/write/edit/bash) and a sub-1,000-token system prompt; MIT, embeddable as an SDK |
 | **OpenHands** | MIT, 80k+ GitHub stars — self-hosted, runs sandboxed in a container; note its dedicated CLI is no longer actively maintained, so follow the project's current official run instructions rather than an old tutorial's |
 | **Amp** | Sourcegraph's harness (CLI + VS Code extension) — pay-as-you-go with zero markup over provider pricing, free tier with no hard token cap |
+| **Open Interpreter** | `pip install open-interpreter` then run `interpreter` — 65k+ GitHub stars, MIT, strong local-model story, edits documents/spreadsheets alongside code |
 
 Install example — OpenCode lands in your home directory and survives everything:
 
@@ -87,6 +88,10 @@ And since virtually every open model lives on Hugging Face, the local stack cons
 You can run this entire workflow without paying for tokens:
 
 **OpenCode Zen** — OpenCode's curated gateway ships rotating free models (community and vendor-promo coding models) selectable straight from the model picker. One honest caveat: some free-period models train on collected data, so keep proprietary code on paid or local routes.
+
+**Kilo Gateway** — Kilo Code's own equivalent: 40+ free coding models (ByteDance Seed, Grok Code Fast, NVIDIA Nemotron, Arcee Trinity, and others), available with zero config to both signed-in and anonymous users — anonymous use is rate-limited to 200 requests/hour per IP. Same rotation caveat as Zen applies: check the live list before assuming a specific model is still there.
+
+**The tools themselves also give away free usage, separately from free models.** A few worth knowing specifically: Google Jules gives 15 fully autonomous agent tasks a day, free, no card. GitHub Copilot's free tier (2,000 completions + 50 chats/month) is the one genuinely *permanent* entry on this list — everything else here is a trial, a rate limit, or subject to change. Zed's Personal plan is free forever for BYOK/local models, no restriction at all — only Zed's own hosted models need the paid tier. And if you maintain a real open-source project, Anthropic's "Claude for Open Source" program gives qualifying maintainers six months of the $200/mo Max 20x tier for nothing. Codex CLI, Cursor, Devin Desktop, Gemini CLI, JetBrains Junie, Amp, and OpenHands all have some free allowance too — smaller and more likely to shift, so check current numbers before planning around them.
 
 **Permanent free tiers** — Google AI Studio (Gemini Flash with 1M context), Groq (fastest inference on open models), Cerebras (~1M tokens/day), NVIDIA NIM (100+ hosted open models), Mistral's Experiment tier (huge monthly budget incl. Codestral), GitHub Models (frontier-class via your GitHub account), and OpenRouter's 30+ `:free` models behind a single key. All OpenAI-compatible, all work with every harness above:
 
@@ -250,4 +255,4 @@ Full command-level detail: [AI-Assisted Development](https://docs.shani.dev/doc/
 - [Distrobox](https://shani.dev/post/distrobox-on-shani-os) — running Node-based CLIs
 - [OpenCode](https://opencode.ai) · [Aider](https://aider.chat) · [MCP](https://modelcontextprotocol.io)
 - [Kilo Code](https://kilo.ai) · [Pi](https://github.com/earendil-works/pi) · [Cursor](https://cursor.com) · [Devin Desktop](https://devin.ai) · [Zed](https://zed.dev)
-- [OpenHands](https://docs.all-hands.dev) · [Amp](https://ampcode.com) · [JetBrains Junie](https://www.jetbrains.com/junie) · [Warp](https://warp.dev)
+- [OpenHands](https://docs.all-hands.dev) · [Amp](https://ampcode.com) · [JetBrains Junie](https://www.jetbrains.com/junie) · [Warp](https://warp.dev) · [Open Interpreter](https://github.com/KillianLucas/open-interpreter)
