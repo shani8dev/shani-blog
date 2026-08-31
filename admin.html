@@ -3114,7 +3114,7 @@ function openInBlog() {
   const slug = document.getElementById('fm-slug').value.trim();
   if (!slug) return;
   const base = BLOG_URL ? BLOG_URL.replace(/\/$/, '') : '';
-  window.open(`${base}/post/${slug}`, '_blank');
+  window.open(`${base}/post/${slug}/`, '_blank');
 }
 
 // ═══════════════════════════════════════════════════════════════════

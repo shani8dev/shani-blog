@@ -766,7 +766,7 @@ const Renderer = {
       return `<article class="card ${isFeat ? 'featured' : ''}" role="link" data-idx="${i}">
         <div class="card__visual">
           ${visual}
-          <button class="card__copy-link" data-url="${Utils.escapeHtml(`${CONFIG.BLOG_URL}/post/${p.slug}`)}" aria-label="Copy link" title="Copy link"><i class="fa-solid fa-link"></i></button>
+          <button class="card__copy-link" data-url="${Utils.escapeHtml(`${CONFIG.BLOG_URL}/post/${p.slug}/`)}" aria-label="Copy link" title="Copy link"><i class="fa-solid fa-link"></i></button>
         </div>
         <div class="card__content">
           <span class="card__tag" data-tag="${Utils.escapeHtml(p.tag)}"><i class="${TAG_ICONS[p.tag] || TAG_ICONS.Post}"></i> ${Utils.escapeHtml(p.tag)}</span>
@@ -896,7 +896,7 @@ const Renderer = {
     const date = Utils.fmtDateShort(post.date);
 
     // ── Update all meta / SEO for this post ───────────────────────
-    const postUrl   = `${CONFIG.BLOG_URL}/post/${post.slug}`;
+    const postUrl   = `${CONFIG.BLOG_URL}/post/${post.slug}/`;
     // og:image/twitter:image must be a fully-qualified absolute URL per spec.
     // post.cover/ogImage are authored as root-relative paths, so absolutize
     // against BLOG_URL; leave an already-absolute value untouched.
@@ -1576,7 +1576,7 @@ const Renderer = {
 // =========================================
 const Router = {
   go(slug) {
-    history.pushState({ slug }, '', `/post/${encodeURIComponent(slug)}`);
+    history.pushState({ slug }, '', `/post/${encodeURIComponent(slug)}/`);
     this.render();
   },
   back(tag) {
@@ -1591,7 +1591,7 @@ const Router = {
     const rawMd = location.pathname.match(/^\/posts\/(.+?)(?:\.md)?$/);
     if (rawMd) {
       const slug = decodeURIComponent(rawMd[1]).replace(/\/+$/, '');
-      history.replaceState({}, '', `/post/${encodeURIComponent(slug)}`);
+      history.replaceState({}, '', `/post/${encodeURIComponent(slug)}/`);
       return slug;
     }
     const m = location.pathname.match(/^\/post\/(.+)$/);
