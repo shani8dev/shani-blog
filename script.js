@@ -1318,7 +1318,9 @@ const Renderer = {
         existingFrame.contentWindow?.postMessage({
           giscus: {
             setConfig: {
-              term: CONFIG.GISCUS_MAPPING === 'pathname' ? location.pathname : location.href,
+              term: CONFIG.GISCUS_MAPPING === 'pathname'
+                ? Router.getSlug() ? `/post/${Router.getSlug()}/` : location.pathname
+                : location.href,
               theme: giscusTheme,
             }
           }
@@ -1340,7 +1342,20 @@ const Renderer = {
         gs.dataset.repoId         = CONFIG.GISCUS_REPO_ID;
         gs.dataset.category       = CONFIG.GISCUS_CATEGORY || 'General';
         gs.dataset.categoryId     = CONFIG.GISCUS_CATEGORY_ID;
-        gs.dataset.mapping        = CONFIG.GISCUS_MAPPING || 'pathname';
+        // Use a stable, slug-derived term instead of data-mapping="pathname".
+        // "pathname" makes giscus read location.pathname itself, which carries
+        // a trailing "/index.html" when a post is served/browsed at its literal
+        // file URL (local preview) — that yields a wrong discussion term and a
+        // 404 from giscus.app/api/discussions. Deriving "/post/<slug>/" from the
+        // clean slug keeps threads identical across "/post/<slug>/" and
+        // "/post/<slug>/index.html", matching how production indexes threads.
+        if ((CONFIG.GISCUS_MAPPING || 'pathname') === 'pathname') {
+          const slug = Router.getSlug();
+          gs.dataset.mapping = 'specific';
+          gs.dataset.term    = slug ? `/post/${slug}/` : location.pathname;
+        } else {
+          gs.dataset.mapping = CONFIG.GISCUS_MAPPING;
+        }
         gs.dataset.strict         = '0';
         gs.dataset.reactionsEnabled = '1';
         gs.dataset.emitMetadata   = '0';
@@ -1587,15 +1602,25 @@ const Router = {
     }
   },
   getSlug() {
+    // Normalize to a clean slug: strip trailing slashes AND a trailing
+    // "/index.html". Served locally (python3 -m http.server) or hit at its
+    // literal file URL the pathname is "/post/<slug>/index.html", not
+    // production's "/post/<slug>/" — without stripping the filename the slug
+    // becomes "<slug>/index.html" and fetchBody() tries "<slug>/index.html.md"
+    // (404, live content silently lost). Both forms must yield the same slug.
+    const clean = raw => {
+      if (!raw) return null;
+      return raw.replace(/\/+$/, '').replace(/(^|\/)index\.html$/, '').replace(/\/+$/, '') || null;
+    };
     // Handle /posts/slug (raw GitHub Pages path) → silently rewrite to /post/slug
     const rawMd = location.pathname.match(/^\/posts\/(.+?)(?:\.md)?$/);
     if (rawMd) {
-      const slug = decodeURIComponent(rawMd[1]).replace(/\/+$/, '');
+      const slug = clean(decodeURIComponent(rawMd[1]));
       history.replaceState({}, '', `/post/${encodeURIComponent(slug)}/`);
       return slug;
     }
     const m = location.pathname.match(/^\/post\/(.+)$/);
-    return m ? decodeURIComponent(m[1]).replace(/\/+$/, '') : null;
+    return m ? clean(decodeURIComponent(m[1])) : null;
   },
   getParams() {
     const qs = new URLSearchParams(location.search);
@@ -2346,8 +2371,23 @@ const UI = {
 // =========================================
 // 7. BOOTSTRAP
 // =========================================
+// Root index.html ships a static prerendered-home fallback inside #view-post
+// (between the PRERENDERED-HOME markers); the SPA post path needs the real
+// <article id="post-article"> that generate-manifest.js injects into stubs.
+// Restore it at runtime so SPA card-click nav doesn't throw on a null element.
+function preparePostView() {
+  const postView = document.getElementById('view-post');
+  if (!postView) return;
+  if (postView.querySelector('#post-article')) return;
+  postView.innerHTML = postView.innerHTML.replace(
+    /<!--PRERENDERED-HOME-START-->[\s\S]*?<!--PRERENDERED-HOME-END-->/,
+    '<article id="post-article"></article>'
+  );
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   Renderer.applyBranding();
+  preparePostView();
   UI.initTheme();
   UI.initMenu();
   UI.initBackTop();

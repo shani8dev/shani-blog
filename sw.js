@@ -1,7 +1,7 @@
 // sw.js — blog.shani.dev
 // Ported from docs.shani.dev's service worker. Gives the blog real offline
 // support instead of just an installable manifest.json with no caching.
-const SHELL_CACHE = 'shaniblog-20260830';
+const SHELL_CACHE = 'shaniblog-20260831';
 const POST_CACHE  = 'shaniblog-posts-v1';
 const SHELL = [
   '/',
