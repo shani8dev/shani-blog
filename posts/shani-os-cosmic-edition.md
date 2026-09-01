@@ -97,7 +97,7 @@ The `shani-desktop-cosmic` metapackage pulls in the COSMIC desktop components fr
 
 ## Try It
 
-Download the COSMIC edition from [shani.dev](https://shani.dev). It is a full installable ISO with the same blue-green update mechanism as the other editions. If you are already running Shanios and want to switch desktops, the recommended path is a fresh install — desktop environments are deeply integrated and switching at runtime is not supported.
+The COSMIC edition is a full installable ISO built by the same blue-green update mechanism as the other editions — but it is not yet published for download. As of now, only the GNOME and KDE Plasma editions ship from [shani.dev](https://shani.dev); the COSMIC ISO is buildable from source (`./build.sh full -p cosmic`) but has not yet been released to the download server. If you are already running Shanios and want to switch desktops, the recommended path is a fresh install — desktop environments are deeply integrated and switching at runtime is not supported.
 
 For the full technical breakdown: [What's Included](https://docs.shani.dev/doc/intro/whats-included).
 

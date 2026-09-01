@@ -19,8 +19,8 @@
   <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/shani-os-build-pipeline.webp">
   <meta property="og:image:alt" id="og-image-alt" content="Inside the Shanios Build Pipeline: From Package List to Bootable Image">
   <meta property="og:locale"    content="en_US">
-  <meta property="article:published_time" id="og-article-pubtime" content="2026-08-25T00:00:00.000Z">
-  <meta property="article:modified_time"  id="og-article-modtime" content="2026-08-25T00:00:00.000Z">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-08-24T18:30:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-08-24T18:30:00.000Z">
   <meta property="article:author"         id="og-article-author"  content="Shrinivas Kumbhar">
   <meta property="article:section"        id="og-article-section" content="Deep Dive">
   
@@ -31,7 +31,7 @@
   <meta name="twitter:description" id="tw-desc"  content="Every Shanios release starts as a list of package names and ends as a GPG-signed, Secure Boot-ready ISO. The build pipeline that bridges tho…">
   <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/shani-os-build-pipeline.webp">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Inside the Shanios Build Pipeline: From Package List to Bootable Image","description":"Every Shanios release starts as a list of package names and ends as a GPG-signed, Secure Boot-ready ISO. The build pipeline that bridges tho…","url":"https://blog.shani.dev/post/shani-os-build-pipeline/","datePublished":"2026-08-25T00:00:00.000Z","dateModified":"2026-08-25T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-os-build-pipeline.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Inside the Shanios Build Pipeline: From Package List to Bootable Image","description":"Every Shanios release starts as a list of package names and ends as a GPG-signed, Secure Boot-ready ISO. The build pipeline that bridges tho…","url":"https://blog.shani.dev/post/shani-os-build-pipeline/","datePublished":"2026-08-24T18:30:00.000Z","dateModified":"2026-08-24T18:30:00.000Z","author":{"@type":"Person","name":"Shrinivas Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-os-build-pipeline.webp","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -231,14 +231,14 @@
           <span class="meta-info">Shrinivas Kumbhar · 2026-08-25 · 10 min</span>
         </div>
       </header>
-      <div class="post-body"><p>Every Shanios release starts as a list of package names and ends as a GPG-signed, Secure Boot-ready ISO. The build pipeline that bridges those two endpoints is fully automated, runs inside a Docker container, and produces reproducible Btrfs images across four desktop profiles. This post walks through how it works.</p>
+      <div class="post-body"><p>Every Shanios release starts as a list of package names and ends as a GPG-signed, Secure Boot-ready ISO. The build pipeline that bridges those two endpoints is fully automated, runs inside a Docker container, and produces reproducible Btrfs images across six image profiles — three of which (GNOME, Plasma, COSMIC) are ISO-capable desktop profiles. This post walks through how it works.</p>
 <hr>
 <h2 id="the-entry-point">The Entry Point</h2>
 <p>Everything starts with <code>build.sh</code> in the <a href="https://github.com/shani8dev/shani-install-media">shani-install-media</a> repository. It is a dispatcher — it parses a command and profile, then calls the appropriate sub-script:</p>
 <pre><code class="language-bash">./build.sh full -p plasma    # build everything for KDE Plasma
 ./build.sh image -p gnome    # just the base image
 ./build.sh iso-only -p cosmic # download from R2, build ISO, upload</code></pre>
-<p>The compound commands chain stages together: <code>full</code> runs image → flatpak → snap → iso → repack → release → upload in sequence. <code>iso-only</code> skips local image building entirely and downloads the base image from Cloudflare R2 instead.</p>
+<p>The compound commands chain stages together: <code>full</code> runs image → flatpak → snap → iso → repack → release latest → upload all in sequence. <code>iso-only</code> skips local image building entirely and downloads the base image from Cloudflare R2 instead.</p>
 <hr>
 <h2 id="stage-1-the-base-image">Stage 1: The Base Image</h2>
 <p><code>build-base-image.sh</code> is where the real work happens. It:</p>
@@ -246,13 +246,14 @@
 <li>Creates a Btrfs subvolume in a chroot directory</li>
 <li>Runs <code>pacstrap</code> with the profile's package list from <code>image_profiles/&lt;profile&gt;/package-list.txt</code></li>
 <li>Applies the shared overlay — base configs, systemd units, environment files</li>
-<li>Runs the profile-specific customization script (e.g., <code>gnome-customization.sh</code> enables GNOME services, installs GNOME Flatpaks)</li>
+<li>Runs the profile-specific customization script (e.g., <code>gnome-customization.sh</code>) — note these per-profile scripts are currently empty placeholders; profile differences are handled by each profile's package list, its <code>overlay/</code>, and whether it ships <code>flatpak-packages.txt</code>/<code>snap-packages.txt</code></li>
 <li>Takes a Btrfs snapshot and compresses it with Zstandard</li>
 </ol>
 <p>The output is a <code>.zst</code> file — a Btrfs send-stream that can be received onto any Btrfs filesystem with the exact same byte-level layout.</p>
 <p>Each profile has its own package list:</p>
-<table><thead><tr><th>Profile</th><th>Packages</th><th>Desktop</th></tr></thead><tbody><tr><td><code>gnome</code></td><td>~25 base packages + Flatpaks</td><td>GNOME</td></tr><tr><td><code>plasma</code></td><td>~25 base packages + Flatpaks</td><td>KDE Plasma</td></tr><tr><td><code>cosmic</code></td><td>~25 base packages + Flatpaks</td><td>COSMIC</td></tr><tr><td><code>server</code></td><td>~30 explicit packages</td><td>None (headless)</td></tr></tbody></table>
-<p>The server profile is notably different — it deliberately excludes the desktop metapackages and instead installs <code>shani-tools-network</code> plus cloud-init, systemd-networkd, and container tooling.</p>
+<table><thead><tr><th>Profile</th><th>Packages</th><th>Desktop</th><th>ISO</th></tr></thead><tbody><tr><td><code>gnome</code></td><td>~25 base packages + Flatpaks</td><td>GNOME</td><td>✅ published</td></tr><tr><td><code>plasma</code></td><td>~25 base packages + Flatpaks</td><td>KDE Plasma</td><td>✅ published</td></tr><tr><td><code>cosmic</code></td><td>~25 base packages + Flatpaks</td><td>COSMIC</td><td>✅ capable, not yet published</td></tr><tr><td><code>kiosk</code></td><td>minimal (Cage + labwc + Firefox)</td><td>Cage/LabWC (full-screen Firefox)</td><td>❌ image-only</td></tr><tr><td><code>server</code></td><td>~120 explicit packages</td><td>None (headless)</td><td>❌ image-only</td></tr><tr><td><code>shared</code></td><td>—</td><td>— (overlay-only base)</td><td>❌</td></tr></tbody></table>
+<p>The three desktop profiles (gnome, plasma, cosmic) each have an <code>iso_profiles/&lt;profile&gt;/</code> counterpart that mkarchiso turns into a Secure Boot-ready ISO — so all three are <strong>ISO-capable</strong>. GNOME and Plasma ISOs are currently published on the download server; COSMIC's ISO is buildable but has not yet been released. The kiosk and server profiles are <strong>image-only</strong> — they build a base image but deliberately have no ISO counterpart (kiosk is a full-screen Cage/LabWC kiosk; server is headless and masks all <code>plymouth-*.service</code> units). The <code>shared</code> profile holds the base overlay (configs, systemd units, environment files) that every other profile starts from.</p>
+<p>The server profile is notably different from the desktops — it deliberately excludes the desktop metapackages and instead installs <code>shani-tools-network</code> plus cloud-init, systemd-networkd, and container tooling.</p>
 <hr>
 <h2 id="stage-2-flatpak-and-snap-images">Stage 2: Flatpak and Snap Images</h2>
 <p>If <code>flatpak-packages.txt</code> exists for the profile (it does for all desktop editions), <code>build-flatpak-image.sh</code> creates a separate Btrfs subvolume, installs every Flatpak listed, and produces a <code>flatpakfs.zst</code>. Same pattern for snaps via <code>build-snap-image.sh</code>.</p>
@@ -273,25 +274,27 @@
 <h2 id="stage-5-upload-and-release">Stage 5: Upload and Release</h2>
 <p><code>upload.sh</code> pushes artifacts to two destinations:</p>
 <ul>
-<li><strong>SourceForge</strong> — primary download server, accessed via <code>lftp</code></li>
-<li><strong>Cloudflare R2</strong> — build cache and CDN, accessed via <code>rclone</code></li>
+<li><strong>SourceForge</strong> — the build's landing pad, accessed via <code>lftp</code>; holds the base-image <code>.zst</code> rootfs streams (no signed ISOs)</li>
+<li><strong>Cloudflare R2</strong> — the primary download host for signed ISOs (<code>downloads.shani.dev</code>), mirrored from every SourceForge upload via <code>rclone</code></li>
 </ul>
 <p><code>release.sh</code> creates channel manifest files (<code>latest.txt</code> or <code>stable.txt</code>) that <code>shani-deploy</code> reads to determine what's available for update.</p>
 <hr>
 <h2 id="the-docker-environment">The Docker Environment</h2>
-<p>None of this runs on your host machine. The entire pipeline executes inside <code>shrinivasvkumbhar/shani-builder</code> — a privileged Docker container based on <code>archlinux:base-devel</code> that pre-installs <code>pacman</code>, <code>btrfs-progs</code>, <code>zstd</code>, <code>squashfs-tools</code>, <code>archiso</code>, <code>dracut</code>, <code>systemd-ukify</code>, <code>sbsigntools</code>, and the Shanios signing key.</p>
+<p>None of this runs on your host machine. The entire pipeline executes inside <code>shrinivasvkumbhar/shani-builder</code> — a privileged Docker container based on <code>archlinux:base-devel</code> that pre-installs <code>archiso</code>, <code>btrfs-progs</code>, <code>arch-install-scripts</code>, <code>shim-signed</code>, <code>sbsigntools</code>, <code>mokutil</code>, <code>zsync</code>, <code>rsync</code>, <code>rclone</code>, <code>mktorrent</code>, <code>flatpak</code>, <code>systemd</code>, <code>snapd</code>, and the Shanios signing key.</p>
 <p>The container runs as privileged because image assembly requires Btrfs operations, loop mounts, and chroot — all of which need host-level access. The host's source tree is bind-mounted read-only, and output artifacts are written to a cache directory.</p>
 <hr>
 <h2 id="cicd">CI/CD</h2>
-<p>Two GitHub Actions workflows in <a href="https://github.com/shani8dev/shani-builder">shani-builder</a> automate the pipeline:</p>
+<p>Four GitHub Actions workflows in <a href="https://github.com/shani8dev/shani-builder">shani-builder</a> automate the pipeline:</p>
 <ul>
+<li><strong><code>build-docker.yaml</code></strong> — builds and pushes the <code>shrinivasvkumbhar/shani-builder</code> build container itself</li>
 <li><strong><code>build-image.yml</code></strong> — triggered on push to <code>main</code> or manual dispatch, builds the OS image</li>
+<li><strong><code>build.yaml</code></strong> — orchestrates the full build/release run within the container</li>
 <li><strong><code>promote-stable.yml</code></strong> — promotes the current <code>latest</code> build to <code>stable</code> after verification</li>
 </ul>
-<p>Both use AWS OIDC for authentication — no long-lived credentials are stored in GitHub secrets for the core build path.</p>
+<p>Both build workflows use AWS OIDC for authentication — no long-lived credentials are stored in GitHub secrets for the core build path.</p>
 <hr>
 <h2 id="testing">Testing</h2>
-<p><code>build.sh test</code> provides three test modes:</p>
+<p><code>build.sh test</code> wraps a full test environment (<code>test-env/</code>) with many subcommands — <code>disk</code>, <code>ca</code>, <code>bootstrap</code>, <code>enter</code>, <code>upgrade</code>, <code>reboot</code>, <code>rollback</code>, <code>install</code>, <code>configure</code>, <code>pacstrap</code>, <code>qemu</code>, and <code>clean</code>. A few common ones:</p>
 <ul>
 <li><code>test disk</code> — creates loop-mounted disks, installs the image, boots it, runs health checks</li>
 <li><code>test bootstrap -p &lt;profile&gt;</code> — installs and configures a profile from scratch</li>

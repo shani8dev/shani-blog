@@ -19,8 +19,8 @@
   <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/shani-os-for-video-creators.webp">
   <meta property="og:image:alt" id="og-image-alt" content="Shani OS for Video Creators and Content Creators — Editing, Colour, Streaming, and Podcasting">
   <meta property="og:locale"    content="en_US">
-  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-10T00:00:00.000Z">
-  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-10T00:00:00.000Z">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-09T18:30:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-09T18:30:00.000Z">
   <meta property="article:author"         id="og-article-author"  content="Shrinivas Vishnu Kumbhar">
   <meta property="article:section"        id="og-article-section" content="Guide">
   
@@ -31,7 +31,7 @@
   <meta name="twitter:description" id="tw-desc"  content="The complete video production stack on Shani OS — DaVinci Resolve, Kdenlive, OpenShot, OBS Studio for streaming and recording, Audacity and Ardour for audio, GPU-accelerated encoding, and everything a YouTuber, podcaster, or video editor needs from first boot.">
   <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/shani-os-for-video-creators.webp">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS for Video Creators and Content Creators — Editing, Colour, Streaming, and Podcasting","description":"The complete video production stack on Shani OS — DaVinci Resolve, Kdenlive, OpenShot, OBS Studio for streaming and recording, Audacity and Ardour for audio, GPU-accelerated encoding, and everything a YouTuber, podcaster, or video editor needs from first boot.","url":"https://blog.shani.dev/post/shani-os-for-video-creators/","datePublished":"2026-05-10T00:00:00.000Z","dateModified":"2026-05-10T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-os-for-video-creators.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Shani OS for Video Creators and Content Creators — Editing, Colour, Streaming, and Podcasting","description":"The complete video production stack on Shani OS — DaVinci Resolve, Kdenlive, OpenShot, OBS Studio for streaming and recording, Audacity and Ardour for audio, GPU-accelerated encoding, and everything a YouTuber, podcaster, or video editor needs from first boot.","url":"https://blog.shani.dev/post/shani-os-for-video-creators/","datePublished":"2026-05-09T18:30:00.000Z","dateModified":"2026-05-09T18:30:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-os-for-video-creators.webp","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -300,9 +300,8 @@ vainfo --display drm --device /dev/dri/renderD128</code></pre>
 <p>Enable hardware encoding in HandBrake: Preferences → Video → select H.264 (Intel QSV/NVENC/AMD VCE).</p>
 <hr>
 <h2 id="screen-recording-and-live-streaming-obs-studio">Screen Recording and Live Streaming — OBS Studio</h2>
-<p>OBS Studio is pre-installed on every edition and is the essential tool for any creator who streams or records:</p>
-<pre><code class="language-bash"># Pre-installed — no action needed. If missing, install manually:
-flatpak install flathub com.obsproject.Studio</code></pre>
+<p>OBS Studio is the essential tool for any creator who streams or records. It is not pre-installed on the base system — install it with one command:</p>
+<pre><code class="language-bash">flatpak install flathub com.obsproject.Studio</code></pre>
 <p>OBS on Shani OS supports:</p>
 <ul>
 <li>Screen capture via PipeWire (works with both GNOME and KDE Wayland sessions)</li>

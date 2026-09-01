@@ -138,7 +138,7 @@ Shani OS uses a multi-runtime model. Applications run entirely outside the base 
 | shani-tools-network | `1.0-3` | Headless networking tools (systemd-networkd, cloud-init) |
 | shani-tools-extra | `1.0-2` | Additional system utilities |
 | shani-multimedia | `1.0-6` | Audio/video codecs, GStreamer plugins, PipeWire extras |
-| shani-video | `1.0-4` | Video production packages (OBS, Kdenlive, DaVinci Resolve deps) |
+| shani-video | `1.0-4` | GPU and video drivers (Mesa, Vulkan drivers, NVIDIA, VA-API/VDPAU) |
 | shani-video-guest | `1.0-1` | Minimal video playback for VMs and containers |
 | shani-fonts | `1.0-3` | Font configuration and Indian language support |
 | shani-accessibility | `1.0-2` | Orca, espeakup, brltty, IBus input methods |

@@ -257,7 +257,7 @@ Full command-level detail: [AI-Assisted Development](https://docs.shani.dev/doc/
 URL: https://blog.shani.dev/post/shani-os-build-pipeline/
 Published: 2026-08-25 · Tag: Deep Dive
 
-Every Shanios release starts as a list of package names and ends as a GPG-signed, Secure Boot-ready ISO. The build pipeline that bridges those two endpoints is fully automated, runs inside a Docker container, and produces reproducible Btrfs images across four desktop profiles. This post walks through how it works.
+Every Shanios release starts as a list of package names and ends as a GPG-signed, Secure Boot-ready ISO. The build pipeline that bridges those two endpoints is fully automated, runs inside a Docker container, and produces reproducible Btrfs images across six image profiles — three of which (GNOME, Plasma, COSMIC) are ISO-capable desktop profiles. This post walks through how it works.
 
 ---
 
@@ -271,7 +271,7 @@ Everything starts with `build.sh` in the [shani-install-media](https://github.co
 ./build.sh iso-only -p cosmic # download from R2, build ISO, upload
 ```
 
-The compound commands chain stages together: `full` runs image → flatpak → snap → iso → repack → release → upload in sequence. `iso-only` skips local image building entirely and downloads the base image from Cloudflare R2 instead.
+The compound commands chain stages together: `full` runs image → flatpak → snap → iso → repack → release latest → upload all in sequence. `iso-only` skips local image building entirely and downloads the base image from Cloudflare R2 instead.
 
 ---
 
@@ -282,21 +282,25 @@ The compound commands chain stages together: `full` runs image → flatpak → s
 1. Creates a Btrfs subvolume in a chroot directory
 2. Runs `pacstrap` with the profile's package list from `image_profiles/<profile>/package-list.txt`
 3. Applies the shared overlay — base configs, systemd units, environment files
-4. Runs the profile-specific customization script (e.g., `gnome-customization.sh` enables GNOME services, installs GNOME Flatpaks)
+4. Runs the profile-specific customization script (e.g., `gnome-customization.sh`) — note these per-profile scripts are currently empty placeholders; profile differences are handled by each profile's package list, its `overlay/`, and whether it ships `flatpak-packages.txt`/`snap-packages.txt`
 5. Takes a Btrfs snapshot and compresses it with Zstandard
 
 The output is a `.zst` file — a Btrfs send-stream that can be received onto any Btrfs filesystem with the exact same byte-level layout.
 
 Each profile has its own package list:
 
-| Profile | Packages | Desktop |
-|---|---|---|
-| `gnome` | ~25 base packages + Flatpaks | GNOME |
-| `plasma` | ~25 base packages + Flatpaks | KDE Plasma |
-| `cosmic` | ~25 base packages + Flatpaks | COSMIC |
-| `server` | ~30 explicit packages | None (headless) |
+| Profile | Packages | Desktop | ISO |
+|---|---|---|---|
+| `gnome` | ~25 base packages + Flatpaks | GNOME | ✅ published |
+| `plasma` | ~25 base packages + Flatpaks | KDE Plasma | ✅ published |
+| `cosmic` | ~25 base packages + Flatpaks | COSMIC | ✅ capable, not yet published |
+| `kiosk` | minimal (Cage + labwc + Firefox) | Cage/LabWC (full-screen Firefox) | ❌ image-only |
+| `server` | ~120 explicit packages | None (headless) | ❌ image-only |
+| `shared` | — | — (overlay-only base) | ❌ |
 
-The server profile is notably different — it deliberately excludes the desktop metapackages and instead installs `shani-tools-network` plus cloud-init, systemd-networkd, and container tooling.
+The three desktop profiles (gnome, plasma, cosmic) each have an `iso_profiles/<profile>/` counterpart that mkarchiso turns into a Secure Boot-ready ISO — so all three are **ISO-capable**. GNOME and Plasma ISOs are currently published on the download server; COSMIC's ISO is buildable but has not yet been released. The kiosk and server profiles are **image-only** — they build a base image but deliberately have no ISO counterpart (kiosk is a full-screen Cage/LabWC kiosk; server is headless and masks all `plymouth-*.service` units). The `shared` profile holds the base overlay (configs, systemd units, environment files) that every other profile starts from.
+
+The server profile is notably different from the desktops — it deliberately excludes the desktop metapackages and instead installs `shani-tools-network` plus cloud-init, systemd-networkd, and container tooling.
 
 ---
 
@@ -330,8 +334,8 @@ The output is a `signed_<os>-<date>-<profile>.iso` ready for distribution.
 
 `upload.sh` pushes artifacts to two destinations:
 
-- **SourceForge** — primary download server, accessed via `lftp`
-- **Cloudflare R2** — build cache and CDN, accessed via `rclone`
+- **SourceForge** — the build's landing pad, accessed via `lftp`; holds the base-image `.zst` rootfs streams (no signed ISOs)
+- **Cloudflare R2** — the primary download host for signed ISOs (`downloads.shani.dev`), mirrored from every SourceForge upload via `rclone`
 
 `release.sh` creates channel manifest files (`latest.txt` or `stable.txt`) that `shani-deploy` reads to determine what's available for update.
 
@@ -339,7 +343,7 @@ The output is a `signed_<os>-<date>-<profile>.iso` ready for distribution.
 
 ## The Docker Environment
 
-None of this runs on your host machine. The entire pipeline executes inside `shrinivasvkumbhar/shani-builder` — a privileged Docker container based on `archlinux:base-devel` that pre-installs `pacman`, `btrfs-progs`, `zstd`, `squashfs-tools`, `archiso`, `dracut`, `systemd-ukify`, `sbsigntools`, and the Shanios signing key.
+None of this runs on your host machine. The entire pipeline executes inside `shrinivasvkumbhar/shani-builder` — a privileged Docker container based on `archlinux:base-devel` that pre-installs `archiso`, `btrfs-progs`, `arch-install-scripts`, `shim-signed`, `sbsigntools`, `mokutil`, `zsync`, `rsync`, `rclone`, `mktorrent`, `flatpak`, `systemd`, `snapd`, and the Shanios signing key.
 
 The container runs as privileged because image assembly requires Btrfs operations, loop mounts, and chroot — all of which need host-level access. The host's source tree is bind-mounted read-only, and output artifacts are written to a cache directory.
 
@@ -347,18 +351,20 @@ The container runs as privileged because image assembly requires Btrfs operation
 
 ## CI/CD
 
-Two GitHub Actions workflows in [shani-builder](https://github.com/shani8dev/shani-builder) automate the pipeline:
+Four GitHub Actions workflows in [shani-builder](https://github.com/shani8dev/shani-builder) automate the pipeline:
 
+- **`build-docker.yaml`** — builds and pushes the `shrinivasvkumbhar/shani-builder` build container itself
 - **`build-image.yml`** — triggered on push to `main` or manual dispatch, builds the OS image
+- **`build.yaml`** — orchestrates the full build/release run within the container
 - **`promote-stable.yml`** — promotes the current `latest` build to `stable` after verification
 
-Both use AWS OIDC for authentication — no long-lived credentials are stored in GitHub secrets for the core build path.
+Both build workflows use AWS OIDC for authentication — no long-lived credentials are stored in GitHub secrets for the core build path.
 
 ---
 
 ## Testing
 
-`build.sh test` provides three test modes:
+`build.sh test` wraps a full test environment (`test-env/`) with many subcommands — `disk`, `ca`, `bootstrap`, `enter`, `upgrade`, `reboot`, `rollback`, `install`, `configure`, `pacstrap`, `qemu`, and `clean`. A few common ones:
 
 - `test disk` — creates loop-mounted disks, installs the image, boots it, runs health checks
 - `test bootstrap -p <profile>` — installs and configures a profile from scratch
@@ -463,7 +469,7 @@ The `shani-desktop-cosmic` metapackage pulls in the COSMIC desktop components fr
 
 ## Try It
 
-Download the COSMIC edition from [shani.dev](https://shani.dev). It is a full installable ISO with the same blue-green update mechanism as the other editions. If you are already running Shanios and want to switch desktops, the recommended path is a fresh install — desktop environments are deeply integrated and switching at runtime is not supported.
+The COSMIC edition is a full installable ISO built by the same blue-green update mechanism as the other editions — but it is not yet published for download. As of now, only the GNOME and KDE Plasma editions ship from [shani.dev](https://shani.dev); the COSMIC ISO is buildable from source (`./build.sh full -p cosmic`) but has not yet been released to the download server. If you are already running Shanios and want to switch desktops, the recommended path is a fresh install — desktop environments are deeply integrated and switching at runtime is not supported.
 
 For the full technical breakdown: [What's Included](https://docs.shani.dev/doc/intro/whats-included).
 
@@ -4114,10 +4120,9 @@ Enable hardware encoding in HandBrake: Preferences → Video → select H.264 (I
 
 ## Screen Recording and Live Streaming — OBS Studio
 
-OBS Studio is pre-installed on every edition and is the essential tool for any creator who streams or records:
+OBS Studio is the essential tool for any creator who streams or records. It is not pre-installed on the base system — install it with one command:
 
 ```bash
-# Pre-installed — no action needed. If missing, install manually:
 flatpak install flathub com.obsproject.Studio
 ```
 
@@ -4407,7 +4412,7 @@ Shani OS's earlyoom out-of-memory manager prevents system freezes during memory-
 URL: https://blog.shani.dev/post/shani-os-multimedia/
 Published: 2026-05-10 · Tag: Guide
 
-Shani OS ships with the GStreamer and FFmpeg multimedia frameworks, full VA-API/VDPAU hardware video decode, and the VLC media player. This means virtually any video or audio format plays at first boot without installing extra codecs — including H.264, H.265/HEVC, VP9, AV1, and more. Hardware-accelerated decode is active on Intel, AMD, and NVIDIA GPUs, keeping CPU usage low during video playback and extending battery life on laptops.
+Shani OS ships with the GStreamer and FFmpeg multimedia frameworks, full VA-API/VDPAU hardware video decode, and a capable media player out of the box (GNOME ships `org.gnome.Showtime`, KDE Plasma ships `org.kde.haruna`). This means virtually any video or audio format plays at first boot without installing extra codecs — including H.264, H.265/HEVC, VP9, AV1, and more. Hardware-accelerated decode is active on Intel, AMD, and NVIDIA GPUs, keeping CPU usage low during video playback and extending battery life on laptops.
 
 This guide covers everyday media playback, streaming services with DRM, media server setup, and managing a home media library.
 
@@ -4459,7 +4464,15 @@ LIBVA_DRIVER_NAME=nvidia vainfo
 
 ---
 
-## VLC
+## VLC (installable via Nix or Flatpak)
+
+Shani OS does not ship VLC pre-installed — the default player is GNOME's `Showtime` (GNOME edition) or KDE's `Haruna` (Plasma edition), both of which handle hardware-accelerated playback automatically. If you prefer VLC, install it with one command:
+
+```bash
+flatpak install flathub org.videolan.VLC
+# or via Nix:
+nix-env -iA nixpkgs.vlc
+```
 
 VLC handles hardware-accelerated playback automatically:
 
@@ -10743,7 +10756,7 @@ podman run -d \
   fosrl/newt:latest
 ```
 
-Full setup: [docs.shani.dev — VPN & Tunnels](https://docs.shani.dev/doc/networking/pangolin).
+Full setup: [docs.shani.dev — VPN & Tunnels](https://docs.shani.dev/doc/servers/networking/pangolin).
 
 ---
 
@@ -10967,8 +10980,8 @@ Every service has a ready-to-run Podman command in the wiki at [docs.shani.dev](
 | [Education](https://docs.shani.dev/doc/servers/education) | Moodle, Canvas LMS, Open edX, BigBlueButton, Greenlight, ERPNext Education, Gibbon, Chamilo, Kolibri, Overleaf, Anki Sync Server, ITflow, H5P |
 | [Game Servers](https://docs.shani.dev/doc/servers/game-servers) | Minecraft Java, Minecraft Bedrock, Velocity Proxy, Valheim, Terraria, Factorio, Satisfactory, CS2, Pterodactyl, Crafty Controller |
 | [IoT](https://docs.shani.dev/doc/servers/iot) | Mosquitto, EMQX, Telegraf, Node-RED, MQTT Exporter, Prometheus, Alertmanager, InfluxDB, Modbus, OPC-UA, OwnTracks |
-| [VPN & Tunnels](https://docs.shani.dev/doc/networking/wireguard-easy) | WireGuard, WG-Easy, Tailscale, Headscale, Headplane, Cloudflared, Pangolin, NetBird, Pritunl, Firezone, Nebula, ZeroTier, OpenVPN, Hysteria 2, Gluetun |
-| [Network & DNS](https://docs.shani.dev/doc/networking/pi-hole) | Pi-hole, AdGuard Home, Blocky, Unbound, Technitium, Nginx Proxy Manager, Traefik, HAProxy, SearXNG, LibreNMS, NetBox, Ntopng, OwnTracks |
+| [VPN & Tunnels](https://docs.shani.dev/doc/servers/networking/wireguard-easy) | WireGuard, WG-Easy, Tailscale, Headscale, Headplane, Cloudflared, Pangolin, NetBird, Pritunl, Firezone, Nebula, ZeroTier, OpenVPN, Hysteria 2, Gluetun |
+| [Network & DNS](https://docs.shani.dev/doc/servers/networking/pi-hole) | Pi-hole, AdGuard Home, Blocky, Unbound, Technitium, Nginx Proxy Manager, Traefik, HAProxy, SearXNG, LibreNMS, NetBox, Ntopng, OwnTracks |
 | [Monitoring](https://docs.shani.dev/doc/servers/monitoring/prometheus) | Prometheus, Alertmanager, Grafana, Grafana Alloy, Loki, Netdata, Uptime Kuma, Gatus, Beszel, Dozzle, Healthchecks, Speedtest Tracker, SmokePing, VictoriaMetrics, Grafana Tempo, Zabbix, SigNoz, OpenTelemetry Collector, Checkmk, Karma, Graylog, Changedetection.io |
 | [Kubernetes](https://docs.shani.dev/doc/servers/kubernetes/overview) | k3s, k0s, MicroK8s, minikube, kind, RKE2, kubeadm, Talos Linux, Helm, ArgoCD, Flux CD, Kustomize, cert-manager, Longhorn, Rancher, Lens/OpenLens, k9s, Kubernetes Dashboard, kube-prometheus-stack, Velero, Tekton, Argo Workflows, Kaniko, Argo Rollouts, ingress-nginx, NGINX Gateway Fabric, Sealed Secrets, External Secrets Operator, Goldilocks |
 | [Clusters & HA](https://docs.shani.dev/doc/servers/clusters) | Patroni, etcd, HAProxy, Redis Sentinel, Valkey Cluster, Elasticsearch Cluster, OpenSearch Cluster, Kafka (KRaft), Cassandra, ScyllaDB, MongoDB Replica Set, RabbitMQ Cluster, VictoriaMetrics Cluster |
@@ -11698,8 +11711,8 @@ Full guide: [docs.shani.dev — Backup & Recovery](https://docs.shani.dev/doc/sy
 
 Any network service also runs as a rootless Podman container on Shani OS, surviving every OS update untouched. The self-hosting wiki covers ready-to-run commands for:
 
-- **[VPN & Tunnels](https://docs.shani.dev/doc/networking/wireguard-easy)** — WG-Easy, Headscale + Headplane, Cloudflared, Pangolin, Pritunl, Firezone, Nebula, ZeroTier, NetBird
-- **[Network & DNS](https://docs.shani.dev/doc/networking/pi-hole)** — Pi-hole, AdGuard Home, Nginx Proxy Manager, Traefik, Caddy, Unbound, SearXNG, Homepage dashboard
+- **[VPN & Tunnels](https://docs.shani.dev/doc/servers/networking/wireguard-easy)** — WG-Easy, Headscale + Headplane, Cloudflared, Pangolin, Pritunl, Firezone, Nebula, ZeroTier, NetBird
+- **[Network & DNS](https://docs.shani.dev/doc/servers/networking/pi-hole)** — Pi-hole, AdGuard Home, Nginx Proxy Manager, Traefik, Caddy, Unbound, SearXNG, Homepage dashboard
 - **[Mail Servers](https://docs.shani.dev/doc/servers/mail)** — Mailcow, Mailu, Stalwart, Roundcube, SnappyMail
 - **[Monitoring](https://docs.shani.dev/doc/servers/monitoring/prometheus)** — Prometheus, Grafana, Loki, Netdata, Uptime Kuma, Gatus, Dozzle
 
@@ -14883,7 +14896,7 @@ Shani OS uses a multi-runtime model. Applications run entirely outside the base 
 | shani-tools-network | `1.0-3` | Headless networking tools (systemd-networkd, cloud-init) |
 | shani-tools-extra | `1.0-2` | Additional system utilities |
 | shani-multimedia | `1.0-6` | Audio/video codecs, GStreamer plugins, PipeWire extras |
-| shani-video | `1.0-4` | Video production packages (OBS, Kdenlive, DaVinci Resolve deps) |
+| shani-video | `1.0-4` | GPU and video drivers (Mesa, Vulkan drivers, NVIDIA, VA-API/VDPAU) |
 | shani-video-guest | `1.0-1` | Minimal video playback for VMs and containers |
 | shani-fonts | `1.0-3` | Font configuration and Indian language support |
 | shani-accessibility | `1.0-2` | Orca, espeakup, brltty, IBus input methods |
@@ -15955,7 +15968,7 @@ The worst case is: reboot to undo it. That is a level of reliability that, until
 
 ## Getting Started
 
-Shani OS ships two desktop editions today: GNOME for a clean, focused desktop suitable for work and switchers, and KDE Plasma for power users and gaming, with Steam, Proton, Heroic, MangoHud, and a kernel tuned for low-latency gaming — all pre-installed. A third edition (COSMIC) plus a headless server profile are on the way.
+Shani OS ships two desktop editions today: GNOME for a clean, focused desktop suitable for work and switchers, and KDE Plasma for power users and gaming, with Steam, Proton, Heroic, MangoHud, and a kernel tuned for low-latency gaming — all pre-installed. A third desktop edition (COSMIC) is on the way, alongside a headless server profile that already exists as a buildable image.
 
 Every edition is free, open source, and requires no account.
 

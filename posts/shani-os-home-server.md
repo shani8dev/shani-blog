@@ -144,7 +144,7 @@ podman run -d \
   fosrl/newt:latest
 ```
 
-Full setup: [docs.shani.dev — VPN & Tunnels](https://docs.shani.dev/doc/networking/pangolin).
+Full setup: [docs.shani.dev — VPN & Tunnels](https://docs.shani.dev/doc/servers/networking/pangolin).
 
 ---
 
@@ -368,8 +368,8 @@ Every service has a ready-to-run Podman command in the wiki at [docs.shani.dev](
 | [Education](https://docs.shani.dev/doc/servers/education) | Moodle, Canvas LMS, Open edX, BigBlueButton, Greenlight, ERPNext Education, Gibbon, Chamilo, Kolibri, Overleaf, Anki Sync Server, ITflow, H5P |
 | [Game Servers](https://docs.shani.dev/doc/servers/game-servers) | Minecraft Java, Minecraft Bedrock, Velocity Proxy, Valheim, Terraria, Factorio, Satisfactory, CS2, Pterodactyl, Crafty Controller |
 | [IoT](https://docs.shani.dev/doc/servers/iot) | Mosquitto, EMQX, Telegraf, Node-RED, MQTT Exporter, Prometheus, Alertmanager, InfluxDB, Modbus, OPC-UA, OwnTracks |
-| [VPN & Tunnels](https://docs.shani.dev/doc/networking/wireguard-easy) | WireGuard, WG-Easy, Tailscale, Headscale, Headplane, Cloudflared, Pangolin, NetBird, Pritunl, Firezone, Nebula, ZeroTier, OpenVPN, Hysteria 2, Gluetun |
-| [Network & DNS](https://docs.shani.dev/doc/networking/pi-hole) | Pi-hole, AdGuard Home, Blocky, Unbound, Technitium, Nginx Proxy Manager, Traefik, HAProxy, SearXNG, LibreNMS, NetBox, Ntopng, OwnTracks |
+| [VPN & Tunnels](https://docs.shani.dev/doc/servers/networking/wireguard-easy) | WireGuard, WG-Easy, Tailscale, Headscale, Headplane, Cloudflared, Pangolin, NetBird, Pritunl, Firezone, Nebula, ZeroTier, OpenVPN, Hysteria 2, Gluetun |
+| [Network & DNS](https://docs.shani.dev/doc/servers/networking/pi-hole) | Pi-hole, AdGuard Home, Blocky, Unbound, Technitium, Nginx Proxy Manager, Traefik, HAProxy, SearXNG, LibreNMS, NetBox, Ntopng, OwnTracks |
 | [Monitoring](https://docs.shani.dev/doc/servers/monitoring/prometheus) | Prometheus, Alertmanager, Grafana, Grafana Alloy, Loki, Netdata, Uptime Kuma, Gatus, Beszel, Dozzle, Healthchecks, Speedtest Tracker, SmokePing, VictoriaMetrics, Grafana Tempo, Zabbix, SigNoz, OpenTelemetry Collector, Checkmk, Karma, Graylog, Changedetection.io |
 | [Kubernetes](https://docs.shani.dev/doc/servers/kubernetes/overview) | k3s, k0s, MicroK8s, minikube, kind, RKE2, kubeadm, Talos Linux, Helm, ArgoCD, Flux CD, Kustomize, cert-manager, Longhorn, Rancher, Lens/OpenLens, k9s, Kubernetes Dashboard, kube-prometheus-stack, Velero, Tekton, Argo Workflows, Kaniko, Argo Rollouts, ingress-nginx, NGINX Gateway Fabric, Sealed Secrets, External Secrets Operator, Goldilocks |
 | [Clusters & HA](https://docs.shani.dev/doc/servers/clusters) | Patroni, etcd, HAProxy, Redis Sentinel, Valkey Cluster, Elasticsearch Cluster, OpenSearch Cluster, Kafka (KRaft), Cassandra, ScyllaDB, MongoDB Replica Set, RabbitMQ Cluster, VictoriaMetrics Cluster |

@@ -132,7 +132,7 @@ The worst case is: reboot to undo it. That is a level of reliability that, until
 
 ## Getting Started
 
-Shani OS ships two desktop editions today: GNOME for a clean, focused desktop suitable for work and switchers, and KDE Plasma for power users and gaming, with Steam, Proton, Heroic, MangoHud, and a kernel tuned for low-latency gaming — all pre-installed. A third edition (COSMIC) plus a headless server profile are on the way.
+Shani OS ships two desktop editions today: GNOME for a clean, focused desktop suitable for work and switchers, and KDE Plasma for power users and gaming, with Steam, Proton, Heroic, MangoHud, and a kernel tuned for low-latency gaming — all pre-installed. A third desktop edition (COSMIC) is on the way, alongside a headless server profile that already exists as a buildable image.
 
 Every edition is free, open source, and requires no account.
 

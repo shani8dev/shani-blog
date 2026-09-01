@@ -6,7 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://giscus.app https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://giscus.app; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev https://pagead2.googlesyndication.com https://tpc.googlesyndication.com data:; frame-src https://giscus.app https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://www.google.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google; connect-src 'self' https://api.github.com https://github.com https://giscus.app https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://csi.gstatic.com">
 
   <title>Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardware Decoding — Shanios Blog</title>
-  <meta name="description" id="meta-desc" content="Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC, media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.">
+  <meta name="description" id="meta-desc" content="Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC (via Nix/Flatpak), media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.">
   <meta name="author"      content="Shrinivas Vishnu Kumbhar">
   <meta name="robots"      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical"    id="canonical-url" href="https://blog.shani.dev/post/shani-os-multimedia/">
@@ -14,13 +14,13 @@
   <meta property="og:site_name" id="og-site-name" content="Shanios Blog">
   <meta property="og:type"      id="og-type"      content="article">
   <meta property="og:title"     id="og-title"     content="Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardware Decoding">
-  <meta property="og:description" id="og-desc"    content="Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC, media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.">
+  <meta property="og:description" id="og-desc"    content="Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC (via Nix/Flatpak), media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.">
   <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/shani-os-multimedia/">
   <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/shani-os-multimedia.webp">
   <meta property="og:image:alt" id="og-image-alt" content="Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardware Decoding">
   <meta property="og:locale"    content="en_US">
-  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-10T00:00:00.000Z">
-  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-10T00:00:00.000Z">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-05-09T18:30:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-09T18:30:00.000Z">
   <meta property="article:author"         id="og-article-author"  content="Shrinivas Vishnu Kumbhar">
   <meta property="article:section"        id="og-article-section" content="Guide">
   
@@ -28,10 +28,10 @@
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
   <meta name="twitter:title"       id="tw-title" content="Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardware Decoding">
-  <meta name="twitter:description" id="tw-desc"  content="Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC, media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.">
+  <meta name="twitter:description" id="tw-desc"  content="Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC (via Nix/Flatpak), media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.">
   <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/shani-os-multimedia.webp">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardware Decoding","description":"Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC, media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.","url":"https://blog.shani.dev/post/shani-os-multimedia/","datePublished":"2026-05-10T00:00:00.000Z","dateModified":"2026-05-10T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-os-multimedia.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardware Decoding","description":"Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC (via Nix/Flatpak), media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.","url":"https://blog.shani.dev/post/shani-os-multimedia/","datePublished":"2026-05-09T18:30:00.000Z","dateModified":"2026-05-09T18:30:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-os-multimedia.webp","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -231,7 +231,7 @@
           <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-10 · 8 min</span>
         </div>
       </header>
-      <div class="post-body"><p>Shani OS ships with the GStreamer and FFmpeg multimedia frameworks, full VA-API/VDPAU hardware video decode, and the VLC media player. This means virtually any video or audio format plays at first boot without installing extra codecs — including H.264, H.265/HEVC, VP9, AV1, and more. Hardware-accelerated decode is active on Intel, AMD, and NVIDIA GPUs, keeping CPU usage low during video playback and extending battery life on laptops.</p>
+      <div class="post-body"><p>Shani OS ships with the GStreamer and FFmpeg multimedia frameworks, full VA-API/VDPAU hardware video decode, and a capable media player out of the box (GNOME ships <code>org.gnome.Showtime</code>, KDE Plasma ships <code>org.kde.haruna</code>). This means virtually any video or audio format plays at first boot without installing extra codecs — including H.264, H.265/HEVC, VP9, AV1, and more. Hardware-accelerated decode is active on Intel, AMD, and NVIDIA GPUs, keeping CPU usage low during video playback and extending battery life on laptops.</p>
 <p>This guide covers everyday media playback, streaming services with DRM, media server setup, and managing a home media library.</p>
 <hr>
 <h2 id="hardware-video-decoding">Hardware Video Decoding</h2>
@@ -262,7 +262,11 @@ vainfo
 # NVIDIA — libva-nvidia-driver (pre-installed)
 LIBVA_DRIVER_NAME=nvidia vainfo</code></pre>
 <hr>
-<h2 id="vlc">VLC</h2>
+<h2 id="vlc-installable-via-nix-or-flatpak">VLC (installable via Nix or Flatpak)</h2>
+<p>Shani OS does not ship VLC pre-installed — the default player is GNOME's <code>Showtime</code> (GNOME edition) or KDE's <code>Haruna</code> (Plasma edition), both of which handle hardware-accelerated playback automatically. If you prefer VLC, install it with one command:</p>
+<pre><code class="language-bash">flatpak install flathub org.videolan.VLC
+# or via Nix:
+nix-env -iA nixpkgs.vlc</code></pre>
 <p>VLC handles hardware-accelerated playback automatically:</p>
 <ul>
 <li>Play any <code>.mkv</code>, <code>.mp4</code>, <code>.avi</code>, <code>.mov</code>, <code>.flv</code>, <code>.webm</code>, <code>.ts</code>, <code>.m2ts</code> file</li>

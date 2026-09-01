@@ -704,8 +704,8 @@ Full guide: [docs.shani.dev — Backup & Recovery](https://docs.shani.dev/doc/sy
 
 Any network service also runs as a rootless Podman container on Shani OS, surviving every OS update untouched. The self-hosting wiki covers ready-to-run commands for:
 
-- **[VPN & Tunnels](https://docs.shani.dev/doc/networking/wireguard-easy)** — WG-Easy, Headscale + Headplane, Cloudflared, Pangolin, Pritunl, Firezone, Nebula, ZeroTier, NetBird
-- **[Network & DNS](https://docs.shani.dev/doc/networking/pi-hole)** — Pi-hole, AdGuard Home, Nginx Proxy Manager, Traefik, Caddy, Unbound, SearXNG, Homepage dashboard
+- **[VPN & Tunnels](https://docs.shani.dev/doc/servers/networking/wireguard-easy)** — WG-Easy, Headscale + Headplane, Cloudflared, Pangolin, Pritunl, Firezone, Nebula, ZeroTier, NetBird
+- **[Network & DNS](https://docs.shani.dev/doc/servers/networking/pi-hole)** — Pi-hole, AdGuard Home, Nginx Proxy Manager, Traefik, Caddy, Unbound, SearXNG, Homepage dashboard
 - **[Mail Servers](https://docs.shani.dev/doc/servers/mail)** — Mailcow, Mailu, Stalwart, Roundcube, SnappyMail
 - **[Monitoring](https://docs.shani.dev/doc/servers/monitoring/prometheus)** — Prometheus, Grafana, Loki, Netdata, Uptime Kuma, Gatus, Dozzle
 

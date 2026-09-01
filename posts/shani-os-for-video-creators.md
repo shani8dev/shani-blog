@@ -134,10 +134,9 @@ Enable hardware encoding in HandBrake: Preferences → Video → select H.264 (I
 
 ## Screen Recording and Live Streaming — OBS Studio
 
-OBS Studio is pre-installed on every edition and is the essential tool for any creator who streams or records:
+OBS Studio is the essential tool for any creator who streams or records. It is not pre-installed on the base system — install it with one command:
 
 ```bash
-# Pre-installed — no action needed. If missing, install manually:
 flatpak install flathub com.obsproject.Studio
 ```
 

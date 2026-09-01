@@ -3,7 +3,7 @@ slug: shani-os-multimedia
 title: 'Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardware Decoding'
 date: '2026-05-10'
 tag: 'Guide'
-excerpt: 'Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC, media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.'
+excerpt: 'Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC (via Nix/Flatpak), media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.'
 cover: /assets/images/blog/shani-os-multimedia.webp
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
@@ -16,7 +16,7 @@ readTime: '8 min'
 series: 'Shani OS Guides'
 ---
 
-Shani OS ships with the GStreamer and FFmpeg multimedia frameworks, full VA-API/VDPAU hardware video decode, and the VLC media player. This means virtually any video or audio format plays at first boot without installing extra codecs — including H.264, H.265/HEVC, VP9, AV1, and more. Hardware-accelerated decode is active on Intel, AMD, and NVIDIA GPUs, keeping CPU usage low during video playback and extending battery life on laptops.
+Shani OS ships with the GStreamer and FFmpeg multimedia frameworks, full VA-API/VDPAU hardware video decode, and a capable media player out of the box (GNOME ships `org.gnome.Showtime`, KDE Plasma ships `org.kde.haruna`). This means virtually any video or audio format plays at first boot without installing extra codecs — including H.264, H.265/HEVC, VP9, AV1, and more. Hardware-accelerated decode is active on Intel, AMD, and NVIDIA GPUs, keeping CPU usage low during video playback and extending battery life on laptops.
 
 This guide covers everyday media playback, streaming services with DRM, media server setup, and managing a home media library.
 
@@ -68,7 +68,15 @@ LIBVA_DRIVER_NAME=nvidia vainfo
 
 ---
 
-## VLC
+## VLC (installable via Nix or Flatpak)
+
+Shani OS does not ship VLC pre-installed — the default player is GNOME's `Showtime` (GNOME edition) or KDE's `Haruna` (Plasma edition), both of which handle hardware-accelerated playback automatically. If you prefer VLC, install it with one command:
+
+```bash
+flatpak install flathub org.videolan.VLC
+# or via Nix:
+nix-env -iA nixpkgs.vlc
+```
 
 VLC handles hardware-accelerated playback automatically:
 

@@ -506,7 +506,7 @@
   {
     "slug": "shani-os-multimedia",
     "title": "Multimedia on Shani OS — Codecs, Media Players, Streaming, and Hardware Decoding",
-    "excerpt": "Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC, media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.",
+    "excerpt": "Everything multimedia on Shani OS — hardware-accelerated video decode for Intel, AMD, and NVIDIA, codec support, streaming services with Widevine DRM, MPV and VLC (via Nix/Flatpak), media servers, DLNA/Chromecast, and managing a media library with Jellyfin or Plex.",
     "date": "2026-05-10",
     "updated": "",
     "tag": "Guide",
