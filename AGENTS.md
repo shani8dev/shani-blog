@@ -174,9 +174,9 @@ DOM behavior from the source alone.
 
 ## Cross-repo impact — check before calling a fix complete
 
-Brand CSS (`brand-shani.css`), `sw.js`, nav JS, and `generate-manifest.js`
+Brand CSS (`brand-shani.css`), `sw.js`, and `generate-manifest.js`
 are **copy-pasted between this repo and `shani-docs` only** — there is no
-shared package. A bug fix in one of these shared-shaped files (a CSP gap,
+shared package. (Nav JS is docs-only: `shani-docs/nav-docs.js` — this repo has no nav JS file.) A bug fix in one of these shared-shaped files (a CSP gap,
 an XSS-prone rendering pattern, a broken service-worker cache rule) almost
 certainly exists in the other copy too. Check **both** repos before
 considering the fix complete, not just the one you started in.
@@ -257,3 +257,69 @@ client-rehydrated one resolve to `https://blog.shani.dev/assets/images/blog/...`
 which IDs/URLs are safe to be public (Razorpay key ID, AdSense ID) versus
 what must never be — don't move a value from the "safe to be public"
 category without re-reading why it was classified that way.
+
+## Garuda Cross-Reference Findings (added 2026-09-17)
+
+Based on a full scan of the garuda clones mapped against shani — **29 repos** (not 34; several user-listed names don't exist — see `../garuda-catalog.md` §Discrepancies). See `../garuda-mapping-analysis.md`, `../deep-analysis.md`, `../shani-catalog.md`, and `../garuda-catalog.md` for full details. garuda-ng (Angular component library) is the most directly comparable reference for the shared-web-code problem this repo faces.
+
+### 🟡 HIGH: CI/CD gap (shared across ALL repos)
+
+1. **Shared CI templates** (estimated 2-3 days, affects ALL repos).
+   - Garuda's `gitlab-ci-commons` provides reusable templates (commitizen, flake-check, pre-commit, tag-to-release). Each repo `include:`s from it.
+   - Shani repos run on GitHub Actions (no `.gitlab-ci.yml` anywhere) — 8 repos (blog, builder, docs, fleet, insights, install-media, pkgbuilds, platform) carry hand-written `.github/workflows/*.yml` with duplicated patterns.
+   - **Action**: Create `shani-ci-commons` (GitHub Actions reusable workflows / composite actions) with templates for lint, test, build, security scan. Each repo references them via `uses: shani8dev/shani-ci-commons/...` instead of copy-pasting.
+   - **Affects**: All 15 shani repos.
+
+### 🟡 HIGH: Dependency management gap
+
+2. **Add automated dependency updates** (estimated 4 hours, affects ALL repos).
+   - Garuda uses `renovate-runner` running hourly against all repos with `renovate.json` files.
+   - Shani repos have no automated dependency updating.
+   - **Action**: Set up Renovate (self-hosted or gitlab.com) with a fleet-wide config. Each repo adds a minimal `renovate.json`.
+
+### 🟢 MEDIUM: Code quality
+
+3. **Conventional commit enforcement** (estimated 2 hours, affects ALL repos).
+   - Every garuda repo has a `[commitizen]` badge; `cz commit` is enforced.
+   - Shani repos have no commit message standardization.
+
+### 🟢 MEDIUM: Shared web components
+
+4. **Shared web component library** (estimated 2-3 days, affects shani-docs/blog/website).
+   - Garuda's `garuda-ng` is an Angular library shared across all web projects.
+   - Shani web repos share CSS/JS by copy-paste. `shani-docs` and `shani-blog` share brand-shani.css, sw.js, and generate-manifest.js (copy-pasted, no shared package; nav JS is docs-only — `nav-docs.js`). `shani-website` and `shani-wiki` do NOT share these files — they are independent static sites.
+   - **Action**: Create a lightweight shared component library (CSS token file + a few React/Vue components). Or standardize on a CSS framework.
+
+### 🔗 Cross-repo trust chain
+
+5. **Paywall architecture** — This repo's paywall is deliberately cosmetic due to the "zero-server" architecture (confirmed in this session's audit). A real fix requires either accepting the residual risk as an inherent trade-off or adding server-side/edge enforcement (Cloudflare Worker). See the full finding in this file's "Audit-verified known issues" section. This mirrors garuda's approach of separate tooling for different deployment targets.
+
+### 🔍 Re-Scan Findings (2026-09-17)
+
+Re-scanned against `garuda-catalog.md` (29 repos, not 34) and `shani-catalog.md` (16 repos). **Confirmed mapping: `garuda-ng`** (EXISTS in `garuda-clones/` — Angular component library, TypeScript/Angular 22/Nx/pnpm, npm `@garudalinux/core`, themed variants, AnalogJS/Vite docs site, GitHub Actions CI+CD, `renovate.json`, Git-Cliff, GPL-3.0-or-later). It is the most directly comparable reference for the shared-web-code problem. shani-blog is an **SPA with a members-only paywall** (Razorpay-backed) and an `admin.html` editor holding a live GitHub write token.
+
+**New gaps from the garuda side:**
+1. **No browser/unit test coverage** — `garuda-ng` has Vitest + Playwright e2e; shani-blog's 3 workflows (`build-manifest.yml`, `issue-license-key.yml`, `manage-keys.yml`) regenerate the manifest and handle license keys but never test paywall gating, routing, or rendering.
+2. **No dependency-update automation** — `garuda-ng` has `renovate.json`; shani-blog has none (Fuse.js v7 is pinned to jsDelivr but not auto-updated).
+3. **No changelog/contribution docs** — `garuda-ng` has Git-Cliff, CONTRIBUTING.md, CODE_OF_CONDUCT.md; shani-blog has a LICENSE but no changelog or CONTRIBUTING.
+4. **Shared files copy-pasted with `shani-docs` only** — `brand-shani.css`, `sw.js`, `generate-manifest.js` (nav JS is docs-only — `nav-docs.js`; per `shani-catalog.md` §15 and the AGENTS.md correction); `garuda-ng` solves this with a published npm package.
+5. **No deploy pipeline** — `garuda-ng` has GitHub Actions CD to Cloudflare Pages; shani-blog's workflows never deploy — GitHub Pages serves the branch directly.
+
+**Shani advantages:**
+1. **Zero-server architecture** — the entire pipeline (including license-key issuance) runs in GitHub Actions with no infrastructure to maintain; `garuda-ng` needs Cloudflare Pages + npm publishing + OIDC.
+2. **Client-side hardening** — SRI on all 24 CDN resources on `admin.html`, CSP on all pages, `sessionStorage`-only token storage, SHA-256-only license-key hashes — stronger than `garuda-ng`'s docs site documents.
+3. **Monetization layer** — Razorpay-backed paywall + license-key pipeline is functionality `garuda-ng` (a component library) doesn't have at all.
+
+**Qt GUI gap note:** not applicable — static SPA; garuda's 12 Qt GUI apps are unrelated to web properties.
+
+### 📋 Implementation Roadmap (2026-09-17)
+
+Implementation priorities are per `../IMPLEMENTATION-ROADMAP.md` (master roadmap for the whole shani ecosystem).
+
+1. **Paywall enforcement architectural decision (P0/P1, blocked on human).** The paywall is deliberately cosmetic — `fetchBody()` always fetches the full `.md` and slices client-side, so the first real `paywalled: true` post would leak its full text over the wire. Document the options for the maintainer: accept the residual risk as an inherent zero-server trade-off (current), add Cloudflare Worker edge enforcement (deliberately avoided elsewhere), or move paid content behind a signed-URL-only store. Do NOT implement without a human decision — this is recorded as deliberately unfixed.
+
+2. **Shared component library for `brand-shani.css`/`sw.js`/`generate-manifest.js` (P3, 2-3 days).** Master-roadmap item #27 (nav JS is `shani-docs`-only — `nav-docs.js`; this repo has no nav JS). Copy-pasted between this repo and `shani-docs` only; divergence accumulates silently. ADOPT the shared-library PATTERN from garuda-ng — never the Angular code; shani's zero-server plain-HTML approach is superior for this ecosystem, it just needs a shared package instead of copy-paste.
+
+3. **AI-detection on visit logs (P3).** `robots.txt` already disallows the AI crawlers the site welcomes; consider logging bot fingerprints (UA + IP) to measure which crawlers actually visit and whether the disallow rules are being respected. Low priority — no analytics infrastructure exists today.
+
+4. **Conventional commits + `renovate.json` (P1).** Ecosystem-wide commit convention (item #9) and Renovate (item #8) — Fuse.js v7 is pinned to jsDelivr and not auto-updated; Renovate would cover it.
