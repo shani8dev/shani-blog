@@ -423,8 +423,8 @@ function buildStub(post) {
   const absolutize    = u => u && !/^https?:\/\//.test(u) ? `${BLOG_URL}${u}` : u;
   const image         = escHtml(absolutize(post.og_image || post.cover) || OG_IMAGE);
   const authorName    = escHtml(post.author || AUTHOR);
-  const datePublished = post.date    ? new Date(post.date    + 'T00:00:00').toISOString() : '';
-  const dateModified  = post.updated ? new Date(post.updated + 'T00:00:00').toISOString() : datePublished;
+  const datePublished = post.date    ? new Date(post.date    + 'T00:00:00Z').toISOString() : '';
+  const dateModified  = post.updated ? new Date(post.updated + 'T00:00:00Z').toISOString() : datePublished;
   const robots        = (post.noindex || post.draft) ? 'noindex' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
 
   const ldJson = JSON.stringify({
@@ -782,8 +782,8 @@ function build() {
     `      <link>${BLOG_URL}/post/${p.slug}/</link>`,
     `      <guid isPermaLink="true">${BLOG_URL}/post/${p.slug}/</guid>`,
     `      <description>${escXml(p.excerpt)}</description>`,
-    `      <pubDate>${new Date(p.date + 'T00:00:00').toUTCString()}</pubDate>`,
-    p.updated ? `      <lastBuildDate>${new Date(p.updated + 'T00:00:00').toUTCString()}</lastBuildDate>` : null,
+    `      <pubDate>${new Date(p.date + 'T00:00:00Z').toUTCString()}</pubDate>`,
+    p.updated ? `      <lastBuildDate>${new Date(p.updated + 'T00:00:00Z').toUTCString()}</lastBuildDate>` : null,
     `      <category>${escXml(p.tag)}</category>`,
     `      <author>${escXml(AUTHOR)}</author>`,
     '    </item>',
