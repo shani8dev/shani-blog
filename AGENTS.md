@@ -77,6 +77,25 @@ and paywall-actually-gates checks above concurrently rather than serially,
 and to actually drive a headless/real browser rather than reasoning about
 DOM behavior from the source alone.
 
+## Boundaries
+
+- ✅ **Always**: `curl` a members-only post's raw markdown path directly
+  after touching anything paywall-related, to confirm content isn't
+  retrievable unauthenticated — client-side hiding is not a paywall.
+- ⚠️ **Ask first**: attempting to "fix" the cosmetic paywall with a second,
+  less-obvious file path or similar security-by-obscurity move — already
+  investigated and rejected; the real fix needs a human decision (accept
+  the risk, or add real edge enforcement), not a code patch that would
+  look closed in a diff while leaving the actual gap open.
+- 🚫 **Never**: store the `admin.html` GitHub write token anywhere but
+  `sessionStorage` — never `localStorage`, never a URL, never a log.
+
+*Maintenance note: this file is well past 300 lines, mostly narrative
+history in "Audit-verified known issues" below. New entries should stay
+terse and current-state; push detailed before/after narrative to a dated
+`AUDIT-HISTORY.md` if it keeps growing, matching the pattern already used
+in shani-docs/shani-install-media/shani-deploy/shani-builder.*
+
 ## Audit-verified known issues (confirmed present)
 
 - **`generate-manifest.js` date parsing was timezone-dependent — FIXED
