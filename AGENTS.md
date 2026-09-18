@@ -198,8 +198,9 @@ The per-site diffs of `sw.js`/`brand-shani.css` between blog and docs are
 asset lists, cosmetic comment-header differences only — the CSS tokens are
 identical). If you fix a bug in a blog/docs shared file, propagate it to
 the *other* one — but do not expect or create copies in website/wiki. See
-the parent-level `AGENTS.md` too, which still lists these as shared across
-all four and should be read with the same caveat.
+the parent-level `AGENTS.md`, which now lists these shared files between
+`shani-blog` and `shani-docs` only (the earlier "shared across all four
+web repos" claim there was corrected to stale). Same caveat applies here.
 
 ## Post cover images
 
