@@ -77,6 +77,13 @@ and paywall-actually-gates checks above concurrently rather than serially,
 and to actually drive a headless/real browser rather than reasoning about
 DOM behavior from the source alone.
 
+## Commit discipline
+
+Before composing a commit message, run `git log --oneline -20` (and `git
+log -5 -- <touched paths>` for the files you changed) and match the
+existing style — subject shape, scope prefixes, body detail level —
+rather than writing in a generic format.
+
 ## Boundaries
 
 - ✅ **Always**: `curl` a members-only post's raw markdown path directly
