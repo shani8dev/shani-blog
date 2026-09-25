@@ -28,7 +28,7 @@ The thing that matters most is the immutable OS root. Shani OS keeps the system 
 
 This means:
 
-- A `shani-update` never touches your cluster state.
+- An OS update never touches your cluster state.
 - A Kubernetes upgrade never touches the OS.
 - An OS rollback doesn't break etcd. A cluster reset doesn't touch your home directory.
 

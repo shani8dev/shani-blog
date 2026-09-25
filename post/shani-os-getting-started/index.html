@@ -380,7 +380,7 @@ waydroid app install myapp.apk</code></pre>
 <p>If an app cannot access a file you expect it to, open Flatseal, find the app, and check its filesystem permissions. Many apps default to sandbox-only access and need you to explicitly grant access to your home folder or specific directories.</p>
 <hr>
 <h2 id="daily-use">Daily Use</h2>
-<p>Once set up, a Shani OS system in daily use is quiet. Updates arrive as desktop notifications (via <code>shani-update</code>, which runs automatically via a systemd timer and at login). You apply them when ready with <code>sudo shani-deploy</code>, then reboot when convenient. Your apps, containers, and home directory are never affected by OS updates.</p>
+<p>Once set up, a Shani OS system in daily use is quiet. Updates arrive as desktop notifications from Shani Cassini's background agent, which checks shortly after you log in and every couple of hours after that. It never applies one on its own: you apply it when ready from Shani Cassini's Updates & Rollback page, or with <code>sudo shani-deploy</code> on a headless machine, then reboot when convenient. Your apps, containers, and home directory are never affected by OS updates.</p>
 <p>The shell environment is set up out of the box: Zsh with syntax highlighting and autosuggestions, Starship prompt, McFly for smart command history, FZF for fuzzy search.</p>
 <p>If something goes wrong after an update:</p>
 <pre><code class="language-bash">sudo shani-deploy -r

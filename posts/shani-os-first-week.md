@@ -46,7 +46,7 @@ sudo shani-deploy
 
 This downloads the latest OS image to the inactive slot, verifies it, and stages it for the next reboot. It takes 5–15 minutes depending on your connection. You can keep using the system while it runs. Reboot when convenient.
 
-After rebooting, `shani-update` will confirm you're on the new system and ask if everything looks good. If anything seems wrong, `sudo shani-deploy -r` and a reboot returns you to the previous state in under a minute.
+After rebooting, the system simply comes up on the new image. If anything seems wrong, `sudo shani-deploy -r` and a reboot returns you to the previous state in under a minute. Nothing asks you to confirm that the update was good, because nothing can know that.
 
 ### Step 3: Add a Nix channel (one-time)
 
@@ -298,7 +298,7 @@ This shows slot state, storage usage, service health, and filesystem status in o
 
 ### Know How Updates Work
 
-`shani-update` runs automatically. When a new OS image is available, a notification appears. You apply it with `sudo shani-deploy`, reboot when ready, and if anything is wrong, `sudo shani-deploy -r` undoes it.
+Updates work without you thinking about them. Shani Cassini's background agent checks shortly after login and every couple of hours after that; when a new OS image is available, a notification appears. You apply it from Shani Cassini's Updates & Rollback page, or with `sudo shani-deploy` on a headless machine, reboot when ready, and if anything is wrong, `sudo shani-deploy -r` undoes it.
 
 Your apps (Flatpak, Nix, containers) update independently on their own schedules and are never affected by OS updates.
 

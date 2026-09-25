@@ -49,7 +49,7 @@ Switchers rarely miss the operating system itself — they miss their habits. He
 | Control Panel / System Settings | Your edition's Settings app |
 | Task Manager / Activity Monitor | Mission Center (pre-installed) or `htop` |
 | cmd / PowerShell / Terminal.app | zsh with the Starship prompt, ready out of the box |
-| Action Centre / Notification Centre | Desktop notification centre; update prompts via `shani-update` |
+| Action Centre / Notification Centre | Desktop notification centre; update notices from Shani Cassini's background agent |
 | `.exe` installers / `.dmg` images | Flatpak first, AppImage next, Bottles for Windows apps |
 | MS Office | OnlyOffice — already installed — or LibreOffice |
 | Photoshop / Illustrator | GIMP/Krita and Inkscape from Flathub |

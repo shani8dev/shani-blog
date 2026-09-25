@@ -365,8 +365,8 @@
   },
   {
     "slug": "shani-os-updates",
-    "title": "Updates on Shani OS — shani-update, shani-deploy, and the Full Reference",
-    "excerpt": "The complete guide to Shani OS updates: how shani-update detects and surfaces updates automatically, and the full shani-deploy flag reference for every scenario — update, rollback, dry-run, cleanup, channel management, and automated fleet deployments.",
+    "title": "Updates on Shani OS — Notifications, Cassini, and the Full shani-deploy Reference",
+    "excerpt": "The complete guide to Shani OS updates: the Shani Cassini notification agent that tells you when an update is ready, and the full shani-deploy flag reference for every scenario — update, rollback, dry-run, cleanup, channel management, and automated fleet deployments.",
     "date": "2026-05-12",
     "updated": "",
     "tag": "Reference",
@@ -393,8 +393,8 @@
   },
   {
     "slug": "shani-os-update-notifications",
-    "title": "shani-update — The Shani OS Update Manager",
-    "excerpt": "shani-update is the user-facing update manager for Shani OS. It runs automatically via a systemd user timer and at login, detects boot failures, checks for...",
+    "title": "Update Notifications on Shani OS — What Tells You, and When",
+    "excerpt": "Shanios tells you when an update is ready, when a restart finishes it, and when the last update did not start — as a desktop notification, nothing more. The notification agent is part of Shani Cassini, and it never applies an update by itself.",
     "date": "2026-05-11",
     "updated": "",
     "tag": "Reference",

@@ -269,7 +269,7 @@
 <li><code>shanios-green (Candidate)</code> — the standby slot</li>
 </ul>
 <p>After each deployment, <code>shani-deploy</code> rewrites both entries. The newly updated slot is labelled Active with <code>+3-0</code> boot-count tries set. If it fails to reach multi-user.target within three attempts, systemd-boot automatically falls back to the Candidate slot.</p>
-<p><code>shani-update</code> runs automatically via a systemd user timer — 15 minutes after boot and every 2 hours — checking for new versions and surfacing the appropriate dialog for fallback boots, pending reboots, or available updates.</p>
+<p>Shani Cassini's background agent runs automatically via a systemd user timer — shortly after login, then every 2 hours — reading the deploy status and sending a desktop notification when a fallback boot was recorded, when a restart is pending, or when a new version is available. It is a background process with no display of its own, it shows notifications rather than dialogs, and it never applies an update itself.</p>
 <hr>
 <h2 id="how-etc-stays-writable">How /etc Stays Writable</h2>
 <p>A fully read-only root creates an obvious problem: <code>/etc</code> needs to be writable. You need to configure things, enable services, manage SSH keys, and edit network settings.</p>

@@ -399,7 +399,7 @@ For detailed printer setup, including HP, Brother, and Canon drivers (Epson need
 
 ## Keeping Your System Updated
 
-`shani-update` checks for OS updates automatically and shows a desktop notification when one is ready. When you're ready, run `sudo shani-deploy` and reboot. If anything feels wrong after the reboot, `sudo shani-deploy -r` instantly restores the previous OS version — your personal files are never affected either way.
+You never have to go looking for an update. Shani Cassini's background agent checks for OS updates automatically and shows a desktop notification when one is ready. When you're ready, open Updates & Rollback and apply it, or run `sudo shani-deploy` in a terminal, then reboot. If anything feels wrong after the reboot, `sudo shani-deploy -r` instantly restores the previous OS version — your personal files are never affected either way.
 
 Flatpak apps update automatically every 12 hours. Warehouse (pre-installed) lets you manage updates manually.
 

@@ -238,7 +238,7 @@
 <p>The thing that matters most is the immutable OS root. Shani OS keeps the system partition read-only. Kubernetes data lives in dedicated Btrfs subvolumes: <code>@containers</code> for runtime state and <code>@home</code> for your kubeconfigs, manifests, and Helm values. Those subvolumes are completely independent of the OS.</p>
 <p>This means:</p>
 <ul>
-<li>A <code>shani-update</code> never touches your cluster state.</li>
+<li>An OS update never touches your cluster state.</li>
 <li>A Kubernetes upgrade never touches the OS.</li>
 <li>An OS rollback doesn't break etcd. A cluster reset doesn't touch your home directory.</li>
 </ul>

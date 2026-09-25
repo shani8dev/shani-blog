@@ -64,7 +64,7 @@ Yes. Each update creates a timestamped Btrfs snapshot of the slot it replaces. `
 
 **Does updating require a reboot?**
 
-Yes. The update is staged in the background — you can continue working normally. Reboot when convenient. `shani-update` shows a notification when a reboot is ready.
+Yes. The update is staged in the background — you can continue working normally. Reboot when convenient. Shani Cassini's background agent sends a notification when a reboot is ready, with a Restart Now action on it.
 
 **Can updates happen automatically?**
 

@@ -244,7 +244,7 @@
 <h3 id="step-2-run-your-first-os-update">Step 2: Run your first OS update</h3>
 <pre><code class="language-bash">sudo shani-deploy</code></pre>
 <p>This downloads the latest OS image to the inactive slot, verifies it, and stages it for the next reboot. It takes 5–15 minutes depending on your connection. You can keep using the system while it runs. Reboot when convenient.</p>
-<p>After rebooting, <code>shani-update</code> will confirm you're on the new system and ask if everything looks good. If anything seems wrong, <code>sudo shani-deploy -r</code> and a reboot returns you to the previous state in under a minute.</p>
+<p>After rebooting, the system simply comes up on the new image. If anything seems wrong, <code>sudo shani-deploy -r</code> and a reboot returns you to the previous state in under a minute. Nothing asks you to confirm that the update was good, because nothing can know that.</p>
 <h3 id="step-3-add-a-nix-channel-one-time">Step 3: Add a Nix channel (one-time)</h3>
 <p>Nix is pre-installed but needs one setup command before you can use it:</p>
 <pre><code class="language-bash">nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
@@ -378,7 +378,7 @@ systemctl list-unit-files --state=enabled | grep -v &quot;systemd\|dbus\|getty&q
 <pre><code class="language-bash">shani-health</code></pre>
 <p>This shows slot state, storage usage, service health, and filesystem status in one place.</p>
 <h3 id="know-how-updates-work">Know How Updates Work</h3>
-<p><code>shani-update</code> runs automatically. When a new OS image is available, a notification appears. You apply it with <code>sudo shani-deploy</code>, reboot when ready, and if anything is wrong, <code>sudo shani-deploy -r</code> undoes it.</p>
+<p>Updates work without you thinking about them. Shani Cassini's background agent checks shortly after login and every couple of hours after that; when a new OS image is available, a notification appears. You apply it from Shani Cassini's Updates & Rollback page, or with <code>sudo shani-deploy</code> on a headless machine, reboot when ready, and if anything is wrong, <code>sudo shani-deploy -r</code> undoes it.</p>
 <p>Your apps (Flatpak, Nix, containers) update independently on their own schedules and are never affected by OS updates.</p>
 <h3 id="keep-a-note-of-your-setup">Keep a Note of Your Setup</h3>
 <p>Write down which Flatpak apps you installed, any Nix packages, and any Distrobox containers you created. If you ever reinstall, this list gets you back to a working setup in 30 minutes. Your actual files in <code>@home</code> always survive, but knowing what tools you had is useful.</p>

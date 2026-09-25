@@ -201,7 +201,7 @@ Every other mode (`--boot`, `--security`, `-s`/`--storage-info`, `--network`, `-
 ## Resources
 
 - [docs.shani.dev — System Updates](https://docs.shani.dev/doc/updates/system) — full update system reference
-- [shani-os-updates](https://blog.shani.dev/post/shani-os-updates) — shani-deploy and shani-update reference
+- [shani-os-updates](https://blog.shani.dev/post/shani-os-updates) — the Cassini notification agent and the full shani-deploy reference
 - [Shani OS for OEMs and IT Fleets](https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment) — fleet monitoring integration
 - [2026.04.15 Release Notes](https://blog.shani.dev/post/2026-04-15-release-notes) — release that introduced shani-health
 - [Telegram community](https://t.me/shani8dev)

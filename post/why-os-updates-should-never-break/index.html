@@ -256,7 +256,7 @@
 </ol>
 <p>If power is cut mid-update, your running system is intact. If the new copy boots but does not work for you: <code>sudo shani-deploy -r</code>. One command. One reboot. You are back.</p>
 <p>If the new copy cannot boot at all: systemd-boot's boot-counting mechanism detects the failure after three attempts and reverts automatically. You may not even notice.</p>
-<p>The active slot is tracked in <code>/data/current-slot</code>. <code>shani-update</code> runs automatically via a systemd timer — 15 minutes after boot and every 2 hours thereafter — and detects whether the last boot was a fallback, whether a staged update is waiting for a reboot, or whether a new version is available — prompting appropriately for each case. For full details on the update pipeline: <a href="/post/shani-os-architecture-deep-dive#the-update-pipeline-in-full">The Architecture Behind Shani OS</a>.</p>
+<p>The active slot is tracked in <code>/data/current-slot</code>. Shani Cassini's background agent runs automatically — shortly after login, then every 2 hours — and reports whether the last boot was a fallback, whether a staged update is waiting for a reboot, or whether a new version is available. It only ever tells you; it never applies anything. For full details on the update pipeline: <a href="/post/shani-os-architecture-deep-dive#the-update-pipeline-in-full">The Architecture Behind Shani OS</a>.</p>
 <hr>
 <h2 id="the-read-only-root">The Read-Only Root</h2>
 <p>The blue-green model handles updates. The immutable root handles everything else.</p>
@@ -289,7 +289,7 @@
 <p>For the full decision guide — what to use for each category, with the comparison table and decision flowchart — see <a href="https://blog.shani.dev/post/shani-os-software-ecosystem">The Shani OS Software Ecosystem</a>.</p>
 <hr>
 <h2 id="the-practical-shape-of-a-day">The Practical Shape of a Day</h2>
-<p>A Shani OS system in daily use is quiet. <code>shani-update</code> runs automatically via a systemd timer — 15 minutes after boot and every 2 hours thereafter — and shows a notification when a new OS image is ready. When you are ready, you run <code>sudo shani-deploy</code>, which takes a few minutes. You reboot when convenient. If anything feels off, <code>sudo shani-deploy -r</code> rolls back with one command and one reboot.</p>
+<p>A Shani OS system in daily use is quiet. Shani Cassini's background agent checks automatically — shortly after login, then every 2 hours — and shows a notification when a new OS image is ready. When you are ready, you run <code>sudo shani-deploy</code>, which takes a few minutes. You reboot when convenient. If anything feels off, <code>sudo shani-deploy -r</code> rolls back with one command and one reboot.</p>
 <p>Your apps — Flatpaks, Snaps, Nix packages, containers — live in their own subvolumes, completely independent of the OS. They update on their own schedules. <code>flatpak update</code> updates your apps. <code>shani-deploy</code> updates the OS. Neither affects the other.</p>
 <p>The worst case is: reboot to undo it. That is a level of reliability that, until recently, was only available to server infrastructure. It runs on your laptop now.</p>
 <hr>

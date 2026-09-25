@@ -56,7 +56,7 @@ If power is cut mid-update, your running system is intact. If the new copy boots
 
 If the new copy cannot boot at all: systemd-boot's boot-counting mechanism detects the failure after three attempts and reverts automatically. You may not even notice.
 
-The active slot is tracked in `/data/current-slot`. `shani-update` runs automatically via a systemd timer — 15 minutes after boot and every 2 hours thereafter — and detects whether the last boot was a fallback, whether a staged update is waiting for a reboot, or whether a new version is available — prompting appropriately for each case. For full details on the update pipeline: [The Architecture Behind Shani OS](/post/shani-os-architecture-deep-dive#the-update-pipeline-in-full).
+The active slot is tracked in `/data/current-slot`. Shani Cassini's background agent runs automatically — shortly after login, then every 2 hours — and reports whether the last boot was a fallback, whether a staged update is waiting for a reboot, or whether a new version is available. It only ever tells you; it never applies anything. For full details on the update pipeline: [The Architecture Behind Shani OS](/post/shani-os-architecture-deep-dive#the-update-pipeline-in-full).
 
 ---
 
@@ -122,7 +122,7 @@ For the full decision guide — what to use for each category, with the comparis
 ---
 ## The Practical Shape of a Day
 
-A Shani OS system in daily use is quiet. `shani-update` runs automatically via a systemd timer — 15 minutes after boot and every 2 hours thereafter — and shows a notification when a new OS image is ready. When you are ready, you run `sudo shani-deploy`, which takes a few minutes. You reboot when convenient. If anything feels off, `sudo shani-deploy -r` rolls back with one command and one reboot.
+A Shani OS system in daily use is quiet. Shani Cassini's background agent checks automatically — shortly after login, then every 2 hours — and shows a notification when a new OS image is ready. When you are ready, you run `sudo shani-deploy`, which takes a few minutes. You reboot when convenient. If anything feels off, `sudo shani-deploy -r` rolls back with one command and one reboot.
 
 Your apps — Flatpaks, Snaps, Nix packages, containers — live in their own subvolumes, completely independent of the OS. They update on their own schedules. `flatpak update` updates your apps. `shani-deploy` updates the OS. Neither affects the other.
 

@@ -290,8 +290,9 @@ Type=oneshot
 ExecStart=/usr/local/bin/shani-deploy</code></pre>
 <pre><code class="language-bash">sudo systemctl enable shani-autoupdate.timer</code></pre>
 <p>After <code>shani-deploy</code> stages an update, check <code>/run/shanios/reboot-needed</code> in your maintenance window logic to trigger the reboot at the right time.</p>
-<p>For managed fleets you should also disable the <code>shani-update</code> autostart entry so it does not prompt users interactively:</p>
-<pre><code class="language-bash">sudo rm /etc/xdg/autostart/shani-update.desktop</code></pre>
+<p>For managed fleets you should also silence the per-user notification agent, so it does not tell users about updates you are already rolling out centrally:</p>
+<pre><code class="language-bash">sudo systemctl --global disable shani-cassini-agent.timer
+sudo systemctl --global mask shani-cassini-agent.timer</code></pre>
 <hr>
 <h2 id="remote-rollback-without-reimaging">Remote Rollback Without Reimaging</h2>
 <p>The most operationally significant property of Shani OS for fleet management is the rollback model. On a traditional mutable system, a bad update on a remote machine requires remote investigation, possible reimaging, or an on-site visit. On Shani OS:</p>

@@ -5,7 +5,7 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.</description>
     <language>en-IN</language>
-    <lastBuildDate>Fri, 18 Sep 2026 19:31:16 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 25 Sep 2026 17:22:02 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>AI-Assisted Development on Shanios: Harnesses, AI Editors, MCP, and Local Models</title>
@@ -126,19 +126,19 @@
       <author>Shrinivas Kumbhar</author>
     </item>
     <item>
-      <title>Updates on Shani OS — shani-update, shani-deploy, and the Full Reference</title>
+      <title>Updates on Shani OS — Notifications, Cassini, and the Full shani-deploy Reference</title>
       <link>https://blog.shani.dev/post/shani-os-updates/</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-updates/</guid>
-      <description>The complete guide to Shani OS updates: how shani-update detects and surfaces updates automatically, and the full shani-deploy flag reference for every scenario — update, rollback, dry-run, cleanup, channel management, and automated fleet deployments.</description>
+      <description>The complete guide to Shani OS updates: the Shani Cassini notification agent that tells you when an update is ready, and the full shani-deploy flag reference for every scenario — update, rollback, dry-run, cleanup, channel management, and automated fleet deployments.</description>
       <pubDate>Tue, 12 May 2026 00:00:00 GMT</pubDate>
       <category>Reference</category>
       <author>Shrinivas Kumbhar</author>
     </item>
     <item>
-      <title>shani-update — The Shani OS Update Manager</title>
+      <title>Update Notifications on Shani OS — What Tells You, and When</title>
       <link>https://blog.shani.dev/post/shani-os-update-notifications/</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-update-notifications/</guid>
-      <description>shani-update is the user-facing update manager for Shani OS. It runs automatically via a systemd user timer and at login, detects boot failures, checks for...</description>
+      <description>Shanios tells you when an update is ready, when a restart finishes it, and when the last update did not start — as a desktop notification, nothing more. The notification agent is part of Shani Cassini, and it never applies an update by itself.</description>
       <pubDate>Mon, 11 May 2026 00:00:00 GMT</pubDate>
       <category>Reference</category>
       <author>Shrinivas Kumbhar</author>

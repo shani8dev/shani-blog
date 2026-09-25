@@ -117,10 +117,11 @@ sudo systemctl enable shani-autoupdate.timer
 
 After `shani-deploy` stages an update, check `/run/shanios/reboot-needed` in your maintenance window logic to trigger the reboot at the right time.
 
-For managed fleets you should also disable the `shani-update` autostart entry so it does not prompt users interactively:
+For managed fleets you should also silence the per-user notification agent, so it does not tell users about updates you are already rolling out centrally:
 
 ```bash
-sudo rm /etc/xdg/autostart/shani-update.desktop
+sudo systemctl --global disable shani-cassini-agent.timer
+sudo systemctl --global mask shani-cassini-agent.timer
 ```
 
 ---

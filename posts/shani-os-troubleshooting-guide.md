@@ -26,7 +26,7 @@ Full reference: [docs.shani.dev](https://docs.shani.dev).
 
 ### System Won't Boot — Automatic Fallback
 
-If your system fails to reach the login prompt three times after an update, systemd-boot's boot counting activates and falls back to the previous slot automatically. On the next successful login, `shani-update` detects the fallback and offers to clean the failed slot.
+If your system fails to reach the login prompt three times after an update, systemd-boot's boot counting activates and falls back to the previous slot automatically. On the next successful login, Shani Cassini's background agent sends a notification telling you the updated slot did not start, so you can roll it back from the Updates & Rollback page (or run `sudo shani-deploy -r`) and have the slot clean for the next deployment.
 
 To check what happened:
 

@@ -461,7 +461,7 @@ nix-env -iA nixpkgs.btop  # if not present</code></pre>
 <p>For detailed printer setup, including HP, Brother, and Canon drivers (Epson needs a manual AUR install — it's not pre-installed): <a href="https://blog.shani.dev/post/shani-os-printing-and-scanning">Printing and Scanning on Shani OS</a>.</p>
 <hr>
 <h2 id="keeping-your-system-updated">Keeping Your System Updated</h2>
-<p><code>shani-update</code> checks for OS updates automatically and shows a desktop notification when one is ready. When you're ready, run <code>sudo shani-deploy</code> and reboot. If anything feels wrong after the reboot, <code>sudo shani-deploy -r</code> instantly restores the previous OS version — your personal files are never affected either way.</p>
+<p>You never have to go looking for an update. Shani Cassini's background agent checks for OS updates automatically and shows a desktop notification when one is ready. When you're ready, open Updates & Rollback and apply it, or run <code>sudo shani-deploy</code> in a terminal, then reboot. If anything feels wrong after the reboot, <code>sudo shani-deploy -r</code> instantly restores the previous OS version — your personal files are never affected either way.</p>
 <p>Flatpak apps update automatically every 12 hours. Warehouse (pre-installed) lets you manage updates manually.</p>
 <p>For the full update workflow, channels, and rollback reference: <a href="https://blog.shani.dev/post/shani-os-updates">Updates on Shani OS</a>.</p>
 <hr>

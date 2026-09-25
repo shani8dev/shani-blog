@@ -231,7 +231,7 @@
           <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-04-26 · 8 min</span>
         </div>
       </header>
-      <div class="post-body"><blockquote><strong>Note:</strong> This post has been superseded by <a href="https://blog.shani.dev/post/shani-os-updates">Updates on Shani OS</a>, which merges <code>shani-deploy</code> and <code>shani-update</code> into a single reference. The content below remains accurate.</blockquote>
+      <div class="post-body"><blockquote><strong>Note:</strong> This post has been superseded by <a href="https://blog.shani.dev/post/shani-os-updates">Updates on Shani OS</a>, which covers the Shani Cassini notification agent and every <code>shani-deploy</code> flag in a single reference. The content below remains accurate.</blockquote>
 <p><code>shani-deploy</code> is the tool that makes Shani OS's atomic update and rollback model work. It downloads, verifies, and deploys OS images to the inactive Btrfs slot — never touching the running system — and handles rollback, storage cleanup, and deduplication.</p>
 <p>This post is the complete reference. For the conceptual explanation of why the blue-green model exists, start with <a href="https://blog.shani.dev/post/why-os-updates-should-never-break">Why Your OS Update Should Never Break Your Computer</a>. For the full architectural detail, see <a href="https://blog.shani.dev/post/shani-os-architecture-deep-dive">The Architecture Behind Shani OS</a>. Full reference: <a href="https://docs.shani.dev/doc/updates/system">docs.shani.dev — System Updates</a>.</p>
 <hr>
@@ -254,7 +254,7 @@ sudo shani-deploy --list-backups         # list available rollback backups with 
 sudo shani-deploy --channel-status       # show latest/stable versions available remotely</code></pre>
 <hr>
 <h2 id="update-notifications">Update Notifications</h2>
-<p><code>shani-update</code> is the user-facing update manager that runs at login and handles the full update lifecycle: it detects boot failures, checks if a staged update needs a reboot, checks if you're running a newly deployed slot, and looks for available OS updates. When an update is found, it shows a GUI dialog asking whether to install now or later. See <a href="https://blog.shani.dev/post/shani-os-update-notifications">shani-update Reference</a> for the full details.</p>
+<p>Shani Cassini's background notification agent is the part that talks to you. It runs as a systemd user service shortly after login and every two hours after that, reads <code>shani-deploy --status --check --json</code> (read-only, no root), and sends a desktop notification when an update is available, when a restart finishes an installed update, or when the last boot of an updated system failed. It never applies an update and never shows a dialog. On a desktop, applying one is an explicit action from Cassini's <strong>Updates & Rollback</strong> page, which drives this same engine through <code>pkexec</code>. See <a href="https://blog.shani.dev/post/shani-os-update-notifications">Update Notifications on Shani OS</a> for the full details.</p>
 <p><code>shani-deploy</code> is the lower-level tool that does the actual work: download, verify, extract, and stage the new image. You can run it directly at any time:</p>
 <pre><code class="language-bash">sudo shani-deploy</code></pre>
 <hr>
@@ -280,7 +280,7 @@ sudo shani-deploy --channel-status       # show latest/stable versions available
 <li><strong>Extract</strong> — pipes the verified image into <code>btrfs receive</code></li>
 <li><strong>UKI generation</strong> — runs <code>gen-efi configure &lt;inactive-slot&gt;</code> inside a chroot of the new slot to build and sign a Unified Kernel Image</li>
 <li><strong>Boot entry update</strong> — updates systemd-boot entries; the new slot becomes next-boot default with <code>+3-0</code> boot count tries</li>
-<li><strong>Reboot marker</strong> — writes <code>/run/shanios/reboot-needed</code> (tmpfs, auto-cleared on reboot) so <code>shani-update</code> can show a restart dialog</li>
+<li><strong>Reboot marker</strong> — writes <code>/run/shanios/reboot-needed</code> (tmpfs, auto-cleared on reboot) so Shani Cassini's agent can offer the restart</li>
 <li><strong>Auto-reboot</strong> — opt-in only; the new slot is ready to boot into immediately, so no reboot happens on its own unless <code>AUTO_REBOOT=yes</code> was set (see <a href="#auto-reboot-after-update">Auto-Reboot After Update</a> below)</li>
 </ol>
 <p>Nothing in your running OS is touched at any point. The chroot bind-mounts <code>data</code>, <code>etc</code>, <code>var</code>, and <code>swap</code> from the live system so <code>gen-efi</code> has access to the MOK keys, vconsole config, and swap offset.</p>
@@ -361,7 +361,7 @@ sudo shani-deploy --set-channel stable
 
 # Check current channel
 cat /etc/shani-channel</code></pre>
-<p>The channel file is <code>/etc/shani-channel</code>. Both <code>shani-deploy</code> and <code>shani-update</code> read from this file.</p>
+<p>The channel file is <code>/etc/shani-channel</code>. Both <code>shani-deploy</code> and Shani Cassini's agent read from this file.</p>
 <hr>
 <h2 id="advanced-flags">Advanced Flags</h2>
 <h3 id="-f---force"><code>-f</code> / <code>--force</code></h3>
@@ -407,7 +407,7 @@ WantedBy=timers.target</code></pre>
 <li>If the new slot fails to boot, systemd-boot decrements the boot count on each attempt. After three failed attempts, systemd-boot automatically falls back to the previous slot.</li>
 </ul>
 <p>This fallback requires no user action and works even when the system cannot reach a login prompt.</p>
-<p>On first login after a fallback, <code>shani-update</code> detects the mismatch between the booted slot and <code>/data/current-slot</code> and shows a GUI dialog offering to roll back the failed slot so it is clean for the next deployment.</p>
+<p>On the next successful login, Shani Cassini's agent notices the recorded failure and notifies you that the updated slot did not start. Rolling the failed slot back — from the <strong>Updates & Rollback</strong> page, or with <code>sudo shani-deploy -r</code> — is then an explicit step you take, so the slot is clean for the next deployment.</p>
 <hr>
 <h2 id="understanding-the-slot-files">Understanding the Slot Files</h2>
 <pre><code class="language-bash"># Which slot is currently active (written by shani-deploy after a successful update)
@@ -422,7 +422,7 @@ ls /data/
 # boot-ok           — written on successful boot
 # boot_failure      — written by check-boot-failure.sh if fallback is detected
 # boot_hard_failure — written by the dracut hook if a slot fails to mount
-# boot_failure.acked — written by shani-update when it acknowledges the failure
+# boot_failure.acked — written by the boot-state check when the failure is acknowledged
 
 # Slot backup snapshots (on the root Btrfs volume)
 sudo btrfs subvolume list / | grep backup

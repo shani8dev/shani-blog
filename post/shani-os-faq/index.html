@@ -255,7 +255,7 @@
 <p><strong>Can I roll back multiple times?</strong></p>
 <p>Yes. Each update creates a timestamped Btrfs snapshot of the slot it replaces. <code>shani-deploy -r</code> restores from the most recent snapshot. To go further back, use <code>btrfs subvolume list /</code> to see older backup snapshots and restore manually.</p>
 <p><strong>Does updating require a reboot?</strong></p>
-<p>Yes. The update is staged in the background — you can continue working normally. Reboot when convenient. <code>shani-update</code> shows a notification when a reboot is ready.</p>
+<p>Yes. The update is staged in the background — you can continue working normally. Reboot when convenient. Shani Cassini's background agent sends a notification when a reboot is ready, with a Restart Now action on it.</p>
 <p><strong>Can updates happen automatically?</strong></p>
 <p>Yes. See the "Automated Updates" section in <a href="https://blog.shani.dev/post/shani-os-updates">shani-os-updates</a> for systemd timer setup. This is the recommended approach for fleet deployments.</p>
 <hr>

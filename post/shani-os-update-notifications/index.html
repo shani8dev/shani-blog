@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://giscus.app https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://giscus.app; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev https://pagead2.googlesyndication.com https://tpc.googlesyndication.com data:; frame-src https://giscus.app https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://www.google.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google; connect-src 'self' https://api.github.com https://github.com https://giscus.app https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://csi.gstatic.com">
 
-  <title>shani-update — The Shani OS Update Manager — Shanios Blog</title>
-  <meta name="description" id="meta-desc" content="shani-update is the user-facing update manager for Shani OS. It runs automatically via a systemd user timer and at login, detects boot failures, checks for...">
+  <title>Update Notifications on Shani OS — What Tells You, and When — Shanios Blog</title>
+  <meta name="description" id="meta-desc" content="Shanios tells you when an update is ready, when a restart finishes it, and when the last update did not start — as a desktop notification, nothing more. The notification agent is part of Shani Cassini, and it never applies an update by itself.">
   <meta name="author"      content="Shrinivas Vishnu Kumbhar">
   <meta name="robots"      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical"    id="canonical-url" href="https://blog.shani.dev/post/shani-os-update-notifications/">
 
   <meta property="og:site_name" id="og-site-name" content="Shanios Blog">
   <meta property="og:type"      id="og-type"      content="article">
-  <meta property="og:title"     id="og-title"     content="shani-update — The Shani OS Update Manager">
-  <meta property="og:description" id="og-desc"    content="shani-update is the user-facing update manager for Shani OS. It runs automatically via a systemd user timer and at login, detects boot failures, checks for...">
+  <meta property="og:title"     id="og-title"     content="Update Notifications on Shani OS — What Tells You, and When">
+  <meta property="og:description" id="og-desc"    content="Shanios tells you when an update is ready, when a restart finishes it, and when the last update did not start — as a desktop notification, nothing more. The notification agent is part of Shani Cassini, and it never applies an update by itself.">
   <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/shani-os-update-notifications/">
   <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/shani-os-update-notifications.webp">
-  <meta property="og:image:alt" id="og-image-alt" content="shani-update — The Shani OS Update Manager">
+  <meta property="og:image:alt" id="og-image-alt" content="Update Notifications on Shani OS — What Tells You, and When">
   <meta property="og:locale"    content="en_US">
   <meta property="article:published_time" id="og-article-pubtime" content="2026-05-11T00:00:00.000Z">
   <meta property="article:modified_time"  id="og-article-modtime" content="2026-05-11T00:00:00.000Z">
@@ -27,11 +27,11 @@
 
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
-  <meta name="twitter:title"       id="tw-title" content="shani-update — The Shani OS Update Manager">
-  <meta name="twitter:description" id="tw-desc"  content="shani-update is the user-facing update manager for Shani OS. It runs automatically via a systemd user timer and at login, detects boot failures, checks for...">
+  <meta name="twitter:title"       id="tw-title" content="Update Notifications on Shani OS — What Tells You, and When">
+  <meta name="twitter:description" id="tw-desc"  content="Shanios tells you when an update is ready, when a restart finishes it, and when the last update did not start — as a desktop notification, nothing more. The notification agent is part of Shani Cassini, and it never applies an update by itself.">
   <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/shani-os-update-notifications.webp">
 
-  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"shani-update — The Shani OS Update Manager","description":"shani-update is the user-facing update manager for Shani OS. It runs automatically via a systemd user timer and at login, detects boot failures, checks for...","url":"https://blog.shani.dev/post/shani-os-update-notifications/","datePublished":"2026-05-11T00:00:00.000Z","dateModified":"2026-05-11T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-os-update-notifications.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Update Notifications on Shani OS — What Tells You, and When","description":"Shanios tells you when an update is ready, when a restart finishes it, and when the last update did not start — as a desktop notification, nothing more. The notification agent is part of Shani Cassini, and it never applies an update by itself.","url":"https://blog.shani.dev/post/shani-os-update-notifications/","datePublished":"2026-05-11T00:00:00.000Z","dateModified":"2026-05-11T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-os-update-notifications.webp","isAccessibleForFree":"True"}</script>
   <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
   <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
 
@@ -226,129 +226,92 @@
       <article id="post-article">
       <header class="post-header">
         <span class="post-tag">Reference</span>
-        <h1 class="post-title">shani-update — The Shani OS Update Manager</h1>
+        <h1 class="post-title">Update Notifications on Shani OS — What Tells You, and When</h1>
         <div class="post-meta">
           <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-11 · 6 min</span>
         </div>
       </header>
-      <div class="post-body"><blockquote><strong>Note:</strong> This post has been superseded by <a href="https://blog.shani.dev/post/shani-os-updates">Updates on Shani OS</a>, which merges <code>shani-update</code> and <code>shani-deploy</code> into a single reference. The content below remains accurate.</blockquote>
-<p><code>shani-update</code> is the user-facing update manager for Shani OS. It runs automatically in two ways: via a desktop autostart entry (<code>shani-update --startup</code>) that fires at login after a 15-second delay, and via a systemd user timer that runs 15 minutes after boot and then every 2 hours thereafter. It can also be invoked manually at any time. It handles the full update lifecycle on behalf of the user: detecting whether the last boot was a fallback, prompting to reboot into a staged update, noticing when you're on a freshly deployed slot and letting you roll back if needed, and checking for new OS images when everything is healthy.</p>
-<p><code>shani-deploy</code> is the lower-level tool that actually downloads, verifies, and stages OS images. <code>shani-update</code> is the front-end that decides when and whether to call it. Full reference: <a href="https://docs.shani.dev/doc/updates/system">docs.shani.dev — System Updates</a>.</p>
+      <div class="post-body"><blockquote><strong>Note:</strong> For the full picture — the notification agent <em>and</em> every <code>shani-deploy</code> flag for update, rollback, dry-run, cleanup, and channel management — see <a href="https://blog.shani.dev/post/shani-os-updates">Updates on Shani OS</a>. This post covers only the part that speaks to you without being asked: the notification agent.</blockquote>
+<p>Shanios does not interrupt you to talk about updates. There is no dialog at login, no countdown, no "install now or remind me later" prompt. What ships is a background notification agent, part of <strong>Shani Cassini</strong> (<code>/usr/bin/shani-cassini --agent</code>), that runs as a systemd <strong>user</strong> service and stays quiet unless there is genuinely something to report.</p>
+<p>It sends a desktop notification through <code>notify-send</code> when one of three things is true:</p>
+<ul>
+<li>an update is available,</li>
+<li>an update is already installed and a restart finishes it,</li>
+<li>the last boot of an updated system failed.</li>
+</ul>
+<p>That is the whole list. If your system is healthy and current, you hear nothing.</p>
 <hr>
-<h2 id="what-shani-update-does-on-each-run">What shani-update Does on Each Run</h2>
-<p>When run with <code>--startup</code>, <code>shani-update</code> waits 15 seconds (to let the polkit agent and desktop shell initialise), then works through a fixed priority sequence. Each step can short-circuit the rest. The same sequence runs for every invocation — at login via the autostart entry, on the 2-hour timer, or when called manually.</p>
-<h3 id="1-fallback-boot-detection">1. Fallback boot detection</h3>
-<p><code>shani-update</code> compares the booted subvolume (read from <code>/proc/cmdline</code>) against <code>/data/current-slot</code>. If they differ and a <code>/data/boot_failure</code> or <code>/data/boot_hard_failure</code> marker is present, it knows the newly deployed slot failed to boot and the system fell back to the previous one.</p>
-<p>In that case it shows a GUI dialog:</p>
-<blockquote><strong>Boot Failure Detected</strong> Slot @green failed to boot. The system fell back to @blue. Roll back @green now so it boots correctly next time?</blockquote>
-<p>If confirmed, it opens a terminal window and runs <code>shani-deploy -r</code> with <code>pkexec</code> for privilege escalation, then shows a follow-up dialog offering to reboot immediately. If the failure was a hard failure (the slot failed to mount entirely), the dialog text makes this explicit.</p>
-<h3 id="2-reboot-needed-check">2. Reboot-needed check</h3>
-<p>If <code>/run/shanios/reboot-needed</code> exists, a staged update is waiting. <code>shani-update</code> shows:</p>
-<blockquote><strong>Restart Required</strong> Shani OS has been updated to v2026.05.01. Restart now to boot into the updated system.</blockquote>
-<p>The user can restart immediately or dismiss and be reminded later. This file lives on a tmpfs and is cleared automatically on reboot, so the reminder never resurfaces after the reboot happens.</p>
-<h3 id="3-candidate-boot-check">3. Candidate boot check</h3>
-<p>If the booted slot differs from <code>current-slot</code> but there's no failure marker, you're running the newly deployed slot for the first time. <code>shani-update</code> shows:</p>
-<blockquote><strong>Running Updated System</strong> You're running the newly updated system (@green). If everything looks good, no action needed. If something is broken, roll back to @blue now.</blockquote>
-<h3 id="4-update-check">4. Update check</h3>
-<p>If none of the above apply, <code>shani-update</code> checks network connectivity, fetches the latest release metadata from the CDN (a small text file — no image download), and compares it to <code>/etc/shani-version</code> and <code>/etc/shani-profile</code>. If a newer version is available, it shows:</p>
-<blockquote><strong>Update Available</strong> Current: v2026.04.15-default Available: v2026.05.01-default The update will download and install in a terminal window.</blockquote>
-<p>If confirmed, <code>shani-update</code> detects the available terminal emulator (checking for <code>alacritty</code>, <code>kitty</code>, <code>wezterm</code>, <code>foot</code>, <code>gnome-terminal</code>, <code>kgx</code>, <code>konsole</code>, <code>xterm</code>, and others), constructs the right command-line arguments for that specific terminal, and launches <code>shani-deploy</code> inside it via <code>pkexec</code>.</p>
-<p>If the user dismisses the dialog, a reminder is scheduled using <code>systemd-run --user --on-active=86400s</code> — the update check runs again in 24 hours without any user action.</p>
+<h2 id="the-notification-agent">The Notification Agent</h2>
+<p>The agent is a plain background process. It is <strong>GTK-free</strong> — it loads no <code>libgtk-4</code>, no <code>libadwaita</code>, no <code>girepository</code> — and needs no display of its own, because it is not a GUI. It runs a few seconds after you log in, then again every two hours, and it does one thing: read the system's real state and decide whether that state is worth a sentence.</p>
+<p>It gets that state from a single read-only command:</p>
+<pre><code class="language-bash">shani-deploy --status --check --json</code></pre>
+<p>No root, no writes, no network image download. <code>--check</code> asks the CDN for release metadata, so it can tell you an update exists without fetching it. <code>shani-deploy</code> is the tool that actually downloads, verifies, and stages OS images; the agent is only the part that decides whether to mention it. Full reference: <a href="https://docs.shani.dev/doc/updates/system">docs.shani.dev — System Updates</a>.</p>
 <hr>
-<h2 id="usage">Usage</h2>
-<pre><code class="language-bash"># Run at login (used by the autostart entry)
-shani-update --startup
-
-# Run interactively — same checks but no 15-second startup delay
-shani-update
-
-# Roll back the inactive slot immediately
-shani-update --rollback
-shani-update -r
-
-# Force deploy even if version matches
-shani-update --force
-shani-update -f
-
-# Use a specific update channel for this run
-shani-update --channel latest
-shani-update -t latest
-
-# Verbose output from shani-deploy
-shani-update --verbose
-shani-update -v
-
-# Dry-run — simulate without changes
-shani-update --dry-run
-shani-update -d</code></pre>
+<h2 id="what-the-agent-reports">What the Agent Reports</h2>
+<h3 id="an-update-is-available">An update is available</h3>
+<blockquote><strong>Shanios 2026.09.20 is available</strong> Install it from Shani Cassini — it goes into the other system slot, your running system is not touched.</blockquote>
+<p>If you ignore it, the agent mentions that same version again after 24 hours. It does not nag faster than that, and it does not queue anything.</p>
+<h3 id="a-restart-finishes-an-installed-update">A restart finishes an installed update</h3>
+<blockquote><strong>Restart to finish the update</strong> Shanios 2026.09.20 is installed and starts after a restart.</blockquote>
+<p>This one carries a <strong>Restart Now</strong> action, so the restart is one click from the notification itself. Underneath, it is the <code>/run/shanios/reboot-needed</code> marker that <code>shani-deploy</code> writes after staging — a tmpfs file, so it clears itself on the next reboot and the notification cannot resurface afterwards.</p>
+<h3 id="the-last-update-did-not-start">The last update did not start</h3>
+<blockquote><strong>The update did not start</strong> The updated system (@green) failed to boot, so Shanios started the previous one. Your files are safe.</blockquote>
+<p>Or, if the switch back also failed:</p>
+<blockquote><strong>Shanios could not recover automatically</strong> The updated system (@green) did not start and switching back failed. Open Shani Cassini to roll back.</blockquote>
+<p>Both mean the same thing to you: your files are intact and you can fix this from <strong>Updates & Rollback</strong>. The fallback to the previous slot usually happened on its own, via boot counting — see <a href="https://blog.shani.dev/post/shani-os-architecture-deep-dive">The Architecture Behind Shani OS</a> for how that works.</p>
+<h3 id="what-it-deliberately-does-not-say">What it deliberately does not say</h3>
+<p>The agent never claims your system booted successfully. A newly deployed slot is not proof that the update was good, and no notification is going to pretend otherwise. It has no "everything looks fine, right?" first-boot dialog, because it has no way to know the answer. Silence after a successful update is the correct output, not a missing feature.</p>
 <hr>
-<h2 id="how-shani-update-runs">How shani-update Runs</h2>
-<p><code>shani-update</code> is triggered by two mechanisms:</p>
-<p><strong>Desktop autostart entry</strong> — <code>shani-update --startup</code> is called when you log in. The script waits 15 seconds to let the polkit agent and desktop shell initialise before acquiring its lock and running the check sequence.</p>
-<p><strong>Systemd user timer</strong> — <code>shani-update.timer</code> fires 15 minutes after boot, then every 2 hours. This ensures checks happen even during long sessions and even if the autostart entry was missed.</p>
-<p>Both paths run the identical check sequence (fallback boot → reboot needed → candidate boot → update check). The lock file prevents two instances running simultaneously.</p>
-<pre><code class="language-bash"># View recent shani-update logs
-cat ~/.cache/shani-update.log
-
-# Or via journalctl (shani-update also writes to the system journal via systemd-cat)
-journalctl -t shani-update -n 50
-
-# Check the timer status
-systemctl --user status shani-update.timer
-
-# Run an immediate interactive check
-shani-update</code></pre>
-<p>The log file at <code>~/.cache/shani-update.log</code> rotates automatically at 1 MB.</p>
-<hr>
-<h2 id="gui-support">GUI Support</h2>
-<p><code>shani-update</code> supports three GUI backends, tried in order: <code>yad</code> (preferred — supports timeouts and button labels), <code>zenity</code>, and <code>kdialog</code>. All dialogs have a configurable timeout — if no response is given within the timeout, the dialog dismisses as if cancelled.</p>
-<p>For fallback boot and reboot dialogs, the timeout is 5 minutes. For the update available dialog, it is 2 minutes before it auto-dismisses and defers.</p>
-<p>When no GUI is available (headless or SSH session), <code>shani-update</code> falls back to <code>notify-send</code> for non-interactive contexts, or an interactive console prompt if running in a terminal (<code>stdin</code> and <code>stdout</code> are both TTYs).</p>
-<hr>
-<h2 id="terminal-detection">Terminal Detection</h2>
-<p>When <code>shani-update</code> needs to open a terminal to run <code>shani-deploy</code>, it detects the right terminal emulator using a layered strategy:</p>
-<ol>
-<li><strong>Session-native hint:</strong> checks <code>KONSOLE_VERSION</code> (set inside any Konsole window), <code>VTE_VERSION</code> (set inside any VTE-based terminal like <code>kgx</code>, <code>gnome-terminal</code>, <code>tilix</code>), and <code>XDG_CURRENT_DESKTOP</code> to prefer the terminal that matches the running desktop</li>
-<li><strong>Environment variables:</strong> checks <code>$TERMINAL</code>, <code>$TERMINAL_EMULATOR</code>, <code>$COLORTERM</code>, <code>$TERM_PROGRAM</code> against an allowlist</li>
-<li><strong>PATH scan:</strong> tries <code>alacritty</code>, <code>kitty</code>, <code>wezterm</code>, <code>foot</code>, <code>gnome-terminal</code>, <code>kgx</code>, <code>tilix</code>, <code>xfce4-terminal</code>, <code>konsole</code>, <code>lxterminal</code>, <code>mate-terminal</code>, <code>deepin-terminal</code>, <code>terminator</code>, <code>xterm</code>, <code>urxvt</code>, <code>st</code> in order</li>
-</ol>
-<p>Each terminal gets its own command construction — for example, <code>konsole</code> is launched with <code>--noclose</code> so the window stays open after <code>shani-deploy</code> finishes; <code>kgx</code> does not support <code>--title</code> so the title argument is omitted.</p>
-<hr>
-<h2 id="update-channels">Update Channels</h2>
-<p><code>shani-update</code> reads the same channel configuration as <code>shani-deploy</code>:</p>
-<pre><code class="language-bash"># Check current channel
-cat /etc/shani-channel
-
-# Switch channel (affects both shani-deploy and shani-update)
-sudo shani-deploy --set-channel latest
-sudo shani-deploy --set-channel stable</code></pre>
-<p>On the <code>stable</code> channel (default), new images arrive approximately monthly. On <code>latest</code>, checks may find something new more frequently.</p>
-<hr>
-<h2 id="applying-the-update-manually">Applying the Update Manually</h2>
-<p>When you are ready to apply an available update without waiting for the dialog:</p>
+<h2 id="applying-an-update">Applying an Update</h2>
+<p>Applying is always an explicit action you take. There are two ways.</p>
+<p><strong>On a desktop</strong>, open Shani Cassini and go to <strong>Updates & Rollback</strong>. The page shows the same live status the agent reads, and its buttons run the real <code>shani-deploy</code> engine through <code>pkexec</code> for privilege escalation, streaming output into the page. The deployment is wrapped in <code>systemd-inhibit</code> so your machine does not suspend halfway through, and your running system is never touched — everything lands in the other slot.</p>
+<p><strong>On a server or a headless box</strong>, there is no desktop to click. Run the engine directly:</p>
 <pre><code class="language-bash"># Download, verify, and stage the update
 sudo shani-deploy
 
 # Simulate without changing anything
-sudo shani-deploy -d</code></pre>
-<p>For the full update workflow, see <a href="https://blog.shani.dev/post/shani-deploy-reference">shani-deploy Reference</a>.</p>
+sudo shani-deploy -d
+
+# Fetch and verify the image, then exit without deploying
+sudo shani-deploy --download-only</code></pre>
+<p>The agent never applies an update, never rolls one back, and never reboots your machine on its own. It is a heads-up mechanism; the decision is yours.</p>
+<hr>
+<h2 id="running-the-agent-by-hand">Running the Agent by Hand</h2>
+<pre><code class="language-bash"># Run one check right now, exactly as the timer would
+shani-cassini --agent
+
+# Is the timer scheduled for this user?
+systemctl --user status shani-cassini-agent.timer
+
+# What did the agent do, and when?
+journalctl --user -u shani-cassini-agent.service -n 50</code></pre>
+<p>The timer fires <code>OnStartupSec=2min</code> after your user manager starts, then <code>OnUnitInactiveSec=2h</code> after each run, with up to five minutes of randomized delay so a fleet of machines does not all wake at the same instant.</p>
+<p>The agent keeps a small state file at <code>~/.local/state/shani-cassini/agent.json</code> (honouring <code>XDG_STATE_HOME</code>) so it says each thing once per event rather than every two hours. Everything else it does goes to the system journal.</p>
+<blockquote><strong>Note:</strong> it needs your desktop session's notification bus, so on a headless or SSH-only login there is nothing to show a notification on and it stays quiet. That is expected — on those machines, check directly with <code>shani-deploy --status --check</code>.</blockquote>
+<hr>
+<h2 id="update-channels">Update Channels</h2>
+<p>The agent reports what your channel offers. The channel file is <code>/etc/shani-channel</code>, the same one <code>shani-deploy</code> reads:</p>
+<pre><code class="language-bash"># Check current channel
+cat /etc/shani-channel
+
+# Switch channel
+sudo shani-deploy --set-channel latest
+sudo shani-deploy --set-channel stable</code></pre>
+<p>On the <code>stable</code> channel (default), new images arrive approximately monthly. On <code>latest</code>, checks may find something new more frequently.</p>
 <hr>
 <h2 id="fleet-and-oem-deployments">Fleet and OEM Deployments</h2>
-<p>For fleet deployments using automated update scheduling, both the autostart entry and the user timer should be disabled in favour of a central update management approach:</p>
-<pre><code class="language-bash"># Disable the autostart entry system-wide
-sudo rm /etc/xdg/autostart/shani-update.desktop
-
-# Disable the user timer system-wide (mask the unit)
-sudo systemctl --global disable shani-update.timer
-sudo systemctl --global mask shani-update.timer</code></pre>
-<p>Updates can then be triggered on schedule via a systemd timer calling <code>shani-deploy</code> directly. See <a href="https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment">Shani OS for OEMs and IT Fleets</a> for the fleet deployment guide.</p>
+<p>For managed fleets you drive the schedule centrally, so silence the per-user agent system-wide:</p>
+<pre><code class="language-bash"># Disable and mask the user timer system-wide
+sudo systemctl --global disable shani-cassini-agent.timer
+sudo systemctl --global mask shani-cassini-agent.timer</code></pre>
+<p>Then trigger updates on your own schedule with a systemd timer calling <code>shani-deploy</code> directly. See <a href="https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment">Shani OS for OEMs and IT Fleets</a> for the fleet deployment guide.</p>
 <hr>
 <h2 id="resources">Resources</h2>
 <ul>
+<li><a href="https://blog.shani.dev/post/shani-os-updates">Updates on Shani OS</a> — the notification agent plus every <code>shani-deploy</code> flag</li>
 <li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
 <li><a href="https://docs.shani.dev/doc/updates/system">docs.shani.dev — System Updates</a> — full update reference</li>
 <li><a href="https://blog.shani.dev/post/shani-deploy-reference">shani-deploy Reference</a> — every flag and workflow</li>
-<li><a href="https://blog.shani.dev/post/shani-os-oem-and-fleet-deployment">Shani OS for OEMs and IT Fleets</a> — fleet update management</li>
 <li><a href="https://t.me/shani8dev">Telegram community</a></li>
 </ul>
 <hr>

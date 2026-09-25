@@ -70,7 +70,7 @@ The boot entries in systemd-boot are labelled clearly:
 
 After each deployment, `shani-deploy` rewrites both entries. The newly updated slot is labelled Active with `+3-0` boot-count tries set. If it fails to reach multi-user.target within three attempts, systemd-boot automatically falls back to the Candidate slot.
 
-`shani-update` runs automatically via a systemd user timer — 15 minutes after boot and every 2 hours — checking for new versions and surfacing the appropriate dialog for fallback boots, pending reboots, or available updates.
+Shani Cassini's background agent runs automatically via a systemd user timer — shortly after login, then every 2 hours — reading the deploy status and sending a desktop notification when a fallback boot was recorded, when a restart is pending, or when a new version is available. It is a background process with no display of its own, it shows notifications rather than dialogs, and it never applies an update itself.
 
 ---
 
