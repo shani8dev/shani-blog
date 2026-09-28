@@ -23,7 +23,7 @@ the rest.
 - `Post cover images`
 
 **On-demand reference — do not page through speculatively:**
-- `Audit-verified known issues (confirmed present)` — ~191 of this file's 383 lines
+- `Audit-verified known issues (confirmed present)` — ~125 lines
 - `Where things are documented`
 - `Garuda Cross-Reference Findings (added 2026-09-17)`
 
