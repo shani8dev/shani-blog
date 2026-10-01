@@ -161,6 +161,7 @@ background: var(--color-bg-alt); border-bottom: 1px solid var(--color-border);
 font-family: var(--font-display); font-size: 0.85rem; letter-spacing: 0.12em;
 }
 .auspicious-text {
+display: inline-flex; align-items: center; min-height: 24px; padding: 0 0.5rem;
 color: var(--color-accent); font-weight: 700; opacity: 0.9;
 transition: opacity 0.2s var(--ease);
 text-decoration: none;
@@ -199,6 +200,12 @@ transition: color 0.15s, background 0.15s;
 }
 .nav a:hover, .nav a.active { color: var(--color-accent); background: var(--color-accent-bg); }
 .header__actions { display: flex; align-items: center; gap: var(--space-3); }
+/* 320 px: logo (160) + 4 icons no longer fit, and the icons slid under the
+   logo - its link took the search button's taps. A phone has no keyboard
+   for the shortcuts hint, so drop it there and tighten the gaps. */
+@media (max-width: 600px) { #shortcuts-hint { display: none; } }
+@media (max-width: 400px) { .header__inner { gap: var(--space-3); } .header__actions { gap: var(--space-2); } }
+.header__actions { flex-shrink: 0; }
 .search {
 height: 32px; padding: 0 var(--space-3);
 border: 1px solid var(--color-border); border-radius: var(--radius-sm);
@@ -361,7 +368,10 @@ transition: background 0.15s;
 }
 .sidebar__list li:last-child { border-bottom: none; }
 .sidebar__list li:hover { background: var(--color-bg-elevated); }
+/* 24 px tall at least (WCAG 2.5.8): at 19 px these were hard to tap on a
+   tablet - shani-testbed `web` tap-targets, 2026-10-01 */
 .sidebar__link {
+min-height: 24px;
 display: flex; align-items: flex-start; gap: var(--space-2);
 font-weight: 500; font-size: 0.84rem;
 color: var(--color-text); margin-bottom: var(--space-1);
@@ -491,7 +501,7 @@ margin-top: var(--space-5); padding-top: var(--space-4); border-top: 1px solid v
 font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-text-faint);
 }
 .empty-state { grid-column: 1/-1; text-align: center; padding: var(--space-20) var(--space-6); color: var(--color-text-muted); }
-.empty-state h3 { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: var(--space-3); color: var(--color-text); }
+.empty-state h2, .empty-state h3 { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: var(--space-3); color: var(--color-text); }
 .empty-state pre {
 display: inline-block; text-align: left; margin-top: var(--space-4);
 padding: var(--space-3) var(--space-4); background: var(--color-bg-alt);
@@ -1066,9 +1076,14 @@ opacity: 0; visibility: hidden; pointer-events: none; z-index: 90; font-size: 0.
 /* =========================================
 15. RESPONSIVE
 ========================================= */
-@media (max-width: 768px) {
+/* The full nav needs ~960px: at a tablet's 820px it wrapped onto two lines
+   over the BLOG wordmark and split "BOOKMARKS" (shani-testbed `web`
+   screenshots, 2026-10-01). Collapse it into the menu button below that. */
+@media (max-width: 960px) {
 .nav { display: none; }
 .menu-btn { display: flex; }
+}
+@media (max-width: 768px) {
 .search { display: none; }
 .hero__sidebar { order: 2; }
 .card.featured { flex-direction: column; }
@@ -1201,7 +1216,7 @@ white-space: nowrap;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 /* .toast i inherits color: var(--color-bg) from parent — perfect contrast on inverted bg */
-.footer__links a { display: inline-flex; align-items: center; gap: var(--space-2); letter-spacing: 0.04em; transition: color 0.15s; }
+.footer__links a { display: inline-flex; align-items: center; gap: var(--space-2); letter-spacing: 0.04em; transition: color 0.15s; min-height: 24px; padding: 3px 0; }
 .footer__links a i { font-size: 0.9rem; }
 /* =========================================
 18. BUTTON SYSTEM (Consolidated)
@@ -1433,6 +1448,14 @@ transition: opacity 0.35s var(--ease), visibility 0.35s var(--ease);
 #page-loader.hidden {
 opacity: 0; visibility: hidden; pointer-events: none;
 }
+/* While the loader covers the page, the page under it is not shown, so keep it
+   out of rendering: the hero and post grid are filled in by JS behind the
+   overlay, and that reflow (hero 74px -> 533px, posts pushed 460px down) was
+   one layout shift of 0.895 - a Cumulative Layout Shift Google rates "poor"
+   (> 0.25) on every load, though no reader saw it. Shifts of hidden elements
+   are not counted, and appearing is not a shift. Found by shani-testbed's
+   `web` perf check. */
+#page-loader:not(.hidden) ~ * { visibility: hidden; }
 .loader__logo {
 display: flex; align-items: center; gap: var(--space-2);
 animation: fadeUp 0.5s var(--ease) both;

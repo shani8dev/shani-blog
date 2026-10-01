@@ -698,7 +698,7 @@ const Renderer = {
         <button class="hero-link" id="hero-read-btn">Read post</button>
       </div>
       <aside class="hero__sidebar">
-        <h3 class="sidebar__title">Also reading</h3>
+        <h2 class="sidebar__title">Also reading</h2>
         <ul class="sidebar__list" id="aside-list">
           <li class="loading-text">Loading…</li>
         </ul>
@@ -1770,11 +1770,11 @@ const Router = {
       const recentPosts = (CONFIG.RECENTLY_VIEWED_COUNT || 0) > 0 ? RecentlyViewed.getPosts() : [];
       bmView.innerHTML = `
         <div class="section-header" style="margin-top:var(--space-12)">
-          <h2 class="section-header__title"><i class="fa-solid fa-bookmark"></i> Bookmarks</h2>
+          <h1 class="section-header__title"><i class="fa-solid fa-bookmark" aria-hidden="true"></i> Bookmarks</h1>
           <div class="section-header__line"></div>
         </div>
         ${savedPosts.length === 0
-          ? `<div class="empty-state"><i class="fa-regular fa-bookmark empty-icon"></i><h3>No bookmarks yet</h3><p>Hit the bookmark icon on any post or card to save it here.</p><button class="btn primary" id="bm-back-btn"><i class="fa-solid fa-arrow-left"></i> Browse posts</button></div>`
+          ? `<div class="empty-state"><i class="fa-regular fa-bookmark empty-icon"></i><h2>No bookmarks yet</h2><p>Hit the bookmark icon on any post or card to save it here.</p><button class="btn primary" id="bm-back-btn"><i class="fa-solid fa-arrow-left"></i> Browse posts</button></div>`
           : `<div class="grid" id="bm-grid" role="list"></div>`}
         ${recentPosts.length > 0 ? `
           <div class="section-header" style="margin-top:var(--space-10)">
@@ -1828,7 +1828,7 @@ const Router = {
                 localStorage.setItem(_key('bm:' + slug), '0');
                 card.remove();
                 if (!bmGrid.children.length) bmView.querySelector('.section-header')?.insertAdjacentHTML('afterend',
-                  `<div class="empty-state"><i class="fa-regular fa-bookmark empty-icon"></i><h3>No bookmarks yet</h3><p>Hit the bookmark icon on any post or card to save it here.</p><button class="btn primary" id="bm-back-btn2"><i class="fa-solid fa-arrow-left"></i> Browse posts</button></div>`);
+                  `<div class="empty-state"><i class="fa-regular fa-bookmark empty-icon"></i><h2>No bookmarks yet</h2><p>Hit the bookmark icon on any post or card to save it here.</p><button class="btn primary" id="bm-back-btn2"><i class="fa-solid fa-arrow-left"></i> Browse posts</button></div>`);
                 bmView.querySelector('#bm-back-btn2')?.addEventListener('click', () => Router.back());
                 UI.showToast('<i class="fa-regular fa-bookmark"></i> Removed from bookmarks');
                 return;

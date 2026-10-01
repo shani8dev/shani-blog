@@ -53,6 +53,49 @@ correct." It is verified by observing the actual behavior of the real
 thing in the real environment — built, served, deployed, signed, running.
 If you haven't seen it work (or fail) for real, it isn't verified.
 
+## Test harness: shani-testbed (use it - and improve it, never invent around it)
+
+The ecosystem's real test harness is the sibling repo **`../shani-testbed`**
+(read its `README.md` and `AGENTS.md`). It installs a real ShaniOS image with
+the real installer, boots its slots (`systemd-nspawn`, and UEFI + TPM VMs),
+runs real deploys and rollbacks, drives GUI apps through their accessibility
+tree, and checks web pages in a real headless browser. Every command runs from
+`../shani-install-media`, which provides the builder container:
+
+```bash
+cd ../shani-install-media
+./run_in_container.sh build.sh test <command> ...   # `... test help` lists them all
+```
+
+**If the check you need does not exist, add it to shani-testbed - do not invent
+around it.** A one-off script in this repo, a scratchpad, or a heredoc piped
+into a container is lost when the session ends, and the next agent re-derives
+it. Extend the harness instead (see "Extend the harness" in its AGENTS.md):
+
+- an in-slot check -> `shani-testbed/slot-tests/<name>.sh` (`# slot-test-mode: boot`,
+  prints `RESULT <name> PASS|FAIL|SKIP` lines), run by `slot-test <slot> <name>`;
+- a GUI interaction or assertion -> an `app` action in `lib/app.sh`, or a walk
+  through a real app as `app-scripts/<app>.actions`;
+- a web check -> `lib/web_client.py`;
+- a new way to boot, drive or observe -> a command or option in `lib/`;
+
+each with a negative control (a check that cannot fail is not a check), its
+self-test (`tests/run-app-actions.sh`, `tests/run-web-client.sh`, ...), and the
+`usage` + README updated. One harness run at a time: disk-touching commands
+take `disk/.testbed.lock` and a second run is refused. Plain nspawn boots see
+the image's whole `/var`; real boots have an empty tmpfs `/var`
+(`systemd.volatile=state`) - use `slot-test --volatile`, or a real UEFI boot
+with `iso-install --boot-only --console-exec=CMD`, for anything touching `/var`.
+
+### What to run for this repo
+
+- `web --site=/opt/shani-blog --offline --crawl=20 --budget-cls=0.25` plus the
+  `--allow-host` / `--ignore` values in `.github/workflows/web-check.yml`
+  (the same checks CI runs). Without the container:
+  `python3 ../shani-testbed/lib/web_serve.py . 8700 &` then
+  `python3 ../shani-testbed/lib/web_client.py --url=http://127.0.0.1:8700/ --offline --crawl=20`.
+- A new web check belongs in `shani-testbed/lib/web_client.py`, not here.
+
 ## Rule: "the page loads" is not verification — open it and actually check
 
 A static site has no compiler to catch a wrong CDN hash, a broken fetch
@@ -135,6 +178,39 @@ terse and current-state; push detailed before/after narrative to a dated
 in shani-docs/shani-install-media/shani-deploy/shani-builder.*
 
 ## Audit-verified known issues (confirmed present)
+
+- **Real-browser check in CI: `.github/workflows/web-check.yml` (2026-10-01).**
+  Calls shani-ci-commons `web-check.yml` (shani-testbed's `lib/web_client.py`:
+  headless Chrome over CDP) against this checkout served as GitHub Pages
+  serves it. Run it locally with
+  `python3 ../shani-testbed/lib/web_serve.py . 8700 & python3 ../shani-testbed/lib/web_client.py --url=http://127.0.0.1:8700/ --offline --crawl=20`.
+  Its allow-hosts list is the hosts the pages are *meant* to contact; a new
+  one is a finding to review, not a line to append.
+- **Cumulative Layout Shift 0.913 on every load - FIXED (2026-10-01).** The
+  hero (74px -> 533px) and post grid are rendered by JS behind the full-page
+  loader, and that reflow counted as one 0.895 shift (Google: > 0.25 is
+  "poor", and CWV feeds search ranking) although no reader saw it. Fix:
+  `#page-loader:not(.hidden) ~ * { visibility: hidden; }` in `style.css` -
+  hidden elements are not counted and appearing is not a shift. Measured
+  after: 0.001 (desktop), 0.003 (390px), 0.001 (a post page).
+- **CSP `img-src` blocked AdSense's ad-quality pixel - FIXED (2026-10-01).**
+  `ep1/ep2.adtrafficquality.google` were allowed in script/frame/connect-src
+  but not img-src, so every page load logged a CSP violation. Added to
+  `index.html`'s CSP; `node generate-manifest.js` carried it into all 60
+  stubs (diff: the CSP line, `feed.xml`'s build date, `sw.js`'s cache name).
+- **An ad that fills taller than its slot still shifts a post page (open).**
+  `.ad-unit` reserves 90px; an observed AdSense fill was 280px (CLS 0.141 on
+  that load, 0.001 when the ad did not fill). Reserving 280px leaves a blank
+  box when AdSense does not fill, and collapsing unfilled slots moves the
+  shift instead - a decision about ad space, not a mechanical fix. CI's CLS
+  budget is 0.25 for this reason.
+- **With JavaScript off the page is the loader forever (open, pre-existing).**
+  `#page-loader` is `position: fixed` over everything at z-index 9999, so the
+  `<noscript>` "JavaScript is required" message is underneath it.
+- **Not ours: two Chrome reports come from Google's ad scripts** - third-party
+  ad cookies (`CookieIssue WarnThirdPartyPhaseout`, googleads.g.doubleclick.net)
+  and `PerformanceIssue DocumentCookie` (`document.cookie` appears nowhere in
+  this repo's JS). Named in web-check.yml's `ignore`; nothing else is.
 
 - **`generate-manifest.js` date parsing was timezone-dependent — FIXED
   (2026-09-18).** `new Date(post.date + 'T00:00:00')` (no `Z`/offset) is
