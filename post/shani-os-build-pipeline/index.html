@@ -133,6 +133,9 @@
 </head>
 <body>
   <noscript>
+    <!-- only script removes the full-screen loader, so without it the
+         overlay covered this notice and every page's prerendered content -->
+    <style>#page-loader{display:none}#page-loader~*{visibility:visible!important}</style>
     <div style="text-align:center;padding:4rem 2rem;font-family:sans-serif">
       <strong>JavaScript is required to view this blog.</strong>
     </div>
