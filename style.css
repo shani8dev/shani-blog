@@ -962,6 +962,15 @@ border-top: 2px solid var(--color-accent); padding: var(--space-10) var(--space-
 }
 .ad-unit {
   display: block;
+  /* Tried and reverted 2026-10-05: reserving the real 280px fill instead of
+     this 90px placeholder DID fix the shift (measured CLS 0.000 vs 0.141),
+     but it also made the ad fill often enough that AdSense's gen_204 pixel
+     loads, and web-check.yml runs with --offline, so that pixel fails with
+     net::ERR_FAILED and turns two checks red (color-scheme desktop,
+     reduced-motion desktop). Adding the pixel to the CI `ignore` list to keep
+     the fix is a maintainer decision, not a mechanical one - it widens what
+     CI tolerates on a monetisation-critical page. Left as-is; see AGENTS.md,
+     "An ad that fills taller than its slot still shifts a post page". */
   min-height: 90px;
   background: var(--color-bg-alt);
   border: 1px solid var(--color-border);

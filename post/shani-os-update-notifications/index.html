@@ -261,13 +261,13 @@
 <blockquote><strong>The update did not start</strong> The updated system (@green) failed to boot, so Shanios started the previous one. Your files are safe.</blockquote>
 <p>Or, if the switch back also failed:</p>
 <blockquote><strong>Shanios could not recover automatically</strong> The updated system (@green) did not start and switching back failed. Open Shani Cassini to roll back.</blockquote>
-<p>Both mean the same thing to you: your files are intact and you can fix this from <strong>Updates & Rollback</strong>. The fallback to the previous slot usually happened on its own, via boot counting — see <a href="https://blog.shani.dev/post/shani-os-architecture-deep-dive">The Architecture Behind Shani OS</a> for how that works.</p>
+<p>Both mean the same thing to you: your files are intact and you can fix this from <strong>Updates &amp; Rollback</strong>. The fallback to the previous slot usually happened on its own, via boot counting — see <a href="https://blog.shani.dev/post/shani-os-architecture-deep-dive">The Architecture Behind Shani OS</a> for how that works.</p>
 <h3 id="what-it-deliberately-does-not-say">What it deliberately does not say</h3>
 <p>The agent never claims your system booted successfully. A newly deployed slot is not proof that the update was good, and no notification is going to pretend otherwise. It has no "everything looks fine, right?" first-boot dialog, because it has no way to know the answer. Silence after a successful update is the correct output, not a missing feature.</p>
 <hr>
 <h2 id="applying-an-update">Applying an Update</h2>
 <p>Applying is always an explicit action you take. There are two ways.</p>
-<p><strong>On a desktop</strong>, open Shani Cassini and go to <strong>Updates & Rollback</strong>. The page shows the same live status the agent reads, and its buttons run the real <code>shani-deploy</code> engine through <code>pkexec</code> for privilege escalation, streaming output into the page. The deployment is wrapped in <code>systemd-inhibit</code> so your machine does not suspend halfway through, and your running system is never touched — everything lands in the other slot.</p>
+<p><strong>On a desktop</strong>, open Shani Cassini and go to <strong>Updates &amp; Rollback</strong>. The page shows the same live status the agent reads, and its buttons run the real <code>shani-deploy</code> engine through <code>pkexec</code> for privilege escalation, streaming output into the page. The deployment is wrapped in <code>systemd-inhibit</code> so your machine does not suspend halfway through, and your running system is never touched — everything lands in the other slot.</p>
 <p><strong>On a server or a headless box</strong>, there is no desktop to click. Run the engine directly:</p>
 <pre><code class="language-bash"># Download, verify, and stage the update
 sudo shani-deploy

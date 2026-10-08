@@ -204,6 +204,16 @@ function autoExcerpt(body, paywalled) {
   return plain.substring(0, 140) + (plain.length > 140 ? '\u2026' : '');
 }
 
+// Plain-text escaping for prose. A bare `&` or `<` in a table cell or
+// paragraph used to reach the served HTML verbatim (`users & groups`,
+// `shows disk < 30 GB`), which html5lib reads as a missing entity and a
+// bogus tag. Existing entities are left alone so `2>&1` in a shell line
+// does not become `2&gt;&amp;1`.
+const escText = t => String(t || '')
+  .replace(/&(?![#\w]+;)/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;');
+
 function escXml(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -225,20 +235,31 @@ function mdToHtmlFallback(md) {
   let src = String(md || '').replace(/\r\n/g, '\n');
 
 
-  const inline = s => s
-    .replace(/`([^`]+)`/g, (_, c) => `<code>${escXml(c)}</code>`)
-    .replace(/!\[([^\]]*)\]\(([^)\s]+)[^)]*\)/g, (_, a, u) => `<img src="${escXml(u)}" alt="${escXml(a)}" loading="lazy">`)
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/~~([^~]+)~~/g, '<del>$1</del>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, u) => `<a href="${escXml(u)}">${t}</a>`);
+  // Code spans are lifted out first so the emphasis rules never see a code
+  // span's contents, and put back last. The placeholder holds an INDEX, not
+  // the code: a content placeholder with \u0000 delimiters made the release
+  // regex span from one span's opening delimiter to the next span's closing
+  // one (half a <code> per span, plus NUL bytes in the page), and an index
+  // also holds no `*`, so `**bold with `code` inside**` still matches across
+  // the gap. Same three orderings were each tried and each shipped something
+  // wrong on shani-docs; see that repo's generate-manifest.js for the full
+  // account.
+  const inline = s => {
+    const str = String(s);
+    const codes = [];
+    const lifted = escText(str).replace(/`([^`]+)`/g, (_, c) => {
+      codes.push(c);            // escaped once by escText above
+      return `\u0000${codes.length - 1}\u0000`;
+    });
 
-  const lines = src.split('\n');
-  const slugifyH = t => t.toLowerCase().replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'-');
-  let inQuoteFence = false, qfLang = '', qfBuf = [];
-  const usedIds = new Set();
-  const uniqId = t => { let id = slugifyH(t) || 'section'; let n = id; let k = 2;
-    while (usedIds.has(n)) n = id + '-' + k++; usedIds.add(n); return n; };
+    return lifted
+      .replace(/\*\*([\s\S]*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*([\s\S]*?)\*/g, '<em>$1</em>')
+      .replace(/~~([\s\S]*?)~~/g, '<del>$1</del>')
+      .replace(/!\[([^\]]*)\]\(([^)\s]+)[^)]*\)/g, (_, a, u) => `<img src="${escXml(u)}" alt="${escXml(a)}" loading="lazy">`)
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, u) => `<a href="${escXml(u)}">${t}</a>`)
+      .replace(/\u0000(\d+)\u0000/g, (_, n) => `<code>${codes[Number(n)]}</code>`);
+  };
 
   // Blockquoted fences ("> ```bash … > ```"): convert to a quoted code
   // block before line processing so the fence scanner sees clean fences.
@@ -255,6 +276,13 @@ function mdToHtmlFallback(md) {
   let list = null; // 'ul' | 'ol'
   let quote = null; // collected blockquote lines
   let table = null; // { head:[], rows:[][] }
+
+  const lines = src.split('\n');
+  const slugifyH = t => t.toLowerCase().replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'-');
+  let inQuoteFence = false, qfLang = '', qfBuf = [];
+  const usedIds = new Set();
+  const uniqId = t => { let id = slugifyH(t) || 'section'; let n = id; let k = 2;
+    while (usedIds.has(n)) n = id + '-' + k++; usedIds.add(n); return n; };
 
   const flushPara = () => {
     if (para.length) { out.push(`<p>${inline(para.join(' ').trim())}</p>`); para = []; }
@@ -364,7 +392,32 @@ function mdToHtmlFallback(md) {
   flushAll();
 
   let html = out.join('\n');
-  blocks.forEach((b, i) => { html = html.replace(`\u0000BLOCK${i}\u0000`, b); });
+  // A GLOBAL regex, not a string needle: `String.replace` with a string
+  // pattern replaces only the FIRST match, and one marker can occur more
+  // than once in a document. Left as-is, a second occurrence was
+  // substituted early and a later pass found nothing to replace, shipping
+  // a literal `\u0000BLOCKnn\u0000` (NUL bytes: invalid HTML, invisible to
+  // grep) into the page - 32 of them in shani-docs' kubernetes/security
+  // page on 2026-10-05. The throw is the backstop: a leaked marker must
+  // never reach a served page.
+  {
+    // Per index, as in shani-docs: a bare /\u0000BLOCK(\d+)\u0000/g matches
+    // EVERY marker, so substituting block 0 rewrote all of them with block
+    // 0's content. And a FUNCTION replacement, not a string: `$&`, `$1` and
+    // friends in shell text are replacement patterns.
+    for (let i = 0; i < blocks.length; i++) {
+      const MARK = new RegExp('\\u0000BLOCK' + i + '\\u0000', 'g');
+      html = html.replace(MARK, () => blocks[i]);
+    }
+    const MARK = /\u0000BLOCK(\d+)\u0000/g;
+    const leftover = html.match(MARK);
+    if (leftover) {
+      throw new Error(
+        `mdToHtmlFallback: ${leftover.length} unresolved code-block marker(s) ` +
+        `(${[...new Set(leftover)].slice(0, 5).join(', ')}) - the placeholder ` +
+        'substitution pass did not consume every marker');
+    }
+  }
   return html;
 }
 

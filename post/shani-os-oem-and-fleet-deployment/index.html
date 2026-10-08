@@ -236,7 +236,7 @@
       </header>
       <div class="post-body"><p>Managing a fleet of Linux desktops with traditional distributions is a problem of accumulation. Each machine starts identical. Over months, updates apply differently across different hardware. Local configuration changes accumulate. A package on machine A conflicts with a library on machine B. The fleet that was uniform on day one is a collection of unique, unmaintainable snowflakes by year two.</p>
 <p>Shani OS is designed to make this problem go away by architecture, not by tooling. Every machine pulls from the same GPG-verified, SHA256-checked image. Updates are atomic and all-or-nothing. Rollback requires no reimaging. The fleet stays uniform because the OS itself is replaced wholesale on each update — never patched in place.</p>
-<p>This post covers deployment, customisation, fleet management, and the security posture that matters for enterprise and OEM scenarios. Enterprise contact and OEM enquiries: <a href="https://shani.dev#enterprise">shani.dev — Enterprise & Vendors</a>.</p>
+<p>This post covers deployment, customisation, fleet management, and the security posture that matters for enterprise and OEM scenarios. Enterprise contact and OEM enquiries: <a href="https://shani.dev#enterprise">shani.dev — Enterprise &amp; Vendors</a>.</p>
 <hr>
 <h2 id="why-immutability-solves-fleet-management">Why Immutability Solves Fleet Management</h2>
 <p>Traditional fleet management tooling (Ansible, Puppet, Chef, Salt) solves a problem Shani OS makes unnecessary: reconciling the actual state of a mutable system with the desired state. You write playbooks to install packages, configure files, enable services, and fix drift. You run them on a schedule to keep machines in line. When something goes wrong, you debug why the machine diverged.</p>
@@ -407,7 +407,7 @@ ssh admin@machine-name.tailnet.ts.net 'sudo shani-deploy -r &amp;&amp; sudo rebo
 <hr>
 <h2 id="resources-and-contact">Resources and Contact</h2>
 <ul>
-<li><a href="https://shani.dev#enterprise">shani.dev — Enterprise & Vendors</a> — OEM partnerships and enterprise contact</li>
+<li><a href="https://shani.dev#enterprise">shani.dev — Enterprise &amp; Vendors</a> — OEM partnerships and enterprise contact</li>
 <li><a href="https://docs.shani.dev/doc/security">docs.shani.dev — Security</a> — full security documentation</li>
 <li><a href="https://docs.shani.dev/doc/updates/system">docs.shani.dev — System Updates</a> — update configuration reference</li>
 <li><a href="https://github.com/shani8dev">github.com/shani8dev</a> — source code, fully auditable</li>

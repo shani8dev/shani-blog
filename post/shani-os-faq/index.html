@@ -236,7 +236,7 @@
       </header>
       <div class="post-body"><p>Questions that come up repeatedly across the Telegram community and documentation, answered in one place.</p>
 <hr>
-<h2 id="installation-requirements">Installation & Requirements</h2>
+<h2 id="installation-requirements">Installation &amp; Requirements</h2>
 <p><strong>Does Shani OS require UEFI?</strong></p>
 <p>Yes. Legacy/CSM BIOS boot is not supported. Most PCs made after 2012 have UEFI. Check your BIOS settings — if you see options like Secure Boot and UEFI boot mode, you're fine.</p>
 <p><strong>Does it work on my hardware?</strong></p>
@@ -248,7 +248,7 @@
 <p><strong>Can I install it on a VM to try it out?</strong></p>
 <p>Yes. Shani OS includes guest tools for QEMU/KVM, VirtualBox, and VMware and they activate automatically. Give the VM at least 4 GB RAM and 40 GB disk.</p>
 <hr>
-<h2 id="updates-rollback">Updates & Rollback</h2>
+<h2 id="updates-rollback">Updates &amp; Rollback</h2>
 <p><strong>How do updates work?</strong></p>
 <p>Updates are applied atomically. <code>shani-deploy</code> downloads and verifies a new OS image, extracts it to the inactive slot, and sets it as the next-boot default. Your running system is never touched. If the new system has a problem, <code>sudo shani-deploy -r</code> rolls back. Full guide: <a href="https://blog.shani.dev/post/shani-os-updates">shani-os-updates</a>.</p>
 <p><strong>How often do updates come out?</strong></p>
@@ -283,7 +283,7 @@ distrobox-export --app some-app</code></pre>
 <p><strong>Does Homebrew work?</strong></p>
 <p>Yes, identically to macOS. It installs to <code>/home/linuxbrew/.linuxbrew</code>, completely outside the read-only root. Guide: <a href="https://blog.shani.dev/post/homebrew-on-shani-os">Homebrew on Shani OS</a>.</p>
 <hr>
-<h2 id="file-safety-data">File Safety & Data</h2>
+<h2 id="file-safety-data">File Safety &amp; Data</h2>
 <p><strong>Is my data safe during an OS update?</strong></p>
 <p>Yes. <code>shani-deploy</code> only writes to the inactive OS slot (<code>@blue</code> or <code>@green</code>). It never touches <code>@home</code>, <code>@flatpak</code>, <code>@nix</code>, <code>@containers</code>, or any other user data subvolume.</p>
 <p><strong>Does encryption work with the immutable model?</strong></p>
@@ -312,7 +312,7 @@ nix-collect-garbage -d        # remove old Nix generations</code></pre>
 <p><strong>Does NVIDIA work for gaming?</strong></p>
 <p>Yes, on every edition. NVIDIA drivers (<code>nvidia-open</code>) are pre-installed and configured. On Optimus laptops, <code>prime-run</code> and <code>nvidia-prime</code> handle GPU selection.</p>
 <hr>
-<h2 id="desktop-daily-use">Desktop & Daily Use</h2>
+<h2 id="desktop-daily-use">Desktop &amp; Daily Use</h2>
 <p><strong>Can I change system settings?</strong></p>
 <p>Yes. <code>/etc</code> is writable via OverlayFS — your configuration changes persist in the <code>@data</code> overlay across every OS update and rollback. Run <code>systemctl enable</code>, edit <code>/etc/ssh/sshd_config</code>, modify <code>/etc/hosts</code> — everything works exactly as on any Linux system.</p>
 <p><strong>Does it work offline?</strong></p>
@@ -322,7 +322,7 @@ nix-collect-garbage -d        # remove old Nix generations</code></pre>
 <p><strong>Does it work on a laptop?</strong></p>
 <p>Yes, with specific laptop features well-supported: hibernation configured automatically at install (swapfile sized to RAM, correct offset embedded in UKI), TPM2 auto-unlock for LUKS, <code>power-profiles-daemon</code> for battery/performance profiles, SOF firmware for Intel DSP audio on newer Intel laptops. Guide: <a href="https://blog.shani.dev/post/shani-os-power-management">Power Management on Shani OS</a>.</p>
 <hr>
-<h2 id="community-support">Community & Support</h2>
+<h2 id="community-support">Community &amp; Support</h2>
 <p><strong>Is Shani OS free?</strong></p>
 <p>Yes, fully free and open source. No accounts, no subscriptions, no paid tiers.</p>
 <p><strong>Where do I get help?</strong></p>

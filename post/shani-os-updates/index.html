@@ -234,7 +234,7 @@
           <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-05-12 · 12 min</span>
         </div>
       </header>
-      <div class="post-body"><p>Shani OS has two halves to its update pipeline, and they do different jobs. <strong>Shani Cassini's notification agent</strong> is the part that talks to you: a small background process that runs shortly after login and every two hours after that, reads the system's real state, and sends a desktop notification when an update is available, when a restart finishes an installed one, or when the last update failed to boot. <strong><code>shani-deploy</code></strong> is the engine that does the work: it downloads, verifies, and applies OS images. Cassini's <strong>Updates & Rollback</strong> page drives that engine, with <code>pkexec</code>, when you decide you want an update. Nothing is ever applied without you asking for it.</p>
+      <div class="post-body"><p>Shani OS has two halves to its update pipeline, and they do different jobs. <strong>Shani Cassini's notification agent</strong> is the part that talks to you: a small background process that runs shortly after login and every two hours after that, reads the system's real state, and sends a desktop notification when an update is available, when a restart finishes an installed one, or when the last update failed to boot. <strong><code>shani-deploy</code></strong> is the engine that does the work: it downloads, verifies, and applies OS images. Cassini's <strong>Updates &amp; Rollback</strong> page drives that engine, with <code>pkexec</code>, when you decide you want an update. Nothing is ever applied without you asking for it.</p>
 <p>For the architecture behind atomic updates — how blue/green slots, Btrfs, and boot counting work — see <a href="https://blog.shani.dev/post/shani-os-architecture-deep-dive">The Architecture Behind Shani OS</a>. For the philosophy: <a href="https://blog.shani.dev/post/why-os-updates-should-never-break">Why Your OS Update Should Never Break Your Computer</a>. Full reference: <a href="https://docs.shani.dev/doc/updates/system">docs.shani.dev — System Updates</a>.</p>
 <hr>
 <h2 id="shani-deploy-quick-reference">shani-deploy Quick Reference</h2>
@@ -275,7 +275,7 @@ journalctl --user -u shani-cassini-agent.service -n 50</code></pre>
 <p>For the notification side in more depth, see <a href="https://blog.shani.dev/post/shani-os-update-notifications">Update Notifications on Shani OS</a>.</p>
 <hr>
 <h2 id="part-2-shani-deploy-the-update-engine">Part 2 — shani-deploy: The Update Engine</h2>
-<p>Everything below is what actually moves the system. On a desktop, you reach it through Shani Cassini's <strong>Updates & Rollback</strong> page, which runs the same <code>shani-deploy</code> invocations through <code>pkexec</code> and streams the output back to you inside the page, wrapped in <code>systemd-inhibit</code> so the machine does not suspend mid-deployment. On a server or a headless box there is no page to click, so you run the commands yourself with <code>sudo</code>. The engine does not care which door you came through.</p>
+<p>Everything below is what actually moves the system. On a desktop, you reach it through Shani Cassini's <strong>Updates &amp; Rollback</strong> page, which runs the same <code>shani-deploy</code> invocations through <code>pkexec</code> and streams the output back to you inside the page, wrapped in <code>systemd-inhibit</code> so the machine does not suspend mid-deployment. On a server or a headless box there is no page to click, so you run the commands yourself with <code>sudo</code>. The engine does not care which door you came through.</p>
 <h3 id="how-shani-deploy-updates-itself">How shani-deploy Updates Itself</h3>
 <p>Before doing anything else, <code>shani-deploy</code> checks GitHub for a newer version of itself. If found, it re-executes with all current state preserved — so you always run the latest deployment logic. Use <code>--skip-self-update</code> to bypass this in network-restricted environments.</p>
 <h3 id="core-operations">Core Operations</h3>
@@ -336,7 +336,7 @@ cat /etc/shani-channel</code></pre>
 <li><strong>Successful boot:</strong> <code>bless-boot</code> calls <code>bootctl set-good</code>, the slot becomes the permanent default.</li>
 <li><strong>Failed boot:</strong> systemd-boot decrements the count on each attempt. After three failures it falls back to the previous slot automatically — no user action required, works even if the system can't reach the login prompt.</li>
 </ul>
-<p>On the next successful login, Shani Cassini's agent notices the recorded failure and sends a notification telling you the updated slot did not start. Cleaning the failed slot up is then a rollback from the <strong>Updates & Rollback</strong> page, or <code>sudo shani-deploy -r</code>.</p>
+<p>On the next successful login, Shani Cassini's agent notices the recorded failure and sends a notification telling you the updated slot did not start. Cleaning the failed slot up is then a rollback from the <strong>Updates &amp; Rollback</strong> page, or <code>sudo shani-deploy -r</code>.</p>
 <hr>
 <h2 id="understanding-slot-state-files">Understanding Slot State Files</h2>
 <pre><code class="language-bash"># Active slot

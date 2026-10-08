@@ -381,7 +381,7 @@ systemctl list-unit-files --state=enabled | grep -v &quot;systemd\|dbus\|getty&q
 <pre><code class="language-bash">shani-health</code></pre>
 <p>This shows slot state, storage usage, service health, and filesystem status in one place.</p>
 <h3 id="know-how-updates-work">Know How Updates Work</h3>
-<p>Updates work without you thinking about them. Shani Cassini's background agent checks shortly after login and every couple of hours after that; when a new OS image is available, a notification appears. You apply it from Shani Cassini's Updates & Rollback page, or with <code>sudo shani-deploy</code> on a headless machine, reboot when ready, and if anything is wrong, <code>sudo shani-deploy -r</code> undoes it.</p>
+<p>Updates work without you thinking about them. Shani Cassini's background agent checks shortly after login and every couple of hours after that; when a new OS image is available, a notification appears. You apply it from Shani Cassini's Updates &amp; Rollback page, or with <code>sudo shani-deploy</code> on a headless machine, reboot when ready, and if anything is wrong, <code>sudo shani-deploy -r</code> undoes it.</p>
 <p>Your apps (Flatpak, Nix, containers) update independently on their own schedules and are never affected by OS updates.</p>
 <h3 id="keep-a-note-of-your-setup">Keep a Note of Your Setup</h3>
 <p>Write down which Flatpak apps you installed, any Nix packages, and any Distrobox containers you created. If you ever reinstall, this list gets you back to a working setup in 30 minutes. Your actual files in <code>@home</code> always survive, but knowing what tools you had is useful.</p>

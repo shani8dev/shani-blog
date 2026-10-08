@@ -257,7 +257,7 @@ sudo shani-deploy --list-backups         # list available rollback backups with 
 sudo shani-deploy --channel-status       # show latest/stable versions available remotely</code></pre>
 <hr>
 <h2 id="update-notifications">Update Notifications</h2>
-<p>Shani Cassini's background notification agent is the part that talks to you. It runs as a systemd user service shortly after login and every two hours after that, reads <code>shani-deploy --status --check --json</code> (read-only, no root), and sends a desktop notification when an update is available, when a restart finishes an installed update, or when the last boot of an updated system failed. It never applies an update and never shows a dialog. On a desktop, applying one is an explicit action from Cassini's <strong>Updates & Rollback</strong> page, which drives this same engine through <code>pkexec</code>. See <a href="https://blog.shani.dev/post/shani-os-update-notifications">Update Notifications on Shani OS</a> for the full details.</p>
+<p>Shani Cassini's background notification agent is the part that talks to you. It runs as a systemd user service shortly after login and every two hours after that, reads <code>shani-deploy --status --check --json</code> (read-only, no root), and sends a desktop notification when an update is available, when a restart finishes an installed update, or when the last boot of an updated system failed. It never applies an update and never shows a dialog. On a desktop, applying one is an explicit action from Cassini's <strong>Updates &amp; Rollback</strong> page, which drives this same engine through <code>pkexec</code>. See <a href="https://blog.shani.dev/post/shani-os-update-notifications">Update Notifications on Shani OS</a> for the full details.</p>
 <p><code>shani-deploy</code> is the lower-level tool that does the actual work: download, verify, extract, and stage the new image. You can run it directly at any time:</p>
 <pre><code class="language-bash">sudo shani-deploy</code></pre>
 <hr>
@@ -410,7 +410,7 @@ WantedBy=timers.target</code></pre>
 <li>If the new slot fails to boot, systemd-boot decrements the boot count on each attempt. After three failed attempts, systemd-boot automatically falls back to the previous slot.</li>
 </ul>
 <p>This fallback requires no user action and works even when the system cannot reach a login prompt.</p>
-<p>On the next successful login, Shani Cassini's agent notices the recorded failure and notifies you that the updated slot did not start. Rolling the failed slot back — from the <strong>Updates & Rollback</strong> page, or with <code>sudo shani-deploy -r</code> — is then an explicit step you take, so the slot is clean for the next deployment.</p>
+<p>On the next successful login, Shani Cassini's agent notices the recorded failure and notifies you that the updated slot did not start. Rolling the failed slot back — from the <strong>Updates &amp; Rollback</strong> page, or with <code>sudo shani-deploy -r</code> — is then an explicit step you take, so the slot is clean for the next deployment.</p>
 <hr>
 <h2 id="understanding-the-slot-files">Understanding the Slot Files</h2>
 <pre><code class="language-bash"># Which slot is currently active (written by shani-deploy after a successful update)

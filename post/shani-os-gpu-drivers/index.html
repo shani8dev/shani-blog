@@ -236,7 +236,7 @@
       </header>
       <div class="post-body"><p>Ask any long-time Linux desktop user about graphics drivers and you will hear war stories: the kernel update that landed before the NVIDIA module was ready, the DKMS build that silently failed at 2 AM, the <code>.run</code> installer that half-wrote into <code>/usr</code> and left the system unbootable after the next kernel bump.</p>
 <p>On Shanios, those stories cannot happen. Not because we are careful — because the architecture makes them impossible. This post explains how GPU drivers work on an immutable, image-based OS, and why driver anxiety is one of the first things that dies when you switch.</p>
-<p>Full reference: <a href="https://docs.shani.dev/doc/system/gpu">GPU & Graphics Drivers</a>.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/system/gpu">GPU &amp; Graphics Drivers</a>.</p>
 <hr>
 <h2 id="everything-ships-in-the-signed-image">Everything Ships in the Signed Image</h2>
 <p>Every driver your hardware needs is inside the signed OS image: kernel modules, Mesa userspace, NVIDIA userland, and GPU firmware from <code>linux-firmware</code>. There is no driver installation step. There is nothing to download after setup, no AUR package to babysit, no DKMS hook waiting for your next kernel update.</p>
@@ -281,7 +281,7 @@ __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia &lt;app&gt;</code><
 <p>That is the whole pitch in one anecdote: your GPU stack is never half-updated, so it never needs rescuing.</p>
 <h2 id="resources">Resources</h2>
 <ul>
-<li><a href="https://docs.shani.dev/doc/system/gpu">GPU & Graphics Drivers — docs</a> — full driver reference, verification commands, troubleshooting table</li>
+<li><a href="https://docs.shani.dev/doc/system/gpu">GPU &amp; Graphics Drivers — docs</a> — full driver reference, verification commands, troubleshooting table</li>
 <li><a href="https://blog.shani.dev/post/gpu-compute-on-shani-os">GPU Compute on Shani OS</a> — CUDA via Distrobox, ROCm, oneAPI</li>
 <li><a href="https://blog.shani.dev/post/shani-os-gaming-deep-dive">Gaming on Shani OS</a> — Proton, MangoHud, and the pre-installed gaming stack</li>
 <li><a href="https://blog.shani.dev/post/shani-os-virtual-machines">Virtual Machines on Shani OS</a> — VFIO GPU passthrough for dedicated VMs</li>

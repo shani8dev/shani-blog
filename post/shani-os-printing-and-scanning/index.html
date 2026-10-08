@@ -236,7 +236,7 @@
       </header>
       <div class="post-body"><p>Shani OS ships a comprehensive printing and scanning stack that handles most modern hardware without any driver installation. The CUPS print system, <code>ipp-usb</code> for driverless USB printing, <code>sane-airscan</code> for driverless network scanning, and manufacturer-specific drivers for HP, Brother, and Canon are all pre-installed.</p>
 <p>Printer and scanner configuration persists across every OS update and rollback via bind mounts from <code>@data</code> — you set up your printer once and it stays set up forever.</p>
-<p>Full reference: <a href="https://docs.shani.dev/doc/system/printing">docs.shani.dev — Printing & Scanning</a>.</p>
+<p>Full reference: <a href="https://docs.shani.dev/doc/system/printing">docs.shani.dev — Printing &amp; Scanning</a>.</p>
 <hr>
 <h2 id="driverless-printing-most-modern-printers">Driverless Printing (Most Modern Printers)</h2>
 <p>Any printer manufactured after roughly 2016 that supports IPP Everywhere (AirPrint, Mopria) works without any driver installation. Plug in via USB or connect to your network and CUPS discovers it automatically.</p>
@@ -397,7 +397,7 @@ sudo scanimage -L
 # If found with sudo but not as user, add yourself to the scanner group
 # (Shani OS does this automatically for new users, but check)
 groups | grep scanner</code></pre>
-<p>Full troubleshooting reference: <a href="https://docs.shani.dev/doc/system/printing">docs.shani.dev — Printing & Scanning</a>.</p>
+<p>Full troubleshooting reference: <a href="https://docs.shani.dev/doc/system/printing">docs.shani.dev — Printing &amp; Scanning</a>.</p>
 <hr>
 <h2 id="persistence-across-updates">Persistence Across Updates</h2>
 <p>CUPS printer configuration lives in <code>/var/lib/cups/</code> and <code>/etc/cups/</code>. Both persist via Shani OS's bind mount system:</p>
@@ -410,7 +410,7 @@ groups | grep scanner</code></pre>
 <h2 id="resources">Resources</h2>
 <ul>
 <li><a href="https://blog.shani.dev/post/shani-os-troubleshooting-guide">Shani OS Troubleshooting Guide</a> — when things go wrong</li>
-<li><a href="https://docs.shani.dev/doc/system/printing">docs.shani.dev — Printing & Scanning</a> — troubleshooting reference</li>
+<li><a href="https://docs.shani.dev/doc/system/printing">docs.shani.dev — Printing &amp; Scanning</a> — troubleshooting reference</li>
 <li><a href="https://www.cups.org/documentation.html">CUPS documentation</a></li>
 <li><a href="https://t.me/shani8dev">Telegram community</a></li>
 </ul>

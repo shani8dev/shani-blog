@@ -198,12 +198,28 @@ in shani-docs/shani-install-media/shani-deploy/shani-builder.*
   but not img-src, so every page load logged a CSP violation. Added to
   `index.html`'s CSP; `node generate-manifest.js` carried it into all 60
   stubs (diff: the CSP line, `feed.xml`'s build date, `sw.js`'s cache name).
-- **An ad that fills taller than its slot still shifts a post page (open).**
+- **An ad that fills taller than its slot still shifts a post page (open —
+  the fix is known, measured, and deliberately NOT applied).**
   `.ad-unit` reserves 90px; an observed AdSense fill was 280px (CLS 0.141 on
   that load, 0.001 when the ad did not fill). Reserving 280px leaves a blank
   box when AdSense does not fill, and collapsing unfilled slots moves the
   shift instead - a decision about ad space, not a mechanical fix. CI's CLS
   budget is 0.25 for this reason.
+  **Measured 2026-10-05, in a real browser, both ways.** Raising
+  `min-height` to 280px **did** fix the shift: `RESULT perf PASS (LCP 600 ms,
+  CLS 0.000)` against `CLS 0.001` before — but it also made the unit fill
+  often enough that AdSense's `pagead/gen_204` pixel loads, and
+  `web-check.yml` runs with `--offline`, so that pixel fails
+  `net::ERR_FAILED` and takes **`color-scheme desktop` and
+  `reduced-motion desktop`** red with it (109/111 instead of 111/111). Both
+  failures are the same blocked third-party request, reported by two checks
+  that were green immediately before the change.
+  So the fix needs a second decision, and it is yours: add
+  `gen_204|pagead2` to the workflow's `ignore` regex (which is what the two
+  existing ad-related ignores already do, but it widens what CI tolerates on
+  the one page that earns money), or turn `--offline` off for the blog and
+  accept CI depending on Google's availability. Left at 90px with the
+  reasoning recorded in `style.css`, so neither change is lost.
 - **With JavaScript off the page is the loader forever (open, pre-existing).**
   `#page-loader` is `position: fixed` over everything at z-index 9999, so the
   `<noscript>` "JavaScript is required" message is underneath it.
@@ -212,6 +228,40 @@ in shani-docs/shani-install-media/shani-deploy/shani-builder.*
   and `PerformanceIssue DocumentCookie` (`document.cookie` appears nowhere in
   this repo's JS). Named in web-check.yml's `ignore`; nothing else is.
 
+- **The shared `generate-manifest.js` carried three latent generator bugs —
+  FIXED here (2026-10-05); the docs copy had all three LIVE.** This file is
+  copy-pasted from `shani-docs`, so a fix belongs in both (see "Cross-repo
+  impact"). Found by running html5lib over both generated trees:
+  - **`blocks.forEach((b, i) => { html = html.replace(`\u0000BLOCK${i}\u0000`, b); })`
+    replaced only the FIRST occurrence of each marker** — `String.replace`
+    with a string pattern is not global, and a code-block marker can occur
+    more than once in one post. On `shani-docs` this shipped **32 literal
+    `\x00BLOCKnn\x00` placeholders** (NUL bytes: invalid HTML, invisible to
+    grep) into `servers/kubernetes/security`, plus 1 each in two siblings.
+    **This repo's 60 posts did not trigger it** (0 leaked markers measured
+    before and after), so it was latent here rather than live — a future post
+    with two adjacent fenced blocks would have tripped it. Now a global
+    regex, with a `throw` if any marker survives.
+  - **`inline()` never escaped plain text**, so a bare `&` or `<` in prose
+    reached the page verbatim. Latent here too (the blog's tables are small),
+    live on docs (25 rows).
+  - **`inline()` applied emphasis rules to a string that already contained
+    `<code>` markup**, so a `*` inside a code span could pair with a `*`
+    outside it (`enp*`/`wlp*` → `<code>enp<em></code>/<code>wlp</em></code>`).
+    Now code spans are lifted out as **index** placeholders, emphasis runs
+    over the joined string, and they are released last. **Three orderings
+    were each tried on the docs copy and each shipped something wrong** — the
+    exact history and the reasoning are in `shani-docs/AGENTS.md`; do not
+    "simplify" this without reading it.
+  Verified here: 60 posts regenerate with **0 changed post stubs** (only
+  `feed.xml`'s wall-clock `lastBuildDate` and `sw.js`'s daily cache stamp
+  move, both by design), 63 pages with **0 parse errors and 0 control
+  characters**, 122 JSON-LD blocks parse, 1764 `<code>` elements, **0 empty
+  `<strong>`/`<em>`**, and `post/` byte-identical on a rerun.
+  **This repo has no `tests/` directory and its CI has no content-validation
+  step at all** — `build-manifest.yml` only regenerates. The equivalent
+  html5lib + duplicate-title gate that now runs on docs is the obvious next
+  addition here.
 - **`generate-manifest.js` date parsing was timezone-dependent — FIXED
   (2026-09-18).** `new Date(post.date + 'T00:00:00')` (no `Z`/offset) is
   parsed as **local time** per the ECMAScript spec, not UTC — unlike a

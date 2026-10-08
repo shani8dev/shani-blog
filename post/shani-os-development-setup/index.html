@@ -295,7 +295,7 @@ WantedBy=default.target</code></pre>
 <p>VS Code's Dev Containers extension speaks Docker, but it happily speaks Podman too:</p>
 <pre><code class="language-bash">systemctl --user enable --now podman.socket
 echo $XDG_RUNTIME_DIR/podman/podman.sock   # /run/user/1000/podman/podman.sock</code></pre>
-<p>Point the extension at Podman with <code>&quot;dev.containers.dockerPath&quot;: &quot;podman&quot;</code> in <code>settings.json</code>, or export the socket for any Docker-API client: <code>DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock</code>. After that, "Reopen in Container" builds and runs entirely rootless — no Docker daemon, no root, no conflict with immutability at all.</p>
+<p>Point the extension at Podman with <code>"dev.containers.dockerPath": "podman"</code> in <code>settings.json</code>, or export the socket for any Docker-API client: <code>DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock</code>. After that, "Reopen in Container" builds and runs entirely rootless — no Docker daemon, no root, no conflict with immutability at all.</p>
 <hr>
 <h2 id="what-you-cannot-do-honesty-section">What You Cannot Do (Honesty Section)</h2>
 <p>Three things, stated plainly:</p>

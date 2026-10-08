@@ -290,7 +290,7 @@ kubectl get nodes</code></pre>
   nixpkgs.argocd nixpkgs.fluxcd nixpkgs.velero nixpkgs.kubeseal \
   nixpkgs.cilium-cli nixpkgs.hubble nixpkgs.krew nixpkgs.helmfile \
   nixpkgs.cosign nixpkgs.trivy nixpkgs.linkerd</code></pre>
-<p>A note: <code>k9s</code> on Snap is unmaintained — always install it via Nix. <code>kubectl</code> and <code>helm</code> are available via Snap as a fallback if needed. The <a href="https://docs.shani.dev/doc/servers/kubernetes/overview#disk-layout--cli-tools">Disk Layout & CLI Tools section</a> also covers the krew plugin manager, which gives you <code>kubectl ctx</code>, <code>kubectl ns</code>, <code>kubectl tree</code>, <code>kubectl df-pv</code>, and a handful of other plugins that make daily operations much faster.</p>
+<p>A note: <code>k9s</code> on Snap is unmaintained — always install it via Nix. <code>kubectl</code> and <code>helm</code> are available via Snap as a fallback if needed. The <a href="https://docs.shani.dev/doc/servers/kubernetes/overview#disk-layout--cli-tools">Disk Layout &amp; CLI Tools section</a> also covers the krew plugin manager, which gives you <code>kubectl ctx</code>, <code>kubectl ns</code>, <code>kubectl tree</code>, <code>kubectl df-pv</code>, and a handful of other plugins that make daily operations much faster.</p>
 <hr>
 <h2 id="networking-why-cilium">Networking: Why Cilium</h2>
 <p>k3s ships with Flannel as its default CNI. Flannel works, but it's L3-only with no observability and no policy beyond basic NetworkPolicy. The recommended stack replaces it with <strong>Cilium</strong> — and also replaces kube-proxy entirely.</p>
@@ -317,7 +317,7 @@ spec:
               - method: GET
                 path: /api/.*</code></pre>
 <p>For bare-metal LoadBalancer services (so you get real IPs, not just NodePort), Cilium's built-in <code>CiliumLoadBalancerIPPool</code> + <code>CiliumL2AnnouncementPolicy</code> handles simple homelab setups without MetalLB.</p>
-<p>Everything — Cilium install values, WireGuard config, Hubble setup, Flannel migration, L7 policies, DNS-aware egress policies, and firewall ports for multi-node clusters — is in the <a href="https://docs.shani.dev/doc/servers/kubernetes/networking#networking--ingress">Networking & Ingress section</a>.</p>
+<p>Everything — Cilium install values, WireGuard config, Hubble setup, Flannel migration, L7 policies, DNS-aware egress policies, and firewall ports for multi-node clusters — is in the <a href="https://docs.shani.dev/doc/servers/kubernetes/networking#networking--ingress">Networking &amp; Ingress section</a>.</p>
 <hr>
 <h2 id="ingress-the-gateway-api">Ingress: The Gateway API</h2>
 <p>The Kubernetes <code>Ingress</code> resource is being superseded by the <strong>Gateway API</strong>, and the recommended ingress controller for this stack is <strong>NGINX Gateway Fabric (NGF)</strong> — NGINX's native Gateway API implementation with no annotations, clean HTTPRoute/GRPCRoute resources, and per-route policies for rate limiting, timeouts, and OpenTelemetry tracing.</p>
@@ -326,7 +326,7 @@ spec:
                    → HTTP → localhost:30080 (NGF NodePort)
                               → HTTPRoute → application pods</code></pre>
 <p>This keeps TLS management in Caddy (where it integrates with your internal CA or Let's Encrypt via <code>tls internal</code>) and keeps Kubernetes ingress configuration clean. The one thing to remember: always add <code>header_up Host {host}</code> in your Caddy <code>reverse_proxy</code> block, otherwise NGF gets <code>localhost</code> as the Host header and can't match any HTTPRoute.</p>
-<p>The <a href="https://docs.shani.dev/doc/servers/kubernetes/networking#nginx-gateway-fabric-ngf">Networking & Ingress section</a> has the full NGF install, NodePort patch, Gateway/HTTPRoute/GRPCRoute examples, ReferenceGrant setup for cross-namespace routing, and NGF version compatibility matrix.</p>
+<p>The <a href="https://docs.shani.dev/doc/servers/kubernetes/networking#nginx-gateway-fabric-ngf">Networking &amp; Ingress section</a> has the full NGF install, NodePort patch, Gateway/HTTPRoute/GRPCRoute examples, ReferenceGrant setup for cross-namespace routing, and NGF version compatibility matrix.</p>
 <hr>
 <h2 id="tls-cert-manager">TLS: cert-manager</h2>
 <p>cert-manager handles certificate provisioning and renewal automatically. Point it at Let's Encrypt for public domains, your internal Step-CA for <code>*.home.local</code>, or Cloudflare DNS-01 for wildcard certs:</p>
@@ -347,7 +347,7 @@ helm upgrade --install longhorn longhorn/longhorn \
   --set defaultSettings.defaultReplicaCount=2</code></pre>
 <p>For workloads that need <code>ReadWriteMany</code> (multiple pods on different nodes sharing one volume), the NFS Subdir External Provisioner is the simplest path in a homelab. For production-grade distributed storage with S3-compatible object storage and CephFS, <strong>Rook-Ceph</strong> is the answer.</p>
 <p><strong>MinIO</strong> deserves a mention here too: it's the self-hosted S3 replacement used as the backend for Velero backups, Loki log storage, and Tempo trace storage. Light enough to run in-cluster, compatible with every AWS S3 SDK.</p>
-<p>Full setup for all of these — including how to set Longhorn as the default StorageClass, PVC resize, and the Caddy reverse proxy entries for each UI — is in the <a href="https://docs.shani.dev/doc/servers/kubernetes/storage#storage">Storage</a>, <a href="https://docs.shani.dev/doc/servers/kubernetes/storage#nfs--shared-storage">NFS & Shared Storage</a>, and <a href="https://docs.shani.dev/doc/servers/kubernetes/storage#minio-self-hosted-s3">MinIO</a> sections.</p>
+<p>Full setup for all of these — including how to set Longhorn as the default StorageClass, PVC resize, and the Caddy reverse proxy entries for each UI — is in the <a href="https://docs.shani.dev/doc/servers/kubernetes/storage#storage">Storage</a>, <a href="https://docs.shani.dev/doc/servers/kubernetes/storage#nfs--shared-storage">NFS &amp; Shared Storage</a>, and <a href="https://docs.shani.dev/doc/servers/kubernetes/storage#minio-self-hosted-s3">MinIO</a> sections.</p>
 <hr>
 <h2 id="security-the-minimum-you-actually-need">Security: The Minimum You Actually Need</h2>
 <p>A cluster that accepts any workload without policy is a liability. These are the tools that matter:</p>
@@ -355,10 +355,10 @@ helm upgrade --install longhorn longhorn/longhorn \
 <pre><code class="language-bash">kubectl label namespace myapp \
   pod-security.kubernetes.io/enforce=restricted \
   pod-security.kubernetes.io/enforce-version=latest</code></pre>
-<p><strong>Kyverno</strong> is the policy engine for everything else — written as YAML CRDs, no Rego required. Use it to require resource limits on all pods, block privileged containers, enforce image signing, and auto-generate a default-deny NetworkPolicy for every new namespace you label as <code>managed: &quot;true&quot;</code>. It's simpler than OPA/Gatekeeper for most teams and integrates cleanly with the rest of this stack.</p>
+<p><strong>Kyverno</strong> is the policy engine for everything else — written as YAML CRDs, no Rego required. Use it to require resource limits on all pods, block privileged containers, enforce image signing, and auto-generate a default-deny NetworkPolicy for every new namespace you label as <code>managed: "true"</code>. It's simpler than OPA/Gatekeeper for most teams and integrates cleanly with the rest of this stack.</p>
 <p><strong>Falco</strong> watches every syscall via eBPF and fires alerts when something unexpected happens at runtime — a shell spawned inside a container, an unexpected outbound connection, a privilege escalation attempt. It integrates with Falcosidekick to route alerts to Slack, ntfy, or PagerDuty.</p>
 <p>For secrets: never put plaintext values in YAML, even in private repos. <strong>Sealed Secrets</strong> encrypts secrets for safe Git storage — the in-cluster controller decrypts them at apply time. <strong>External Secrets Operator</strong> syncs secrets from OpenBao, Infisical, HashiCorp Vault, or any major cloud secrets manager into native Kubernetes <code>Secret</code> objects on a refresh interval. The wiki has the full setup for both, including a ClusterSecretStore for OpenBao and Infisical.</p>
-<p>The <a href="https://docs.shani.dev/doc/servers/kubernetes/security#security--policy">Security & Policy section</a> covers RBAC, PSA, SecurityContext hardening, Kyverno, OPA/Gatekeeper, and Falco. The <a href="https://docs.shani.dev/doc/servers/kubernetes/security#secrets-management">Secrets Management section</a> covers Sealed Secrets and ESO with full YAML for multiple backends.</p>
+<p>The <a href="https://docs.shani.dev/doc/servers/kubernetes/security#security--policy">Security &amp; Policy section</a> covers RBAC, PSA, SecurityContext hardening, Kyverno, OPA/Gatekeeper, and Falco. The <a href="https://docs.shani.dev/doc/servers/kubernetes/security#secrets-management">Secrets Management section</a> covers Sealed Secrets and ESO with full YAML for multiple backends.</p>
 <hr>
 <h2 id="gitops-the-operational-model-that-makes-this-all-manageable">GitOps: The Operational Model That Makes This All Manageable</h2>
 <p>Running Kubernetes without GitOps is painful. You apply manifests manually, you lose track of what's running, rollbacks are scary because you're not sure what state you were in. With GitOps, Git becomes the source of truth for cluster state. Changes are commits. Rollbacks are <code>git revert</code>. Every deployment is auditable.</p>
@@ -382,7 +382,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
 <p>Then point an <code>Application</code> CRD at your manifests repo and set <code>syncPolicy.automated</code>. From that point, every commit to the manifests repo automatically deploys. The App-of-Apps pattern lets a single root Application manage a directory of child Applications — one for each service, one for monitoring, one for ingress. The ApplicationSet resource generates Applications dynamically from a Git directory listing or a list of clusters.</p>
 <p><strong>Flux CD</strong> is the alternative if you prefer a CLI-first approach with tighter Helm and Kustomize integration and no separate UI. Both are excellent; choose based on your team's preferences.</p>
 <p><strong>Kargo</strong> sits between CI and ArgoCD and adds ordered promotion pipelines: a new image tag can only move from dev → staging → prod after each stage passes a verification step. Approval gates, rollback, and multi-source freight tracking are all built in.</p>
-<p>The <a href="https://docs.shani.dev/doc/servers/kubernetes/gitops#gitops--continuous-delivery">GitOps & Continuous Delivery section</a> covers ArgoCD, Flux, Kargo, Kustomize overlays for multi-environment config, and Flux Image Automation. The <a href="https://docs.shani.dev/doc/servers/kubernetes/gitops#advanced-gitops-patterns">Advanced GitOps Patterns section</a> covers App-of-Apps, ApplicationSets, and Flux HelmRelease/Kustomization CRDs.</p>
+<p>The <a href="https://docs.shani.dev/doc/servers/kubernetes/gitops#gitops--continuous-delivery">GitOps &amp; Continuous Delivery section</a> covers ArgoCD, Flux, Kargo, Kustomize overlays for multi-environment config, and Flux Image Automation. The <a href="https://docs.shani.dev/doc/servers/kubernetes/gitops#advanced-gitops-patterns">Advanced GitOps Patterns section</a> covers App-of-Apps, ApplicationSets, and Flux HelmRelease/Kustomization CRDs.</p>
 <hr>
 <h2 id="progressive-delivery-canaries-without-the-fear">Progressive Delivery: Canaries Without the Fear</h2>
 <p>The four deployment strategies, in brief:</p>
@@ -426,7 +426,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
 <p><strong>Velero</strong> backs up namespace resources and PVC data to S3 (MinIO works perfectly as the backend). A scheduled backup runs daily at 2 AM and keeps 30 days of history. Restore to a different namespace for migration testing.</p>
 <p><strong>etcd snapshots</strong> (k3s has this built in) capture the full cluster state independent of Velero:</p>
 <pre><code class="language-bash">sudo k3s etcd-snapshot save --name homelab-$(date +%Y%m%d)</code></pre>
-<p>Run both. Velero for individual namespace restores and migrations, etcd snapshots for full cluster disaster recovery. The <a href="https://docs.shani.dev/doc/servers/kubernetes/operations#backup--disaster-recovery">Backup & Disaster Recovery section</a> has the Velero install, scheduled backup Schedule CRDs, and restore commands.</p>
+<p>Run both. Velero for individual namespace restores and migrations, etcd snapshots for full cluster disaster recovery. The <a href="https://docs.shani.dev/doc/servers/kubernetes/operations#backup--disaster-recovery">Backup &amp; Disaster Recovery section</a> has the Velero install, scheduled backup Schedule CRDs, and restore commands.</p>
 <hr>
 <h2 id="the-hardening-checklist">The Hardening Checklist</h2>
 <p>Before calling a cluster production-ready, run through this. The <a href="https://docs.shani.dev/doc/servers/kubernetes/security#cluster-hardening">Cluster Hardening section</a> has the <code>kube-bench</code> commands and the full checklist with tooling references:</p>
@@ -450,24 +450,24 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
 <ul>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/overview#key-concepts">Key Concepts</a> — control plane, etcd, pod lifecycle, RBAC, probes, GitOps mental model, DORA metrics</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/overview#distributions">Distributions</a> — k3s, k0s, MicroK8s, minikube, kind, RKE2, Talos, kubeadm, Cluster API</li>
-<li><a href="https://docs.shani.dev/doc/servers/kubernetes/networking#networking--ingress">Networking & Ingress</a> — Cilium, MetalLB, Gateway API, NGF, L7 policies</li>
+<li><a href="https://docs.shani.dev/doc/servers/kubernetes/networking#networking--ingress">Networking &amp; Ingress</a> — Cilium, MetalLB, Gateway API, NGF, L7 policies</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/networking#dns">DNS</a> — CoreDNS customization, ndots, ExternalDNS</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/storage#storage">Storage</a> — Longhorn, Rook-Ceph, NFS, MinIO, PVC resize</li>
-<li><a href="https://docs.shani.dev/doc/servers/kubernetes/security#security--policy">Security & Policy</a> — RBAC, PSA, Kyverno, OPA/Gatekeeper, Falco</li>
+<li><a href="https://docs.shani.dev/doc/servers/kubernetes/security#security--policy">Security &amp; Policy</a> — RBAC, PSA, Kyverno, OPA/Gatekeeper, Falco</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/security#secrets-management">Secrets Management</a> — Sealed Secrets, ESO with OpenBao/Infisical</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/workloads#workload-patterns">Workload Patterns</a> — Init containers, StatefulSets, Jobs, CronJobs, PDBs, affinity, lifecycle hooks</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/workloads#autoscaling">Autoscaling</a> — HPA, KEDA, Karpenter, Goldilocks</li>
-<li><a href="https://docs.shani.dev/doc/servers/kubernetes/gitops#gitops--continuous-delivery">GitOps & Continuous Delivery</a> — ArgoCD, Flux, Kargo, Kustomize</li>
+<li><a href="https://docs.shani.dev/doc/servers/kubernetes/gitops#gitops--continuous-delivery">GitOps &amp; Continuous Delivery</a> — ArgoCD, Flux, Kargo, Kustomize</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/gitops#progressive-delivery">Progressive Delivery</a> — Argo Rollouts canary/blue-green</li>
-<li><a href="https://docs.shani.dev/doc/servers/kubernetes/gitops#in-cluster-cicd--build">In-Cluster CI/CD & Build</a> — Tekton, Kaniko, Argo Workflows</li>
+<li><a href="https://docs.shani.dev/doc/servers/kubernetes/gitops#in-cluster-cicd--build">In-Cluster CI/CD &amp; Build</a> — Tekton, Kaniko, Argo Workflows</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/security#image-supply-chain-security">Image Supply Chain Security</a> — Harbor, Cosign, Trivy, Zot</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/observability#observability">Observability</a> — Prometheus, Loki, Alloy, OTel, Tempo, OpenCost, DORA</li>
-<li><a href="https://docs.shani.dev/doc/servers/kubernetes/troubleshooting#alerting--on-call">Alerting & On-Call</a> — AlertManager, PrometheusRule, ServiceMonitor, Grafana OnCall</li>
+<li><a href="https://docs.shani.dev/doc/servers/kubernetes/troubleshooting#alerting--on-call">Alerting &amp; On-Call</a> — AlertManager, PrometheusRule, ServiceMonitor, Grafana OnCall</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/networking#service-mesh">Service Mesh</a> — Linkerd mTLS, ServiceProfile, traffic splitting</li>
-<li><a href="https://docs.shani.dev/doc/servers/kubernetes/operations#backup--disaster-recovery">Backup & Disaster Recovery</a> — Velero, etcd snapshots</li>
+<li><a href="https://docs.shani.dev/doc/servers/kubernetes/operations#backup--disaster-recovery">Backup &amp; Disaster Recovery</a> — Velero, etcd snapshots</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/operations#platform-engineering">Platform Engineering</a> — Crossplane, LitmusChaos, Keptn, Golden Paths, Port</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/operations#operator-pattern--custom-resources">Operator Pattern</a> — CloudNativePG, Strimzi Kafka, Redis Operator</li>
-<li><a href="https://docs.shani.dev/doc/servers/kubernetes/operations#multi-tenancy--audit">Multi-Tenancy & Audit</a> — vCluster, audit logging, LogQL queries</li>
+<li><a href="https://docs.shani.dev/doc/servers/kubernetes/operations#multi-tenancy--audit">Multi-Tenancy &amp; Audit</a> — vCluster, audit logging, LogQL queries</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/operations#helm--advanced-usage">Helm — Advanced Usage</a> — Helmfile, OCI charts, schema validation</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/operations#multi-cluster">Multi-Cluster</a> — Admiralty, Submariner</li>
 <li><a href="https://docs.shani.dev/doc/servers/kubernetes/operations#kubectl-power-usage">kubectl Power Usage</a> — JSONPath, patch patterns, one-liners</li>
