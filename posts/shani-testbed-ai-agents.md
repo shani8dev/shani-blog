@@ -133,7 +133,7 @@ emergency mode : 0
 verify-boot PASSED for @blue
 ```
 
-On my last blue boot it printed 13 — not a typo. Those are `[FAILED]` lines from audit units retrying because a container has no audit subsystem, and `verify-boot` still passes: the verdict is the target and emergency-mode lines, and the count is a warning to review. `boot-health` is the check that separates the expected failures from a real one.
+On my last blue boot it printed 13 — not a typo. Twelve are `[FAILED]` lines from the two audit units retrying (a container has no audit subsystem) and one is `/var/log` failing to unmount at shutdown, and `verify-boot` still passes: the verdict is the target and emergency-mode lines, and the count is a warning to review. `boot-health` is the check that separates the expected failures from a real one.
 
 To watch a boot instead, run `../shani-testbed/testbed watch` on the host and open `http://127.0.0.1:8090/`: it live-tails the newest console log. If the log does not explain a failure, ask systemd directly:
 
@@ -404,6 +404,12 @@ One practical consequence of the design: an agent is just another client of the 
 To see whether it actually works, I gave Claude Code a plain-English task and nothing else:
 
 > Boot the blue slot headless and check it reached its target. Start shani-cassini with recording on. Open "Updates & Rollback" using the accessibility tree, not pixel guessing, and confirm it with a screenshot. Run the accessibility lint. Stop the app and report what you verified.
+
+Here is the whole run - the agent's real transcript on the left, the harness's own screen recording of the virtual display inside the booted slot on the right (38 seconds, no edits to what happened):
+
+[![Claude Code driving shani-testbed: the agent transcript beside the real screen recording of Shani Cassini in a booted ShaniOS slot](/assets/images/blog/shani-testbed-agent-demo-poster.webp)](/assets/videos/shani-testbed-agent-demo.mp4)
+
+*Click to play (MP4, 1 MB).*
 
 It chose every call itself. Condensed from the real transcript:
 
