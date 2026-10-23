@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://giscus.app https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://giscus.app; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev https://pagead2.googlesyndication.com https://tpc.googlesyndication.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google data:; frame-src https://giscus.app https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://www.google.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google; connect-src 'self' https://api.github.com https://github.com https://giscus.app https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://csi.gstatic.com">
+
+  <title>An AI Agent That Boots and Tests a Linux Distro: Inside shani-testbed — Shanios Blog</title>
+  <meta name="description" id="meta-desc" content="Shanios's update dialog had never shown up. Not on my machine, not on anyone's. It passed a command-line flag to yad that does not exist, ya…">
+  <meta name="author"      content="Shrinivas Kumbhar">
+  <meta name="robots"      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical"    id="canonical-url" href="https://blog.shani.dev/post/shani-testbed-ai-agents/">
+
+  <meta property="og:site_name" id="og-site-name" content="Shanios Blog">
+  <meta property="og:type"      id="og-type"      content="article">
+  <meta property="og:title"     id="og-title"     content="An AI Agent That Boots and Tests a Linux Distro: Inside shani-testbed">
+  <meta property="og:description" id="og-desc"    content="Shanios's update dialog had never shown up. Not on my machine, not on anyone's. It passed a command-line flag to yad that does not exist, ya…">
+  <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/shani-testbed-ai-agents/">
+  <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/shani-testbed-ai-agents.webp">
+  <meta property="og:image:alt" id="og-image-alt" content="An AI Agent That Boots and Tests a Linux Distro: Inside shani-testbed">
+  <meta property="og:locale"    content="en_US">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-10-23T00:00:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-10-23T00:00:00.000Z">
+  <meta property="article:author"         id="og-article-author"  content="Shrinivas Kumbhar">
+  <meta property="article:section"        id="og-article-section" content="Deep Dive">
+  
+
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
+  <meta name="twitter:title"       id="tw-title" content="An AI Agent That Boots and Tests a Linux Distro: Inside shani-testbed">
+  <meta name="twitter:description" id="tw-desc"  content="Shanios's update dialog had never shown up. Not on my machine, not on anyone's. It passed a command-line flag to yad that does not exist, ya…">
+  <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/shani-testbed-ai-agents.webp">
+
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"An AI Agent That Boots and Tests a Linux Distro: Inside shani-testbed","description":"Shanios's update dialog had never shown up. Not on my machine, not on anyone's. It passed a command-line flag to yad that does not exist, ya…","url":"https://blog.shani.dev/post/shani-testbed-ai-agents/","datePublished":"2026-10-23T00:00:00.000Z","dateModified":"2026-10-23T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/shani-testbed-ai-agents.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
+  <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
+
+  <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <!-- ═══ FAVICON — src overwritten by applyBranding() ═════════════════════ -->
+  <link rel="icon" id="favicon" type="image/svg+xml" href="https://shani.dev/assets/images/logo.svg">
+
+  <!-- ═══ PWA / Web App ════════════════════════════════════════════════════ -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" id="pwa-theme-color" content="#161514">
+
+  <!-- ═══ GitHub Pages SPA: restore real URL from 404.html redirect ════════ -->
+  <script>
+    (function () {
+      var qs = new URLSearchParams(location.search);
+      var p  = qs.get('p');
+      if (!p) return;
+      qs.delete('p');
+      var q = qs.get('q') || ''; qs.delete('q');
+      var h = qs.get('h') || ''; qs.delete('h');
+      var url = decodeURIComponent(p);
+      // Rewrite /posts/slug or /posts/slug.md or /posts/slug/ → /post/slug
+      var postsMatch = url.match(/^\/posts\/(.+?)(?:\.md)?\/?(\?.*)?$/);
+      if (postsMatch) url = '/post/' + postsMatch[1];
+      if (q) url += '?' + decodeURIComponent(q);
+      if (h) url += '#' + decodeURIComponent(h);
+      history.replaceState(null, '', url);
+    })();
+  </script>
+
+  <!-- ═══ Theme — applied before CSS to prevent flash ══════════════════════ -->
+  <script>
+    (function () {
+      // PREFIX is read from CONFIG if available; falls back to 'blogs' for the
+      // very first paint (CONFIG loads after this inline script).
+      try {
+        var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
+        var t = localStorage.getItem(pfx + '_theme') ||
+                (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+
+  <!-- ═══ STYLES ═══════════════════════════════════════════════════════════ -->
+  <link rel="stylesheet" href="/brand-shani.css">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Prism.js — code syntax highlighting -->
+  <link rel="stylesheet" id="prism-theme"
+        href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+  <!-- KaTeX — math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" defer></script>
+
+  <!-- Markdown Parser & Sanitizer -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script>
+
+  <!-- Prism.js Core + Languages -->
+  <!-- All non-critical CDN libs are now `defer`red (were previously blocking
+       HTML parsing) — same pattern already used on docs.shani.dev. `defer`
+       scripts execute in source order right before DOMContentLoaded, so
+       load order relative to each other and to config-shani.js/script.js
+       (also at end of body) is preserved. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hcl.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-nginx.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js" defer></script>
+  <!-- Java / Spring Boot / Kotlin / Groovy / XML / Properties -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-groovy.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-gradle.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-properties.min.js" defer></script>
+</head>
+<body>
+  <noscript>
+    <!-- only script removes the full-screen loader, so without it the
+         overlay covered this notice and every page's prerendered content -->
+    <style>#page-loader{display:none}#page-loader~*{visibility:visible!important}</style>
+    <div style="text-align:center;padding:4rem 2rem;font-family:sans-serif">
+      <strong>JavaScript is required to view this blog.</strong>
+    </div>
+  </noscript>
+
+  <!-- Full-page loading overlay — hidden by JS once posts are ready -->
+  <div id="page-loader" aria-hidden="true">
+    <div class="loader__logo">
+      <img id="loader-logo-img" src="" alt="Blog">
+      <span class="logo__sub"></span>
+    </div>
+    <div class="loader__track"><div class="loader__bar"></div></div>
+    <p class="loader__text">Loading posts…</p>
+  </div>
+
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- ═══ HEADER ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div class="auspicious-bar">
+      <a href="#" class="auspicious-text" id="auspicious-link" aria-label="Visit site"></a>
+    </div>
+
+    <div class="header__inner container">
+      <a href="/" class="logo logo--img" id="logo-link" aria-label="Blog home">
+        <img src="" alt="Blog" class="logo__img" height="28" id="logo-img">
+        <span class="logo__sub">blog</span>
+      </a>
+
+      <!-- Desktop nav — items injected by applyBranding() -->
+      <nav class="nav" id="desktop-nav" aria-label="Primary"></nav>
+
+      <div class="header__actions">
+        <button class="btn-icon" id="search-toggle" aria-label="Search (Ctrl+K)">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        <button class="btn-icon" id="theme-btn" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
+        <button class="btn-icon" id="shortcuts-hint" aria-label="Keyboard shortcuts (?)" title="Keyboard shortcuts (?)">
+          <i class="fa-solid fa-keyboard"></i>
+        </button>
+        <button class="btn-icon menu-btn" id="menu-toggle"
+                aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile nav — items injected by applyBranding() -->
+    <nav class="mobile-nav container" id="mobile-nav" aria-hidden="true"></nav>
+  </header>
+
+  <!-- ═══ SEARCH BAR ═══════════════════════════════════════════════════════ -->
+  <div class="search-bar" id="search-bar" aria-hidden="true" role="search">
+    <div class="search-bar__inner container">
+      <i class="fa-solid fa-magnifying-glass search-bar__icon" aria-hidden="true"></i>
+      <input type="search" class="search" id="search-input"
+             placeholder="Search posts…" aria-label="Search posts" autocomplete="off">
+      <button class="btn-icon search-bar__close" id="search-close" aria-label="Close search">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+  <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+  <div id="reading-bar" role="progressbar" aria-label="Reading progress" aria-hidden="true"></div>
+  <main id="main-content">
+    <!-- INDEX VIEW -->
+    <section id="view-index" style="display:none">
+      <header class="hero container">
+        <div class="hero__grid">
+          <!-- Populated by Renderer.renderHero() -->
+        </div>
+      </header>
+
+      <section class="posts container">
+        <div class="section-header">
+          <h2 class="section-header__title" id="section-title">Latest Posts</h2>
+          <div class="section-header__line"></div>
+        </div>
+        <div class="filters__bar" id="tag-bar" role="toolbar" aria-label="Filter by tag"></div>
+        <div class="grid" id="posts-grid" role="list"></div>
+      </section>
+    </section>
+
+    <!-- POST VIEW -->
+    <section id="view-post" class="container" aria-label="Post">
+      <div class="reading-progress" aria-hidden="true"></div>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Deep Dive</span>
+        <h1 class="post-title">An AI Agent That Boots and Tests a Linux Distro: Inside shani-testbed</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Kumbhar · 2026-10-23 · 24 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Shanios's update dialog had never shown up. Not on my machine, not on anyone's. It passed a command-line flag to <code>yad</code> that does not exist, <code>yad</code> exited before drawing anything, the code treated that as "try the next backend", and every update notification quietly fell back to a plain desktop notification. The code read fine, and nothing failed loudly.</p>
+<p>What caught it was booting the real OS and looking at the screen. That is the whole idea behind <strong>shani-testbed</strong>, the test harness for Shanios — and, as of this week, the thing an AI agent uses to boot the distro, drive its apps and report what it found, without a script.</p>
+<p>This post is a guide first and a deep dive second. The first half is the shortest path from a checkout to a real boot with a passing check: what you need, the exact commands, what each one prints, and what to do when it does not. The second half is how the machinery underneath actually works, how the MCP server hands it to an agent, and how to add a check that the next run will enforce.</p>
+<p>The commands and flags below match the current harness, and the transcripts and logs are from real runs on this machine. If you only want to use it, the first two sections are enough.</p>
+<hr>
+<h2 id="what-you-are-actually-running">What you are actually running</h2>
+<p>The harness lives in <a href="https://github.com/shani8dev/shani-testbed">shani8dev/shani-testbed</a> and runs inside the same builder container that builds the images, so it tests exactly what users get:</p>
+<pre><code class="language-bash">cd shani-install-media
+./run_in_container.sh build.sh test &lt;command&gt; [options]</code></pre>
+<p>Five commands are host-only — <code>qemu</code>, <code>gui</code>, <code>iso</code>, <code>watch</code> and <code>vmspawn</code> — and run as <code>../shani-testbed/testbed &lt;command&gt;</code> instead, because they need the host's UEFI firmware, display or VM tooling rather than the builder container.</p>
+<p>"Real" is the design constraint, not a slogan:</p>
+<table><thead><tr><th>Layer</th><th>What is actually running</th></tr></thead><tbody><tr><td>Install</td><td>the unmodified <code>install.sh</code> + <code>configure.sh</code> from os-installer-config</td></tr><tr><td>Boot</td><td>systemd as PID 1 under nspawn, or a full OVMF firmware boot</td></tr><tr><td>Update</td><td>the real <code>shani-deploy --force --channel latest</code></td></tr><tr><td>Apps</td><td>the real GTK/Qt/Electron binaries on a private Xvfb display</td></tr><tr><td>Release gate</td><td>the published artifact, over HTTPS, SHA-256 and GPG checked</td></tr></tbody></table>
+<p>The rule written into every repository's <code>AGENTS.md</code> follows from that:</p>
+<blockquote>Reading code is analysis. Running code is verification.</blockquote>
+<hr>
+<h2 id="before-you-start">Before you start</h2>
+<p>You do not need a spare laptop, a VM, or <code>/dev/kvm</code>. You do need:</p>
+<ul>
+<li><strong>Docker or Podman.</strong> <code>run_in_container.sh</code> prefers Docker and falls back to Podman.</li>
+<li><strong>Checkouts side by side.</strong> <code>shani-install-media</code> and <code>shani-testbed</code> must be siblings; add <code>os-installer-config</code> for the real-install commands, and the app repo you want to drive if you use <code>--local-src</code> or <code>--local-pkg</code>.</li>
+<li><strong>One built image.</strong> <code>./build.sh image -p &lt;profile&gt;</code> produces what <code>bootstrap</code> installs; <code>./build.sh release -p &lt;profile&gt; latest</code> writes the pointer <code>upgrade</code> and <code>serve</code> read.</li>
+<li><strong>About 24 GB of sparse disk.</strong> <code>install.img</code> is a whole GPT disk, created sparse. <code>INSTALL_DISK_SIZE</code> overrides the default.</li>
+<li><strong>One run at a time.</strong> Disk-touching commands take <code>disk/.testbed.lock</code>; a second run fails at once and names the holder. <code>status</code>, <code>serve</code>, <code>web</code>, <code>slot-diff</code> and <code>watch</code> are exempt.</li>
+<li><strong>The <code>/var</code> difference.</strong> nspawn sees the image's whole <code>/var</code>; a real boot gets an empty tmpfs. Checks that read <code>/var</code> need <code>--volatile</code> or a UEFI boot.</li>
+</ul>
+<p>All state lives under <code>shani-install-media/test-env/disk/</code>: images, CA, console logs, the lock, the suite JSON. That is the directory to inspect when a run surprises you.</p>
+<hr>
+<h2 id="your-first-run-step-by-step">Your first run, step by step</h2>
+<p>Every command below runs from the <code>shani-install-media</code> checkout. The order matters: the CA has to exist before the install trusts it, and the install has to exist before anything can boot it.</p>
+<h3 id="step-1-see-what-is-there">Step 1 — See what is there</h3>
+<pre><code class="language-bash">./run_in_container.sh build.sh test help</code></pre>
+<p>That prints the command list grouped by area. On the host, <code>../shani-testbed/testbed --help</code> adds the host-only flags. One gotcha: the generated table in the README shows <code>no line in lib/usage.sh</code> for <code>verify-boot</code>, <code>slot-test</code>, <code>update-check</code> and <code>iso-install</code>. Those commands exist and do print in <code>testbed --help</code>; their help lines simply do not match the table generator's expected shape yet. Trust the help output, not those four cells.</p>
+<h3 id="step-2-build-and-release-one-image">Step 2 — Build and release one image</h3>
+<pre><code class="language-bash">./build.sh image -p gnome
+./build.sh release -p gnome latest</code></pre>
+<p>The first command builds the image; the second publishes it into <code>cache/output</code> and writes the <code>latest</code> pointer. The boot commands only need the image; <code>upgrade</code> and <code>serve</code> need the pointer.</p>
+<h3 id="step-3-mint-the-throwaway-ca">Step 3 — Mint the throwaway CA</h3>
+<pre><code class="language-bash">./run_in_container.sh build.sh test ca</code></pre>
+<p>This creates a session CA and a leaf certificate for <code>downloads.shani.dev</code>. The install trusts that CA in both slots, and <code>serve</code> presents its certificate, so the OS under test can download from your machine as if it were the real update host — without touching real DNS or a real certificate. Do this before <code>bootstrap</code>: without it, the install can still finish, but every later download fails instantly.</p>
+<h3 id="step-4-install-the-os-onto-a-loop-disk">Step 4 — Install the OS onto a loop disk</h3>
+<pre><code class="language-bash">./run_in_container.sh build.sh test bootstrap -p gnome</code></pre>
+<p>This is the real thing: <code>install.sh</code> and <code>configure.sh</code> run unmodified against <code>disk/install.img</code> — GPT partitioning, optionally LUKS, Btrfs subvolumes, image extraction, UKI generation and signing, then a genuinely test-only step that anchors the session CA into both slots. The result is <code>@blue</code> and <code>@green</code>, not a mock of them.</p>
+<p>Expect it to take a while and to end with a usable disk. Check it with:</p>
+<pre><code class="language-bash">./run_in_container.sh build.sh test status</code></pre>
+<p><code>status</code> is read-only and works even while another run holds the lock. It prints four sections: the image and its loop attachments, the <code>shani_root</code>/<code>shani_boot</code> by-label links, whether <code>@blue</code>/<code>@green</code> are present and which slot is current, and any nspawn overlays with pending <code>--local-src</code> files.</p>
+<p>Two variants worth knowing:</p>
+<ul>
+<li><code>--encrypted</code> installs with LUKS2. The passphrase is typed at each boot, one key at a time through Plymouth, so it is not the path for unattended loops.</li>
+<li><code>--from-r2</code> installs a published release from the real CDN instead of a local build. It checks SHA-256 and the GPG signature on every file.</li>
+<li><code>install</code> + <code>configure</code> run the same two scripts separately, which is the closer match to what the ISO installer does.</li>
+</ul>
+<h3 id="step-5-boot-it-headless">Step 5 — Boot it headless</h3>
+<pre><code class="language-bash">./run_in_container.sh build.sh test verify-boot blue 120</code></pre>
+<p>It boots the slot with <code>systemd-nspawn --boot</code>, captures the console to <code>disk/boot-blue-console.log</code>, and reports the three facts that matter:</p>
+<pre><code class="language-text">target reached : yes
+failed units   : 13
+emergency mode : 0
+verify-boot PASSED for @blue</code></pre>
+<p>On my last blue boot it printed 13 — not a typo. Those are <code>[FAILED]</code> lines from audit units retrying because a container has no audit subsystem, and <code>verify-boot</code> still passes: the verdict is the target and emergency-mode lines, and the count is a warning to review. <code>boot-health</code> is the check that separates the expected failures from a real one.</p>
+<p>To watch a boot instead, run <code>../shani-testbed/testbed watch</code> on the host and open <code>http://127.0.0.1:8090/</code>: it live-tails the newest console log. If the log does not explain a failure, ask systemd directly:</p>
+<pre><code class="language-bash">./run_in_container.sh build.sh test probe blue --exec=&quot;systemctl --failed --no-pager -l&quot;</code></pre>
+<p><code>probe</code> boots the slot for real, waits for the target, then <code>nsenter</code>s in and runs your command. It exists because some units genuinely start or fail without a line appearing in the captured console.</p>
+<h3 id="step-6-run-a-check-inside-the-booted-slot">Step 6 — Run a check inside the booted slot</h3>
+<pre><code class="language-bash">./run_in_container.sh build.sh test slot-test blue boot-health --volatile</code></pre>
+<p><code>slot-test</code> boots the slot <strong>once</strong>, then runs each named check inside it. Each check prints <code>RESULT</code> lines, and the run ends with a summary:</p>
+<pre><code class="language-text">── slot-test summary (@blue) ──
+  boot-health                    2 pass   0 fail  rc=0
+slot-test PASSED</code></pre>
+<p>Thirty-nine boot-mode checks live in <code>slot-tests/</code>. <code>boot-health</code> is the minimal one; the rest cover a fresh user's first login, AppArmor profiles, sysctl hardening, PAM wiring, signed systemd reports, DNS, deploy status, disk layout, and a set of Chronoa skill checks. <code>all</code> runs every check in one boot, which is much cheaper than thirty-nine separate boots.</p>
+<p><code>--volatile</code> is not optional for checks that read <code>/var</code>. On a real boot <code>/var</code> is an empty tmpfs; without the flag, nspawn shows the image's populated <code>/var</code> and the check passes for the wrong reason.</p>
+<h3 id="step-7-update-it-then-roll-it-back">Step 7 — Update it, then roll it back</h3>
+<p>An update needs two things: a release for <code>serve</code> to publish, and <code>serve</code> actually running. Start the mirror in a second terminal and leave it up:</p>
+<pre><code class="language-bash"># terminal 2 — blocks, and is meant to
+./run_in_container.sh build.sh test serve</code></pre>
+<p>Then, in the first terminal:</p>
+<pre><code class="language-bash">./run_in_container.sh build.sh test upgrade
+./run_in_container.sh build.sh test reboot
+./run_in_container.sh build.sh test rollback
+./run_in_container.sh build.sh test reboot</code></pre>
+<p><code>upgrade</code> calls the real <code>shani-deploy</code> with <code>--force --channel latest</code> and <code>--skip-self-update</code>. It installs into the inactive slot, writes its UKI and flips the boot default. <code>reboot</code> re-enters whichever slot is now current, so the two reboots are what turn a disk operation into a boot that either works or does not. <code>rollback</code> is the real recovery path, not a script that edits a file.</p>
+<p>For a real version bump, build and release a newer image between steps 4 and 7. Without a newer release, <code>upgrade</code> still deploys the published image into the other slot — useful for testing the switch — but it is not testing a version change.</p>
+<p>If you want the whole sequence in one command:</p>
+<pre><code class="language-bash">./run_in_container.sh build.sh test suite -p gnome</code></pre>
+<p><code>suite</code> runs <code>critical-writes</code> (a static check on the source before anything is deployed), then <code>clean</code> → <code>ca</code> → <code>bootstrap</code> → <code>upgrade</code> → <code>rollback</code> → <code>clean</code>, with per-step timing. It writes <code>disk/suite-&lt;epoch&gt;.json</code> and ends with <code>suite PASSED</code> or <code>suite FAILED</code>. The final <code>clean</code> runs even when a step fails. <code>--keep</code> skips it so you can <code>probe</code> or <code>enter</code> the result.</p>
+<p>The two assertions between the steps are the interesting part: <code>upgrade:switched</code> checks that the current slot actually changed and versions did not go backwards, and <code>rollback:restored</code> checks that the original slot and both versions came back. A sequence that merely exited 0 would not catch a deploy that wrote the wrong slot.</p>
+<h3 id="step-8-drive-a-gui-app">Step 8 — Drive a GUI app</h3>
+<pre><code class="language-bash">./run_in_container.sh build.sh test app blue --run=shani-cassini \
+  --wait-window=Cassini --find='list item:Updates' \
+  --click-element='list item:^Updates &amp; Rollback$' --screenshot --a11y-lint</code></pre>
+<p>The app runs inside the slot on a private Xvfb display, so input can never land on your real desktop. The replies are the driver's own log, not a summary written afterwards:</p>
+<pre><code class="language-text">find: [45] list item 'Updates &amp; Rollback'  [48] label 'Updates &amp; Rollback'
+click list item 'Updates &amp; Rollback' at 136,408; appeared: button 'Check'; combo box 'Update channel'; ...
+all 26 on-screen controls have an accessible name</code></pre>
+<p>Screenshots, <code>app.stdout</code>, <code>app.stderr</code> and the exit code land in <code>disk/app-&lt;slot&gt;-&lt;epoch&gt;/</code>. The first <code>app</code> run is slower: it installs Xvfb, <code>xdotool</code>, ImageMagick and the AT-SPI client into the builder container once.</p>
+<h3 id="step-9-hand-the-same-harness-to-an-agent">Step 9 — Hand the same harness to an agent</h3>
+<p>The MCP server is a stdio process, so registration is one entry. For OpenCode, in <code>opencode.json</code>:</p>
+<pre><code class="language-json">&quot;mcp&quot;: {
+  &quot;shani-harness&quot;: {
+    &quot;type&quot;: &quot;local&quot;,
+    &quot;command&quot;: [&quot;python3&quot;, &quot;/path/to/shani-testbed/mcp/shani_harness_mcp.py&quot;],
+    &quot;enabled&quot;: true
+  }
+}</code></pre>
+<p>For Claude Code:</p>
+<pre><code class="language-bash">claude mcp add shani-harness -- python3 /path/to/shani-testbed/mcp/shani_harness_mcp.py</code></pre>
+<p>It expects <code>shani-install-media</code> next to <code>shani-testbed</code>, or <code>SHANI_INSTALL_MEDIA</code> pointing at it, and it needs no root on the host. Then give it a task, not a script:</p>
+<blockquote>Boot the blue slot headless and check it reached its target. Start shani-cassini with recording on. Open "Updates &amp; Rollback" through the accessibility tree, screenshot it, run the accessibility lint, stop the app, and report what you verified — including anything the log says that I did not ask about.</blockquote>
+<p>The agent inherits the same rules you do: one disk-touching run at a time, and a read-only <code>status</code> is always safe while something else is running.</p>
+<h3 id="step-10-clean-up">Step 10 — Clean up</h3>
+<pre><code class="language-bash">./run_in_container.sh build.sh test clean</code></pre>
+<p><code>clean</code> unmounts the nspawn overlays, the ESP and the top-level Btrfs mount, then detaches the loop devices. It leaves <code>install.img</code> in place, so the next run re-attaches it instead of reinstalling.</p>
+<hr>
+<h2 id="how-a-run-is-wired">How a run is wired</h2>
+<p>The commands are the surface. Underneath there are three layers, and knowing them makes the failure modes obvious.</p>
+<h3 id="one-entry-point-three-layers">One entry point, three layers</h3>
+<p><code>run_in_container.sh</code> starts the builder container with the sibling repos bind-mounted and runs <code>build.sh test &lt;command&gt;</code>, which is the <code>testbed</code> dispatcher, inside it. The dispatcher takes the lock, resolves the command to a <code>cmd_*</code> function in <code>lib/</code>, and that function uses one of three paths: nspawn, OVMF/QEMU, or vmspawn. It is the same container the release build uses — nothing is special-cased for testing.</p>
+<h3 id="the-disk-is-the-state">The disk is the state</h3>
+<p><code>disk/install.img</code> is a whole GPT disk: partition 1 is the ESP labelled <code>shani_boot</code>, partition 2 is Btrfs labelled <code>shani_root</code> with <code>@blue</code>, <code>@green</code> and <code>@data</code>. <code>@data/current-slot</code> says which slot boots. The harness creates <code>/dev/disk/by-label</code> links to the attached loop device so the real installer and <code>shani-deploy</code> can find the disk by label, the way they do on hardware.</p>
+<p>That is why <code>status</code> is worth learning: it shows the image and its loop devices, whether the by-label links point at <strong>this</strong> data directory (two checkouts can otherwise fight over the same labels), which slot is current, and which overlays still have pending <code>--local-src</code> files.</p>
+<h3 id="one-run-at-a-time">One run at a time</h3>
+<p>The lock is a <code>flock</code> on descriptor 9, taken on <code>disk/.testbed.lock</code>, with the holder written to <code>.testbed.lock.who</code>. It works across separate <code>run_in_container.sh</code> invocations because they are separate containers sharing the same directory. A second run does not wait; it fails at once:</p>
+<pre><code class="language-text">shani-testbed: another harness run holds /path/test-env/disk: pid 1234, `suite -p gnome`, since 2026-10-23 10:00:00 - wait for it to finish</code></pre>
+<p>and exits 75.</p>
+<p>The subtle part is not taking the lock, it is not leaking it. Children that outlive the command — the system D-Bus, a background boot, Xvfb, an ISO VM — close descriptor 9 explicitly, because an inherited descriptor keeps the lock held. That bug was real: on 2026-10-03 a <code>slot-test</code> printed its PASS summary, exited 0, and the <code>enter</code> that followed was refused with a pid that had already exited. The fix is a set of literal <code>9&gt;&amp;-</code> closes, guarded by <code>tests/lock-release.sh</code>.</p>
+<h3 id="three-ways-to-boot">Three ways to boot</h3>
+<table><thead><tr><th>Path</th><th>What it really is</th><th>Used by</th></tr></thead><tbody><tr><td><code>systemd-nspawn --boot</code></td><td>systemd as PID 1 in a container, no firmware</td><td><code>verify-boot</code>, <code>slot-test</code>, <code>probe</code>, <code>desktop</code>, <code>app</code>, <code>enter</code></td></tr><tr><td>OVMF via QEMU</td><td>firmware → shim → systemd-boot → the signed UKI</td><td><code>qemu</code>, <code>iso</code>, <code>gui</code>, <code>iso-install</code></td></tr><tr><td><code>systemd-vmspawn</code></td><td>OVMF + Secure Boot + a software TPM, no KVM required</td><td><code>vmspawn</code></td></tr></tbody></table>
+<p>nspawn is the fast, CI-friendly path: no firmware, no boot menu, and the console is captured to a file. OVMF is the path that can catch a broken shim signature, a corrupt ESP, or a UKI that the firmware will not start — things nspawn never sees, because nspawn runs no firmware at all. <code>vmspawn</code> is how Secure Boot and TPM2 auto-unlock of LUKS get tested on a machine that cannot do hardware virtualisation.</p>
+<h3 id="the-var-trap">The <code>/var</code> trap</h3>
+<p>On a real Shanios system <code>/etc</code> and <code>/var</code> are overlayfs mounts, and <code>/var</code> is a tmpfs because of <code>systemd.volatile=state</code>. A plain nspawn boot is a container, not a boot: it sees the whole <code>/var</code> from the image. Any check about a service's state directory, the pacman database or a first-boot file can pass in nspawn and fail on hardware, or the reverse.</p>
+<p><code>slot-test --volatile</code> closes that gap with <code>systemd-nspawn --tmpfs=/var</code>. It is deliberately not <code>--volatile=state</code>, which would also make <code>/etc</code> read-only, unlike Shanios's writable <code>/etc</code> overlay. Checks that need pacman read the slot's database from its read-only subvolume through <code>slot-tests/_pacdb.sh</code>, because a real boot has none.</p>
+<h3 id="a-suite-is-a-sequence-with-invariants">A suite is a sequence with invariants</h3>
+<p><code>suite</code> is not a convenience wrapper that runs five commands and trusts their exit codes. It runs <code>critical-writes</code> first, because there is no point spending twenty minutes deploying only to discover that a script truncates a boot-critical ESP file in place. Then it runs the mandatory sequence and checks the state <em>between</em> steps: the slot must actually switch on upgrade, and the original slot and versions must actually come back on rollback. Each step runs in a subshell so a failure cannot skip the final <code>clean</code>, and the summary is written as JSON as well as logged.</p>
+<h3 id="power-cuts-reproduce-the-state-not-the-cut">Power cuts: reproduce the state, not the cut</h3>
+<p>A power cut is not reproducible. <strong>The state it leaves behind is.</strong> The harness reproduces those end states on the disk image and boots them for real:</p>
+<table><thead><tr><th>Scenario</th><th>Cut point</th><th>Must hold</th></tr></thead><tbody><tr><td>A</td><td>during extraction, before the boot flip</td><td>boots the old slot; nothing moves</td></tr><tr><td>B</td><td>after the flip, new slot healthy</td><td>boots the new slot; the failover hook must <strong>not</strong> fire</td></tr><tr><td>C</td><td>after the flip, new slot cannot mount</td><td>the hook rewrites the default; the next boot lands on the good slot</td></tr></tbody></table>
+<p>Scenario B is the control that makes C mean something: a hook that always rewrote the boot default would pass C too.</p>
+<hr>
+<h2 id="command-map">Command map</h2>
+<p>The authoritative list is <code>test help</code>; these are the ones you will actually type. <code>†</code> marks host-only commands, run as <code>../shani-testbed/testbed &lt;command&gt;</code>.</p>
+<h3 id="install-boot-and-inspect">Install, boot and inspect</h3>
+<table><thead><tr><th>Command</th><th>Arguments</th><th>What it does</th></tr></thead><tbody><tr><td><code>ca</code></td><td><code>[extra-host ...]</code></td><td>Throwaway CA + leaf certs; <code>bootstrap</code> trusts it, <code>serve</code> presents it</td></tr><tr><td><code>bootstrap</code></td><td><code>-p &lt;profile&gt; [-d latest/stable/&lt;date&gt;] [--encrypted] [--from-r2]</code></td><td>Real <code>install.sh</code> + <code>configure.sh</code> onto <code>install.img</code>; produces <code>@blue</code>/<code>@green</code></td></tr><tr><td><code>install</code></td><td><code>-p &lt;profile&gt; [-d ...] [--encrypted]</code></td><td>The real <code>install.sh</code> alone: partitioning, LUKS, subvolumes, extraction</td></tr><tr><td><code>configure</code></td><td><code>-p &lt;profile&gt; [--encrypted]</code></td><td>The real <code>configure.sh</code> on <code>install</code>'s result: locale, user, Secure Boot, UKI</td></tr><tr><td><code>iso-install</code></td><td><code>-p &lt;profile&gt; --iso=...</code></td><td>Boot a real ISO under OVMF, install through the ISO's own scripts, boot the result</td></tr><tr><td><code>verify-boot</code></td><td><code>&lt;blue/green&gt; [seconds]</code></td><td>nspawn boot; target reached, failed units, emergency mode; console log</td></tr><tr><td><code>probe</code></td><td><code>&lt;blue/green&gt; --exec="cmd"</code></td><td>Boot, then run any command inside the slot and print its output</td></tr><tr><td><code>enter</code></td><td><code>&lt;blue/green&gt; [--boot] [cmd...]</code></td><td>Enter a slot with nspawn, optionally after a real boot</td></tr><tr><td><code>desktop</code></td><td><code>&lt;blue/green&gt; [--de=...] [--tour]</code></td><td>Real GNOME/Plasma session, screenshot; <code>--tour</code> opens each shell surface</td></tr><tr><td><code>slot-test</code></td><td><code>&lt;blue/green&gt; &lt;name.../all&gt; [--volatile]</code></td><td>Boot once, run in-slot checks, aggregate their <code>RESULT</code> lines</td></tr><tr><td><code>app</code></td><td><code>&lt;blue/green&gt; --run="cmd" [actions...]</code></td><td>GUI app on a private Xvfb display, driven through AT-SPI</td></tr><tr><td><code>status</code></td><td></td><td>Read-only: images, loops, by-label, slots, overlays, CA, session</td></tr><tr><td><code>slot-diff</code></td><td><code>[--from=...] [--to=...]</code></td><td>Packages, units, sonames and <code>/etc</code> changes between the two slots</td></tr><tr><td><code>clean</code></td><td></td><td>Unmount everything, detach loops, keep the images</td></tr></tbody></table>
+<h3 id="update-and-release">Update and release</h3>
+<table><thead><tr><th>Command</th><th>Arguments</th><th>What it does</th></tr></thead><tbody><tr><td><code>serve</code></td><td><code>[port] [docroot] [cert-host]</code></td><td>HTTPS mirror of <code>cache/output</code> as <code>downloads.shani.dev</code></td></tr><tr><td><code>upgrade</code></td><td><code>[--local-src=&lt;dir&gt;]</code></td><td>Real deploy into the inactive slot, then switch the boot default</td></tr><tr><td><code>reboot</code></td><td></td><td>Re-enter whichever slot is current</td></tr><tr><td><code>rollback</code></td><td><code>[--local-src=&lt;dir&gt;]</code></td><td>The real <code>shani-deploy --rollback</code></td></tr><tr><td><code>update-check</code></td><td></td><td>Read-only status contract used by Cassini's update agent</td></tr><tr><td><code>cycle</code></td><td><code>-p &lt;profile&gt;</code></td><td><code>ca → bootstrap → serve → upgrade → reboot</code>, in one go</td></tr><tr><td><code>suite</code></td><td><code>[-p &lt;profile&gt;] [--keep] [--encrypted]</code></td><td>The mandatory sequence with timings, invariants and JSON</td></tr><tr><td><code>gate</code></td><td><code>-p &lt;profile&gt; [--candidate=...] [--skip=...]</code></td><td>Release gate for <code>promote-stable</code>, image and ISO separately</td></tr></tbody></table>
+<h3 id="host-only-and-the-rest">Host-only, and the rest</h3>
+<table><thead><tr><th>Command</th><th>What it does</th></tr></thead><tbody><tr><td><code>qemu</code> †</td><td>Genuine UEFI boot of <code>install.img</code> through OVMF; <code>--vnc</code> serves the framebuffer</td></tr><tr><td><code>gui</code> †</td><td>Headless real-desktop check over OVMF, QMP and the guest agent</td></tr><tr><td><code>iso</code> †</td><td>Boot a real installer ISO through OVMF</td></tr><tr><td><code>watch</code> †</td><td>Local dashboard with a live console tail and a noVNC panel</td></tr><tr><td><code>vmspawn</code> †</td><td>UEFI + Secure Boot + software TPM, works without <code>/dev/kvm</code></td></tr><tr><td><code>web</code></td><td>Headless Chromium checks for the four sites: console, a11y, mobile, budgets</td></tr><tr><td><code>pacstrap</code></td><td>Signature-verified <code>pacstrap</code> smoke test into a throwaway target</td></tr><tr><td><code>disk</code></td><td>Compatibility helper: by-label links, remove the legacy image pair</td></tr></tbody></table>
+<hr>
+<h2 id="driving-gui-apps-like-a-browser-drives-a-page">Driving GUI apps like a browser drives a page</h2>
+<p>Booting is half the story. Shanios ships its own apps — <strong>Shani Cassini</strong>, the system manager, and <strong>Chronoa</strong>, the local AI assistant — and they need testing as a user would use them.</p>
+<p>The <code>app</code> command runs any GUI program inside a slot, on a private Xvfb display in the builder container, then drives it through <strong>AT-SPI</strong>, the accessibility tree that GTK, Qt and Electron apps publish — the native-app equivalent of a browser's DOM. Clicking by accessible name instead of pixels means a test survives a theme change:</p>
+<pre><code class="language-bash">./run_in_container.sh build.sh test app blue --run=shani-cassini \
+  --find='list item:Updates' --click-element='list item:^Updates &amp; Rollback$'</code></pre>
+<p>The actions group the same way the MCP tools do:</p>
+<table><thead><tr><th>Phase</th><th>Actions</th></tr></thead><tbody><tr><td>Look</td><td><code>windows</code>, <code>screenshot</code>, <code>tree</code>, <code>find=QUERY</code>, <code>observe</code></td></tr><tr><td>Act</td><td><code>click</code>, <code>click-element</code>, <code>click-control</code>, <code>click-text</code>, <code>type</code>, <code>key</code>, <code>scroll</code>, <code>drag</code>, <code>focus</code></td></tr><tr><td>Wait</td><td><code>wait-window</code>, <code>wait-element</code>, <code>wait-exit</code>, <code>wait-settle</code></td></tr><tr><td>Assert</td><td><code>expect-window</code>, <code>expect-gone</code>, <code>expect-text</code>, <code>expect-field</code>, <code>expect-same</code>, <code>expect-changed</code>, <code>expect-clean-log</code>, <code>a11y-lint</code>, <code>monkey</code></td></tr></tbody></table>
+<p><code>a11y-lint</code> fails if any control would be announced to a screen reader as just "button". Visual regression compares against a reference with masks for clocks and spinners, and <code>expect-changed</code> catches the opposite failure — a click that did nothing, which a non-empty screenshot would happily hide. <code>monkey=N[:SEED]</code> random-clicks enabled controls and prints the seed, so a failure replays exactly. Voice apps get a virtual microphone and speaker, and <code>--record=FILE</code> writes an MP4 of the run.</p>
+<p>One detail worth knowing if you build something similar: <strong>GTK4 reports no screen position over AT-SPI</strong> — its screen extents are always <code>0,0</code>. The client maps window-relative extents through the X window's origin. Before that fix, every click on a GTK4 app landed in the window's top-left corner.</p>
+<hr>
+<h2 id="the-mcp-server-handing-the-harness-to-an-agent">The MCP server: handing the harness to an agent</h2>
+<p><code>mcp/shani_harness_mcp.py</code> is a stdio MCP server, Python standard library only, that gives an AI agent the loop Claude in Chrome gives it for web pages: look, act, look again. It speaks newline-delimited JSON-RPC over stdio, so any MCP client can launch it — the command is <code>python3</code>, the argument is the path to the script.</p>
+<p>As of this week it has <strong>46 tools</strong> — 42 <code>app_*</code> and 4 <code>harness_*</code>:</p>
+<ul>
+<li><strong>App tools</strong> follow the loop. <code>app_start</code> takes recording, strict GTK criticals, voice and an overlay for unpublished packages; then look (<code>app_screenshot</code>, <code>app_tree</code>, <code>app_find</code>, <code>app_observe</code>), act (<code>app_click_element</code>, <code>app_click_control</code>, <code>app_type</code>, <code>app_key</code>, ...), wait and assert (<code>app_expect_text</code> for OCR, <code>app_expect_same</code> for visual regression, <code>app_a11y_lint</code>, <code>app_monkey</code>). Voice has five tools, and <code>app_action</code> reaches anything not wrapped.</li>
+<li><strong>Harness tools</strong>: <code>harness_run</code> runs 29 of the testbed's 30 commands — every one except <code>app</code>, which the <code>app_*</code> tools cover — and <code>harness_start</code> / <code>harness_job</code> / <code>harness_stop</code> run long-running ones (the HTTPS mirror, a QEMU boot, the dashboard) in the background.</li>
+</ul>
+<p>The server runs everything the same way a human would: <code>run_in_container.sh</code> for the container commands, <code>testbed</code> directly for the host-only ones. It keeps one app session at a time under <code>disk/mcp-session</code>. It is also why the tool surface is now tested: <code>tests/mcp-parity.sh</code> fails the moment the testbed gains a command or action the server does not expose. It exists because, until this week, the server quietly offered 16 of 30 commands and none of the actions behind visual regression, OCR, <code>a11y-lint</code>, <code>monkey</code>, voice or recording.</p>
+<p>One practical consequence of the design: an agent is just another client of the lock. A long <code>verify-boot</code> blocks an <code>upgrade</code> the same way a human's second terminal would. Inside a session, the read-only app tools (<code>app_screenshot</code>, <code>app_find</code>) are always safe; <code>harness_run status</code> is safe even while another run holds the disk.</p>
+<hr>
+<h2 id="a-real-session-no-script">A real session, no script</h2>
+<p>To see whether it actually works, I gave Claude Code a plain-English task and nothing else:</p>
+<blockquote>Boot the blue slot headless and check it reached its target. Start shani-cassini with recording on. Open "Updates &amp; Rollback" using the accessibility tree, not pixel guessing, and confirm it with a screenshot. Run the accessibility lint. Stop the app and report what you verified.</blockquote>
+<p>It chose every call itself. Condensed from the real transcript:</p>
+<pre><code class="language-text">agent → harness_run {&quot;command&quot;:&quot;verify-boot&quot;,&quot;args&quot;:[&quot;blue&quot;,&quot;120&quot;]}
+        target reached : yes   ·   emergency mode : 0
+agent → app_start {&quot;slot&quot;:&quot;blue&quot;,&quot;command&quot;:&quot;shani-cassini&quot;,&quot;local_pkg&quot;:[&quot;shani-cassini&quot;],&quot;record&quot;:true}
+agent → app_wait_window → app_screenshot
+agent → app_find {&quot;query&quot;:&quot;Updates &amp; Rollback&quot;}
+      ← [45] list item 'Updates &amp; Rollback'   [48] label 'Updates &amp; Rollback'
+agent → app_click_element {&quot;query&quot;:&quot;list item:^Updates &amp; Rollback$&quot;}
+      ← click list item 'Updates &amp; Rollback' at 136,408
+agent → app_screenshot → app_a11y_lint
+      ← all 26 on-screen controls have an accessible name
+agent → app_stop   (recording saved)</code></pre>
+<p>Eleven tool calls, four minutes. And then the part I did not ask for. From its report:</p>
+<blockquote>The log shows a version mismatch: the app runs <code>shani-deploy --status</code>, but the blue slot's <code>shani-deploy</code> rejects that option. As a result the page shows "Cannot read the system state" and the Version field reads "Unavailable".</blockquote>
+<p>That is a real bug in the combination: a newer Cassini against an older system image. The agent found it by reading the app's own log after the screen looked wrong — exactly what a careful human tester would do.</p>
+<hr>
+<h2 id="what-i-took-from-chronoas-own-driver">What I took from Chronoa's own driver</h2>
+<p>Chronoa, the assistant, has to drive other apps for its users, so it grew its own <code>ui_driver</code>. Four of its ideas are now harness actions (and MCP tools):</p>
+<ul>
+<li><strong><code>observe</code></strong> — a numbered view of the usable controls, so an agent picks <code>click-control=7</code> instead of writing a regex. Fewer tokens, and a real path to a <em>small local model</em> driving the harness.</li>
+<li><strong>What appeared, what went</strong> — every click replies with the controls that came and went, so a click that did nothing is visible as such.</li>
+<li><strong><code>expect-field</code></strong> — reads the focused field back after typing, catching keystrokes the app dropped.</li>
+<li><strong><code>click-text</code> / <code>wait-settle</code></strong> — OCR for windows with no accessibility tree, and waiting for the pixels to stop changing instead of a <code>sleep</code> that is either flaky or slow.</li>
+</ul>
+<hr>
+<h2 id="writing-your-own-check">Writing your own check</h2>
+<p>The rule from the <code>AGENTS.md</code> files applies to the harness itself: if the check you need does not exist, add it to the harness rather than writing a one-off script beside it. A check in <code>slot-tests/</code> runs under the same lock, in the same boot, with the same summary — and the next person gets it for free.</p>
+<h3 id="the-contract">The contract</h3>
+<p>A boot-mode check is a Bash file in <code>slot-tests/</code> whose first line after the shebang is:</p>
+<pre><code class="language-bash"># slot-test-mode: boot</code></pre>
+<p>It boots once, runs inside the slot, and prints one line per assertion:</p>
+<pre><code class="language-text">RESULT &lt;name&gt; PASS|FAIL|SKIP &lt;message&gt;</code></pre>
+<p>The name must contain no spaces, and the verdict must be the first token after the name. The aggregator matches <code>^RESULT [^ ]+ +PASS\b</code> and the same for <code>FAIL</code>, so <code>RESULT foo PASS (docker0 failed)</code> is one pass and no failure. A test fails the run if its exit code is non-zero, if it prints any FAIL, or if it prints no PASS at all. <code>SKIP</code> is how a check says "this environment cannot answer the question" without pretending to pass.</p>
+<h3 id="a-minimal-check-that-can-fail">A minimal check that can fail</h3>
+<p>Here is a complete one, <code>slot-tests/var-volatile.sh</code>, which asserts the <code>/var</code> contract that every nspawn-based check has to respect:</p>
+<pre><code class="language-bash">#!/bin/bash
+# slot-test-mode: boot
+#
+# var-volatile — on a real boot /var is an empty tmpfs
+# (systemd.volatile=state). Without --volatile, nspawn shows the
+# image's /var and this check must say so rather than pass.
+set -u
+res() { printf 'RESULT %-30s %s\n' &quot;$1&quot; &quot;$2&quot;; }
+
+fstype=$(findmnt -n -o FSTYPE /var 2&gt;/dev/null || true)
+if [[ &quot;$fstype&quot; == tmpfs ]]; then
+  res var-volatile &quot;PASS /var is a tmpfs&quot;
+else
+  res var-volatile &quot;FAIL /var is '${fstype:-not mounted}', expected tmpfs - run with --volatile&quot;
+fi</code></pre>
+<p>Run it both ways:</p>
+<pre><code class="language-bash"># must FAIL, and say why
+./run_in_container.sh build.sh test slot-test blue var-volatile
+
+# must PASS
+./run_in_container.sh build.sh test slot-test blue var-volatile --volatile</code></pre>
+<p>That pair is the whole discipline. A check you have only ever seen pass is not evidence; it is a check that has not been tested. The harness applies the same idea to its own tests with <code>tools/mutate.py</code>, which breaks the code on purpose and requires the named check to fail.</p>
+<h3 id="if-the-check-is-about-a-gui">If the check is about a GUI</h3>
+<p>Use the <code>app</code> actions rather than the accessibility tree directly: <code>--a11y-lint</code> for names, <code>--expect-text</code> for OCR, <code>--expect-same</code> / <code>--expect-changed</code> for visual state, <code>--expect-clean-log</code> for GTK/Qt criticals. If you need a new action, add it to <code>lib/app.sh</code>, expose it in the MCP server, and add it to the parity test — otherwise the next <code>tests/mcp-parity.sh</code> run will (correctly) fail.</p>
+<h3 id="keep-the-furniture-in-sync">Keep the furniture in sync</h3>
+<p>Three generated things will tell you when you forget:</p>
+<ul>
+<li><code>tools/gen_readme.py</code> rebuilds the README's command, MCP-tool and slot-test tables from the dispatcher, <code>usage.sh</code>, the server's tool list and the slot-test headers.</li>
+<li><code>tests/readme-generated.sh</code> fails when those tables are stale.</li>
+<li><code>tests/mcp-parity.sh</code> fails when a command or action has no tool.</li>
+</ul>
+<p>That is not bureaucracy. The README once described commands that no longer existed, and the MCP server once offered half the actions, because both were maintained by hand.</p>
+<hr>
+<h2 id="when-it-goes-wrong">When it goes wrong</h2>
+<table><thead><tr><th>Symptom</th><th>Likely cause</th><th>What to do</th></tr></thead><tbody><tr><td><code>another harness run holds ...</code> and exit 75</td><td>another command (or a leaked background child) holds the disk lock</td><td>wait for the pid in the message, or stop it; deleting the lock file will not help, the lock lives on the open descriptor. <code>status</code> still works.</td></tr><tr><td><code>upgrade</code> fails with "no internet" or every download fails "after 0 ms"</td><td><code>serve</code> is not running, or the CA was never minted/trusted</td><td>run <code>ca</code> before <code>bootstrap</code>, keep <code>serve</code> up in a second terminal</td></tr><tr><td><code>upgrade</code> has nothing to do</td><td>no release published for <code>serve</code> to hand out</td><td><code>./build.sh release -p &lt;profile&gt; latest</code>; for a real version change, build again first</td></tr><tr><td><code>verify-boot</code> cannot explain a failed unit</td><td>some units fail or start without a console line</td><td><code>probe &lt;slot&gt; --exec="systemctl --failed --no-pager -l"</code></td></tr><tr><td><code>slot-test</code> dies with "header has no '# slot-test-mode: boot'"</td><td>the file is not a boot-mode check</td><td>add the header, or run it through <code>enter</code>/<code>probe</code> instead</td></tr><tr><td><code>slot-test FAILED</code> but no FAIL line in the output</td><td>the name has spaces, the verdict is not the first token, or the test printed no PASS</td><td>use <code>res()</code>, one word for the name, <code>PASS</code>/<code>FAIL</code> first</td></tr><tr><td>a <code>/var</code> check behaves differently than on hardware</td><td>plain nspawn mounts the image's <code>/var</code></td><td>add <code>--volatile</code> to the <code>slot-test</code> run</td></tr><tr><td><code>status</code> shows loops or overlays still mounted after a crash</td><td>a killed run left mounts behind</td><td><code>clean</code> unmounts and detaches; it keeps the images</td></tr><tr><td><code>qemu</code> warns and boots an empty disk</td><td>it fell back to <code>root.img</code>/<code>esp.img</code> because <code>install.img</code> is absent</td><td>run <code>bootstrap</code> (or <code>install</code> + <code>configure</code>) first</td></tr><tr><td>an OVMF/TPM boot fails with <code>TPM result for CMD_INIT: 0x101</code></td><td>overlapping ISO runs corrupted the swtpm state — the reason the lock exists</td><td><code>iso-install --boot-only --reset-firmware</code> to start from fresh NVRAM and TPM</td></tr><tr><td>an agent cannot find the install repo</td><td>the checkouts are not siblings and <code>SHANI_INSTALL_MEDIA</code> is unset</td><td>set <code>SHANI_INSTALL_MEDIA</code>, or move the checkouts side by side</td></tr></tbody></table>
+<hr>
+<h2 id="bugs-only-running-it-for-real-could-find">Bugs only running it for real could find</h2>
+<p>None of these was visible by reading the code. Each was found by running the thing.</p>
+<p><strong>Every MCP GUI tool failed with "Permission denied."</strong> The app session listens on a FIFO created by root inside the container. The server opened it with Python's <code>open(path, "w")</code>, which adds <code>O_CREAT</code> — and with <code>fs.protected_fifos=1</code>, the kernel refuses an <code>O_CREAT</code> open of a FIFO owned by another user in a sticky, world-writable directory. The fix is one line: <code>os.open(path, os.O_WRONLY)</code>. The interesting part is that nothing about the code looked wrong.</p>
+<p><strong>OCR had been comparing against an empty string.</strong> <code>expect-text</code> takes a screenshot, upscales it 2x and runs tesseract. On a display larger than the app's window — which is every run — tesseract 5.5.3 returned <em>nothing</em> for the full image, while the same pixels cropped to the window read perfectly. So <code>expect-text</code> failed even when the text was plainly on screen. OCR input is now cropped to the app's windows first.</p>
+<p><strong>A check that measured nothing.</strong> The new parity test extracted action names with a pattern that had no digits in it, so it never checked <code>a11y-lint</code>. It passed. It was found by the next tool.</p>
+<hr>
+<h2 id="tests-for-the-tests">Tests for the tests</h2>
+<p>A test that cannot fail is worse than no test: it tells you something is covered when it is not. The harness has had those — a power-cut check that reported PASS for a write that never happened — so two tools from Chronoa came over this week.</p>
+<p><strong><code>tools/mutate.py</code></strong> breaks the code on purpose and requires the named test to fail. Each mutation is an exact-once text replacement, restored in a <code>finally</code>, with a journal so a killed run is put back by the next one and a lock so two runs cannot overwrite each other's restore. The five sets so far:</p>
+<pre><code class="language-text">[boot_default_entry_id] 1/1 caught   shani-deploy writes the slot stem, not the entry id
+[boot_failure_timing]   2/2 caught   the failure check and the rollback timer swap order
+[lock_release]          1/1 caught   the system bus inherits the disk lock again
+[mcp_parity]            4/4 caught   the server drops a command, a tool, recording
+[readme_generated]      2/2 caught   the code changes under the README
+10/10 mutations caught across 5/5 sets measured</code></pre>
+<p>Its first run is what found the digit bug above.</p>
+<p><strong><code>tools/gen_readme.py</code></strong> rebuilds the README's reference tables — commands, MCP tools, slot tests — from the dispatcher, <code>usage.sh</code>, the server's tool list and the slot-test headers, and <code>tests/readme-generated.sh</code> fails when they are stale. On its first run it caught a formatting inconsistency in <code>lib/usage.sh</code>: four commands (<code>verify-boot</code>, <code>slot-test</code>, <code>update-check</code>, <code>iso-install</code>) do print in <code>testbed --help</code>, but their lines do not match the parser's shape — three use a single space after the command where the rest of the file uses two, and <code>slot-test</code> is not indented at all — so their table rows say <code>no line in lib/usage.sh</code> and carry no arguments or description.</p>
+<hr>
+<h2 id="whats-next">What's next</h2>
+<p>The next step is the one Chronoa itself exists for: a small local model, not a frontier model in the cloud, driving this harness well enough to be useful. A numbered <code>observe</code> view and a "what changed" reply after every action are the first two pieces of that. The harness will tell me whether they are enough — by running it.</p>
+<p>Everything is open source under <a href="https://github.com/shani8dev">shani8dev</a>. Start with <code>test help</code>, run one <code>verify-boot</code>, add one check, and hand it to an agent. The first real bug it finds will be one you would not have seen by reading the code.</p></div>
+      </article>
+    </section>
+
+    <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->
+    <section id="view-membership" class="container" style="display:none" aria-label="Membership">
+      <!-- script.js writes this section's innerHTML from CONFIG on every /membership visit.
+           Razorpay SDK is lazy-loaded by script.js only when this page is visited. -->
+    </section>
+  </main>
+
+  <!-- ═══ FOOTER ══════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="footer__inner container">
+      <span class="footer__brand" id="footer-name">
+        <img src="" alt="Blog" class="logo__img logo__img--footer" height="20" id="footer-logo-img">
+        <span class="logo__sub"></span>
+      </span>
+      <nav class="footer__links" id="footer-links" aria-label="Social links"></nav>
+      <span class="footer__copy">© <span data-current-year></span></span>
+    </div>
+  </footer>
+
+  <!-- Back-to-top -->
+  <button class="to-top" id="back-top" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <!-- ═══ SCRIPTS — config must come first ═════════════════════════════════ -->
+  <script src="/config-shani.js"></script>
+  <script src="/utils.js"></script>
+  <script>
+    // Inject AdSense library if configured — done here so it loads in parallel
+    // with script.js rather than blocking it. The ad unit itself is inserted
+    // mid-post by script.js after the post body is rendered.
+    (function () {
+      var cfg = (typeof CONFIG !== 'undefined') ? CONFIG : {};
+      if (!cfg.ADSENSE_CLIENT) return;
+      if (document.getElementById('adsense-script')) return;
+      var s = document.createElement('script');
+      s.id = 'adsense-script';
+      s.async = true;
+      s.crossOrigin = 'anonymous';
+      s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + cfg.ADSENSE_CLIENT;
+      document.head.appendChild(s);
+    })();
+  </script>
+  <script src="/script.js"></script>
+
+  <!-- ═══ Service worker — offline shell + stale-while-revalidate posts ═══ -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function (e) { console.error('SW failed:', e); });
+    }
+  </script>
+</body>
+</html>

@@ -5,8 +5,17 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.</description>
     <language>en-IN</language>
-    <lastBuildDate>Thu, 08 Oct 2026 19:42:10 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 23 Oct 2026 04:33:27 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>An AI Agent That Boots and Tests a Linux Distro: Inside shani-testbed</title>
+      <link>https://blog.shani.dev/post/shani-testbed-ai-agents/</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/shani-testbed-ai-agents/</guid>
+      <description>Shanios's update dialog had never shown up. Not on my machine, not on anyone's. It passed a command-line flag to yad that does not exist, ya…</description>
+      <pubDate>Fri, 23 Oct 2026 00:00:00 GMT</pubDate>
+      <category>Deep Dive</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
     <item>
       <title>AI-Assisted Development on Shanios: Harnesses, AI Editors, MCP, and Local Models</title>
       <link>https://blog.shani.dev/post/ai-assisted-development-on-shani-os/</link>
@@ -447,15 +456,6 @@
       <description>How Flatpak works on Shani OS, what apps are pre-installed, how to install more from Flathub, manage permissions with Flatseal, and why sandboxing is the right model for an immutable system.</description>
       <pubDate>Fri, 17 Apr 2026 00:00:00 GMT</pubDate>
       <category>Ecosystem</category>
-      <author>Shrinivas Kumbhar</author>
-    </item>
-    <item>
-      <title>Shani OS for Researchers and HPC — Reproducible Environments from Desktop to Cluster</title>
-      <link>https://blog.shani.dev/post/shani-os-for-researchers-and-hpc/</link>
-      <guid isPermaLink="true">https://blog.shani.dev/post/shani-os-for-researchers-and-hpc/</guid>
-      <description>How Shani OS makes scientific computing reproducible from the ground up — Apptainer for cluster workloads, Nix for pinned environments, AMD ROCm and NVIDIA CUDA via Distrobox containers, DVC for data versioning, and a GPG-signed host OS that is itself a verifiable artefact.</description>
-      <pubDate>Thu, 16 Apr 2026 00:00:00 GMT</pubDate>
-      <category>Guide</category>
       <author>Shrinivas Kumbhar</author>
     </item>
   </channel>

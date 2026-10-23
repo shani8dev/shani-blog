@@ -610,7 +610,11 @@ function buildStub(post) {
   // this only affects what's visible before/without JS execution.
   // (ARTICLE_PLACEHOLDER defined at module scope)
   if (html.includes(ARTICLE_PLACEHOLDER)) {
-    html = html.replace(ARTICLE_PLACEHOLDER, `<article id="post-article">${articleHtml}</article>`);
+    // Function replacement, not a string: the rendered article can contain
+    // `$&`, `$'`, `` $` `` or `$1` (e.g. a shell/JSON snippet with
+    // `Rollback$"}`), and those are replacement patterns in a string — they
+    // silently splice the page into itself instead of inserting the text.
+    html = html.replace(ARTICLE_PLACEHOLDER, () => `<article id="post-article">${articleHtml}</article>`);
   } else {
     console.warn(`  ⚠  buildStub: #post-article placeholder not found for "${post.slug}" — stub will ship with empty article content.`);
   }
@@ -916,7 +920,7 @@ function prerenderHome() {
   if (html.includes(ARTICLE_PLACEHOLDER)) {
     html = html.replace(
       ARTICLE_PLACEHOLDER,
-      `${HOME_MARKER_START}${buildStaticHomeHtml()}${HOME_MARKER_END}`
+      () => `${HOME_MARKER_START}${buildStaticHomeHtml()}${HOME_MARKER_END}`
     );
   }
 
@@ -925,11 +929,11 @@ function prerenderHome() {
   // filled in by script.js at runtime, so non-JS crawlers saw nothing.
   html = html.replace(
     /<script type="application\/ld\+json" id="ld-blogs">.*?<\/script>/s,
-    `<script type="application/ld+json" id="ld-blogs">${BLOG_JSON}</script>`
+    () => `<script type="application/ld+json" id="ld-blogs">${BLOG_JSON}</script>`
   );
   html = html.replace(
     /<script type="application\/ld\+json" id="ld-org">.*?<\/script>/s,
-    `<script type="application/ld+json" id="ld-org">${ORG_JSON}</script>`
+    () => `<script type="application/ld+json" id="ld-org">${ORG_JSON}</script>`
   );
 
   fs.writeFileSync(indexPath, html);

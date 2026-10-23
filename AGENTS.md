@@ -262,6 +262,22 @@ in shani-docs/shani-install-media/shani-deploy/shani-builder.*
   step at all** — `build-manifest.yml` only regenerates. The equivalent
   html5lib + duplicate-title gate that now runs on docs is the obvious next
   addition here.
+- **`generate-manifest.js` injected the article as a *string* replacement —
+  FIXED (2026-10-23).** `buildStub()` did
+  `html.replace(ARTICLE_PLACEHOLDER, \`<article …>${articleHtml}</article>\`)`.
+  In a string replacement `$&`, `$'`, `` $` `` and `$n` are patterns, so a
+  post whose rendered HTML contains them — `posts/shani-testbed-ai-agents.md`
+  had `--click-element='…Rollback$'` and a JSON transcript with
+  `…Rollback$"}` — expanded them: the stub shipped a second
+  `<article id="post-article">`, the placeholder, and the article's tail
+  spliced into itself, producing duplicate heading ids and mobile overflow
+  (the hydrated server actually rendered correctly, which is why it looked
+  fine in one place and broken in another). Now function replacements in
+  `buildStub()` and `prerenderHome()` — the same fix `mdToHtml()`'s block
+  substitution already documents at its `\u0000BLOCK` markers. Verified by
+  dumping the hydrated DOM (0 duplicate ids, 1 post-body) and a real-browser
+  check; `shani-docs` has no `ARTICLE_PLACEHOLDER`/`articleHtml` code, so
+  there is nothing to propagate.
 - **`generate-manifest.js` date parsing was timezone-dependent — FIXED
   (2026-09-18).** `new Date(post.date + 'T00:00:00')` (no `Z`/offset) is
   parsed as **local time** per the ECMAScript spec, not UTC — unlike a
