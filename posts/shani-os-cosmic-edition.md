@@ -4,7 +4,7 @@ date: 2026-08-25
 author: Shrinivas Kumbhar
 author_bio: Creator of Shanios. Building immutable Linux distributions.
 author_initials: SK
-author_linkedin: shrinivaskumbhar
+author_linkedin: 'https://linkedin.com/in/shrinivasvkumbhar'
 author_github: shrinivasvkumbhar
 author_website: https://shani.dev
 tag: Release
