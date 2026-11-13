@@ -5,13 +5,13 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.</description>
     <language>en-IN</language>
-    <lastBuildDate>Fri, 13 Nov 2026 12:16:51 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 13 Nov 2026 13:35:59 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
-      <title>Meet Shani Shell: The Desktop of Shani OS — Click, Don''t Type</title>
+      <title>Meet Shani Shell: The Desktop of Shani OS — with Chronoa, an Assistant That Asks First</title>
       <link>https://blog.shani.dev/post/meet-shani-shell/</link>
       <guid isPermaLink="true">https://blog.shani.dev/post/meet-shani-shell/</guid>
-      <description>Sign in without typing, find anything from one launcher, 39 apps of its own, your phone built in, a desktop you can drive by keyboard, touch or game controller — and an assistant that asks before it acts. What it does, and what it does not do yet.</description>
+      <description>Sign in without typing, one launcher for everything, 39 apps of its own, your phone built in, a desktop you can drive by keyboard, touch or game controller — and Chronoa, an assistant on your own computer that asks before it acts. What it does, and what it does not do yet.</description>
       <pubDate>Fri, 13 Nov 2026 00:00:00 GMT</pubDate>
       <category>Ecosystem</category>
       <author>Shrinivas Kumbhar</author>

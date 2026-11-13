@@ -1,10 +1,10 @@
 ---
-title: 'Meet Shani Shell: The Desktop of Shani OS — Click, Don''t Type'
+title: 'Meet Shani Shell: The Desktop of Shani OS — with Chronoa, an Assistant That Asks First'
 slug: meet-shani-shell
 date: '2026-11-13'
 tag: 'Ecosystem'
 cover: /assets/images/blog/meet-shani-shell.webp
-excerpt: 'Sign in without typing, find anything from one launcher, 39 apps of its own, your phone built in, a desktop you can drive by keyboard, touch or game controller — and an assistant that asks before it acts. What it does, and what it does not do yet.'
+excerpt: 'Sign in without typing, one launcher for everything, 39 apps of its own, your phone built in, a desktop you can drive by keyboard, touch or game controller — and Chronoa, an assistant on your own computer that asks before it acts. What it does, and what it does not do yet.'
 author: 'Shrinivas Vishnu Kumbhar'
 author_role: 'Founder & Lead Developer, Shani OS'
 author_bio: 'Shrinivas is a cloud expert, DevOps engineer, and creator of Shani OS.'

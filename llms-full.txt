@@ -4,7 +4,7 @@
 
 ---
 
-# Meet Shani Shell: The Desktop of Shani OS — Click, Don''t Type
+# Meet Shani Shell: The Desktop of Shani OS — with Chronoa, an Assistant That Asks First
 
 URL: https://blog.shani.dev/post/meet-shani-shell/
 Published: 2026-11-13 · Tag: Ecosystem
