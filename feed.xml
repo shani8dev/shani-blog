@@ -5,8 +5,17 @@
     <link>https://blog.shani.dev/</link>
     <description>Engineering breakdowns, release notes, and stories from the team building India's immutable Linux OS.</description>
     <language>en-IN</language>
-    <lastBuildDate>Fri, 23 Oct 2026 05:31:56 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 13 Nov 2026 12:16:51 GMT</lastBuildDate>
     <atom:link href="https://blog.shani.dev/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Meet Shani Shell: The Desktop of Shani OS — Click, Don''t Type</title>
+      <link>https://blog.shani.dev/post/meet-shani-shell/</link>
+      <guid isPermaLink="true">https://blog.shani.dev/post/meet-shani-shell/</guid>
+      <description>Sign in without typing, find anything from one launcher, 39 apps of its own, your phone built in, a desktop you can drive by keyboard, touch or game controller — and an assistant that asks before it acts. What it does, and what it does not do yet.</description>
+      <pubDate>Fri, 13 Nov 2026 00:00:00 GMT</pubDate>
+      <category>Ecosystem</category>
+      <author>Shrinivas Kumbhar</author>
+    </item>
     <item>
       <title>An AI Agent That Boots and Tests a Linux Distro: Inside shani-testbed</title>
       <link>https://blog.shani.dev/post/shani-testbed-ai-agents/</link>
@@ -447,15 +456,6 @@
       <description>Waydroid runs a full hardware-accelerated Android stack inside a lightweight container on Shani OS — full Play Store access, ARM app compatibility, and native GPU performance. Here is how to set it up and get the most out of it.</description>
       <pubDate>Sat, 18 Apr 2026 00:00:00 GMT</pubDate>
       <category>Guide</category>
-      <author>Shrinivas Kumbhar</author>
-    </item>
-    <item>
-      <title>Flatpak on Shani OS — Your Complete App Management Guide</title>
-      <link>https://blog.shani.dev/post/flatpak-on-shani-os/</link>
-      <guid isPermaLink="true">https://blog.shani.dev/post/flatpak-on-shani-os/</guid>
-      <description>How Flatpak works on Shani OS, what apps are pre-installed, how to install more from Flathub, manage permissions with Flatseal, and why sandboxing is the right model for an immutable system.</description>
-      <pubDate>Fri, 17 Apr 2026 00:00:00 GMT</pubDate>
-      <category>Ecosystem</category>
       <author>Shrinivas Kumbhar</author>
     </item>
   </channel>

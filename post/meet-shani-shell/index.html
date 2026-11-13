@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://giscus.app https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://giscus.app; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' https://shani.dev https://pagead2.googlesyndication.com https://tpc.googlesyndication.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google data:; frame-src https://giscus.app https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://www.google.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google; connect-src 'self' https://api.github.com https://github.com https://giscus.app https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://csi.gstatic.com">
+
+  <title>Meet Shani Shell: The Desktop of Shani OS — Click, Don''t Type — Shanios Blog</title>
+  <meta name="description" id="meta-desc" content="Sign in without typing, find anything from one launcher, 39 apps of its own, your phone built in, a desktop you can drive by keyboard, touch or game controller — and an assistant that asks before it acts. What it does, and what it does not do yet.">
+  <meta name="author"      content="Shrinivas Vishnu Kumbhar">
+  <meta name="robots"      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical"    id="canonical-url" href="https://blog.shani.dev/post/meet-shani-shell/">
+
+  <meta property="og:site_name" id="og-site-name" content="Shanios Blog">
+  <meta property="og:type"      id="og-type"      content="article">
+  <meta property="og:title"     id="og-title"     content="Meet Shani Shell: The Desktop of Shani OS — Click, Don''t Type">
+  <meta property="og:description" id="og-desc"    content="Sign in without typing, find anything from one launcher, 39 apps of its own, your phone built in, a desktop you can drive by keyboard, touch or game controller — and an assistant that asks before it acts. What it does, and what it does not do yet.">
+  <meta property="og:url"       id="og-url"       content="https://blog.shani.dev/post/meet-shani-shell/">
+  <meta property="og:image"     id="og-image"     content="https://blog.shani.dev/assets/images/blog/meet-shani-shell.webp">
+  <meta property="og:image:alt" id="og-image-alt" content="Meet Shani Shell: The Desktop of Shani OS — Click, Don''t Type">
+  <meta property="og:locale"    content="en_US">
+  <meta property="article:published_time" id="og-article-pubtime" content="2026-11-13T00:00:00.000Z">
+  <meta property="article:modified_time"  id="og-article-modtime" content="2026-11-13T00:00:00.000Z">
+  <meta property="article:author"         id="og-article-author"  content="Shrinivas Vishnu Kumbhar">
+  <meta property="article:section"        id="og-article-section" content="Ecosystem">
+  
+
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:site"        id="tw-site"  content="@shani8dev">
+  <meta name="twitter:title"       id="tw-title" content="Meet Shani Shell: The Desktop of Shani OS — Click, Don''t Type">
+  <meta name="twitter:description" id="tw-desc"  content="Sign in without typing, find anything from one launcher, 39 apps of its own, your phone built in, a desktop you can drive by keyboard, touch or game controller — and an assistant that asks before it acts. What it does, and what it does not do yet.">
+  <meta name="twitter:image"       id="tw-image" content="https://blog.shani.dev/assets/images/blog/meet-shani-shell.webp">
+
+  <script type="application/ld+json" id="ld-blogs">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Meet Shani Shell: The Desktop of Shani OS — Click, Don''t Type","description":"Sign in without typing, find anything from one launcher, 39 apps of its own, your phone built in, a desktop you can drive by keyboard, touch or game controller — and an assistant that asks before it acts. What it does, and what it does not do yet.","url":"https://blog.shani.dev/post/meet-shani-shell/","datePublished":"2026-11-13T00:00:00.000Z","dateModified":"2026-11-13T00:00:00.000Z","author":{"@type":"Person","name":"Shrinivas Vishnu Kumbhar"},"publisher":{"@type":"Organization","name":"Shanios","logo":{"@type":"ImageObject","url":"https://shani.dev/assets/images/logo.svg"}},"image":"https://blog.shani.dev/assets/images/blog/meet-shani-shell.webp","isAccessibleForFree":"True"}</script>
+  <script type="application/ld+json" id="ld-org">{"@context":"https://schema.org","@type":"Organization","name":"Shanios","url":"https://shani.dev","logo":"https://shani.dev/assets/images/logo.svg","sameAs":["https://github.com/shani8dev","https://www.linkedin.com/in/Shrinivasvkumbhar/","https://shani.dev","https://docs.shani.dev"]}</script>
+  <link rel="alternate" type="application/rss+xml" title="Shanios Blog RSS Feed" href="/feed.xml">
+
+  <!-- ═══ PERFORMANCE ══════════════════════════════════════════════════════ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <!-- ═══ FAVICON — src overwritten by applyBranding() ═════════════════════ -->
+  <link rel="icon" id="favicon" type="image/svg+xml" href="https://shani.dev/assets/images/logo.svg">
+
+  <!-- ═══ PWA / Web App ════════════════════════════════════════════════════ -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" id="pwa-theme-color" content="#161514">
+
+  <!-- ═══ GitHub Pages SPA: restore real URL from 404.html redirect ════════ -->
+  <script>
+    (function () {
+      var qs = new URLSearchParams(location.search);
+      var p  = qs.get('p');
+      if (!p) return;
+      qs.delete('p');
+      var q = qs.get('q') || ''; qs.delete('q');
+      var h = qs.get('h') || ''; qs.delete('h');
+      var url = decodeURIComponent(p);
+      // Rewrite /posts/slug or /posts/slug.md or /posts/slug/ → /post/slug
+      var postsMatch = url.match(/^\/posts\/(.+?)(?:\.md)?\/?(\?.*)?$/);
+      if (postsMatch) url = '/post/' + postsMatch[1];
+      if (q) url += '?' + decodeURIComponent(q);
+      if (h) url += '#' + decodeURIComponent(h);
+      history.replaceState(null, '', url);
+    })();
+  </script>
+
+  <!-- ═══ Theme — applied before CSS to prevent flash ══════════════════════ -->
+  <script>
+    (function () {
+      // PREFIX is read from CONFIG if available; falls back to 'blogs' for the
+      // very first paint (CONFIG loads after this inline script).
+      try {
+        var pfx = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_PREFIX) ? CONFIG.STORAGE_PREFIX : 'shani';
+        var t = localStorage.getItem(pfx + '_theme') ||
+                (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+
+  <!-- ═══ STYLES ═══════════════════════════════════════════════════════════ -->
+  <link rel="stylesheet" href="/brand-shani.css">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Prism.js — code syntax highlighting -->
+  <link rel="stylesheet" id="prism-theme"
+        href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+  <!-- KaTeX — math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" defer></script>
+
+  <!-- Markdown Parser & Sanitizer -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script>
+
+  <!-- Prism.js Core + Languages -->
+  <!-- All non-critical CDN libs are now `defer`red (were previously blocking
+       HTML parsing) — same pattern already used on docs.shani.dev. `defer`
+       scripts execute in source order right before DOMContentLoaded, so
+       load order relative to each other and to config-shani.js/script.js
+       (also at end of body) is preserved. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hcl.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-nginx.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js" defer></script>
+  <!-- Java / Spring Boot / Kotlin / Groovy / XML / Properties -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-groovy.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-gradle.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-properties.min.js" defer></script>
+</head>
+<body>
+  <noscript>
+    <!-- only script removes the full-screen loader, so without it the
+         overlay covered this notice and every page's prerendered content -->
+    <style>#page-loader{display:none}#page-loader~*{visibility:visible!important}</style>
+    <div style="text-align:center;padding:4rem 2rem;font-family:sans-serif">
+      <strong>JavaScript is required to view this blog.</strong>
+    </div>
+  </noscript>
+
+  <!-- Full-page loading overlay — hidden by JS once posts are ready -->
+  <div id="page-loader" aria-hidden="true">
+    <div class="loader__logo">
+      <img id="loader-logo-img" src="" alt="Blog">
+      <span class="logo__sub"></span>
+    </div>
+    <div class="loader__track"><div class="loader__bar"></div></div>
+    <p class="loader__text">Loading posts…</p>
+  </div>
+
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- ═══ HEADER ══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div class="auspicious-bar">
+      <a href="#" class="auspicious-text" id="auspicious-link" aria-label="Visit site"></a>
+    </div>
+
+    <div class="header__inner container">
+      <a href="/" class="logo logo--img" id="logo-link" aria-label="Blog home">
+        <img src="" alt="Blog" class="logo__img" height="28" id="logo-img">
+        <span class="logo__sub">blog</span>
+      </a>
+
+      <!-- Desktop nav — items injected by applyBranding() -->
+      <nav class="nav" id="desktop-nav" aria-label="Primary"></nav>
+
+      <div class="header__actions">
+        <button class="btn-icon" id="search-toggle" aria-label="Search (Ctrl+K)">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        <button class="btn-icon" id="theme-btn" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
+        <button class="btn-icon" id="shortcuts-hint" aria-label="Keyboard shortcuts (?)" title="Keyboard shortcuts (?)">
+          <i class="fa-solid fa-keyboard"></i>
+        </button>
+        <button class="btn-icon menu-btn" id="menu-toggle"
+                aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile nav — items injected by applyBranding() -->
+    <nav class="mobile-nav container" id="mobile-nav" aria-hidden="true"></nav>
+  </header>
+
+  <!-- ═══ SEARCH BAR ═══════════════════════════════════════════════════════ -->
+  <div class="search-bar" id="search-bar" aria-hidden="true" role="search">
+    <div class="search-bar__inner container">
+      <i class="fa-solid fa-magnifying-glass search-bar__icon" aria-hidden="true"></i>
+      <input type="search" class="search" id="search-input"
+             placeholder="Search posts…" aria-label="Search posts" autocomplete="off">
+      <button class="btn-icon search-bar__close" id="search-close" aria-label="Close search">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+  <div id="search-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+  <div id="reading-bar" role="progressbar" aria-label="Reading progress" aria-hidden="true"></div>
+  <main id="main-content">
+    <!-- INDEX VIEW -->
+    <section id="view-index" style="display:none">
+      <header class="hero container">
+        <div class="hero__grid">
+          <!-- Populated by Renderer.renderHero() -->
+        </div>
+      </header>
+
+      <section class="posts container">
+        <div class="section-header">
+          <h2 class="section-header__title" id="section-title">Latest Posts</h2>
+          <div class="section-header__line"></div>
+        </div>
+        <div class="filters__bar" id="tag-bar" role="toolbar" aria-label="Filter by tag"></div>
+        <div class="grid" id="posts-grid" role="list"></div>
+      </section>
+    </section>
+
+    <!-- POST VIEW -->
+    <section id="view-post" class="container" aria-label="Post">
+      <div class="reading-progress" aria-hidden="true"></div>
+      <article id="post-article">
+      <header class="post-header">
+        <span class="post-tag">Ecosystem</span>
+        <h1 class="post-title">Meet Shani Shell: The Desktop of Shani OS — Click, Don''t Type</h1>
+        <div class="post-meta">
+          <span class="meta-info">Shrinivas Vishnu Kumbhar · 2026-11-13 · 8 min</span>
+        </div>
+      </header>
+      <div class="post-body"><p>Shani Shell is the desktop of Shani OS's niri edition — the bar, the dock, the launcher, the lock and sign-in screens, Quick Settings, notifications and 39 apps, built on the <a href="https://github.com/YaLTeR/niri">niri</a> scrolling compositor with <a href="https://quickshell.org">Quickshell</a>.</p>
+<p>One rule runs through all of it: <strong>everything is a click or a glance away.</strong> You pick settings from choices instead of typing values you would have to know, you sign in without typing a password, and when you are not using it, the desktop costs almost nothing.</p>
+<p><img src="/assets/images/blog/meet-shani-shell-tour-poster.webp" alt="A tour of Shani Shell" loading="lazy"></p>
+<p>The tour in motion, 87 seconds: <a href="/assets/videos/meet-shani-shell-tour.mp4">watch the video</a>.</p>
+<p>Everything in this post was recorded or photographed on a real Shani Shell session. Where something has only been proven in our test session and not yet on real hardware, we say so.</p>
+<hr>
+<h2 id="sign-in-without-typing">Sign in without typing</h2>
+<p>Look at an infrared camera and you are in, as with Windows Hello. Or touch the fingerprint reader, or a YubiKey. Your password always works too, and is still asked for anything that changes the system. The sign-in screen already shows your name and picture — there is no user name to type — and the sign-in screen, the lock screen, first setup and the administrator prompt each have an on-screen keyboard that opens by itself when no keyboard is connected.</p>
+<p><img src="/assets/images/blog/meet-shani-shell/greeter.jpg" alt="The sign-in screen: your name and picture already picked" loading="lazy"></p>
+<p>The lock screen is one you can use: notifications, what is playing, a camera button, restart and power off.</p>
+<p><img src="/assets/images/blog/meet-shani-shell/lock.jpg" alt="The lock screen, with what is playing" loading="lazy"></p>
+<h2 id="a-desktop-that-stays-out-of-your-way">A desktop that stays out of your way</h2>
+<p>A bar, a dock and, in the middle of the bar, the <strong>Island</strong>, which shows what is happening — a recording, a call, a timer, a print job — and acts on it when clicked. The bar and dock step aside when a window needs the room and come back at the edge. There is an overview of every window, Alt+Tab, hot corners, desktop layouts to try on with one click, and the <strong>Ring</strong>, a pie menu at the pointer:</p>
+<p><img src="/assets/images/blog/meet-shani-shell/ring.gif" alt="The Ring, Super+X" loading="lazy"></p>
+<p><img src="/assets/images/blog/meet-shani-shell/overview.jpg" alt="The overview: every workspace and window, live" loading="lazy"></p>
+<p>Windows open the way you choose — glide, pop or dissolve — with the corners, shadow and frosted glass set from Settings, not a config file.</p>
+<p><img src="/assets/images/blog/meet-shani-shell/effects.gif" alt="Windows opening with Dissolve and Pop, slowed down to see" loading="lazy"></p>
+<h2 id="find-anything">Find anything</h2>
+<p>One launcher (<strong>Super + Space</strong>) finds apps, open windows, files and the words inside them, actions like "dark style" or "lock", sums and unit conversions, emoji and your clipboard history. Files is the shell's own file manager, and <strong>Space</strong> on any file shows it without opening an app:</p>
+<p><img src="/assets/images/blog/meet-shani-shell/quicklook.gif" alt="Quick Look in Files" loading="lazy"></p>
+<p><strong>Lens</strong> (<strong>Super + S</strong>) reads any part of the screen on your computer — copy it, search it, translate it, or scan a QR code:</p>
+<p><img src="/assets/images/blog/meet-shani-shell/lens.gif" alt="Lens reads part of the screen" loading="lazy"></p>
+<h2 id="39-apps-of-its-own">39 apps of its own</h2>
+<p>A fresh install is complete without a single download: Files, Text Editor, Media Player (it picks up where you left off, and shrinks to a mini player), Image Viewer, a Document Viewer for PDFs, e-books, comics and DjVu that also fills in PDF forms, Photos, Archive Manager, Calculator, Calendar, Tasks, Clocks, Weather, Notes, Maps with directions, Translate, Camera, Voice Recorder, Characters, Fonts, Disk Usage, Document Scanner, System Monitor, Logs, an Authenticator, Nearby Share (LocalSend), a Converter, a PDF Signer, a Video Trimmer, a Kundali — and Settings. They share one look and one launcher, and open your files by default.</p>
+<p><img src="/assets/images/blog/meet-shani-shell/apps.webp" alt="Files, the Document Viewer and Maps" loading="lazy"></p>
+<h2 id="built-for-everyone">Built for everyone</h2>
+<p>Every control has a name a screen reader can say — checked with real accessibility tools, not assumed. There is large text, high contrast, reduce motion, mono audio, a magnifier, live captions and read-aloud, and the whole desktop can be driven by keyboard alone or by a game controller (A selects, B goes back, Start opens Quick Settings).</p>
+<p><img src="/assets/images/blog/meet-shani-shell/accessibility.jpg" alt="Accessibility settings" loading="lazy"></p>
+<p>For India in particular: the on-screen keyboard has a hand-made Marathi layout where a vowel after a consonant becomes its sign, plus any of xkb's 598 layouts — 45 of them Indian. Handwriting is read on your computer in English, Hindi and Marathi, and fcitx5 comes with Hindi phonetic ready.</p>
+<p><img src="/assets/images/blog/meet-shani-shell/osk.gif" alt="Typing Marathi on the screen keyboard" loading="lazy"></p>
+<p>Or don't type at all: tap the keyboard's microphone and speak. The words are heard on your computer — by the same speech engine Chronoa uses — and typed where you were.</p>
+<p><img src="/assets/images/blog/meet-shani-shell/dictation.gif" alt="Voice typing: the keyboard's microphone, and the words typed into the editor" loading="lazy"></p>
+<p>First setup speaks six languages — English, मराठी, हिन्दी, Deutsch, Español and Français — and offers accessibility from its first screen.</p>
+<p><img src="/assets/images/blog/meet-shani-shell/setup-marathi.jpg" alt="First setup in Marathi" loading="lazy"></p>
+<h2 id="your-devices-and-your-phone">Your devices, and your phone</h2>
+<p>Plug something in and the desktop says what it can do with it, once: a monitor asks whether to extend, mirror or present (Do Not Disturb, and no sleep, until it is unplugged); a camera offers to import; a security key offers sign-in; a game controller shows its battery and a button test. Bluetooth pairing shows the code big and clear.</p>
+<p>With <strong>Shani Link</strong>, your phone is part of the desktop: calls from your phone, a landline or the laptop's own modem ring once, on the Island; texts, one address book and one call history; your Android phone's screen in a window; the screen locks itself when your phone walks out of range.</p>
+<p><img src="/assets/images/blog/meet-shani-shell/call.jpg" alt="A call ringing on the Island" loading="lazy"></p>
+<p>On a handheld, <strong>InputPlumber</strong> makes its built-in controls the kind of controller a game expects, and the guide button opens Quick Settings over the game — the game sees no press until you close it. On a desktop, a <strong>UPS</strong> is watched too: a power cut is said the moment the UPS takes over, with how long it will last.</p>
+<p><img src="/assets/images/blog/meet-shani-shell/controllers.jpg" alt="Game controllers in Settings" loading="lazy"></p>
+<h2 id="power-privacy-and-family">Power, privacy and family</h2>
+<p>Settings shows how worn your battery is and what is keeping the processor busy.</p>
+<p><img src="/assets/images/blog/meet-shani-shell/battery.jpg" alt="Battery health in Settings" loading="lazy"> Laptops sleep and then hibernate so a flat battery never loses your work, fast screens drop to 60 Hz on battery, and every display change is confirmed or undone in 15 seconds. Earlier versions of your files come from daily snapshots, backups go to another drive, and parental controls keep apps a child shouldn't use out of their launcher and dock.</p>
+<h2 id="an-assistant-that-is-part-of-the-desktop-and-asks-first">An assistant that is part of the desktop — and asks first</h2>
+<p>Shani Shell works without an assistant. With <strong>Chronoa</strong> installed (<code>shani-chronoa</code>), it lives in the middle of the bar, runs a model on your own computer, and <strong>asks before it changes anything</strong> — in the bar, without opening a window:</p>
+<p><img src="/assets/images/blog/meet-shani-shell/island.gif" alt="Chronoa asks for approval in the bar" loading="lazy"></p>
+<p>You can ask it from the launcher (<strong>Ctrl + Enter</strong>), about a notification, a file, a window or a terminal error. Select text in any app and <strong>Super + Shift + W</strong> proofreads, rewrites or translates it and puts the result back where it was:</p>
+<p><img src="/assets/images/blog/meet-shani-shell/writing.gif" alt="Writing tools: select text, Super+Shift+W, Proofread, Replace" loading="lazy"></p>
+<p>It also writes suggested replies on message notifications, names files from their own words, and powers live captions and voice typing — all on the machine.</p>
+<h2 id="light-and-tested-by-running-it">Light, and tested by running it</h2>
+<p>At rest the shell draws nothing and starts at most a few programs a minute. The test suite measures exactly that, along with memory, start-up time and leaks, so a feature that polls in the background fails by name. More than 700 checks drive the real shell in a nested session — keystrokes, D-Bus, real daemons — and read back what it did. Recording the clips for this post found and fixed four bugs that reading the code had not: the dock's rounded ends were cut off, Maps stayed blank after a search, an answer from the launcher appeared nowhere, and the cards over Files were see-through.</p>
+<h2 id="what-it-does-not-do-yet">What it does not do yet</h2>
+<p>We would rather you hear this from us:</p>
+<ul>
+<li><strong>Proven in a test session, not yet on an installed image.</strong> Everything above runs in our nested test session. A full run on a real Shani OS install, and the features that need real hardware — Wi-Fi edge cases, real Bluetooth pairing, two screens, face and fingerprint sign-in, the camera, modem calls — still have to be checked on real machines. Our <a href="https://github.com/shani8dev/shani-shell/blob/main/docs/GAPS.md">known gaps</a> list every one.</li>
+<li><strong>Translations are partial.</strong> Marathi and Hindi are translated for the shell's main surfaces (1527 of 2347 strings; the newer app windows and settings still show in English); German, Spanish and French cover setup only.</li>
+<li><strong>What niri cannot give yet:</strong> remote desktop through the portal, colour management, "always on top", sticky keys handled by the compositor.</li>
+<li><strong>Not built:</strong> online accounts, a session chooser at sign-in, and an office suite or browser of our own — those stay Flatpaks.</li>
+</ul>
+<h2 id="try-it">Try it</h2>
+<p>Shani Shell is the desktop of Shani OS's niri edition. On Arch, add the <code>[shani]</code> repository (<code>https://repo.shani.dev/$arch</code>) and install <code>shani-shell shani-desktop-niri</code>; Chronoa is optional.</p>
+<p>The source, every feature with its test, and the known gaps: <strong><a href="https://github.com/shani8dev/shani-shell">github.com/shani8dev/shani-shell</a></strong>.</p></div>
+      </article>
+    </section>
+
+    <!-- MEMBERSHIP PAGE — content rendered by script.js from CONFIG -->
+    <section id="view-membership" class="container" style="display:none" aria-label="Membership">
+      <!-- script.js writes this section's innerHTML from CONFIG on every /membership visit.
+           Razorpay SDK is lazy-loaded by script.js only when this page is visited. -->
+    </section>
+  </main>
+
+  <!-- ═══ FOOTER ══════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="footer__inner container">
+      <span class="footer__brand" id="footer-name">
+        <img src="" alt="Blog" class="logo__img logo__img--footer" height="20" id="footer-logo-img">
+        <span class="logo__sub"></span>
+      </span>
+      <nav class="footer__links" id="footer-links" aria-label="Social links"></nav>
+      <span class="footer__copy">© <span data-current-year></span></span>
+    </div>
+  </footer>
+
+  <!-- Back-to-top -->
+  <button class="to-top" id="back-top" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <!-- ═══ SCRIPTS — config must come first ═════════════════════════════════ -->
+  <script src="/config-shani.js"></script>
+  <script src="/utils.js"></script>
+  <script>
+    // Inject AdSense library if configured — done here so it loads in parallel
+    // with script.js rather than blocking it. The ad unit itself is inserted
+    // mid-post by script.js after the post body is rendered.
+    (function () {
+      var cfg = (typeof CONFIG !== 'undefined') ? CONFIG : {};
+      if (!cfg.ADSENSE_CLIENT) return;
+      if (document.getElementById('adsense-script')) return;
+      var s = document.createElement('script');
+      s.id = 'adsense-script';
+      s.async = true;
+      s.crossOrigin = 'anonymous';
+      s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + cfg.ADSENSE_CLIENT;
+      document.head.appendChild(s);
+    })();
+  </script>
+  <script src="/script.js"></script>
+
+  <!-- ═══ Service worker — offline shell + stale-while-revalidate posts ═══ -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function (e) { console.error('SW failed:', e); });
+    }
+  </script>
+</body>
+</html>

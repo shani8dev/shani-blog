@@ -19,6 +19,7 @@ All posts are also available as full-content HTML at https://blog.shani.dev/post
 
 ## Ecosystem
 
+- [Meet Shani Shell: The Desktop of Shani OS — Click, Don''t Type](https://blog.shani.dev/post/meet-shani-shell/): Sign in without typing, find anything from one launcher, 39 apps of its own, your phone built in, a desktop you can drive by keyboard, touch or game controller — and an assistant that asks before it acts. What it does, and what it does not do yet.
 - [LXC and LXD on Shani OS — Full System Containers](https://blog.shani.dev/post/lxc-lxd-on-shani-os/): LXC and LXD run full Linux system containers on Shani OS — complete OS environments sharing the host kernel, stored in dedicated @lxc and @lxd Btrfs subvolumes that survive every OS update. Lighter than VMs, more complete than Distrobox.
 - [systemd-nspawn and machinectl on Shani OS — Lightweight System Containers](https://blog.shani.dev/post/systemd-nspawn-on-shani-os/): systemd-nspawn is the lightest way to run a full Linux system environment on Shani OS — no image management, no daemon, no setup. Containers boot in under a second, live in the @machines Btrfs subvolume, and survive every OS update untouched.
 - [Kubernetes on Shani OS — From a Single Node to a Production-Grade Cluster](https://blog.shani.dev/post/kubernetes-on-shani-os/): Shani OS and Kubernetes are built for each other. Immutable OS root, Btrfs subvolumes, and fully decoupled lifecycles make it the ideal base for running k3s, RKE2, and the full modern stack — Cilium, ArgoCD, Longhorn, cert-manager, and beyond.
